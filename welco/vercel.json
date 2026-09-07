@@ -8,6 +8,10 @@
     {
       "source": "/files/:path*",
       "destination": "https://welco-gateway.runasp.net/files/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }

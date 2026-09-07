@@ -2140,8 +2140,9 @@ onUnmounted(_removeListeners)
     gap: 0.5rem;
   }
   .dash-head__actions > * {
-    flex: 1 1 calc(50% - 0.5rem);
+    flex: 1 1 100%;
     justify-content: center;
+    min-width: 0;
   }
   .status-badge {
     flex: 1 1 100%;

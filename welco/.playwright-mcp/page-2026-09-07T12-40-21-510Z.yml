@@ -1,0 +1,321 @@
+- generic [ref=f1e1]:
+  - generic [ref=f1e2]:
+    - link "Skip to main content" [ref=f1e3] [cursor=pointer]:
+      - /url: "#main-content"
+    - banner [ref=f1e6]:
+      - generic [ref=f1e8]:
+        - link "Home" [ref=f1e9] [cursor=pointer]:
+          - /url: /admin
+          - img "Welco" [ref=f1e10]
+        - generic [ref=f1e11]:
+          - button "Toggle theme" [ref=f1e12] [cursor=pointer]:
+            - generic [ref=f1e13]: dark_mode
+          - button "AU" [ref=f1e15] [cursor=pointer]
+    - main [ref=f1e18]:
+      - generic [ref=f1e19]:
+        - generic "Navigation" [ref=f1e20]:
+          - link "Dashboard" [ref=f1e21] [cursor=pointer]:
+            - /url: /admin
+          - link "Sales" [ref=f1e22] [cursor=pointer]:
+            - /url: /admin/sales
+          - link "Orders" [ref=f1e23] [cursor=pointer]:
+            - /url: /admin/orders
+          - link "Catalog" [ref=f1e24] [cursor=pointer]:
+            - /url: /admin/catalog
+          - link "Companies" [ref=f1e25] [cursor=pointer]:
+            - /url: /admin/companies
+          - link "Countries" [ref=f1e26] [cursor=pointer]:
+            - /url: /admin/countries
+          - link "Users" [ref=f1e27] [cursor=pointer]:
+            - /url: /admin/users
+          - link "Support Tickets" [ref=f1e28] [cursor=pointer]:
+            - /url: /admin/tickets
+          - link "Audit Logs" [ref=f1e29] [cursor=pointer]:
+            - /url: /admin/audit-logs
+        - generic [ref=f1e31]:
+          - generic [ref=f1e32]:
+            - generic [ref=f1e33]:
+              - generic [ref=f1e34]: Dashboard
+              - heading "Dashboard" [level=1] [ref=f1e37]
+              - paragraph [ref=f1e38]: Maintain the map — countries, cities, zones and user directory
+            - generic [ref=f1e39]:
+              - generic [ref=f1e40]: Gateway Active · Contour live
+              - button "contact_support Support & Contact Channels" [active] [ref=f1e43] [cursor=pointer]:
+                - generic [ref=f1e44]: contact_support
+                - generic [ref=f1e45]: Support & Contact Channels
+              - button "inventory_2 Catalog" [ref=f1e46] [cursor=pointer]:
+                - generic [ref=f1e47]: inventory_2
+                - generic [ref=f1e48]: Catalog
+          - generic [ref=f1e286]:
+            - link "Countries Active Lineage public 0" [ref=f1e287] [cursor=pointer]:
+              - /url: /admin/countries
+              - generic [ref=f1e288]:
+                - generic [ref=f1e289]: Countries
+                - generic [ref=f1e290]:
+                  - generic [ref=f1e291]:
+                    - generic [aria-hidden] [ref=f1e292]: •
+                    - text: Active Lineage
+                  - generic [ref=f1e293]: public
+              - generic [ref=f1e295]: "0"
+            - link "Cities Distribution Hubs location_city 0" [ref=f1e298] [cursor=pointer]:
+              - /url: /admin/cities
+              - generic [ref=f1e299]:
+                - generic [ref=f1e300]: Cities
+                - generic [ref=f1e301]:
+                  - generic [ref=f1e302]:
+                    - generic [aria-hidden] [ref=f1e303]: •
+                    - text: Distribution Hubs
+                  - generic [ref=f1e304]: location_city
+              - generic [ref=f1e306]: "0"
+            - link "Zones Delivery Drop Points my_location 0" [ref=f1e309] [cursor=pointer]:
+              - /url: /admin/zones
+              - generic [ref=f1e310]:
+                - generic [ref=f1e311]: Zones
+                - generic [ref=f1e312]:
+                  - generic [ref=f1e313]:
+                    - generic [aria-hidden] [ref=f1e314]: •
+                    - text: Delivery Drop Points
+                  - generic [ref=f1e315]: my_location
+              - generic [ref=f1e317]: "0"
+            - link "Total Users Platform Accounts group 0" [ref=f1e320] [cursor=pointer]:
+              - /url: /admin/users
+              - generic [ref=f1e321]:
+                - generic [ref=f1e322]: Total Users
+                - generic [ref=f1e323]:
+                  - generic [ref=f1e324]:
+                    - generic [aria-hidden] [ref=f1e325]: •
+                    - text: Platform Accounts
+                  - generic [ref=f1e326]: group
+              - generic [ref=f1e328]: "0"
+            - link "Distributor Applications All Reviewed apartment 0" [ref=f1e331] [cursor=pointer]:
+              - /url: /admin/companies
+              - generic [ref=f1e332]:
+                - generic [ref=f1e333]: Distributor Applications
+                - generic [ref=f1e334]:
+                  - generic [ref=f1e335]:
+                    - generic [aria-hidden] [ref=f1e336]: •
+                    - text: All Reviewed
+                  - generic [ref=f1e337]: apartment
+              - generic [ref=f1e339]: "0"
+            - link "Products inventory_2 0" [ref=f1e342] [cursor=pointer]:
+              - /url: /admin/catalog?tab=products
+              - generic [ref=f1e343]:
+                - generic [ref=f1e344]: Products
+                - generic [ref=f1e345]: inventory_2
+              - generic [ref=f1e348]: "0"
+          - generic [ref=f1e89]:
+            - generic [ref=f1e90]:
+              - generic [ref=f1e91]:
+                - generic [ref=f1e92]:
+                  - generic [ref=f1e93]: OPERATIONAL TELEMETRY
+                  - heading "trending_up Operations Throughput & Activity" [level=3] [ref=f1e96]:
+                    - generic [ref=f1e97]: trending_up
+                    - text: Operations Throughput & Activity
+                - generic [ref=f1e98]:
+                  - generic [ref=f1e99]:
+                    - generic [ref=f1e100]: 7-Mo Operations
+                    - strong [ref=f1e101]: "0"
+                  - generic [ref=f1e102]:
+                    - generic [ref=f1e103]: Peak Volume
+                    - strong [ref=f1e104]: Mar · 0
+                  - generic [ref=f1e105]:
+                    - generic [ref=f1e106]: Run Rate
+                    - strong [ref=f1e107]: 0 ops/mo
+              - img [ref=f1e109]:
+                - generic [ref=f1e110]:
+                  - generic [ref=f1e112] [cursor=pointer]
+                  - generic [ref=f1e113]: Mar
+                - generic [ref=f1e114]:
+                  - generic [ref=f1e116] [cursor=pointer]
+                  - generic [ref=f1e117]: Apr
+                - generic [ref=f1e118]:
+                  - generic [ref=f1e120] [cursor=pointer]
+                  - generic [ref=f1e121]: May
+                - generic [ref=f1e122]:
+                  - generic [ref=f1e124] [cursor=pointer]
+                  - generic [ref=f1e125]: Jun
+                - generic [ref=f1e126]:
+                  - generic [ref=f1e128] [cursor=pointer]
+                  - generic [ref=f1e129]: Jul
+                - generic [ref=f1e130]:
+                  - generic [ref=f1e132] [cursor=pointer]
+                  - generic [ref=f1e133]: Aug
+                - generic [ref=f1e134]:
+                  - generic [ref=f1e136] [cursor=pointer]
+                  - generic [ref=f1e137]: Sep
+            - generic [ref=f1e138]:
+              - generic [ref=f1e140]:
+                - generic [ref=f1e141]:
+                  - generic [ref=f1e142]: share_location
+                  - generic [ref=f1e143]: GEOGRAPHIC HIERARCHY
+                - heading "public Territory Lineage Architecture" [level=3] [ref=f1e144]:
+                  - generic [ref=f1e145]: public
+                  - text: Territory Lineage Architecture
+                - text: 0.0 Cities/Country · 0 Zones/City
+              - generic [ref=f1e146]:
+                - generic [ref=f1e148]:
+                  - generic [ref=f1e149]:
+                    - generic [ref=f1e150]: public
+                    - generic [ref=f1e151]: Countries
+                    - generic [ref=f1e152]: Sovereign Root Lineage
+                  - generic [ref=f1e153]:
+                    - strong [ref=f1e154]: "0"
+                    - generic [ref=f1e155]: 0% depth
+                - generic [ref=f1e158]:
+                  - generic [ref=f1e159]:
+                    - generic [ref=f1e160]: location_city
+                    - generic [ref=f1e161]: Cities
+                    - generic [ref=f1e162]: Regional Distribution Hubs
+                  - generic [ref=f1e163]:
+                    - strong [ref=f1e164]: "0"
+                    - generic [ref=f1e165]: 0% depth
+                - generic [ref=f1e168]:
+                  - generic [ref=f1e169]:
+                    - generic [ref=f1e170]: my_location
+                    - generic [ref=f1e171]: Zones
+                    - generic [ref=f1e172]: Delivery Point Anchors
+                  - generic [ref=f1e173]:
+                    - strong [ref=f1e174]: "0"
+                    - generic [ref=f1e175]: 0% depth
+              - generic [ref=f1e177]:
+                - generic [ref=f1e178]: verified_user
+                - generic [ref=f1e179]: All zones link deterministically into verified country/city governance trees.
+            - generic [ref=f1e180]:
+              - generic [ref=f1e182]:
+                - generic [ref=f1e183]:
+                  - generic [ref=f1e184]: pie_chart
+                  - generic [ref=f1e185]: CATALOG COMPOSITION
+                - heading "donut_small Platform Catalog Breakdown" [level=3] [ref=f1e186]:
+                  - generic [ref=f1e187]: donut_small
+                  - text: Platform Catalog Breakdown
+                - text: 0 verified indexed records
+              - generic [ref=f1e188]:
+                - generic [ref=f1e189]:
+                  - img [ref=f1e190]:
+                    - generic [ref=f1e192] [cursor=pointer]
+                    - generic [ref=f1e193] [cursor=pointer]
+                    - generic [ref=f1e194] [cursor=pointer]
+                    - generic [ref=f1e195] [cursor=pointer]
+                  - generic:
+                    - generic: TOTAL ASSETS
+                    - strong: "0"
+                    - generic: INDEXED ENTITIES
+                - generic [ref=f1e196]:
+                  - link "Products 0 0%" [ref=f1e197] [cursor=pointer]:
+                    - /url: /admin/catalog?tab=products
+                    - generic [ref=f1e199]: Products
+                    - generic [ref=f1e200]: "0"
+                    - generic [ref=f1e201]: 0%
+                  - link "Categories 0 0%" [ref=f1e202] [cursor=pointer]:
+                    - /url: /admin/catalog?tab=categories
+                    - generic [ref=f1e204]: Categories
+                    - generic [ref=f1e205]: "0"
+                    - generic [ref=f1e206]: 0%
+                  - link "Users 0 0%" [ref=f1e207] [cursor=pointer]:
+                    - /url: /admin/users
+                    - generic [ref=f1e209]: Users
+                    - generic [ref=f1e210]: "0"
+                    - generic [ref=f1e211]: 0%
+                  - link "Distributor Applications 0 0%" [ref=f1e212] [cursor=pointer]:
+                    - /url: /admin/companies
+                    - generic [ref=f1e214]: Distributor Applications
+                    - generic [ref=f1e215]: "0"
+                    - generic [ref=f1e216]: 0%
+          - generic [ref=f1e217]:
+            - generic [ref=f1e219]:
+              - generic [ref=f1e220]:
+                - generic [ref=f1e221]: history
+                - generic [ref=f1e222]: AUDIT COMPLIANCE TRAIL
+              - heading "Audit Logs · Live Activity Ledger" [level=2] [ref=f1e223]
+            - generic [ref=f1e224]:
+              - generic [ref=f1e225]: history_toggle_off
+              - generic [ref=f1e226]: No audit activity records found
+          - generic [ref=f1e227]:
+            - generic [ref=f1e229]:
+              - heading "Quick Actions" [level=3] [ref=f1e230]
+              - text: System Administration Shortcuts
+            - generic [ref=f1e231]:
+              - button "add_circle New Product Create new instrument" [ref=f1e232] [cursor=pointer]:
+                - generic [ref=f1e233]: add_circle
+                - generic [ref=f1e234]:
+                  - strong [ref=f1e235]: New Product
+                  - generic [ref=f1e236]: Create new instrument
+              - button "category New Category Surgical specialty" [ref=f1e237] [cursor=pointer]:
+                - generic [ref=f1e238]: category
+                - generic [ref=f1e239]:
+                  - strong [ref=f1e240]: New Category
+                  - generic [ref=f1e241]: Surgical specialty
+              - button "public + New Country Add export destination" [ref=f1e242] [cursor=pointer]:
+                - generic [ref=f1e243]: public
+                - generic [ref=f1e244]:
+                  - strong [ref=f1e245]: + New Country
+                  - generic [ref=f1e246]: Add export destination
+              - button "location_city + New City Distribution Hubs" [ref=f1e247] [cursor=pointer]:
+                - generic [ref=f1e248]: location_city
+                - generic [ref=f1e249]:
+                  - strong [ref=f1e250]: + New City
+                  - generic [ref=f1e251]: Distribution Hubs
+              - button "verified Quality & Certifications ISO / CE / FDA" [ref=f1e252] [cursor=pointer]:
+                - generic [ref=f1e253]: verified
+                - generic [ref=f1e254]:
+                  - strong [ref=f1e255]: Quality & Certifications
+                  - generic [ref=f1e256]: ISO / CE / FDA
+              - button "contact_support Support & Contact Channels Configure public email & WhatsApp" [ref=f1e257] [cursor=pointer]:
+                - generic [ref=f1e258]: contact_support
+                - generic [ref=f1e259]:
+                  - strong [ref=f1e260]: Support & Contact Channels
+                  - generic [ref=f1e261]: Configure public email & WhatsApp
+              - button "storefront Storefront Preview public catalog" [ref=f1e262] [cursor=pointer]:
+                - generic [ref=f1e263]: storefront
+                - generic [ref=f1e264]:
+                  - strong [ref=f1e265]: Storefront
+                  - generic [ref=f1e266]: Preview public catalog
+    - navigation "Navigation" [ref=f1e268]:
+      - link "dashboard Dashboard" [ref=f1e269] [cursor=pointer]:
+        - /url: /admin
+        - generic [ref=f1e270]: dashboard
+        - generic [ref=f1e271]: Dashboard
+      - link "request_quote Sales" [ref=f1e272] [cursor=pointer]:
+        - /url: /admin/sales
+        - generic [ref=f1e273]: request_quote
+        - generic [ref=f1e274]: Sales
+      - link "local_shipping Orders" [ref=f1e275] [cursor=pointer]:
+        - /url: /admin/orders
+        - generic [ref=f1e276]: local_shipping
+        - generic [ref=f1e277]: Orders
+      - link "inventory_2 Catalog" [ref=f1e278] [cursor=pointer]:
+        - /url: /admin/catalog
+        - generic [ref=f1e279]: inventory_2
+        - generic [ref=f1e280]: Catalog
+      - button "All allowed pages" [ref=f1e281] [cursor=pointer]:
+        - generic [ref=f1e282]: apps
+        - generic [ref=f1e284]: More
+  - generic [ref=f1e285]: Dashboard
+  - dialog [ref=f1e352]:
+    - generic [ref=f1e353]:
+      - generic [ref=f1e354]:
+        - heading "Support & Inquiries Channels" [level=3] [ref=f1e355]
+        - button "Close" [ref=f1e356] [cursor=pointer]: ✕
+      - generic [ref=f1e358]:
+        - generic [ref=f1e359]:
+          - generic [ref=f1e360]:
+            - generic [ref=f1e361]: Support Email
+            - generic [aria-hidden] [ref=f1e362]: "*"
+          - textbox "support@example.com" [ref=f1e364]
+        - generic [ref=f1e365]:
+          - generic [ref=f1e366]:
+            - generic [ref=f1e367]:
+              - generic [ref=f1e368]: Telephone (Call Us)
+              - generic [aria-hidden] [ref=f1e369]: "*"
+            - textbox "+1 555 000 0000" [ref=f1e371]
+          - generic [ref=f1e372]:
+            - generic [ref=f1e373]:
+              - generic [ref=f1e374]: WhatsApp Inquiries Number
+              - generic [aria-hidden] [ref=f1e375]: "*"
+            - textbox "+15550000000" [ref=f1e377]
+        - generic [ref=f1e378]:
+          - generic [ref=f1e379]: Working Hours / Availability
+          - 'textbox "Mon - Fri: 8:00 AM - 6:00 PM (GST)" [ref=f1e382]'
+        - generic [ref=f1e383]:
+          - button "Save" [ref=f1e384] [cursor=pointer]
+          - button "Cancel" [ref=f1e385] [cursor=pointer]

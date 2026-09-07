@@ -65,11 +65,8 @@ onMounted(async () => {
   } catch {
     availableCurrencies.value = []
   }
-  // Load exchange rates for conversion, then compute display prices for the
-  // restored cart (the watcher alone won't run when nothing changed yet).
   try { await services.exchangeRateService.loadLatest('USD') } catch { }
   try { await refreshConversions() } catch { }
-  // Derive target currencies from organization addresses (country -> currency)
   try {
     await services.locationService.loadCountries().catch(() => {})
     await companyService.loadMyCompany().catch(() => {})
@@ -80,17 +77,14 @@ onMounted(async () => {
       const countries = locationService.countries.value as unknown as { id: string; code?: string | null; nameEn?: string | null; nameAr?: string | null }[]
       const distinct = distinctCurrenciesFromAddresses(addrs, countries)
       addressCurrencies.value = distinct
-      // Auto-set target to first address currency if not yet chosen or still USD default with items
       if (distinct.length > 0) {
         const current = targetCurrency.value.toUpperCase()
         if (!distinct.includes(current)) {
-          // If user has addresses, prefer first address currency; otherwise keep product currency
           const preferred = distinct[0] as string
           if (preferred) setTargetCurrency(preferred)
         }
       }
     }
-    // Fallback: if still USD and items have different currency, use first product's currency
     if (items.value.length && targetCurrency.value === 'USD' && !addressCurrencies.value.length) {
       const firstCur = (items.value[0]?.product.currencyCode || 'USD').toUpperCase()
       if (firstCur !== 'USD') setTargetCurrency(firstCur)

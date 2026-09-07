@@ -40,13 +40,11 @@ export class AddressService {
     }
     this.loading.value = true
     try {
-      // 1. For regular users / Doctors: load addresses from /api/v1/auth/profile
       const res = await this.authService.loadProfile()
       if (res.ok && res.profile?.addresses) {
         this.addresses.value = res.profile.addresses
         return
       }
-      // 2. For Admin managing user addresses: fallback to user-management repository
       const userId = this.authService.user.value?.id
       if (userId && this.authService.isAdmin.value) {
         this.addresses.value = await this.repo.getUserAddresses(userId)

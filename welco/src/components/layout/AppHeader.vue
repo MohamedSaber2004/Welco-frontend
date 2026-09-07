@@ -290,15 +290,18 @@ watch(isAuthed, (v) => {
   background: var(--wl-surface-soft);
   border: 1px solid var(--wl-border);
   border-radius: 8px;
-  padding: 0.4rem 0.6rem 0.4rem 0.7rem;
+  padding: 0 0.6rem 0 0.7rem;
+  height: 38px;
+  max-height: 38px;
   min-width: 220px;
   max-width: 320px;
   flex-shrink: 1;
   transition: border-color 0.12s, box-shadow 0.12s;
+  overflow: hidden;
 }
 .header__search:focus-within { border-color: var(--wl-primary); box-shadow: var(--wl-focus-ring); background: var(--wl-surface); }
 .header__search-icon { font-size: 18px; color: var(--wl-muted); flex-shrink: 0; }
-.header__search input { flex: 1; min-width: 0; border: none; background: transparent; outline: none; font-size: 13px; color: var(--wl-ink); }
+.header__search input { flex: 1; min-width: 0; min-height: 0; height: 100%; border: none; background: transparent; outline: none; font-size: 13px; color: var(--wl-ink); }
 .header__search input::placeholder { color: var(--wl-muted); }
 [dir="rtl"] .header__search input { direction: rtl; text-align: right; }
 .header__search-kbd {

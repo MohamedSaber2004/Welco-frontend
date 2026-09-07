@@ -1,0 +1,62 @@
+- generic [active] [ref=f1e1]:
+  - generic [ref=f1e2]:
+    - link "Skip to main content" [ref=f1e3] [cursor=pointer]:
+      - /url: "#main-content"
+    - banner [ref=f1e4]:
+      - generic [ref=f1e6]:
+        - link "Home" [ref=f1e7] [cursor=pointer]:
+          - /url: /
+          - img "Welco" [ref=f1e8]
+        - generic [ref=f1e9]:
+          - link "Wishlist" [ref=f1e10] [cursor=pointer]:
+            - /url: /wishlist
+            - generic [ref=f1e11]: favorite
+          - link "Quote Cart" [ref=f1e12] [cursor=pointer]:
+            - /url: /cart
+            - generic [ref=f1e13]: shopping_bag
+          - button "Toggle theme" [ref=f1e14] [cursor=pointer]:
+            - generic [ref=f1e15]: dark_mode
+          - button "BU" [ref=f1e17] [cursor=pointer]
+          - button "Toggle menu" [ref=f1e20] [cursor=pointer]
+    - main [ref=f1e24]:
+      - generic [ref=f1e25]:
+        - button "Back" [ref=f1e26] [cursor=pointer]:
+          - generic [aria-hidden] [ref=f1e27]: arrow_back
+        - navigation "Breadcrumb" [ref=f1e29]:
+          - link "Home" [ref=f1e30] [cursor=pointer]:
+            - /url: /
+          - generic [ref=f1e31]: /
+          - generic [ref=f1e32]: Track Order
+        - generic [ref=f1e33]:
+          - generic [ref=f1e34]: GLOBAL SUPPLY CHAIN · LIVE CONSIGNMENT TRACKING
+          - heading "Track an order" [level=1] [ref=f1e37]
+          - paragraph [ref=f1e38]: Enter your order number to see live status. No account needed.
+        - generic [ref=f1e40]:
+          - generic [ref=f1e41]:
+            - generic: local_shipping
+            - textbox "Order number" [ref=f1e42]:
+              - /placeholder: e.g. ORD-20260831-ABC123
+          - button "search Track" [disabled] [ref=f1e43]:
+            - generic [ref=f1e44]: search
+            - generic [ref=f1e45]: Track
+    - navigation "Navigation" [ref=f1e47]:
+      - link "home Home" [ref=f1e48] [cursor=pointer]:
+        - /url: /
+        - generic [ref=f1e49]: home
+        - generic [ref=f1e50]: Home
+      - link "storefront Marketplace" [ref=f1e51] [cursor=pointer]:
+        - /url: /marketplace
+        - generic [ref=f1e52]: storefront
+        - generic [ref=f1e53]: Marketplace
+      - link "dashboard Account" [ref=f1e54] [cursor=pointer]:
+        - /url: /account
+        - generic [ref=f1e55]: dashboard
+        - generic [ref=f1e56]: Account
+      - link "shopping_bag Quote Cart" [ref=f1e57] [cursor=pointer]:
+        - /url: /cart
+        - generic [ref=f1e58]: shopping_bag
+        - generic [ref=f1e60]: Quote Cart
+      - button "All allowed pages" [ref=f1e61] [cursor=pointer]:
+        - generic [ref=f1e62]: apps
+        - generic [ref=f1e64]: More
+  - generic [ref=f1e65]: Track an order

@@ -521,4 +521,60 @@ async function track() {
   color: #4F46E5;
   background: #EEF2FF;
 }
+
+@media (max-width: 640px) {
+  .track-search-card {
+    padding: 1rem;
+  }
+  .track-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .input-icon-wrap {
+    min-width: 0;
+    flex: 1 1 100%;
+  }
+  .btn-track-submit {
+    width: 100%;
+    justify-content: center;
+  }
+  .result-card {
+    padding: 1.1rem 1rem;
+    min-width: 0;
+  }
+  .card-head-row {
+    flex-wrap: wrap;
+  }
+  .order-heading {
+    font-size: 1.15rem;
+    overflow-wrap: anywhere;
+  }
+  .stepper-zone {
+    overflow-x: auto;
+    margin: 0 -0.25rem;
+    padding: 0.5rem 0.25rem;
+  }
+  .stepper-zone .chain-steps {
+    min-width: 430px;
+  }
+  .line-item-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.4rem;
+  }
+  .line-item-meta {
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+  .action-footer-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .action-footer-row .btn-action-ghost {
+    justify-content: center;
+  }
+  .foot-total {
+    font-size: 1.15rem;
+  }
+}
 </style>

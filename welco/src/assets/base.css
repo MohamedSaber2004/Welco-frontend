@@ -804,7 +804,9 @@ html[dir='rtl'] input.mono-num::placeholder {
 
 /* ── Compact inputs, project-wide ──
    Shrinks the legacy 48px copy-pasted input classes down to the 40px
-   design-system height. !important beats the per-view scoped copies. */
+   design-system height. !important beats the per-view scoped copies.
+   NOTE: inline (start/end) padding is intentionally untouched — auth
+   inputs reserve gutters there for icons and password toggles. */
 .vip-input,
 .vip-select,
 .vip-48-input,
@@ -813,8 +815,6 @@ html[dir='rtl'] input.mono-num::placeholder {
   height: 40px !important;
   padding-top: 0 !important;
   padding-bottom: 0 !important;
-  padding-inline-start: 0.8rem !important;
-  padding-inline-end: 0.8rem !important;
   font-size: 13.5px !important;
 }
 textarea.vip-input {
@@ -822,6 +822,26 @@ textarea.vip-input {
   min-height: 96px !important;
   padding-top: 0.6rem !important;
   padding-bottom: 0.6rem !important;
+}
+
+/* Hover feedback for the legacy auth input classes (they define none). */
+.vip-input:hover:not(:disabled):not(:focus),
+.vip-select:hover:not(:disabled):not(:focus),
+.vip-48-input:hover:not(:disabled):not(:focus),
+.vip-track-input:hover:not(:disabled):not(:focus) {
+  border-color: var(--wl-border-strong) !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06) !important;
+}
+
+/* Google's Material Symbols webfont pins `direction: ltr` on
+   .material-symbols-outlined, which freezes `inset-inline-start/end`
+   adornment icons (input/search icons) to the left in RTL layouts.
+   Inherit instead so they mirror with their container; single-ligature
+   glyph rendering is unaffected. Higher specificity beats the
+   cross-origin font stylesheet regardless of load order. */
+span.material-symbols-outlined,
+i.material-symbols-outlined {
+  direction: inherit;
 }
 
 /* ── Responsive inputs for all devices ── */

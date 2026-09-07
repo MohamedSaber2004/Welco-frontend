@@ -14,7 +14,6 @@ const password = ref('')
 const loading = ref(false)
 const error = ref('')
 const showPassword = ref(false)
-const rememberMe = ref(false)
 
 const handleLogin = async () => {
   error.value = ''
@@ -82,7 +81,7 @@ const handleLogin = async () => {
             {{ t('auth.forgotPassword') }}
           </router-link>
         </div>
-        <div class="input-wrap input-wrap--ltr">
+        <div class="input-wrap">
           <span class="material-symbols-outlined input-icon">lock</span>
           <input
             id="login-password"
@@ -102,13 +101,6 @@ const handleLogin = async () => {
             <span class="material-symbols-outlined">{{ showPassword ? 'visibility_off' : 'visibility' }}</span>
           </button>
         </div>
-      </div>
-
-      <div class="form-options">
-        <label class="checkbox-label">
-          <input v-model="rememberMe" type="checkbox" class="vip-checkbox" />
-          <span>{{ t('auth.rememberMe') }}</span>
-        </label>
       </div>
 
       <div v-if="error" class="form-error-banner" role="alert">
@@ -239,31 +231,6 @@ const handleLogin = async () => {
 
 .pwd-toggle-btn:hover {
   color: var(--wl-primary);
-}
-
-.form-options {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: 0.55rem;
-  font-size: 13px;
-  color: #475569;
-  cursor: pointer;
-  user-select: none;
-}
-
-.vip-checkbox {
-  width: 16px;
-  height: 16px;
-  border-radius: 4px;
-  border: 1.5px solid var(--wl-border-strong);
-  accent-color: var(--wl-primary);
-  cursor: pointer;
 }
 
 .form-error-banner {

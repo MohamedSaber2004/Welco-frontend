@@ -193,7 +193,7 @@ const handleRegister = async () => {
             <label class="form-label mono" for="reg-password">
               {{ t('auth.password') }} <span class="req">*</span>
             </label>
-            <div class="input-wrap input-wrap--ltr">
+            <div class="input-wrap">
               <span class="material-symbols-outlined input-icon">lock</span>
               <input
                 id="reg-password"
@@ -238,7 +238,7 @@ const handleRegister = async () => {
             <label class="form-label mono" for="reg-confirm">
               {{ t('auth.confirmPassword') }} <span class="req">*</span>
             </label>
-            <div class="input-wrap input-wrap--ltr">
+            <div class="input-wrap">
               <span class="material-symbols-outlined input-icon">lock</span>
               <input
                 id="reg-confirm"

@@ -108,7 +108,7 @@ const handleReset = async () => {
           <label class="form-label mono" for="reset-new-password">
             {{ t('auth.newPassword') }} <span class="req">*</span>
           </label>
-          <div class="input-wrap input-wrap--ltr">
+          <div class="input-wrap">
             <span class="material-symbols-outlined input-icon">lock</span>
             <input
               id="reset-new-password"
@@ -154,7 +154,7 @@ const handleReset = async () => {
           <label class="form-label mono" for="reset-confirm">
             {{ t('auth.confirmPassword') }} <span class="req">*</span>
           </label>
-          <div class="input-wrap input-wrap--ltr">
+          <div class="input-wrap">
             <span class="material-symbols-outlined input-icon">lock</span>
             <input
               id="reset-confirm"

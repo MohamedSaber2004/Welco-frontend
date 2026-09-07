@@ -175,7 +175,8 @@ export class ContentService {
   async loadSupportContact(): Promise<SupportContactDto> {
     try {
       const data = await this.repo.getSupportContact()
-      if (data) {
+      // Keep last-known-good: an empty/failed fetch must not blank the footer.
+      if (data && (data.supportEmail || data.phoneNumber || data.whatsAppNumber)) {
         this.supportContact.value = data
       }
       return this.supportContact.value

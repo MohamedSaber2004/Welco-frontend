@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { t } from '../../i18n'
-import { services } from '../../di/container'
+import { authService, services } from '../../di/container'
 
 const support = computed(() => services.contentService.supportContact.value)
+// Footer shows general guest links only; account links render for authed users.
+const isAuthed = computed(() => authService.isAuthenticated)
 </script>
 
 <template>
   <footer class="footer">
-    <div class="footer__inner">
+    <div class="footer__inner" :class="{ 'is-guest': !isAuthed }">
       <div class="footer__brand">
         <div class="footer__logo">
           <img src="/logo.jpeg" alt="Welco" width="120" height="28" loading="lazy" />
@@ -27,11 +29,9 @@ const support = computed(() => services.contentService.supportContact.value)
         <router-link to="/marketplace" class="footer__link">{{ t('nav.marketplace') }}</router-link>
         <router-link to="/certifications" class="footer__link">{{ t('nav.certifications') }}</router-link>
         <router-link to="/oem" class="footer__link">{{ t('nav.oem') }}</router-link>
-        <router-link to="/marketplace" class="footer__link">{{ t('footer.generalSurgery') }}</router-link>
-        <router-link to="/marketplace" class="footer__link">{{ t('footer.orthopedicLine') }}</router-link>
       </div>
 
-      <div class="footer__col">
+      <div v-if="isAuthed" class="footer__col">
         <h4>{{ t('footer.account') }}</h4>
         <router-link to="/account" class="footer__link">{{ t('nav.account') }}</router-link>
         <router-link to="/account/rfqs" class="footer__link">{{ t('sales.rfqTitle') }}</router-link>
@@ -43,14 +43,14 @@ const support = computed(() => services.contentService.supportContact.value)
       <div class="footer__col">
         <h4>{{ t('footer.support') }}</h4>
         <router-link to="/help" class="footer__link">{{ t('footer.helpCenter') }}</router-link>
-        <router-link to="/help/my-tickets" class="footer__link">{{ t('help.myTickets') }}</router-link>
-        <router-link to="/track-order" class="footer__link">{{ t('nav.trackOrder') }}</router-link>
+        <router-link v-if="isAuthed" to="/help/my-tickets" class="footer__link">{{ t('help.myTickets') }}</router-link>
         <a v-if="support.supportEmail" class="footer__link" :href="'mailto:' + support.supportEmail">
           {{ support.supportEmail }}
         </a>
         <a v-if="support.phoneNumber" class="footer__link" :href="'tel:' + support.phoneNumber.replace(/\s+/g, '')">
           {{ support.phoneNumber }}
         </a>
+        <span v-if="support.workingHours" class="footer__note mono">{{ support.workingHours }}</span>
       </div>
     </div>
 
@@ -95,6 +95,9 @@ const support = computed(() => services.contentService.supportContact.value)
   display: grid;
   grid-template-columns: 1.5fr repeat(3, 1fr);
   gap: 2.5rem;
+}
+.footer__inner.is-guest {
+  grid-template-columns: 1.5fr repeat(2, 1fr);
 }
 
 .footer__logo {
@@ -163,6 +166,14 @@ const support = computed(() => services.contentService.supportContact.value)
 .footer__link:hover {
   color: var(--wl-primary);
   transform: translateX(2px);
+}
+
+.footer__note {
+  display: block;
+  font-size: 10.5px;
+  color: var(--wl-muted);
+  padding: 0.35rem 0;
+  line-height: 1.5;
 }
 [dir='rtl'] .footer__link:hover {
   transform: translateX(-2px);

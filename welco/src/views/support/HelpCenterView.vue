@@ -173,6 +173,40 @@ onMounted(async () => {
 function categoryName(id: string): string {
   return categories.value.find((c) => c.id === id)?.name ?? id
 }
+
+// Images that 404 — those cards fall back to an icon instead of a broken frame.
+const brokenThumbs = ref(new Set<string>())
+function markThumbBroken(key: string): void {
+  brokenThumbs.value.add(key)
+}
+
+function categoryIconName(icon?: string | null, fallback = 'article'): string {
+  const raw = (icon ?? '').trim()
+  if (!raw) return fallback
+  if (isStoredFileName(raw)) return fallback
+  return ICONS[raw] ?? (/^[a-z_]+$/.test(raw) ? raw : fallback)
+}
+
+interface CategoryVisual {
+  kind: 'img' | 'icon'
+  src: string
+  name: string
+}
+
+/**
+ * Visual for a help category, resolved from backend data only:
+ * stored upload -> image, otherwise a material icon. Articles carry no
+ * image of their own, so they reuse their category's visual.
+ */
+function categoryVisual(categoryId?: string | null, fallback = 'article'): CategoryVisual {
+  const cat = categories.value.find((c) => c.id === categoryId)
+  const icon = (cat?.icon ?? '').trim()
+  if (cat && icon && isStoredFileName(icon) && !brokenThumbs.value.has(`cat:${cat.id}`)) {
+    const src = resolveFileUrl(icon, '')
+    if (src) return { kind: 'img', src, name: categoryIconName(icon, fallback) }
+  }
+  return { kind: 'icon', src: '', name: categoryIconName(icon, fallback) }
+}
 </script>
 
 <template>
@@ -338,7 +372,15 @@ function categoryName(id: string): string {
 
             <div class="help-card__top">
               <div class="hc-icon-wrapper" :style="{ color: card.def.color, background: `${card.def.color}14` }">
-                <span class="material-symbols-outlined hc-icon">{{ card.def.icon }}</span>
+                <img
+                  v-if="categoryVisual(card.cat?.id, 'menu_book').kind === 'img'"
+                  :src="categoryVisual(card.cat?.id, 'menu_book').src"
+                  alt=""
+                  loading="lazy"
+                  class="hc-thumb-img"
+                  @error="markThumbBroken(`cat:${card.cat?.id}`)"
+                />
+                <span v-else class="material-symbols-outlined hc-icon">{{ categoryVisual(card.cat?.id, 'menu_book').name }}</span>
               </div>
               <span class="help-card__tag mono">{{ card.def.tag }}</span>
             </div>
@@ -414,9 +456,22 @@ function categoryName(id: string): string {
         >
           <div class="article-grid">
             <article v-for="a in filteredArticles" :key="a.id" class="article-card">
-              <div class="article-card__meta">
-                <span class="article-cat mono">{{ categoryName(a.categoryId) }}</span>
-                <span class="article-read-time mono">{{ t('help.readTime', { minutes: 3 }) }}</span>
+              <div class="article-card__head">
+                <span class="article-thumb" aria-hidden="true">
+                  <img
+                    v-if="categoryVisual(a.categoryId).kind === 'img'"
+                    :src="categoryVisual(a.categoryId).src"
+                    alt=""
+                    loading="lazy"
+                    class="article-thumb__img"
+                    @error="markThumbBroken(`cat:${a.categoryId}`)"
+                  />
+                  <span v-else class="material-symbols-outlined">{{ categoryVisual(a.categoryId).name }}</span>
+                </span>
+                <div class="article-card__meta">
+                  <span class="article-cat mono">{{ categoryName(a.categoryId) }}</span>
+                  <span class="article-read-time mono">{{ t('help.readTime', { minutes: 3 }) }}</span>
+                </div>
               </div>
               <h3 class="article-card__title">{{ a.title }}</h3>
               <p class="article-card__body">{{ a.body }}</p>
@@ -1126,6 +1181,14 @@ function categoryName(id: string): string {
   font-size: 20px;
 }
 
+.hc-thumb-img {
+  width: 22px;
+  height: 22px;
+  object-fit: cover;
+  border-radius: 6px;
+  display: block;
+}
+
 .help-card__tag {
   font-size: 9.5px;
   font-weight: 700;
@@ -1304,6 +1367,36 @@ function categoryName(id: string): string {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex: 1;
+  min-width: 0;
+  gap: 0.5rem;
+}
+
+.article-card__head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.article-thumb {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  background: var(--wl-surface-soft);
+  border: 1px solid var(--wl-border);
+  color: var(--wl-teal);
+  overflow: hidden;
+  font-size: 20px;
+}
+
+.article-thumb__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .article-cat {

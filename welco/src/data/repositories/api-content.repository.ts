@@ -177,28 +177,44 @@ export class ApiContentRepository implements ContentRepository {
     return await this.http.post<import('../../domain/models/content').SupportTicketDto>(SUPPORT_ROUTES.ticketClose(id), {})
   }
 
+  private toSupportContact(raw: unknown): SupportContactDto {
+    // Backend may return the DTO directly, PascalCase keys, or an empty
+    // paginated/401 shell (data: []). Normalize to a valid DTO always.
+    const src = raw && typeof raw === 'object' && !Array.isArray(raw) ? (raw as Record<string, unknown>) : {}
+    const payload =
+      src.data && typeof src.data === 'object' && !Array.isArray(src.data)
+        ? (src.data as Record<string, unknown>)
+        : src
+    const pick = (...keys: string[]): string => {
+      for (const k of keys) {
+        const v = payload[k]
+        if (typeof v === 'string' && v.trim()) return v.trim()
+      }
+      return ''
+    }
+    const str = (v: unknown): string | undefined =>
+      typeof v === 'string' && v.trim() ? v.trim() : undefined
+    return {
+      id: str(payload.id ?? payload.Id),
+      supportEmail: pick('supportEmail', 'SupportEmail', 'email', 'Email'),
+      phoneNumber: pick('phoneNumber', 'PhoneNumber', 'phone', 'Phone'),
+      whatsAppNumber: pick('whatsAppNumber', 'WhatsAppNumber', 'whatsapp', 'Whatsapp'),
+      workingHours: pick('workingHours', 'WorkingHours') || undefined,
+      updatedAt: str(payload.updatedAt ?? payload.UpdatedAt),
+    }
+  }
+
   async getSupportContact(): Promise<SupportContactDto> {
     try {
-      const res = await this.http.get<SupportContactDto | { data: SupportContactDto }>(SUPPORT_ROUTES.contact, { showFeedback: false })
-      if (res && typeof res === 'object' && 'data' in res && res.data) {
-        return res.data as SupportContactDto
-      }
-      return res as SupportContactDto
+      const res = await this.http.get<unknown>(SUPPORT_ROUTES.contact, { showFeedback: false })
+      return this.toSupportContact(res)
     } catch {
-      return {
-        supportEmail: '',
-        phoneNumber: '',
-        whatsAppNumber: '',
-        workingHours: '',
-      }
+      return this.toSupportContact(null)
     }
   }
 
   async updateSupportContact(payload: UpdateSupportContactPayload): Promise<SupportContactDto> {
-    const res = await this.http.put<SupportContactDto | { data: SupportContactDto }>(SUPPORT_ROUTES.contact, payload)
-    if (res && typeof res === 'object' && 'data' in res && res.data) {
-      return res.data as SupportContactDto
-    }
-    return res as SupportContactDto
+    const res = await this.http.put<unknown>(SUPPORT_ROUTES.contact, payload)
+    return this.toSupportContact(res)
   }
 }

@@ -124,7 +124,7 @@ watch(isAuthed, (v) => {
           <span v-if="cartCount > 0" class="icon-btn__badge">{{ cartCount > 9 ? '9+' : cartCount }}</span>
         </router-link>
 
-        <button class="icon-btn" :aria-label="t('nav.toggleTheme')" @click="toggleTheme">
+        <button v-if="isAuthed" class="icon-btn" :aria-label="t('nav.toggleTheme')" @click="toggleTheme">
           <span class="material-symbols-outlined" style="font-size:16px">{{ theme === 'light' ? 'dark_mode' : 'light_mode' }}</span>
         </button>
 

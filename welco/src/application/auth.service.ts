@@ -1,7 +1,7 @@
 import { computed, ref } from 'vue'
 import { t, type MessageKey } from '../i18n'
 import type { User, AuthResponseDto, UserProfileDto } from '../domain/models/user'
-import { USER_TINTS } from '../domain/models/user'
+import { USER_TINTS, normalizeThemeMode } from '../domain/models/user'
 import type { AuthRepository } from '../domain/ports/auth-repository'
 import type {
   LoginPayload,
@@ -46,6 +46,7 @@ const nameToUser = (raw: AuthResponseDto | UserProfileDto): User => {
     profilePictureName: 'profilePictureName' in raw ? (raw.profilePictureName ?? null) : null,
     userType: raw.userType,
     language: raw.language,
+    themeMode: normalizeThemeMode((raw as { themeMode?: unknown }).themeMode ?? (raw as { ThemeMode?: unknown }).ThemeMode ?? null),
     isEmailConfirmed: 'isEmailConfirmed' in raw ? Boolean((raw as UserProfileDto).isEmailConfirmed) : true,
     createdAt: 'createdAt' in raw ? String((raw as UserProfileDto).createdAt) : new Date().toISOString(),
     roles: raw.roles ?? [],
@@ -398,12 +399,15 @@ export class AuthService {
     }
   }
 
-  async updateProfile(payload: UpdateProfilePayload): Promise<AuthResult & { profile?: UserProfileDto }> {
+  async updateProfile(
+    payload: UpdateProfilePayload,
+    opts?: { silent?: boolean },
+  ): Promise<AuthResult & { profile?: UserProfileDto }> {
     if (!this.user.value) return { ok: false, error: t('auth.errSessionExpired') }
     try {
       const profile = await this.authRepository.updateProfile(payload)
       this.updateUserFromProfile(profile)
-      toastService.success(t('profile.savedToast'))
+      if (!opts?.silent) toastService.success(t('profile.savedToast'))
       return { ok: true, profile }
     } catch (err) {
       return { ok: false, error: toErrorMessage(err, 'auth.errGeneric') }

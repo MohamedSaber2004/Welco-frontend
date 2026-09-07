@@ -1,23 +1,40 @@
 import { ref, watch } from 'vue'
 import { authService } from '../di/container'
+import { ThemeMode, normalizeThemeMode } from '../domain/models/user'
 
 export type Theme = 'light' | 'dark'
 
 /**
- * Dark mode is an authenticated-users-only feature.
- * Guests are always pinned to the light (white) theme: stored/OS dark
- * preferences are ignored until login, and the toggle is hidden.
+ * Theme rules:
+ * - Default mode is WHITE (light) for everyone — no OS sniffing.
+ * - Dark mode is an authenticated-users-only feature; guests stay white.
+ * - Per-user mode persists to the backend (`User.ThemeMode`: 1 = White,
+ *   2 = Dark). localStorage is the offline fallback and wins only when the
+ *   backend has no value yet. Until the backend exposes the column,
+ *   everything runs on localStorage alone.
  */
 
 const STORAGE_KEY = 'welco-theme'
 
-const prefersDark = (): boolean =>
-  typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches
+const themeFromMode = (mode: ThemeMode | null | undefined): Theme =>
+  mode === ThemeMode.Dark ? 'dark' : 'light'
+
+const modeFromTheme = (theme: Theme): ThemeMode =>
+  theme === 'dark' ? ThemeMode.Dark : ThemeMode.White
 
 const readStoredTheme = (): Theme => {
   const stored = localStorage.getItem(STORAGE_KEY)
-  if (stored === 'dark' || stored === 'light') return stored
-  return prefersDark() ? 'dark' : 'light'
+  return stored === 'dark' ? 'dark' : 'light'
+}
+
+/** Effective theme for the current session: server value first, then stored, else white. */
+const resolveSessionTheme = (): Theme => {
+  const user = authService.user.value
+  if (!user) return 'light'
+  if (user.themeMode === ThemeMode.White || user.themeMode === ThemeMode.Dark) {
+    return themeFromMode(user.themeMode)
+  }
+  return readStoredTheme()
 }
 
 const THEME_COLOR: Record<Theme, string> = { light: '#F8FAFC', dark: '#09090B' }
@@ -36,42 +53,49 @@ const applyTheme = (next: Theme) => {
   if (meta) meta.content = THEME_COLOR[next]
 }
 
-export const theme = ref<Theme>(authService.isAuthenticated ? readStoredTheme() : 'light')
+export const theme = ref<Theme>(resolveSessionTheme())
 
 applyTheme(theme.value)
 
-// Follow OS preference when the user hasn't chosen explicitly —
-// authenticated users only; guests stay on light.
-if (typeof window !== 'undefined' && !localStorage.getItem(STORAGE_KEY)) {
-  const mql = window.matchMedia('(prefers-color-scheme: dark)')
-  const onChange = (e: MediaQueryListEvent) => {
-    if (!authService.isAuthenticated) return
-    const next: Theme = e.matches ? 'dark' : 'light'
-    theme.value = next
-    document.documentElement.classList.add('theme-transition')
-    applyTheme(next)
-    setTimeout(() => document.documentElement.classList.remove('theme-transition'), 320)
-  }
-  // Safari <14 fallback
-  if (typeof mql.addEventListener === 'function') mql.addEventListener('change', onChange)
-  else (mql as unknown as { addListener: (cb: (e: MediaQueryListEvent) => void) => void }).addListener(onChange)
+/** Push the mode to the backend profile (fire-and-forget; local wins on failure). */
+const persistModeToBackend = (next: Theme) => {
+  if (!authService.isAuthenticated) return
+  const user = authService.user.value
+  const mode = modeFromTheme(next)
+  if (user) user.themeMode = mode
+  void authService
+    .updateProfile({ themeMode: mode }, { silent: true })
+    .then((res) => {
+      // If the backend echoes the saved mode, converge to it (covers any
+      // server-side coercion). updateUserFromProfile already applied it to
+      // the session user, so this only corrects drift.
+      if (res.ok && res.profile) {
+        const raw = res.profile as unknown as Record<string, unknown>
+        const serverMode = normalizeThemeMode(raw.themeMode ?? raw.ThemeMode)
+        if (serverMode) {
+          const normalized = themeFromMode(serverMode)
+          if (normalized !== theme.value && authService.isAuthenticated) {
+            theme.value = normalized
+            localStorage.setItem(STORAGE_KEY, normalized)
+            applyTheme(normalized)
+          }
+        }
+      }
+    })
+    .catch(() => {})
 }
 
 /**
  * Keep the theme in sync with auth state (call once at boot):
- * - logout/expiry -> force light (stored preference is kept for next login)
- * - login -> restore the user's stored/OS preference
+ * - guest -> white
+ * - login/restored session -> backend ThemeMode, else stored choice, else white
  */
 export const applyAuthGatedTheme = () => {
   const sync = () => {
-    if (!authService.isAuthenticated) {
-      if (theme.value !== 'light') {
-        theme.value = 'light'
-        applyTheme('light')
-      }
-    } else if (theme.value !== readStoredTheme()) {
-      theme.value = readStoredTheme()
-      applyTheme(theme.value)
+    const next = resolveSessionTheme()
+    if (theme.value !== next) {
+      theme.value = next
+      applyTheme(next)
     }
   }
   sync()
@@ -81,7 +105,7 @@ export const applyAuthGatedTheme = () => {
 let transitionTimer: ReturnType<typeof setTimeout> | null = null
 
 export const toggleTheme = () => {
-  // Guests are pinned to light — no path may enable dark for them.
+  // Guests are pinned to white — no path may enable dark for them.
   if (!authService.isAuthenticated) {
     if (theme.value !== 'light') {
       theme.value = 'light'
@@ -89,8 +113,9 @@ export const toggleTheme = () => {
     }
     return
   }
-  theme.value = theme.value === 'light' ? 'dark' : 'light'
-  localStorage.setItem(STORAGE_KEY, theme.value)
+  const next: Theme = theme.value === 'light' ? 'dark' : 'light'
+  theme.value = next
+  localStorage.setItem(STORAGE_KEY, next)
   if (typeof document !== 'undefined') {
     document.documentElement.classList.add('theme-transition')
     if (transitionTimer) clearTimeout(transitionTimer)
@@ -98,5 +123,6 @@ export const toggleTheme = () => {
       document.documentElement.classList.remove('theme-transition')
     }, 320)
   }
-  applyTheme(theme.value)
+  applyTheme(next)
+  persistModeToBackend(next)
 }

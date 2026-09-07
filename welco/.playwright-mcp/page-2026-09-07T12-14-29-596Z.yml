@@ -1,0 +1,64 @@
+- generic [ref=f15e2]:
+  - link "Skip to main content" [ref=f15e3] [cursor=pointer]:
+    - /url: "#main-content"
+  - banner [ref=f15e6]:
+    - generic [ref=f15e8]:
+      - link "Home" [ref=f15e9] [cursor=pointer]:
+        - /url: /
+        - img "Welco" [ref=f15e10]
+      - generic [ref=f15e11]:
+        - link "Quote Cart" [ref=f15e12] [cursor=pointer]:
+          - /url: /cart
+          - generic [ref=f15e13]: shopping_bag
+        - button "Login" [ref=f15e14] [cursor=pointer]:
+          - generic [ref=f15e15]: person
+        - button "Toggle menu" [ref=f15e16] [cursor=pointer]
+  - main [ref=f15e20]
+  - contentinfo [ref=f15e21]:
+    - generic [ref=f15e22]:
+      - generic [ref=f15e23]:
+        - generic [ref=f15e24]:
+          - img "Welco" [ref=f15e25]
+          - generic [ref=f15e26]: Welco Surgical
+        - paragraph [ref=f15e27]: Precision surgical instrument manufacturer built for institutional operating rooms, hospital procurement desks, and private-label OEM partners worldwide.
+        - generic [ref=f15e28]:
+          - generic [ref=f15e29]: ISO 13485:2016
+          - generic [ref=f15e30]: CE MDR CLASS IIa
+          - generic [ref=f15e31]: UDI LOT-TRACEABLE
+      - generic [ref=f15e32]:
+        - heading "Product" [level=4] [ref=f15e33]
+        - link "Marketplace" [ref=f15e34] [cursor=pointer]:
+          - /url: /marketplace
+        - link "Quality & Certs" [ref=f15e35] [cursor=pointer]:
+          - /url: /certifications
+        - link "OEM / Private Label" [ref=f15e36] [cursor=pointer]:
+          - /url: /oem
+      - generic [ref=f15e37]:
+        - heading "Support" [level=4] [ref=f15e38]
+        - link "Help Center" [ref=f15e39] [cursor=pointer]:
+          - /url: /help
+    - generic [ref=f15e40]:
+      - generic [ref=f15e41]:
+        - generic [ref=f15e42]: © 2026 Welco Surgical Instruments GmbH / FZ-LLC. All rights reserved.
+        - generic [ref=f15e43]: Passivated Stainless Steel DIN EN ISO 17664 · 134°C Autoclave Validated.
+      - generic [ref=f15e44]: PRODUCTION CELLS ONLINE
+  - navigation "Navigation" [ref=f15e49]:
+    - link "home Home" [ref=f15e50] [cursor=pointer]:
+      - /url: /
+      - generic [ref=f15e51]: home
+      - generic [ref=f15e52]: Home
+    - link "storefront Marketplace" [ref=f15e53] [cursor=pointer]:
+      - /url: /marketplace
+      - generic [ref=f15e54]: storefront
+      - generic [ref=f15e55]: Marketplace
+    - link "verified Quality & Certs" [ref=f15e56] [cursor=pointer]:
+      - /url: /certifications
+      - generic [ref=f15e57]: verified
+      - generic [ref=f15e58]: Quality & Certs
+    - link "help Help Center" [ref=f15e59] [cursor=pointer]:
+      - /url: /help
+      - generic [ref=f15e60]: help
+      - generic [ref=f15e61]: Help Center
+    - button "All allowed pages" [ref=f15e62] [cursor=pointer]:
+      - generic [ref=f15e63]: apps
+      - generic [ref=f15e65]: More

@@ -9,6 +9,23 @@ export enum AppLanguage {
   Ar = 2,
 }
 
+/** Backend-persisted UI mode per user (mirrors AppLanguage numbering). */
+export enum ThemeMode {
+  White = 1,
+  Dark = 2,
+}
+
+/** Accepts backend variants (1/2, 'White'/'Dark', 'white'/'dark', 'light'/'dark'). */
+export function normalizeThemeMode(value: unknown): ThemeMode | null {
+  if (value === ThemeMode.White || value === ThemeMode.Dark) return value as ThemeMode
+  if (typeof value === 'string') {
+    const v = value.trim().toLowerCase()
+    if (v === 'white' || v === 'light') return ThemeMode.White
+    if (v === 'dark') return ThemeMode.Dark
+  }
+  return null
+}
+
 export interface User {
   id: string
   fullName: string
@@ -18,6 +35,8 @@ export interface User {
   profilePictureName?: string | null
   userType: UserType
   language: AppLanguage
+  /** Backend-persisted UI mode; null until the backend exposes the column. */
+  themeMode?: ThemeMode | null
   isEmailConfirmed: boolean
   createdAt: string
   updatedAt?: string | null
@@ -33,6 +52,7 @@ export interface AuthResponseDto {
   userName?: string | null
   userType: UserType
   language: AppLanguage
+  themeMode?: ThemeMode | null
   roles: string[]
   companyId?: string | null
   accessToken: string
@@ -49,6 +69,7 @@ export interface UserProfileDto {
   profilePictureName?: string | null
   userType: UserType
   language: AppLanguage
+  themeMode?: ThemeMode | null
   isEmailConfirmed: boolean
   createdAt: string
   roles: string[]
@@ -66,6 +87,7 @@ export interface UserDto {
   profilePictureName?: string | null
   userType: UserType
   language: AppLanguage
+  themeMode?: ThemeMode | null
   isActive: boolean
   isEmailConfirmed: boolean
   createdAt: string

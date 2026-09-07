@@ -1,0 +1,104 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - link "Skip to main content" [ref=e3] [cursor=pointer]:
+      - /url: "#main-content"
+    - banner [ref=e4]:
+      - generic [ref=e6]:
+        - link "Home" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - img "Welco" [ref=e8]
+          - generic [ref=e9]: Welco
+        - navigation "Navigation" [ref=e10]:
+          - link "Home" [ref=e97] [cursor=pointer]:
+            - /url: /
+          - link "Marketplace" [ref=e98] [cursor=pointer]:
+            - /url: /marketplace
+          - link "Quality & Certs" [ref=e99] [cursor=pointer]:
+            - /url: /certifications
+          - link "Help Center" [ref=e100] [cursor=pointer]:
+            - /url: /help
+        - search [ref=e15]:
+          - generic [aria-hidden] [ref=e16]: search
+          - textbox "Search implants, SKU, manufacturer, supplier…" [ref=e17]
+          - generic [ref=e18]: ⌘K
+        - generic [ref=e19]:
+          - link "Quote Cart" [ref=e20] [cursor=pointer]:
+            - /url: /cart
+            - generic [ref=e21]: shopping_bag
+          - generic [ref=e101]:
+            - button "Login" [ref=e102] [cursor=pointer]
+            - button "Register" [ref=e103] [cursor=pointer]
+    - main [ref=e25]:
+      - generic [ref=e105]:
+        - complementary "Brand Overview" [ref=e106]:
+          - generic [ref=e107]: EST. 1994 · SURGICAL INSTRUMENTS
+          - generic [ref=e111]:
+            - generic [ref=e112]: SURGICAL INSTRUMENT MANUFACTURER — EST. 1994
+            - heading "Precision instruments, built for the operating room." [level=2] [ref=e113]:
+              - text: Precision instruments,
+              - generic [ref=e114]: built for the operating room.
+            - paragraph [ref=e115]: Manufacturer-direct surgical instruments for hospitals, distributors, and importers — with OEM private-label production and full ISO / CE documentation on every line.
+            - generic [ref=e116]:
+              - generic [ref=e117]:
+                - generic [ref=e118]: "METALLURGY:"
+                - strong [ref=e119]: AISI 420 Martensitic Steel
+              - generic [ref=e120]:
+                - generic [ref=e121]: "STANDARDS:"
+                - strong [ref=e122]: ISO 13485:2016 · CE MDR
+              - generic [ref=e123]:
+                - generic [ref=e124]: "AUTOCLAVE:"
+                - strong [ref=e125]: 134°C (273°F) Validated
+              - text: SIALKOT — TUTTLINGEN — LOT-TRACEABLE
+            - list [ref=e126]:
+              - listitem [ref=e127]:
+                - generic [ref=e128]: verified
+                - generic [ref=e129]: 30+ yrs — Years in surgical instrument manufacturing
+              - listitem [ref=e130]:
+                - generic [ref=e131]: precision_manufacturing
+                - generic [ref=e132]: Certified quality management system
+              - listitem [ref=e133]:
+                - generic [ref=e134]: shield
+                - generic [ref=e135]: 40+ countries in our export network — territory-aware
+          - generic [ref=e136]:
+            - generic [ref=e137]: ISO 13485
+            - generic [ref=e138]: •
+            - generic [ref=e139]: CE Marked
+            - generic [ref=e140]: •
+            - generic [ref=e141]: 40+ Countries
+        - main [ref=e142]:
+          - generic [ref=e143]:
+            - img "Welco — Surgical Instruments" [ref=e145]
+            - generic [ref=e146]:
+              - generic [ref=e147]: WelcoSurgical
+              - generic [ref=e148]: Surgical Instruments
+          - generic [ref=e149]:
+            - generic [ref=e150]: ISO 13485 · CE · Verified Line
+            - heading "Welcome back" [level=1] [ref=e151]
+            - paragraph [ref=e152]: Sign in to your account
+          - generic [ref=e154]:
+            - generic [ref=e155]:
+              - generic [ref=e156]: Email
+              - generic [ref=e157]:
+                - generic: mail
+                - textbox "Email" [ref=e158]:
+                  - /placeholder: provider@medical.com
+            - generic [ref=e159]:
+              - generic [ref=e160]:
+                - generic [ref=e161]: Password
+                - link "Forgot password?" [ref=e162] [cursor=pointer]:
+                  - /url: /auth/forgot-password
+              - generic [ref=e163]:
+                - generic: lock
+                - textbox "Password" [ref=e164]:
+                  - /placeholder: ••••••••
+                - button "Show password" [ref=e165] [cursor=pointer]:
+                  - generic [ref=e166]: visibility
+            - button "Sign in arrow_forward" [ref=e167] [cursor=pointer]:
+              - generic [ref=e168]: Sign in
+              - generic [ref=e169]: arrow_forward
+            - generic [ref=e170]:
+              - generic [ref=e171]: Don't have an account?
+              - link "Sign up" [ref=e172] [cursor=pointer]:
+                - /url: /auth/register
+          - generic [ref=e173]: Manufacturer-direct · Territory-aware · Verified supply chain
+  - generic [ref=e96]: Welcome back

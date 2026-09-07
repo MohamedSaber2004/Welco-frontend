@@ -1,0 +1,64 @@
+- generic [ref=f9e2]:
+  - link "Skip to main content" [ref=f9e3] [cursor=pointer]:
+    - /url: "#main-content"
+  - banner [ref=f9e6]:
+    - generic [ref=f9e8]:
+      - link "Home" [ref=f9e9] [cursor=pointer]:
+        - /url: /
+        - img "Welco" [ref=f9e10]
+      - generic [ref=f9e11]:
+        - link "Quote Cart" [ref=f9e12] [cursor=pointer]:
+          - /url: /cart
+          - generic [ref=f9e13]: shopping_bag
+        - button "Login" [ref=f9e14] [cursor=pointer]:
+          - generic [ref=f9e15]: person
+        - button "Toggle menu" [ref=f9e16] [cursor=pointer]
+  - main [ref=f9e20]
+  - contentinfo [ref=f9e21]:
+    - generic [ref=f9e22]:
+      - generic [ref=f9e23]:
+        - generic [ref=f9e24]:
+          - img "Welco" [ref=f9e25]
+          - generic [ref=f9e26]: Welco Surgical
+        - paragraph [ref=f9e27]: Precision surgical instrument manufacturer built for institutional operating rooms, hospital procurement desks, and private-label OEM partners worldwide.
+        - generic [ref=f9e28]:
+          - generic [ref=f9e29]: ISO 13485:2016
+          - generic [ref=f9e30]: CE MDR CLASS IIa
+          - generic [ref=f9e31]: UDI LOT-TRACEABLE
+      - generic [ref=f9e32]:
+        - heading "Product" [level=4] [ref=f9e33]
+        - link "Marketplace" [ref=f9e34] [cursor=pointer]:
+          - /url: /marketplace
+        - link "Quality & Certs" [ref=f9e35] [cursor=pointer]:
+          - /url: /certifications
+        - link "OEM / Private Label" [ref=f9e36] [cursor=pointer]:
+          - /url: /oem
+      - generic [ref=f9e37]:
+        - heading "Support" [level=4] [ref=f9e38]
+        - link "Help Center" [ref=f9e39] [cursor=pointer]:
+          - /url: /help
+    - generic [ref=f9e40]:
+      - generic [ref=f9e41]:
+        - generic [ref=f9e42]: © 2026 Welco Surgical Instruments GmbH / FZ-LLC. All rights reserved.
+        - generic [ref=f9e43]: Passivated Stainless Steel DIN EN ISO 17664 · 134°C Autoclave Validated.
+      - generic [ref=f9e44]: PRODUCTION CELLS ONLINE
+  - navigation "Navigation" [ref=f9e49]:
+    - link "home Home" [ref=f9e50] [cursor=pointer]:
+      - /url: /
+      - generic [ref=f9e51]: home
+      - generic [ref=f9e52]: Home
+    - link "storefront Marketplace" [ref=f9e53] [cursor=pointer]:
+      - /url: /marketplace
+      - generic [ref=f9e54]: storefront
+      - generic [ref=f9e55]: Marketplace
+    - link "verified Quality & Certs" [ref=f9e56] [cursor=pointer]:
+      - /url: /certifications
+      - generic [ref=f9e57]: verified
+      - generic [ref=f9e58]: Quality & Certs
+    - link "help Help Center" [ref=f9e59] [cursor=pointer]:
+      - /url: /help
+      - generic [ref=f9e60]: help
+      - generic [ref=f9e61]: Help Center
+    - button "All allowed pages" [ref=f9e62] [cursor=pointer]:
+      - generic [ref=f9e63]: apps
+      - generic [ref=f9e65]: More

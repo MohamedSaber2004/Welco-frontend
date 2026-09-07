@@ -474,4 +474,31 @@ function isPdfDoc(name: string | null | undefined): boolean {
   font-weight: 500;
 }
 
+@media (max-width: 640px) {
+  .cert-hero {
+    padding: 1.25rem;
+    border-radius: 16px;
+  }
+  .hero-top-row {
+    gap: 1.25rem;
+  }
+  .telemetry-box {
+    flex: 1 1 100%;
+    min-width: 0;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    gap: 0.85rem;
+    padding: 1rem;
+  }
+  .telemetry-val {
+    font-size: 1.15rem;
+  }
+  .cert-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .section-head {
+    gap: 0.75rem;
+  }
+}
+
 </style>

@@ -1,5 +1,5 @@
-import { AppLanguage, UserType } from './user'
-export { AppLanguage, UserType }
+import { AppLanguage, ThemeMode, UserType } from './user'
+export { AppLanguage, ThemeMode, UserType }
 
 export interface RegisterPayload {
   fullName: string
@@ -58,6 +58,7 @@ export interface UpdateProfilePayload {
   phoneNumber?: string
   profilePictureName?: string
   language?: AppLanguage
+  themeMode?: ThemeMode
   addresses?: UpdateProfileAddressDto[]
 }
 

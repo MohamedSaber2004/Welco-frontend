@@ -202,6 +202,11 @@ export class HttpClient {
     const run = async (): Promise<T> => {
       await this.waitForRateLimit(path)
 
+      // True once this request refreshed the access token successfully.
+      // A 401 AFTER a successful refresh means the endpoint rejects a valid
+      // token (permissions/gateway quirk) — that must NOT log the user out.
+      let refreshedThisRequest = false
+
       for (let attempt = 0; ; attempt++) {
         let response: Response
         try {
@@ -219,6 +224,7 @@ export class HttpClient {
           if (!isRefresh && attempt === 0 && this.tokenStore.getRefreshToken() && !this.tokenStore.isRefreshTokenExpired()) {
             const refreshed = await this.tryRefreshToken()
             if (refreshed) {
+              refreshedThisRequest = true
               const newToken = this.tokenStore.getAccessToken()
               if (newToken) headers['Authorization'] = `Bearer ${newToken}`
               try {
@@ -229,19 +235,20 @@ export class HttpClient {
               }
             }
           }
-          // Still 401 after the refresh attempt (or no refresh possible): the
-          // session is dead server-side (revoked token, deleted user) — drop it.
+          // Still 401 with a dead (unrefreshable) token: the session is dead
+          // server-side (revoked token, deleted user) — drop it.
           // GET has its own silent-401 handling below; this covers the rest.
-          if (response.status === 401 && method !== 'GET' && this.tokenStore.hasAccessToken()) {
+          if (response.status === 401 && method !== 'GET' && this.tokenStore.hasAccessToken() && !refreshedThisRequest) {
             this.tokenStore.clear()
             this.authBridge.onSessionExpired()
           }
         }
 
         // ── Silent 401 for GET requests (public/auth data without valid session) ──
-        // Return a safe empty paginated result so callers don't crash
+        // Return a safe empty paginated result so callers don't crash.
+        // Never drop the session when the token just proved itself valid.
         if (response.status === 401 && method === 'GET') {
-          if (this.tokenStore.hasAccessToken()) {
+          if (this.tokenStore.hasAccessToken() && !refreshedThisRequest) {
             this.tokenStore.clear()
             this.authBridge.onSessionExpired()
           }

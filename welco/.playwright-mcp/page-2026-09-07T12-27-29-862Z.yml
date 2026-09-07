@@ -1,0 +1,158 @@
+- generic [ref=f1e1]:
+  - generic [ref=f1e2]:
+    - link "Skip to main content" [ref=f1e3] [cursor=pointer]:
+      - /url: "#main-content"
+    - banner [ref=f1e4]:
+      - generic [ref=f1e6]:
+        - link "Home" [ref=f1e7] [cursor=pointer]:
+          - /url: /
+          - img "Welco" [ref=f1e8]
+          - generic [ref=f1e9]: Welco
+        - navigation "Navigation" [ref=f1e10]:
+          - link "Home" [ref=f1e99] [cursor=pointer]:
+            - /url: /
+          - link "Marketplace" [ref=f1e100] [cursor=pointer]:
+            - /url: /marketplace
+          - link "Account" [ref=f1e101] [cursor=pointer]:
+            - /url: /account
+          - link "Wishlist" [ref=f1e102] [cursor=pointer]:
+            - /url: /wishlist
+          - link "My Tickets" [ref=f1e103] [cursor=pointer]:
+            - /url: /help/my-tickets
+          - link "Help Center" [ref=f1e104] [cursor=pointer]:
+            - /url: /help
+        - search [ref=f1e15]:
+          - generic [aria-hidden] [ref=f1e16]: search
+          - textbox "Search implants, SKU, manufacturer, supplier…" [ref=f1e17]
+          - generic [ref=f1e18]: ⌘K
+        - generic [ref=f1e19]:
+          - link "Wishlist" [ref=f1e105] [cursor=pointer]:
+            - /url: /wishlist
+            - generic [ref=f1e106]: favorite
+          - link "Quote Cart" [ref=f1e20] [cursor=pointer]:
+            - /url: /cart
+            - generic [ref=f1e21]: shopping_bag
+          - button "Toggle theme" [ref=f1e107] [cursor=pointer]:
+            - generic [ref=f1e108]: dark_mode
+          - button "TT Theme Tester Organization User" [ref=f1e110] [cursor=pointer]:
+            - generic [ref=f1e111]: TT
+            - generic [ref=f1e113]:
+              - generic [ref=f1e114]: Theme Tester
+              - generic [ref=f1e115]: Organization User
+    - status [ref=f1e117]:
+      - generic [ref=f1e118]: Welcome back!
+      - button "Dismiss" [ref=f1e119] [cursor=pointer]: ×
+    - main [active] [ref=f1e25]:
+      - generic [ref=f1e120]:
+        - generic [ref=f1e122]:
+          - generic [ref=f1e123]:
+            - heading [level=1] [ref=f1e124]:
+              - text: Every edge, measured.
+              - emphasis [ref=f1e125]: Every lot, traceable.
+            - paragraph [ref=f1e126]: German-steel instruments, finished by hand, lot-stamped and ISO 13485 papered — from needle holder to retractor, tolerance ±0.02mm. Direct from factory, no broker.
+            - generic [ref=f1e128]:
+              - textbox "Search implants, SKU, manufacturer, supplier…" [ref=f1e129]
+              - button "Search" [ref=f1e130] [cursor=pointer]
+            - generic [ref=f1e131]:
+              - button "Marketplace" [ref=f1e132] [cursor=pointer]
+              - button "request_quote Price this tray" [ref=f1e134] [cursor=pointer]:
+                - generic [ref=f1e135]: request_quote
+                - generic [ref=f1e136]: Price this tray
+          - img "Welco — Surgical Instruments" [ref=f1e138]
+        - region [ref=f1e139]:
+          - generic [ref=f1e140]:
+            - heading "Operational Metrics" [level=2] [ref=f1e141]
+            - generic [ref=f1e142]:
+              - generic [ref=f1e143]:
+                - generic [ref=f1e144]:
+                  - generic [ref=f1e145]: Years at the bench, not the brochure
+                  - generic [ref=f1e146]: EST. 1994
+                - generic [ref=f1e147]: 32+
+              - generic [ref=f1e149]:
+                - generic [ref=f1e150]:
+                  - generic [ref=f1e151]: Export lanes, verified by zone
+                  - generic [ref=f1e152]: GLOBAL
+                - generic [ref=f1e153]: 254+
+              - generic [ref=f1e155]:
+                - generic [ref=f1e156]:
+                  - generic [ref=f1e157]: Your mark, our metallurgy
+                  - generic [ref=f1e158]: DIRECT
+                - generic [ref=f1e159]: OEM / ODM
+        - region [ref=f1e161]:
+          - generic [ref=f1e162]:
+            - generic [ref=f1e164]:
+              - generic [ref=f1e165]: Browse by clinical specialty
+              - heading "Browse by Category" [level=2] [ref=f1e166]
+            - status "Loading..." [ref=f1e168]
+        - region [ref=f1e210]:
+          - generic [ref=f1e211]:
+            - generic [ref=f1e212]:
+              - generic [ref=f1e213]:
+                - generic [ref=f1e214]: Clinical highlights
+                - heading "Top-rated and ready to ship across EG · SA · AE" [level=2] [ref=f1e215]
+              - link "Browse complete line →" [ref=f1e216] [cursor=pointer]:
+                - /url: /marketplace
+                - generic [ref=f1e217]: Browse complete line
+                - generic [ref=f1e218]: →
+            - status "Loading..." [ref=f1e220]
+        - region [ref=f1e273]:
+          - generic [ref=f1e274]:
+            - generic [ref=f1e275]:
+              - generic [ref=f1e276]: Export network
+              - heading "Trusted in 254+ countries" [level=2] [ref=f1e277]
+              - paragraph [ref=f1e278]: Territories served by the Welco network — verified by Country → City → Zone.
+            - generic [ref=f1e279]:
+              - generic [ref=f1e280]: TRADE SHOWS
+              - heading "Meet Welco Engineering" [level=3] [ref=f1e281]
+              - paragraph [ref=f1e282]: No upcoming trade shows scheduled.
+    - contentinfo [ref=f1e283]:
+      - generic [ref=f1e284]:
+        - generic [ref=f1e285]:
+          - generic [ref=f1e286]:
+            - img "Welco" [ref=f1e287]
+            - generic [ref=f1e288]: Welco Surgical
+          - paragraph [ref=f1e289]: Precision surgical instrument manufacturer built for institutional operating rooms, hospital procurement desks, and private-label OEM partners worldwide.
+          - generic [ref=f1e290]:
+            - generic [ref=f1e291]: ISO 13485:2016
+            - generic [ref=f1e292]: CE MDR CLASS IIa
+            - generic [ref=f1e293]: UDI LOT-TRACEABLE
+        - generic [ref=f1e294]:
+          - heading "Product" [level=4] [ref=f1e295]
+          - link "Marketplace" [ref=f1e296] [cursor=pointer]:
+            - /url: /marketplace
+          - link "Quality & Certs" [ref=f1e297] [cursor=pointer]:
+            - /url: /certifications
+          - link "OEM / Private Label" [ref=f1e298] [cursor=pointer]:
+            - /url: /oem
+        - generic [ref=f1e299]:
+          - heading "Account" [level=4] [ref=f1e300]
+          - link "Account" [ref=f1e301] [cursor=pointer]:
+            - /url: /account
+          - link "Quote requests" [ref=f1e302] [cursor=pointer]:
+            - /url: /account/rfqs
+          - link "Quotes" [ref=f1e303] [cursor=pointer]:
+            - /url: /account/quotes
+          - link "Order history" [ref=f1e304] [cursor=pointer]:
+            - /url: /account/orders
+          - link "Addresses" [ref=f1e305] [cursor=pointer]:
+            - /url: /addresses
+        - generic [ref=f1e306]:
+          - heading "Support" [level=4] [ref=f1e307]
+          - link "Help Center" [ref=f1e308] [cursor=pointer]:
+            - /url: /help
+          - link "My Tickets" [ref=f1e309] [cursor=pointer]:
+            - /url: /help/my-tickets
+          - link "support@welco.com" [ref=f1e310] [cursor=pointer]:
+            - /url: mailto:support@welco.com
+          - link "+201022812243" [ref=f1e311] [cursor=pointer]:
+            - /url: tel:+201022812243
+          - generic [ref=f1e312]: "Mon - Fri: 8:00 AM - 6:00 PM (GST)"
+      - generic [ref=f1e313]:
+        - generic [ref=f1e314]:
+          - generic [ref=f1e315]: © 2026 Welco Surgical Instruments GmbH / FZ-LLC. All rights reserved.
+          - generic [ref=f1e316]: Passivated Stainless Steel DIN EN ISO 17664 · 134°C Autoclave Validated.
+        - generic [ref=f1e317]: PRODUCTION CELLS ONLINE
+    - link "WhatsApp Inquiry" [ref=f1e321] [cursor=pointer]:
+      - /url: https://wa.me/201022812243?text=Hello%20Welco%20team%20%E2%80%94%20I%20need%20assistance%20with%20surgical%20instruments.
+      - generic [ref=f1e326]: Call Us
+  - generic [ref=f1e96]: Home

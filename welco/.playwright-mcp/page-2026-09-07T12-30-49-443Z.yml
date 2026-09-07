@@ -1,0 +1,58 @@
+- generic [active] [ref=f4e1]:
+  - generic [ref=f4e2]:
+    - link "Skip to main content" [ref=f4e3] [cursor=pointer]:
+      - /url: "#main-content"
+    - banner [ref=f4e6]:
+      - generic [ref=f4e8]:
+        - link "Home" [ref=f4e9] [cursor=pointer]:
+          - /url: /
+          - img "Welco" [ref=f4e10]
+          - generic [ref=f4e11]: Welco
+        - navigation "Navigation" [ref=f4e12]:
+          - link "Home" [ref=f4e13] [cursor=pointer]:
+            - /url: /
+          - link "Marketplace" [ref=f4e14] [cursor=pointer]:
+            - /url: /marketplace
+          - link "Account" [ref=f4e15] [cursor=pointer]:
+            - /url: /account
+          - link "Wishlist" [ref=f4e16] [cursor=pointer]:
+            - /url: /wishlist
+          - link "My Tickets" [ref=f4e17] [cursor=pointer]:
+            - /url: /help/my-tickets
+          - link "Help Center" [ref=f4e18] [cursor=pointer]:
+            - /url: /help
+        - search [ref=f4e19]:
+          - generic [aria-hidden] [ref=f4e20]: search
+          - textbox "Search implants, SKU, manufacturer, supplier…" [ref=f4e21]
+          - generic [ref=f4e22]: ⌘K
+        - generic [ref=f4e23]:
+          - link "Wishlist" [ref=f4e24] [cursor=pointer]:
+            - /url: /wishlist
+            - generic [ref=f4e25]: favorite
+          - link "Quote Cart" [ref=f4e26] [cursor=pointer]:
+            - /url: /cart
+            - generic [ref=f4e27]: shopping_bag
+          - button "Toggle theme" [ref=f4e28] [cursor=pointer]:
+            - generic [ref=f4e29]: dark_mode
+          - button "TT Theme Tester Organization User" [ref=f4e31] [cursor=pointer]:
+            - generic [ref=f4e32]: TT
+            - generic [ref=f4e34]:
+              - generic [ref=f4e35]: Theme Tester
+              - generic [ref=f4e36]: Organization User
+    - main [ref=f4e37]:
+      - generic [ref=f4e38]:
+        - button "Back" [ref=f4e39] [cursor=pointer]:
+          - generic [aria-hidden] [ref=f4e40]: arrow_back
+        - navigation "Breadcrumb" [ref=f4e42]:
+          - link "Home" [ref=f4e43] [cursor=pointer]:
+            - /url: /
+          - generic [ref=f4e44]: /
+          - link "Marketplace" [ref=f4e45] [cursor=pointer]:
+            - /url: /marketplace
+          - generic [ref=f4e46]: /
+          - generic [ref=f4e47]: Your Favourites
+        - generic [ref=f4e49]:
+          - generic [ref=f4e50]: 0 favourites
+          - heading "Your Favourites" [level=1] [ref=f4e53]
+        - status "Loading..." [ref=f4e54]
+  - generic [ref=f4e124]: Your Favourites

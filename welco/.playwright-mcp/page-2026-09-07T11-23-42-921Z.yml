@@ -1,0 +1,64 @@
+- generic [ref=e2]:
+  - link "تخطي إلى المحتوى الرئيسي" [ref=e3] [cursor=pointer]:
+    - /url: "#main-content"
+  - banner [ref=e6]:
+    - generic [ref=e8]:
+      - link "الرئيسية" [ref=e9] [cursor=pointer]:
+        - /url: /
+        - img "Welco" [ref=e10]
+      - generic [ref=e11]:
+        - link "سلة التسعير" [ref=e12] [cursor=pointer]:
+          - /url: /cart
+          - generic [ref=e13]: shopping_bag
+        - button "تسجيل الدخول" [ref=e14] [cursor=pointer]:
+          - generic [ref=e15]: person
+        - button "تبديل القائمة" [ref=e16] [cursor=pointer]
+  - main [ref=e20]
+  - contentinfo [ref=e21]:
+    - generic [ref=e22]:
+      - generic [ref=e23]:
+        - generic [ref=e24]:
+          - img "Welco" [ref=e25]
+          - generic [ref=e26]: Welco Surgical
+        - paragraph [ref=e27]: مصنّع أدوات جراحية دقيقة لغرف العمليات المؤسسية ومكاتب المشتريات بالمستشفيات وشركاء العلامة الخاصة OEM حول العالم.
+        - generic [ref=e28]:
+          - generic [ref=e29]: ISO 13485:2016
+          - generic [ref=e30]: CE MDR CLASS IIa
+          - generic [ref=e31]: UDI LOT-TRACEABLE
+      - generic [ref=e32]:
+        - heading "المنتج" [level=4] [ref=e33]
+        - link "السوق الطبي" [ref=e34] [cursor=pointer]:
+          - /url: /marketplace
+        - link "الجودة والشهادات" [ref=e35] [cursor=pointer]:
+          - /url: /certifications
+        - link "العلامة الخاصة (OEM)" [ref=e36] [cursor=pointer]:
+          - /url: /oem
+      - generic [ref=e37]:
+        - heading "الدعم" [level=4] [ref=e38]
+        - link "مركز المساعدة" [ref=e39] [cursor=pointer]:
+          - /url: /help
+    - generic [ref=e40]:
+      - generic [ref=e41]:
+        - generic [ref=e42]: © 2026 Welco Surgical Instruments GmbH / FZ-LLC. All rights reserved.
+        - generic [ref=e43]: Passivated Stainless Steel DIN EN ISO 17664 · 134°C Autoclave Validated.
+      - generic [ref=e44]: خلايا الإنتاج متصلة
+  - navigation "التنقل" [ref=e49]:
+    - link "home الرئيسية" [ref=e50] [cursor=pointer]:
+      - /url: /
+      - generic [ref=e51]: home
+      - generic [ref=e52]: الرئيسية
+    - link "storefront السوق الطبي" [ref=e53] [cursor=pointer]:
+      - /url: /marketplace
+      - generic [ref=e54]: storefront
+      - generic [ref=e55]: السوق الطبي
+    - link "verified الجودة والشهادات" [ref=e56] [cursor=pointer]:
+      - /url: /certifications
+      - generic [ref=e57]: verified
+      - generic [ref=e58]: الجودة والشهادات
+    - link "help مركز المساعدة" [ref=e59] [cursor=pointer]:
+      - /url: /help
+      - generic [ref=e60]: help
+      - generic [ref=e61]: مركز المساعدة
+    - button "All allowed pages" [ref=e62] [cursor=pointer]:
+      - generic [ref=e63]: apps
+      - generic [ref=e65]: المزيد

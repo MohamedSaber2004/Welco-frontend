@@ -1,8 +1,10 @@
-export const API_BASE_URL = (
-  import.meta.env.VITE_API_BASE_URL
-    ? import.meta.env.VITE_API_BASE_URL
-    : 'https://welco-gateway.runasp.net'
-).replace(/\/+$/, '')
+const RAW_API_BASE = ((import.meta.env.VITE_API_BASE_URL as string | undefined) ?? '').trim()
+
+// Empty in development/test .env files on purpose: API calls stay
+// same-origin (`/api/...`) so they flow through the Vite dev proxy
+// (or Vercel rewrites on preview deploys) with zero CORS involvement.
+// Production sets an absolute URL and is untouched by this.
+export const API_BASE_URL = RAW_API_BASE ? RAW_API_BASE.replace(/\/+$/, '') : ''
 
 export const PRODUCT_API_BASE_URL = (
   (import.meta.env.VITE_PRODUCT_API_BASE_URL as string | undefined)

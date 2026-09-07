@@ -307,13 +307,15 @@ input[type="checkbox"]:focus-visible, input[type="radio"]:focus-visible { box-sh
 .field__error { font-size: 0.78rem; font-weight: 600; color: var(--wl-danger); display: flex; align-items: center; gap: 5px; margin-top: 2px; animation: fadeIn 0.2s ease; }
 .field__error::before { content: '●'; font-size: 6px; }
 
-/* ── Buttons ── */
+/* ── Buttons: device-aware scale ──
+   Desktop/laptop/tablet default is a compact 40px (matches inputs);
+   touch devices get 42px targets (see media query below). */
 .btn {
   font-family: var(--wl-font-body);
   font-weight: 600;
-  font-size: 13.5px;
-  min-height: 44px;
-  padding: 0 20px;
+  font-size: 13px;
+  min-height: 40px;
+  padding: 0 18px;
   border-radius: var(--radius-sm);
   border: 1px solid transparent;
   cursor: pointer;
@@ -327,6 +329,7 @@ input[type="checkbox"]:focus-visible, input[type="radio"]:focus-visible { box-sh
   user-select: none;
   position: relative;
   overflow: hidden;
+  max-width: 100%;
 }
 .btn:focus-visible { outline: 2px solid var(--wl-primary); outline-offset: 2px; box-shadow: var(--wl-focus-ring); }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
@@ -382,9 +385,38 @@ input[type="checkbox"]:focus-visible, input[type="radio"]:focus-visible { box-sh
 }
 .btn-danger-ghost { background: transparent; color: var(--wl-danger); border: 1px solid var(--wl-danger); }
 .btn-danger-ghost:hover:not(:disabled) { background: var(--wl-danger); color: #fff; }
-.btn-sm { min-height: 36px; padding: 0 14px; font-size: 13px; border-radius: var(--radius-xs); }
-.btn-lg { min-height: 50px; padding: 0 24px; font-size: 15px; border-radius: var(--radius-md); font-weight: 700; }
+.btn-sm { min-height: 34px; padding: 0 12px; font-size: 12.5px; border-radius: var(--radius-xs); }
+.btn-lg { min-height: 46px; padding: 0 22px; font-size: 14.5px; border-radius: var(--radius-md); font-weight: 700; }
 .btn-block { width: 100%; }
+
+/* Legacy 48px CTA buttons (copy-pasted per view) → 44px desktop:
+   still prominent next to the 40px default without towering over forms.
+   !important beats the per-view scoped copies. */
+.vip-submit-btn,
+.btn-modal-save,
+.btn-modal-cancel,
+.btn-primary-cta,
+.btn-secondary-quote,
+.btn-primary-action,
+.btn-secondary-action,
+.btn-approve,
+.btn-place-order,
+.btn-submit-inquiry,
+.btn-submit-ticket,
+.btn-send-ticket,
+.btn-track-submit {
+  min-height: 44px !important;
+  height: 44px !important;
+  font-size: 14px !important;
+}
+
+/* Touch devices: slightly taller targets, full-width stacked CTA rows. */
+@media (max-width: 640px) {
+  .btn { min-height: 42px; }
+  .btn-sm { min-height: 36px; }
+  .modal-actions { flex-direction: column-reverse; align-items: stretch; }
+  .modal-actions .btn { width: 100%; }
+}
 
 /* ── Tables ── */
 .admin-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 1.25rem; flex-wrap: wrap; }

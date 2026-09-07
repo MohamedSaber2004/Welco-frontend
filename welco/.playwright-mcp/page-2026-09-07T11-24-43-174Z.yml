@@ -1,0 +1,58 @@
+- generic [ref=f2e2]:
+  - link "تخطي إلى المحتوى الرئيسي" [ref=f2e3] [cursor=pointer]:
+    - /url: "#main-content"
+  - banner [ref=f2e6]:
+    - generic [ref=f2e8]:
+      - link "الرئيسية" [ref=f2e9] [cursor=pointer]:
+        - /url: /
+        - img "Welco" [ref=f2e10]
+        - generic [ref=f2e11]: Welco
+      - navigation "التنقل" [ref=f2e12]:
+        - link "الرئيسية" [ref=f2e13] [cursor=pointer]:
+          - /url: /
+        - link "السوق الطبي" [ref=f2e14] [cursor=pointer]:
+          - /url: /marketplace
+        - link "الجودة والشهادات" [ref=f2e15] [cursor=pointer]:
+          - /url: /certifications
+        - link "مركز المساعدة" [ref=f2e16] [cursor=pointer]:
+          - /url: /help
+      - search [ref=f2e17]:
+        - generic [aria-hidden] [ref=f2e18]: search
+        - textbox "ابحث عن زرعات، كود SKU، مصنع أو مورد…" [ref=f2e19]
+        - generic [ref=f2e20]: ⌘K
+      - generic [ref=f2e21]:
+        - link "سلة التسعير" [ref=f2e22] [cursor=pointer]:
+          - /url: /cart
+          - generic [ref=f2e23]: shopping_bag
+        - generic [ref=f2e24]:
+          - button "تسجيل الدخول" [ref=f2e25] [cursor=pointer]
+          - button "إنشاء حساب" [ref=f2e26] [cursor=pointer]
+  - main [ref=f2e27]
+  - contentinfo [ref=f2e28]:
+    - generic [ref=f2e29]:
+      - generic [ref=f2e30]:
+        - generic [ref=f2e31]:
+          - img "Welco" [ref=f2e32]
+          - generic [ref=f2e33]: Welco Surgical
+        - paragraph [ref=f2e34]: مصنّع أدوات جراحية دقيقة لغرف العمليات المؤسسية ومكاتب المشتريات بالمستشفيات وشركاء العلامة الخاصة OEM حول العالم.
+        - generic [ref=f2e35]:
+          - generic [ref=f2e36]: ISO 13485:2016
+          - generic [ref=f2e37]: CE MDR CLASS IIa
+          - generic [ref=f2e38]: UDI LOT-TRACEABLE
+      - generic [ref=f2e39]:
+        - heading "المنتج" [level=4] [ref=f2e40]
+        - link "السوق الطبي" [ref=f2e41] [cursor=pointer]:
+          - /url: /marketplace
+        - link "الجودة والشهادات" [ref=f2e42] [cursor=pointer]:
+          - /url: /certifications
+        - link "العلامة الخاصة (OEM)" [ref=f2e43] [cursor=pointer]:
+          - /url: /oem
+      - generic [ref=f2e44]:
+        - heading "الدعم" [level=4] [ref=f2e45]
+        - link "مركز المساعدة" [ref=f2e46] [cursor=pointer]:
+          - /url: /help
+    - generic [ref=f2e47]:
+      - generic [ref=f2e48]:
+        - generic [ref=f2e49]: © 2026 Welco Surgical Instruments GmbH / FZ-LLC. All rights reserved.
+        - generic [ref=f2e50]: Passivated Stainless Steel DIN EN ISO 17664 · 134°C Autoclave Validated.
+      - generic [ref=f2e51]: خلايا الإنتاج متصلة

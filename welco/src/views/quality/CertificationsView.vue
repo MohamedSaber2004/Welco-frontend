@@ -1,0 +1,477 @@
+<script setup lang="ts">
+import { onMounted, ref } from 'vue'
+import { t, locale } from '../../i18n'
+import { certificationService } from '../../di/container'
+import SkeletonLoader from '../../components/ui/SkeletonLoader.vue'
+import DataState from '../../components/ui/DataState.vue'
+import { resolveFileUrl, PLACEHOLDER } from '../../utils/file-url'
+import BackButton from '../../components/ui/BackButton.vue'
+
+const certs = certificationService.certifications
+const loading = ref(true)
+
+onMounted(async () => {
+  await certificationService.load()
+  loading.value = false
+})
+
+function isActive(c: { expiryDate?: string | null }): boolean {
+  if (!c.expiryDate) return true
+  return new Date(c.expiryDate) > new Date()
+}
+
+function isPdfDoc(name: string | null | undefined): boolean {
+  if (!name) return false
+  const str = name.toLowerCase()
+  const qIdx = str.indexOf('?')
+  const noQuery = qIdx >= 0 ? str.slice(0, qIdx) : str
+  const hIdx = noQuery.indexOf('#')
+  const clean = hIdx >= 0 ? noQuery.slice(0, hIdx) : noQuery
+  return clean.endsWith('.pdf')
+}
+</script>
+
+<template>
+  <div class="page-shell cert-view">
+    <BackButton fallback="/" variant="minimal" class="mb-3" />
+
+    <nav class="crumb-bar mono" :aria-label="t('common.breadcrumb')">
+      <router-link to="/">{{ t('nav.home') }}</router-link>
+      <span class="crumb-sep icon--directional">/</span>
+      <span class="crumb-active">{{ t('certifications.title') }}</span>
+    </nav>
+
+    <header class="cert-hero">
+      <div class="hero-top-row">
+        <div class="hero-text-zone">
+          <div class="head-chip mono">
+            <span class="pulse-dot"></span>
+            <span>{{ t('certifications.eyebrow') }}</span>
+          </div>
+          <h1 class="hero-title">{{ t('certifications.qualityTitle') }}</h1>
+          <p class="hero-desc">{{ t('certifications.qualitySubtitle') }}</p>
+
+          <div v-if="certs.length" class="standards-pills-wrap">
+            <span v-for="c in certs" :key="c.id" class="standard-pill mono">{{ c.certificateNumber || c.title }}</span>
+          </div>
+        </div>
+
+        <div class="telemetry-box" :aria-label="t('certifications.title')">
+          <div class="telemetry-cell">
+            <span class="telemetry-val mono">{{ certs.length ? '100%' : '—' }}</span>
+            <span class="telemetry-lbl mono">{{ certs.length ? 'VALIDITY RATE' : 'AWAITING DOSSIER' }}</span>
+          </div>
+          <div class="telemetry-div"></div>
+          <div class="telemetry-cell">
+            <span class="telemetry-val mono">AUDITED</span>
+            <span class="telemetry-lbl mono">NOTIFIED BODY</span>
+          </div>
+          <div class="telemetry-div"></div>
+          <div class="telemetry-cell">
+            <span class="telemetry-val mono">AISI 420</span>
+            <span class="telemetry-lbl mono">STEEL ALLOY SPEC</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="cert-section">
+      <div class="section-head">
+        <div>
+          <div class="head-chip mono">
+            <span class="pulse-dot"></span>
+            <span>{{ t('certifications.jurisdictions', { count: certs.length }) }}</span>
+          </div>
+          <h2 class="section-title">{{ t('certifications.certsTitle') }}</h2>
+        </div>
+        <span class="mono count-badge">{{ t('certifications.certsValid', { count: certs.length }) }}</span>
+      </div>
+
+      <SkeletonLoader v-if="loading" type="category-grid" :count="4" />
+      <DataState
+        v-else
+        :empty="!certs.length"
+        :empty-title="t('certifications.certsTitle')"
+        :empty-description="t('certifications.certsSubtitle')"
+        skeleton-type="card"
+        min-height="240px"
+      >
+        <div class="cert-grid">
+          <article v-for="c in certs" :key="c.id" class="cert-card">
+            <div class="card-head-row">
+              <div class="seal-box" :class="{ 'seal-box--pdf': isPdfDoc(c.certificationImageName) }">
+                <span v-if="isPdfDoc(c.certificationImageName)" class="material-symbols-outlined seal-pdf-icon">picture_as_pdf</span>
+                <img
+                  v-else
+                  :src="resolveFileUrl(c.certificationImageName)"
+                  :alt="c.title"
+                  class="seal-img"
+                  @error="(e) => ((e.target as HTMLImageElement).src = PLACEHOLDER)"
+                />
+              </div>
+
+              <span
+                class="status-pill mono"
+                :class="isActive(c) ? 'status-pill--active' : 'status-pill--expired'"
+              >
+                <span class="dot"></span>
+                <span>{{ isActive(c) ? t('common.verified') : t('common.pending') }}</span>
+              </span>
+            </div>
+
+            <h3 class="cert-title-text">{{ c.title }}</h3>
+            <div class="ref-badge mono">
+              <span class="ref-label">{{ t('certifications.docRef') }}</span>
+              <strong class="ref-num">{{ c.certificateNumber }}</strong>
+            </div>
+
+            <dl class="cert-meta-list">
+              <div class="meta-item">
+                <dt class="mono">{{ t('certifications.issuedTo') }}:</dt>
+                <dd>{{ c.issuedTo }}</dd>
+              </div>
+              <div class="meta-item">
+                <dt class="mono">{{ t('certifications.issuer') }}:</dt>
+                <dd>{{ c.issuer }}</dd>
+              </div>
+              <div class="meta-item">
+                <dt class="mono">{{ t('certifications.issueDate') }}:</dt>
+                <dd class="mono">{{ new Date(c.issueDate).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</dd>
+              </div>
+              <div v-if="c.expiryDate" class="meta-item">
+                <dt class="mono">{{ t('certifications.expiryDate') }}:</dt>
+                <dd class="mono">{{ new Date(c.expiryDate).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</dd>
+              </div>
+            </dl>
+
+          </article>
+        </div>
+      </DataState>
+    </section>
+  </div>
+</template>
+
+<style scoped>
+.cert-view {
+  width: 100%;
+  gap: 2.5rem;
+}
+
+.crumb-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 11px;
+  color: #64748B;
+}
+
+.crumb-bar a {
+  color: #64748B;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.crumb-bar a:hover {
+  color: #4F46E5;
+}
+
+.crumb-sep {
+  color: #CBD5E1;
+}
+
+.crumb-active {
+  color: #0F172A;
+  font-weight: 700;
+}
+
+.head-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 10px;
+  font-weight: 700;
+  color: #4F46E5;
+  background: #EEF2FF;
+  border: 1px solid #C7D2FE;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  letter-spacing: 0.06em;
+  width: fit-content;
+  margin-bottom: 0.5rem;
+}
+
+.pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4F46E5;
+}
+
+.cert-hero {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 20px;
+  padding: 2.5rem;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+}
+
+.hero-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.hero-text-zone {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  max-width: 680px;
+}
+
+.hero-title {
+  font-family: var(--wl-font-display, system-ui);
+  font-size: clamp(1.85rem, 3.5vw, 2.5rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #0F172A;
+  margin: 0;
+  line-height: 1.1;
+}
+
+.hero-desc {
+  font-size: 15px;
+  color: #64748B;
+  line-height: 1.6;
+  margin: 0.35rem 0 0;
+}
+
+.standards-pills-wrap {
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+}
+
+.standard-pill {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #0369A1;
+  background: #E0F2FE;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  letter-spacing: 0.04em;
+}
+
+.telemetry-box {
+  display: flex;
+  align-items: center;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 14px;
+  padding: 1.25rem 1.75rem;
+  gap: 1.5rem;
+}
+
+.telemetry-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.telemetry-val {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #0F172A;
+}
+
+.telemetry-lbl {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #64748B;
+  letter-spacing: 0.06em;
+}
+
+.telemetry-div {
+  width: 1px;
+  height: 36px;
+  background: #CBD5E1;
+}
+
+.cert-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.section-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: #0F172A;
+  margin: 0.2rem 0 0;
+}
+
+.count-badge {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #475569;
+  background: #F1F5F9;
+  border: 1px solid #E2E8F0;
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+}
+
+.cert-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.25rem;
+}
+
+.cert-card {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  transition: all 0.2s ease;
+}
+
+.cert-card:hover {
+  border-color: #CBD5E1;
+  box-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.08);
+}
+
+.card-head-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.seal-box {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.seal-box--pdf {
+  background: #FFF1F2;
+  border-color: #FECDD3;
+}
+
+.seal-pdf-icon {
+  font-size: 26px;
+  color: #E11D48;
+}
+
+.seal-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cert-card-actions {
+  margin-top: auto;
+  padding-top: 0.75rem;
+  border-top: 1px solid #F1F5F9;
+}
+
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+}
+
+.status-pill .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.status-pill--active {
+  background: #ECFDF5;
+  color: #059669;
+}
+.status-pill--active .dot { background: #10B981; }
+
+.status-pill--expired {
+  background: #FEF3C7;
+  color: #92400E;
+}
+.status-pill--expired .dot { background: #F59E0B; }
+
+.cert-title-text {
+  font-size: 15px;
+  font-weight: 800;
+  color: #0F172A;
+  margin: 0;
+}
+
+.ref-badge {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  font-size: 12px;
+}
+
+.ref-label {
+  font-size: 10px;
+  color: #64748B;
+  font-weight: 700;
+}
+
+.ref-num {
+  color: #4F46E5;
+}
+
+.cert-meta-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin: 0;
+  padding-top: 0.65rem;
+  border-top: 1px solid #F1F5F9;
+  font-size: 12px;
+}
+
+.meta-item {
+  display: flex;
+  justify-content: space-between;
+}
+
+.meta-item dt {
+  color: #64748B;
+  font-weight: 600;
+}
+
+.meta-item dd {
+  color: #0F172A;
+  margin: 0;
+  font-weight: 500;
+}
+
+</style>

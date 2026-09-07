@@ -1,0 +1,93 @@
+- generic [ref=f13e2]:
+  - link "Skip to main content" [ref=f13e3] [cursor=pointer]:
+    - /url: "#main-content"
+  - banner [ref=f13e6]:
+    - generic [ref=f13e8]:
+      - link "Home" [ref=f13e9] [cursor=pointer]:
+        - /url: /
+        - img "Welco" [ref=f13e10]
+        - generic [ref=f13e11]: Welco
+      - generic [ref=f13e12]:
+        - link "Quote Cart" [ref=f13e13] [cursor=pointer]:
+          - /url: /cart
+          - generic [ref=f13e14]: shopping_bag
+        - button "Toggle theme" [ref=f13e15] [cursor=pointer]:
+          - generic [ref=f13e16]: dark_mode
+        - button "Login" [ref=f13e17] [cursor=pointer]:
+          - generic [ref=f13e18]: person
+        - button "Toggle menu" [ref=f13e19] [cursor=pointer]
+  - main [ref=f13e23]
+  - contentinfo [ref=f13e24]:
+    - generic [ref=f13e25]:
+      - generic [ref=f13e26]:
+        - generic [ref=f13e27]:
+          - img "Welco" [ref=f13e28]
+          - generic [ref=f13e29]: Welco Surgical
+        - paragraph [ref=f13e30]: Precision surgical instrument manufacturer built for institutional operating rooms, hospital procurement desks, and private-label OEM partners worldwide.
+        - generic [ref=f13e31]:
+          - generic [ref=f13e32]: ISO 13485:2016
+          - generic [ref=f13e33]: CE MDR CLASS IIa
+          - generic [ref=f13e34]: UDI LOT-TRACEABLE
+      - generic [ref=f13e35]:
+        - heading "Product" [level=4] [ref=f13e36]
+        - link "Marketplace" [ref=f13e37] [cursor=pointer]:
+          - /url: /marketplace
+        - link "Quality & Certs" [ref=f13e38] [cursor=pointer]:
+          - /url: /certifications
+        - link "OEM / Private Label" [ref=f13e39] [cursor=pointer]:
+          - /url: /oem
+        - link "General Surgery" [ref=f13e40] [cursor=pointer]:
+          - /url: /marketplace
+        - link "Orthopedic Line" [ref=f13e41] [cursor=pointer]:
+          - /url: /marketplace
+      - generic [ref=f13e42]:
+        - heading "Account" [level=4] [ref=f13e43]
+        - link "Account" [ref=f13e44] [cursor=pointer]:
+          - /url: /account
+        - link "Quote requests" [ref=f13e45] [cursor=pointer]:
+          - /url: /account/rfqs
+        - link "Quotes" [ref=f13e46] [cursor=pointer]:
+          - /url: /account/quotes
+        - link "Order history" [ref=f13e47] [cursor=pointer]:
+          - /url: /account/orders
+        - link "Addresses" [ref=f13e48] [cursor=pointer]:
+          - /url: /addresses
+      - generic [ref=f13e49]:
+        - heading "Support" [level=4] [ref=f13e50]
+        - link "Help Center" [ref=f13e51] [cursor=pointer]:
+          - /url: /help
+        - link "My Tickets" [ref=f13e52] [cursor=pointer]:
+          - /url: /help/my-tickets
+        - link "Track Order" [ref=f13e53] [cursor=pointer]:
+          - /url: /track-order
+        - link "support@welco.health" [ref=f13e54] [cursor=pointer]:
+          - /url: mailto:support@welco.health
+        - link "+971 50 000 0000" [ref=f13e55] [cursor=pointer]:
+          - /url: tel:+971500000000
+    - generic [ref=f13e56]:
+      - generic [ref=f13e57]:
+        - generic [ref=f13e58]: © 2026 Welco Surgical Instruments GmbH / FZ-LLC. All rights reserved.
+        - generic [ref=f13e59]: Passivated Stainless Steel DIN EN ISO 17664 · 134°C Autoclave Validated.
+      - generic [ref=f13e60]: PRODUCTION CELLS ONLINE
+  - navigation "Mobile Navigation" [ref=f13e65]:
+    - link "home Home" [ref=f13e66] [cursor=pointer]:
+      - /url: /
+      - generic [ref=f13e67]: home
+      - generic [ref=f13e68]: Home
+    - link "storefront Marketplace" [ref=f13e69] [cursor=pointer]:
+      - /url: /marketplace
+      - generic [ref=f13e70]: storefront
+      - generic [ref=f13e71]: Marketplace
+    - link "verified Quality & Certs" [ref=f13e72] [cursor=pointer]:
+      - /url: /certifications
+      - generic [ref=f13e73]: verified
+      - generic [ref=f13e74]: Quality & Certs
+    - link "help Help Center" [ref=f13e75] [cursor=pointer]:
+      - /url: /help
+      - generic [ref=f13e76]: help
+      - generic [ref=f13e77]: Help Center
+    - button "All allowed pages" [ref=f13e78] [cursor=pointer]:
+      - generic [ref=f13e79]: apps
+      - generic [ref=f13e81]: More
+  - link "WhatsApp Inquiry" [ref=f13e82] [cursor=pointer]:
+    - /url: https://wa.me/971500000000?text=Hello%20Welco%20team%20%E2%80%94%20I%20need%20assistance%20with%20surgical%20instruments.

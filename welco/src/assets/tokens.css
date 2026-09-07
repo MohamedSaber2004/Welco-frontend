@@ -1,0 +1,352 @@
+/* Welco — Surgical Precision Design System
+ * Zinc & Slate neutral foundation · Electric Indigo #4F46E5 · Precision Cobalt #6366F1
+ * Plus Jakarta Sans & Sora Display · Inter Body · Alexandria & IBM Plex Sans Arabic · JetBrains Mono Data
+ * Signature: Laser scalpel sweep, luminous micro-focus rings, 44px ergonomic controls
+ */
+@import url('https://fonts.googleapis.com/css2?family=Alexandria:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Sora:wght@500;600;700;800&display=swap');
+
+:root {
+  /* ── Typography — Surgical Precision & High-Density Clinical Clarity ── */
+  --wl-font-display: 'Plus Jakarta Sans', 'Sora', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --wl-font-body: 'Inter', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --wl-font-mono: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, monospace;
+  --wl-text-display: clamp(2.75rem, 5vw, 3.75rem);
+  --wl-text-h1: clamp(2rem, 3.6vw, 2.5rem);
+  --wl-text-h2: clamp(1.5rem, 2.6vw, 2.05rem);
+  --wl-text-h3: 1.28rem;
+  --wl-text-h4: 1.08rem;
+  --wl-text-body: 0.95rem;
+  --wl-text-small: 0.84rem;
+  --wl-text-caption: 0.72rem;
+  --wl-tracking-display: -0.026em;
+  --wl-tracking-tight: -0.012em;
+  --wl-leading-body: 1.62;
+
+  /* ── RGB channels for Tailwind opacity ── */
+  --wl-primary-rgb: 79, 70, 229;
+  --wl-accent-rgb: 99, 102, 241;
+  --wl-danger-rgb: 244, 63, 94;
+  --wl-success-rgb: 16, 185, 129;
+  --wl-warning-rgb: 245, 158, 11;
+  --wl-paper-rgb: 248, 250, 252;
+  --wl-surface-rgb: 255, 255, 255;
+  --wl-ink-rgb: 30, 41, 59;
+  --wl-ink-strong-rgb: 15, 23, 42;
+  --wl-ink-soft-rgb: 71, 85, 105;
+  --wl-muted-rgb: 100, 116, 139;
+
+  /* ── Zinc Neutrals ── */
+  --zinc-50: #FAFAFA;
+  --zinc-100: #F4F4F5;
+  --zinc-200: #E4E4E7;
+  --zinc-300: #D4D4D8;
+  --zinc-400: #A1A1AA;
+  --zinc-500: #71717A;
+  --zinc-600: #52525B;
+  --zinc-700: #3F3F46;
+  --zinc-800: #27272A;
+  --zinc-900: #18181B;
+  --zinc-950: #09090B;
+
+  /* ── Primary — Electric Indigo ── */
+  --wl-primary: #4F46E5;
+  --wl-primary-hover: #4338CA;
+  --wl-primary-active: #3730A3;
+  --wl-primary-soft: #EEF2FF;
+  --wl-primary-faint: #F5F3FF;
+  --wl-primary-ring: 0 0 0 4px rgba(79, 70, 229, 0.12);
+  --wl-primary-shadow: 0 4px 20px -2px rgba(79, 70, 229, 0.15), 0 2px 8px rgba(79, 70, 229, 0.08);
+  --wl-primary-glow: 0 0 0 3.5px rgba(79, 70, 229, 0.14), 0 2px 8px -2px rgba(79, 70, 229, 0.18);
+
+  /* ── Accent — Precision Cobalt ── */
+  --wl-accent: #6366F1;
+  --wl-accent-hover: #4F46E5;
+  --wl-accent-soft: #EEF2FF;
+  --wl-accent-faint: #F5F3FF;
+  --wl-accent-ring: 0 0 0 4px rgba(99, 102, 241, 0.12);
+
+  /* ── Semantic ── */
+  --wl-success: #10B981;
+  --wl-success-soft: #ECFDF5;
+  --wl-success-ring: 0 0 0 4px rgba(16, 185, 129, 0.12);
+  --wl-warning: #F59E0B;
+  --wl-warning-soft: #FFFBEB;
+  --wl-danger: #F43F5E;
+  --wl-danger-soft: #FFF1F2;
+  --wl-danger-ring: 0 0 0 4px rgba(244, 63, 94, 0.12);
+  --wl-info: #0EA5E9;
+  --wl-info-soft: #F0F9FF;
+
+  /* ── Ink & Line ── */
+  --wl-ink-strong: #0F172A;
+  --wl-ink: #1E293B;
+  --wl-ink-soft: #475569;
+  --wl-muted: #64748B;
+  --wl-muted-soft: #94A3B8;
+  --wl-line: #E2E8F0;
+  --wl-line-strong: #CBD5E1;
+
+  /* ── Surfaces ── */
+  --wl-paper: #F8FAFC;
+  --wl-surface: #FFFFFF;
+  --wl-card: #FFFFFF;
+  --wl-surface-soft: #F1F5F9;
+  --wl-surface-hover: #E2E8F0;
+  --wl-surface-muted: #F8FAFC;
+  --wl-border: #E2E8F0;
+  --wl-border-strong: #CBD5E1;
+  --wl-header-bg: rgba(248, 250, 252, 0.8);
+  --wl-header-border: rgba(0, 0, 0, 0.06);
+
+  /* ── Text Colors ── */
+  --wl-text-primary: var(--wl-ink-strong);
+  --wl-text-secondary: var(--wl-ink-soft);
+  --wl-text-muted: var(--wl-muted);
+
+  /* ── Background Colors ── */
+  --wl-bg-app: var(--wl-paper);
+  --wl-bg-surface: var(--wl-surface);
+  --wl-bg-surface-soft: var(--wl-surface-soft);
+
+  /* ── Spacing Scale (4px harmonic base) ── */
+  --space-0: 0px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+
+  /* ── Radii ── */
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-full: 999px;
+
+  /* ── Shadows (Multi-stage ambient diffusion) ── */
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 4px 8px -2px rgba(15, 23, 42, 0.06), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 12px 20px -4px rgba(15, 23, 42, 0.07), 0 4px 6px -2px rgba(15, 23, 42, 0.03);
+  --shadow-xl: 0 24px 36px -8px rgba(15, 23, 42, 0.09), 0 8px 16px -4px rgba(15, 23, 42, 0.04);
+  --wl-shadow-card: 0 0 0 1px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.04), 0 6px 18px -4px rgba(15, 23, 42, 0.03);
+  --wl-shadow-primary: 0 4px 16px -2px rgba(79, 70, 229, 0.28), 0 2px 6px -1px rgba(79, 70, 229, 0.18);
+
+  /* ── Layout & Semantic Spacing Tokens ── */
+  --wl-max-width: 1280px;
+  --wl-header-height: 56px;
+  --wl-touch-min: 44px;
+  --wl-header-search-min: 170px;
+  --wl-header-search-max: 230px;
+  --wl-rail-width: 240px;
+  --wl-rail-collapsed: 64px;
+  --wl-gutter: 1.5rem;
+  --wl-section: 4rem;
+
+  /* Semantic Layout Spacing */
+  --wl-page-padding-top: 1.75rem;
+  --wl-page-padding-bottom: 3.5rem;
+  --wl-page-gap: 1.5rem;
+  --wl-section-gap: 3.5rem;
+  --wl-card-padding: 1.5rem;
+  --wl-card-padding-sm: 1rem;
+  --wl-card-padding-lg: 2rem;
+  --wl-form-gap: 1.25rem;
+  --wl-field-gap: 0.45rem;
+  --wl-table-cell-padding-y: 0.85rem;
+  --wl-table-cell-padding-x: 1.15rem;
+  --wl-table-cell-padding: var(--wl-table-cell-padding-y) var(--wl-table-cell-padding-x);
+  --wl-modal-padding: 1.5rem;
+  --wl-modal-padding-sm: 1rem;
+
+  /* ── Control Sizing ── */
+  --wl-control-sm: 36px;
+  --wl-control-md: 44px;
+  --wl-control-lg: 52px;
+
+  /* ── Motion ── */
+  --wl-transition: 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  --wl-ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --wl-focus-ring: 0 0 0 3.5px rgba(79, 70, 229, 0.14), 0 2px 8px -2px rgba(79, 70, 229, 0.18);
+  --wl-focus-ring-danger: 0 0 0 3.5px rgba(244, 63, 94, 0.16);
+
+  /* ── Backward-compatible aliases (consolidate to --wl-primary / --wl-accent) ── */
+  --wl-teal: var(--wl-primary);
+  --wl-teal-hover: var(--wl-primary-hover);
+  --wl-teal-soft: var(--wl-primary-soft);
+  --wl-teal-faint: var(--wl-primary-faint);
+  --wl-teal-ring: var(--wl-primary-ring);
+  --wl-teal-rgb: var(--wl-primary-rgb);
+  --wl-amber-rgb: var(--wl-accent-rgb);
+  --wl-amber: var(--wl-accent);
+  --wl-amber-soft: var(--wl-accent-soft);
+  --wl-brass: var(--wl-accent);
+  --wl-brass-soft: var(--wl-accent-soft);
+  --wl-on-primary: #FFFFFF;
+  --clinical-primary: var(--wl-primary);
+  --clinical-primary-container: var(--wl-primary-soft);
+  --clinical-inverse-surface: var(--wl-ink-strong);
+  --clinical-inverse-primary: #A5B4FC;
+  --wl-medical-blue-soft: var(--wl-primary-soft);
+  --wl-medical-blue-faint: var(--wl-primary-faint);
+  --wl-steril-amber-soft: var(--wl-accent-soft);
+  --wl-steril-amber-strong: var(--wl-accent);
+  /* Stale component vars → canonical */
+  --bg-surface: var(--wl-surface);
+  --bg-surface-soft: var(--wl-surface-soft);
+  --border-color: var(--wl-border);
+  --wl-obsidian: var(--wl-ink-strong);
+  --wl-stone: var(--wl-paper);
+  --wl-radius-lg: var(--radius-lg);
+  --wl-radius-xl: var(--radius-xl);
+
+  /* ── Laser Sweep Gradient ── */
+  --wl-laser-sweep: linear-gradient(90deg, transparent, var(--wl-primary), var(--wl-accent), transparent);
+}
+
+/* ── Dark Theme — refined zinc + indigo glow ── */
+:root.dark, :root[data-theme='dark'] {
+  color-scheme: dark;
+  --wl-paper-rgb: 9, 9, 11;
+  --wl-surface-rgb: 24, 24, 27;
+  --wl-ink-rgb: 228, 228, 231;
+  --wl-ink-strong-rgb: 250, 250, 250;
+  --wl-ink-strong: #FAFAFA;
+  --wl-ink: #E4E4E7;
+  --wl-ink-soft: #A1A1AA;
+  --wl-muted: #71717A;
+  --wl-muted-soft: #52525B;
+  --wl-paper: #09090B;
+  --wl-surface: #18181B;
+  --wl-card: #1E1E20;
+  --wl-surface-soft: #27272A;
+  --wl-surface-hover: #3F3F46;
+  --wl-surface-muted: #1A1A1E;
+  --wl-border: rgba(255, 255, 255, 0.07);
+  --wl-border-strong: rgba(255, 255, 255, 0.13);
+  --wl-line: rgba(255, 255, 255, 0.07);
+  --wl-line-strong: rgba(255, 255, 255, 0.13);
+  --wl-header-bg: rgba(9, 9, 11, 0.88);
+  --wl-header-border: rgba(255, 255, 255, 0.06);
+  --wl-text-primary: #FAFAFA;
+  --wl-text-secondary: #A1A1AA;
+  --wl-text-muted: #71717A;
+  --wl-bg-app: #09090B;
+  --wl-bg-surface: #18181B;
+  --wl-bg-surface-soft: #27272A;
+  --wl-primary: #818CF8;
+  --wl-primary-hover: #A5B4FC;
+  --wl-primary-active: #6366F1;
+  --wl-primary-soft: rgba(129, 140, 248, 0.14);
+  --wl-primary-faint: rgba(129, 140, 248, 0.07);
+  --wl-primary-ring: 0 0 0 4px rgba(129, 140, 248, 0.18);
+  --wl-primary-shadow: 0 4px 20px rgba(129, 140, 248, 0.22);
+  --wl-primary-glow: 0 0 0 3.5px rgba(129, 140, 248, 0.16), 0 2px 10px rgba(129, 140, 248, 0.2);
+  --wl-accent: #A5B4FC;
+  --wl-accent-hover: #C7D2FE;
+  --wl-accent-soft: rgba(165, 180, 252, 0.12);
+  --wl-accent-faint: rgba(165, 180, 252, 0.06);
+  --wl-success: #34D399;
+  --wl-success-soft: rgba(52, 211, 153, 0.12);
+  --wl-success-ring: 0 0 0 4px rgba(52, 211, 153, 0.14);
+  --wl-warning: #FBBF24;
+  --wl-warning-soft: rgba(251, 191, 36, 0.12);
+  --wl-danger: #FB7185;
+  --wl-danger-soft: rgba(251, 113, 133, 0.12);
+  --wl-danger-ring: 0 0 0 4px rgba(251, 113, 133, 0.14);
+  --wl-info: #38BDF8;
+  --wl-info-soft: rgba(56, 189, 248, 0.12);
+  --wl-focus-ring: 0 0 0 3.5px rgba(129, 140, 248, 0.18), 0 2px 10px rgba(129, 140, 248, 0.16);
+  --wl-focus-ring-danger: 0 0 0 3.5px rgba(251, 113, 133, 0.16);
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.45), 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 10px 28px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 20px 44px rgba(0, 0, 0, 0.55);
+  --wl-shadow-card: 0 0 0 1px rgba(255, 255, 255, 0.07), 0 2px 8px rgba(0, 0, 0, 0.4), 0 12px 28px -6px rgba(0, 0, 0, 0.5);
+  --wl-shadow-primary: 0 4px 20px rgba(129, 140, 248, 0.25);
+  --wl-laser-sweep: linear-gradient(90deg, transparent, #818CF8, #A5B4FC, transparent);
+  /* Alias sync for dark */
+  --wl-teal: var(--wl-primary);
+  --wl-teal-hover: var(--wl-primary-hover);
+  --wl-teal-soft: var(--wl-primary-soft);
+  --wl-teal-faint: var(--wl-primary-faint);
+  --wl-teal-ring: var(--wl-primary-ring);
+  --wl-brass: var(--wl-accent);
+  --wl-brass-soft: var(--wl-accent-soft);
+  --clinical-primary: var(--wl-primary);
+  --clinical-inverse-surface: #FAFAFA;
+  --clinical-inverse-primary: #4F46E5;
+  --bg-surface: var(--wl-surface);
+  --bg-surface-soft: var(--wl-surface-soft);
+  --border-color: var(--wl-border);
+}
+
+/* ── Dedicated Arabic Typography & Geometry ── */
+[dir="rtl"],
+[lang="ar"],
+html[lang="ar"],
+html[dir="rtl"] {
+  --wl-font-display: 'Alexandria', 'IBM Plex Sans Arabic', 'Plus Jakarta Sans', system-ui, sans-serif;
+  --wl-font-body: 'IBM Plex Sans Arabic', 'Alexandria', 'Inter', system-ui, sans-serif;
+  --wl-leading-body: 1.68;
+}
+
+@media (max-width: 1024px) {
+  :root {
+    --wl-gutter: 1.25rem;
+    --wl-page-padding-top: 1.5rem;
+    --wl-page-padding-bottom: 3rem;
+    --wl-page-gap: 1.35rem;
+    --wl-section-gap: 3rem;
+    --wl-card-padding: 1.35rem;
+    --wl-card-padding-lg: 1.75rem;
+  }
+}
+@media (max-width: 768px) {
+  :root {
+    --wl-gutter: 1rem;
+    --wl-header-height: 52px;
+    --wl-page-padding-top: 1.25rem;
+    --wl-page-padding-bottom: 2.5rem;
+    --wl-page-gap: 1.25rem;
+    --wl-section: 3rem;
+    --wl-section-gap: 2.5rem;
+    --wl-card-padding: 1.15rem;
+    --wl-card-padding-lg: 1.35rem;
+    --wl-form-gap: 1rem;
+    --wl-table-cell-padding-y: 0.75rem;
+    --wl-table-cell-padding-x: 0.85rem;
+    --wl-modal-padding: 1.15rem;
+  }
+}
+@media (max-width: 480px) {
+  :root {
+    --wl-gutter: 0.85rem;
+    --wl-section: 2.25rem;
+    --wl-page-padding-top: 1rem;
+    --wl-page-padding-bottom: 2rem;
+    --wl-page-gap: 1rem;
+    --wl-section-gap: 2rem;
+    --wl-card-padding: 1rem;
+    --wl-card-padding-lg: 1.15rem;
+    --wl-form-gap: 0.85rem;
+    --wl-modal-padding: 0.85rem;
+  }
+}
+@media (max-width: 360px) {
+  :root {
+    --wl-gutter: 0.65rem;
+    --wl-page-padding-top: 0.75rem;
+    --wl-page-padding-bottom: 1.75rem;
+  }
+}

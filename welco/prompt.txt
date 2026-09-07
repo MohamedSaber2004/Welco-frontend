@@ -1,0 +1,1 @@
+ @[src/utils/country-currency-map.ts]  if that not need remove it and if needed remove static data from here

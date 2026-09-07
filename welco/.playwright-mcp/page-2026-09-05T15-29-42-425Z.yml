@@ -1,0 +1,168 @@
+- generic [active] [ref=f7e1]:
+  - generic [ref=f7e2]:
+    - link "Skip to main content" [ref=f7e3] [cursor=pointer]:
+      - /url: "#main-content"
+    - banner [ref=f7e6]:
+      - generic [ref=f7e8]:
+        - link "Home" [ref=f7e9] [cursor=pointer]:
+          - /url: /
+          - img "Welco" [ref=f7e10]
+          - generic [ref=f7e11]: Welco
+        - navigation "Primary" [ref=f7e12]:
+          - link "Home" [ref=f7e13] [cursor=pointer]:
+            - /url: /
+          - link "Marketplace" [ref=f7e14] [cursor=pointer]:
+            - /url: /marketplace
+          - link "Quality & Certs" [ref=f7e15] [cursor=pointer]:
+            - /url: /certifications
+          - link "Help Center" [ref=f7e16] [cursor=pointer]:
+            - /url: /help
+        - search [ref=f7e17]:
+          - generic [aria-hidden] [ref=f7e18]: search
+          - textbox "Search implants, SKU, manufacturer, supplier…" [ref=f7e19]
+          - generic [ref=f7e20]: ⌘K
+        - generic [ref=f7e21]:
+          - link "Quote Cart" [ref=f7e22] [cursor=pointer]:
+            - /url: /cart
+            - generic [ref=f7e23]: shopping_bag
+          - button "Toggle theme" [ref=f7e24] [cursor=pointer]:
+            - generic [ref=f7e25]: dark_mode
+          - generic [ref=f7e26]:
+            - button "Login" [ref=f7e27] [cursor=pointer]
+            - button "Register" [ref=f7e28] [cursor=pointer]
+          - button "Login" [ref=f7e29] [cursor=pointer]:
+            - generic [ref=f7e30]: person
+    - main [ref=f7e31]:
+      - generic [ref=f7e32]:
+        - button "Back" [ref=f7e33] [cursor=pointer]:
+          - generic [aria-hidden] [ref=f7e34]: arrow_back
+        - navigation "Breadcrumb" [ref=f7e36]:
+          - link "Home" [ref=f7e37] [cursor=pointer]:
+            - /url: /
+          - generic [ref=f7e38]: /
+          - generic [ref=f7e39]: OEM & Contract Manufacturing
+        - generic [ref=f7e41]:
+          - generic [ref=f7e42]:
+            - generic [ref=f7e43]: CONTRACT SURGICAL MANUFACTURING · ISO 13485 CERTIFIED
+            - heading "Your brand, our instruments" [level=1] [ref=f7e46]
+            - paragraph [ref=f7e47]: For 30 years we have manufactured surgical instruments for partners who sell under their own names. From single-kit private labels to fully custom developments, every run is ISO 13485 and lot-traceable.
+            - generic [ref=f7e48]:
+              - generic [ref=f7e49]: verified
+              - generic [ref=f7e50]: Built on ISO 13485 · CE · 40+ export markets
+          - generic [aria-hidden] [ref=f7e51]:
+            - generic [ref=f7e52]:
+              - generic [ref=f7e53]: "PRODUCTION CELL #04"
+              - generic [ref=f7e56]: EST. 1994
+            - generic [ref=f7e57]:
+              - generic [ref=f7e58]:
+                - generic [ref=f7e59]: "STEEL GRADE:"
+                - generic [ref=f7e60]: AISI 410 / 420 Martensitic
+              - generic [ref=f7e61]:
+                - generic [ref=f7e62]: "INSERTS:"
+                - generic [ref=f7e63]: Tungsten Carbide (HRC 70+)
+              - generic [ref=f7e64]:
+                - generic [ref=f7e65]: "PASSIVATION:"
+                - generic [ref=f7e66]: ASTM A967 Citric / Nitric
+              - generic [ref=f7e67]:
+                - generic [ref=f7e68]: "TRACEABILITY:"
+                - generic [ref=f7e69]: GS1-128 / UDI Micro-Laser
+            - generic [ref=f7e73]:
+              - generic [ref=f7e74]: "Annual Capacity: 1.2M+ Surgical Units"
+              - generic [ref=f7e75]: 88% Utilized
+        - generic [ref=f7e77]:
+          - generic [ref=f7e78]: MODULAR PRODUCTION CAPABILITIES · 5 DEDICATED LINES
+          - heading "Manufacturing services" [level=2] [ref=f7e81]
+          - paragraph [ref=f7e82]: Each service is a production line, not a bullet point.
+        - generic [ref=f7e84]:
+          - generic [ref=f7e85]:
+            - generic [ref=f7e86]: ENGINEERING CONSULTATION
+            - heading "Start an OEM inquiry" [level=2] [ref=f7e89]
+            - paragraph [ref=f7e90]: Tell us what you build and we respond within two business days. Our medical manufacturing engineers will review your CAD drawings, quantity tiers, and technical specifications within two business days.
+            - generic [ref=f7e91]:
+              - generic [ref=f7e92]:
+                - generic [ref=f7e93]: lock
+                - generic [ref=f7e94]:
+                  - strong [ref=f7e95]: Full Mutual NDA
+                  - paragraph [ref=f7e96]: Your proprietary instrument geometries remain strictly confidential.
+              - generic [ref=f7e97]:
+                - generic [ref=f7e98]: token
+                - generic [ref=f7e99]:
+                  - strong [ref=f7e100]: Prototyping Run
+                  - paragraph [ref=f7e101]: First-article inspection (FAI) samples provided prior to volume batch run.
+          - generic [ref=f7e103]:
+            - generic [ref=f7e104]:
+              - generic [ref=f7e105]:
+                - generic [ref=f7e106]: Full name *
+                - textbox "Full name *" [ref=f7e107]
+              - generic [ref=f7e108]:
+                - generic [ref=f7e109]: Work email *
+                - textbox "Work email *" [ref=f7e110]
+            - generic [ref=f7e111]:
+              - generic [ref=f7e112]:
+                - generic [ref=f7e113]: Company *
+                - textbox "Company *" [ref=f7e114]
+              - generic [ref=f7e115]:
+                - generic [ref=f7e116]: Service of interest *
+                - combobox "Service of interest *" [ref=f7e117] [cursor=pointer]:
+                  - option "Select a service type" [disabled] [selected]
+                  - option "Full Custom Solution"
+            - generic [ref=f7e118]:
+              - generic [ref=f7e119]: What are you building? *
+              - textbox "What are you building? *" [ref=f7e120]:
+                - /placeholder: Include estimated annual volumes, CAD readiness, and special sterilization requirements...
+            - button "send Send inquiry" [ref=f7e121] [cursor=pointer]:
+              - generic [ref=f7e122]: send
+              - generic [ref=f7e123]: Send inquiry
+    - contentinfo [ref=f7e124]:
+      - generic [ref=f7e125]:
+        - generic [ref=f7e126]:
+          - generic [ref=f7e127]:
+            - img "Welco" [ref=f7e128]
+            - generic [ref=f7e129]: Welco Surgical
+          - paragraph [ref=f7e130]: Precision surgical instrument manufacturer built for institutional operating rooms, hospital procurement desks, and private-label OEM partners worldwide.
+          - generic [ref=f7e131]:
+            - generic [ref=f7e132]: ISO 13485:2016
+            - generic [ref=f7e133]: CE MDR CLASS IIa
+            - generic [ref=f7e134]: UDI LOT-TRACEABLE
+        - generic [ref=f7e135]:
+          - heading "Product" [level=4] [ref=f7e136]
+          - link "Marketplace" [ref=f7e137] [cursor=pointer]:
+            - /url: /marketplace
+          - link "Quality & Certs" [ref=f7e138] [cursor=pointer]:
+            - /url: /certifications
+          - link "OEM / Private Label" [ref=f7e139] [cursor=pointer]:
+            - /url: /oem
+          - link "General Surgery" [ref=f7e140] [cursor=pointer]:
+            - /url: /marketplace
+          - link "Orthopedic Line" [ref=f7e141] [cursor=pointer]:
+            - /url: /marketplace
+        - generic [ref=f7e142]:
+          - heading "Account" [level=4] [ref=f7e143]
+          - link "Account" [ref=f7e144] [cursor=pointer]:
+            - /url: /account
+          - link "Quote requests" [ref=f7e145] [cursor=pointer]:
+            - /url: /account/rfqs
+          - link "Quotes" [ref=f7e146] [cursor=pointer]:
+            - /url: /account/quotes
+          - link "Order history" [ref=f7e147] [cursor=pointer]:
+            - /url: /account/orders
+          - link "Addresses" [ref=f7e148] [cursor=pointer]:
+            - /url: /addresses
+        - generic [ref=f7e149]:
+          - heading "Support" [level=4] [ref=f7e150]
+          - link "Help Center" [ref=f7e151] [cursor=pointer]:
+            - /url: /help
+          - link "My Tickets" [ref=f7e152] [cursor=pointer]:
+            - /url: /help/my-tickets
+          - link "Track Order" [ref=f7e153] [cursor=pointer]:
+            - /url: /track-order
+          - link "support@welco.health" [ref=f7e154] [cursor=pointer]:
+            - /url: mailto:support@welco.health
+          - link "+971 50 000 0000" [ref=f7e155] [cursor=pointer]:
+            - /url: tel:+971500000000
+      - generic [ref=f7e156]:
+        - generic [ref=f7e157]:
+          - generic [ref=f7e158]: © 2026 Welco Surgical Instruments GmbH / FZ-LLC. All rights reserved.
+          - generic [ref=f7e159]: Passivated Stainless Steel DIN EN ISO 17664 · 134°C Autoclave Validated.
+        - generic [ref=f7e160]: PRODUCTION CELLS ONLINE
+  - generic [ref=f7e164]: OEM / Private Label

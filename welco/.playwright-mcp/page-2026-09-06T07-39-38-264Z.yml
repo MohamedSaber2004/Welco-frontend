@@ -1,0 +1,161 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - link "Skip to main content" [ref=e3] [cursor=pointer]:
+      - /url: "#main-content"
+    - banner [ref=e6]:
+      - generic [ref=e8]:
+        - link "Home" [ref=e9] [cursor=pointer]:
+          - /url: /
+          - img "Welco" [ref=e10]
+          - generic [ref=e11]: Welco
+        - navigation "Navigation" [ref=e12]:
+          - link "Home" [ref=e13] [cursor=pointer]:
+            - /url: /
+          - link "Marketplace" [ref=e14] [cursor=pointer]:
+            - /url: /marketplace
+          - link "Quality & Certs" [ref=e15] [cursor=pointer]:
+            - /url: /certifications
+          - link "Help Center" [ref=e16] [cursor=pointer]:
+            - /url: /help
+        - search [ref=e17]:
+          - generic [aria-hidden] [ref=e18]: search
+          - textbox "Search implants, SKU, manufacturer, supplier…" [ref=e19]
+        - generic [ref=e20]:
+          - link "Quote Cart" [ref=e21] [cursor=pointer]:
+            - /url: /cart
+            - generic [ref=e22]: shopping_bag
+          - button "Toggle theme" [ref=e23] [cursor=pointer]:
+            - generic [ref=e24]: dark_mode
+          - generic [ref=e25]:
+            - button "Login" [ref=e26] [cursor=pointer]
+            - button "Register" [ref=e27] [cursor=pointer]
+    - main [ref=e28]:
+      - generic [ref=e29]:
+        - generic [ref=e31]:
+          - generic [ref=e32]:
+            - heading [level=1] [ref=e33]:
+              - text: Every edge, measured.
+              - emphasis [ref=e34]: Every lot, traceable.
+            - paragraph [ref=e35]: German-steel instruments, finished by hand, lot-stamped and ISO 13485 papered — from needle holder to retractor, tolerance ±0.02mm. Direct from factory, no broker.
+            - generic [ref=e37]:
+              - textbox "Search implants, SKU, manufacturer, supplier…" [ref=e38]
+              - button "Search" [ref=e39] [cursor=pointer]
+            - generic [ref=e40]:
+              - button "Marketplace" [ref=e41] [cursor=pointer]
+              - button "request_quote Price this tray" [ref=e43] [cursor=pointer]:
+                - generic [ref=e44]: request_quote
+                - generic [ref=e45]: Price this tray
+          - img "Welco — Surgical Instruments" [ref=e47]
+        - region [ref=e48]:
+          - generic [ref=e49]:
+            - heading "Operational Metrics" [level=2] [ref=e50]
+            - generic [ref=e51]:
+              - generic [ref=e52]:
+                - generic [ref=e53]:
+                  - generic [ref=e54]: Years at the bench, not the brochure
+                  - generic [ref=e55]: EST. 1994
+                - generic [ref=e56]: 32+
+              - generic [ref=e58]:
+                - generic [ref=e59]:
+                  - generic [ref=e60]: One QMS, audited — not badge-collected
+                  - generic [ref=e61]: AUDITED
+                - generic [ref=e62]: ISO 13485
+              - generic [ref=e64]:
+                - generic [ref=e65]:
+                  - generic [ref=e66]: Export lanes, verified by zone
+                  - generic [ref=e67]: GLOBAL
+                - generic [ref=e68]: 40+
+              - generic [ref=e70]:
+                - generic [ref=e71]:
+                  - generic [ref=e72]: Your mark, our metallurgy
+                  - generic [ref=e73]: DIRECT
+                - generic [ref=e74]: OEM / ODM
+        - region [ref=e76]:
+          - generic [ref=e77]:
+            - generic [ref=e79]:
+              - generic [ref=e80]: Browse by clinical specialty
+              - heading "Browse by Category" [level=2] [ref=e81]
+            - status "Loading..." [ref=e83]
+        - region [ref=e125]:
+          - generic [ref=e126]:
+            - generic [ref=e127]:
+              - generic [ref=e128]:
+                - generic [ref=e129]: Clinical highlights
+                - heading "Top-rated and ready to ship across EG · SA · AE" [level=2] [ref=e130]
+              - link "Browse complete line →" [ref=e131] [cursor=pointer]:
+                - /url: /marketplace
+                - generic [ref=e132]: Browse complete line
+                - generic [ref=e133]: →
+            - status "Loading..." [ref=e135]
+        - region [ref=e188]:
+          - generic [ref=e189]:
+            - generic [ref=e190]:
+              - generic [ref=e191]: Export network
+              - heading "Trusted globally" [level=2] [ref=e192]
+              - paragraph [ref=e193]: Territories served by the Welco network — verified by Country → City → Zone.
+            - generic [ref=e194]:
+              - generic [ref=e195]: TRADE SHOWS
+              - heading "Meet Welco Engineering" [level=3] [ref=e196]
+              - paragraph [ref=e197]: No upcoming trade shows scheduled.
+        - region [ref=e198]:
+          - generic [ref=e199]:
+            - generic [ref=e201]:
+              - generic [ref=e202]: Technical Files
+              - heading "Inside the factory" [level=2] [ref=e203]
+            - status "Loading..." [ref=e205]
+    - contentinfo [ref=e227]:
+      - generic [ref=e228]:
+        - generic [ref=e229]:
+          - generic [ref=e230]:
+            - img "Welco" [ref=e231]
+            - generic [ref=e232]: Welco Surgical
+          - paragraph [ref=e233]: Precision surgical instrument manufacturer built for institutional operating rooms, hospital procurement desks, and private-label OEM partners worldwide.
+          - generic [ref=e234]:
+            - generic [ref=e235]: ISO 13485:2016
+            - generic [ref=e236]: CE MDR CLASS IIa
+            - generic [ref=e237]: UDI LOT-TRACEABLE
+        - generic [ref=e238]:
+          - heading "Product" [level=4] [ref=e239]
+          - link "Marketplace" [ref=e240] [cursor=pointer]:
+            - /url: /marketplace
+          - link "Quality & Certs" [ref=e241] [cursor=pointer]:
+            - /url: /certifications
+          - link "OEM / Private Label" [ref=e242] [cursor=pointer]:
+            - /url: /oem
+          - link "General Surgery" [ref=e243] [cursor=pointer]:
+            - /url: /marketplace
+          - link "Orthopedic Line" [ref=e244] [cursor=pointer]:
+            - /url: /marketplace
+        - generic [ref=e245]:
+          - heading "Account" [level=4] [ref=e246]
+          - link "Account" [ref=e247] [cursor=pointer]:
+            - /url: /account
+          - link "Quote requests" [ref=e248] [cursor=pointer]:
+            - /url: /account/rfqs
+          - link "Quotes" [ref=e249] [cursor=pointer]:
+            - /url: /account/quotes
+          - link "Order history" [ref=e250] [cursor=pointer]:
+            - /url: /account/orders
+          - link "Addresses" [ref=e251] [cursor=pointer]:
+            - /url: /addresses
+        - generic [ref=e252]:
+          - heading "Support" [level=4] [ref=e253]
+          - link "Help Center" [ref=e254] [cursor=pointer]:
+            - /url: /help
+          - link "My Tickets" [ref=e255] [cursor=pointer]:
+            - /url: /help/my-tickets
+          - link "Track Order" [ref=e256] [cursor=pointer]:
+            - /url: /track-order
+          - link "support@welco.health" [ref=e257] [cursor=pointer]:
+            - /url: mailto:support@welco.health
+          - link "+971 50 000 0000" [ref=e258] [cursor=pointer]:
+            - /url: tel:+971500000000
+      - generic [ref=e259]:
+        - generic [ref=e260]:
+          - generic [ref=e261]: © 2026 Welco Surgical Instruments GmbH / FZ-LLC. All rights reserved.
+          - generic [ref=e262]: Passivated Stainless Steel DIN EN ISO 17664 · 134°C Autoclave Validated.
+        - generic [ref=e263]: PRODUCTION CELLS ONLINE
+    - link "WhatsApp Inquiry" [ref=e267] [cursor=pointer]:
+      - /url: https://wa.me/971500000000?text=Hello%20Welco%20team%20%E2%80%94%20I%20need%20assistance%20with%20surgical%20instruments.
+      - generic [ref=e272]: Call Us
+  - generic [ref=e273]: Home

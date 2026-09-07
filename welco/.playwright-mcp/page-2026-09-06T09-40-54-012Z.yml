@@ -1,0 +1,161 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - link "تخطي إلى المحتوى الرئيسي" [ref=e3] [cursor=pointer]:
+      - /url: "#main-content"
+    - banner [ref=e6]:
+      - generic [ref=e8]:
+        - link "الرئيسية" [ref=e9] [cursor=pointer]:
+          - /url: /
+          - img "Welco" [ref=e10]
+          - generic [ref=e11]: Welco
+        - navigation "التنقل" [ref=e12]:
+          - link "الرئيسية" [ref=e13] [cursor=pointer]:
+            - /url: /
+          - link "السوق الطبي" [ref=e14] [cursor=pointer]:
+            - /url: /marketplace
+          - link "الجودة والشهادات" [ref=e15] [cursor=pointer]:
+            - /url: /certifications
+          - link "مركز المساعدة" [ref=e16] [cursor=pointer]:
+            - /url: /help
+        - search [ref=e17]:
+          - generic [aria-hidden] [ref=e18]: search
+          - textbox "ابحث عن زرعات، كود SKU، مصنع أو مورد…" [ref=e19]
+        - generic [ref=e20]:
+          - link "سلة التسعير" [ref=e21] [cursor=pointer]:
+            - /url: /cart
+            - generic [ref=e22]: shopping_bag
+          - button "تبديل المظهر" [ref=e23] [cursor=pointer]:
+            - generic [ref=e24]: dark_mode
+          - generic [ref=e25]:
+            - button "تسجيل الدخول" [ref=e26] [cursor=pointer]
+            - button "إنشاء حساب" [ref=e27] [cursor=pointer]
+    - main [ref=e28]:
+      - generic [ref=e29]:
+        - generic [ref=e31]:
+          - generic [ref=e32]:
+            - heading [level=1] [ref=e33]:
+              - text: كل حافة، مقاسة.
+              - emphasis [ref=e34]: وكل دفعة، قابلة للتتبع.
+            - paragraph [ref=e35]: أدوات فولاذ ألماني، تشطيب يدوي، مختومة بالدفعة وموثقة ISO 13485 — من حامل الإبر إلى المبعد، تفاوت ±٠٫٠٢ مم. مباشرة من المصنع، بلا وسيط.
+            - generic [ref=e37]:
+              - textbox "ابحث عن زرعات، كود SKU، مصنع أو مورد…" [ref=e38]
+              - button "بحث" [ref=e39] [cursor=pointer]
+            - generic [ref=e40]:
+              - button "السوق الطبي" [ref=e41] [cursor=pointer]
+              - button "request_quote طلب عرض سعر" [ref=e43] [cursor=pointer]:
+                - generic [ref=e44]: request_quote
+                - generic [ref=e45]: طلب عرض سعر
+          - img "Welco — Surgical Instruments" [ref=e47]
+        - region [ref=e48]:
+          - generic [ref=e49]:
+            - heading "مؤشرات التشغيل" [level=2] [ref=e50]
+            - generic [ref=e51]:
+              - generic [ref=e52]:
+                - generic [ref=e53]:
+                  - generic [ref=e54]: سنوات على طاولة العمل، لا في الكتيب
+                  - generic [ref=e55]: EST. 1994
+                - generic [ref=e56]: 32+
+              - generic [ref=e58]:
+                - generic [ref=e59]:
+                  - generic [ref=e60]: نظام جودة واحد، مدقق — لا مجموعة شارات
+                  - generic [ref=e61]: AUDITED
+                - generic [ref=e62]: ISO 13485
+              - generic [ref=e64]:
+                - generic [ref=e65]:
+                  - generic [ref=e66]: مسارات تصدير، موثقة حسب النطاق
+                  - generic [ref=e67]: GLOBAL
+                - generic [ref=e68]: 40+
+              - generic [ref=e70]:
+                - generic [ref=e71]:
+                  - generic [ref=e72]: علامتك، ومعادننا
+                  - generic [ref=e73]: DIRECT
+                - generic [ref=e74]: OEM / ODM
+        - region [ref=e76]:
+          - generic [ref=e77]:
+            - generic [ref=e79]:
+              - generic [ref=e80]: تصفح حسب التخصص السريري
+              - heading "تصفح حسب الفئة" [level=2] [ref=e81]
+            - status "جاري التحميل..." [ref=e83]
+        - region [ref=e125]:
+          - generic [ref=e126]:
+            - generic [ref=e127]:
+              - generic [ref=e128]:
+                - generic [ref=e129]: أبرز المنتجات السريرية
+                - heading "الأعلى تقييما وجاهز للشحن عبر مصر · السعودية · الإمارات" [level=2] [ref=e130]
+              - link "استعرض المجموعة الكاملة →" [ref=e131] [cursor=pointer]:
+                - /url: /marketplace
+                - generic [ref=e132]: استعرض المجموعة الكاملة
+                - generic [ref=e133]: →
+            - status "جاري التحميل..." [ref=e135]
+        - region [ref=e188]:
+          - generic [ref=e189]:
+            - generic [ref=e190]:
+              - generic [ref=e191]: شبكة التصدير
+              - heading "موثوق عالمياً" [level=2] [ref=e192]
+              - paragraph [ref=e193]: المناطق التي تخدمها شبكة ويلكو — موثّقة حسب الدولة → المدينة → المنطقة.
+            - generic [ref=e194]:
+              - generic [ref=e195]: المعارض التجارية
+              - heading "قابل فريق ويلكو الهندسي" [level=3] [ref=e196]
+              - paragraph [ref=e197]: لا توجد معارض قادمة مجدولة.
+        - region [ref=e198]:
+          - generic [ref=e199]:
+            - generic [ref=e201]:
+              - generic [ref=e202]: الملفات الفنية
+              - heading "داخل المصنع" [level=2] [ref=e203]
+            - status "جاري التحميل..." [ref=e205]
+    - contentinfo [ref=e227]:
+      - generic [ref=e228]:
+        - generic [ref=e229]:
+          - generic [ref=e230]:
+            - img "Welco" [ref=e231]
+            - generic [ref=e232]: Welco Surgical
+          - paragraph [ref=e233]: مصنّع أدوات جراحية دقيقة لغرف العمليات المؤسسية ومكاتب المشتريات بالمستشفيات وشركاء العلامة الخاصة OEM حول العالم.
+          - generic [ref=e234]:
+            - generic [ref=e235]: ISO 13485:2016
+            - generic [ref=e236]: CE MDR CLASS IIa
+            - generic [ref=e237]: UDI LOT-TRACEABLE
+        - generic [ref=e238]:
+          - heading "المنتج" [level=4] [ref=e239]
+          - link "السوق الطبي" [ref=e240] [cursor=pointer]:
+            - /url: /marketplace
+          - link "الجودة والشهادات" [ref=e241] [cursor=pointer]:
+            - /url: /certifications
+          - link "العلامة الخاصة (OEM)" [ref=e242] [cursor=pointer]:
+            - /url: /oem
+          - link "الجراحة العامة" [ref=e243] [cursor=pointer]:
+            - /url: /marketplace
+          - link "خط العظام" [ref=e244] [cursor=pointer]:
+            - /url: /marketplace
+        - generic [ref=e245]:
+          - heading "الحساب" [level=4] [ref=e246]
+          - link "الحساب" [ref=e247] [cursor=pointer]:
+            - /url: /account
+          - link "طلبات التسعير" [ref=e248] [cursor=pointer]:
+            - /url: /account/rfqs
+          - link "عروض الأسعار" [ref=e249] [cursor=pointer]:
+            - /url: /account/quotes
+          - link "سجل الطلبات" [ref=e250] [cursor=pointer]:
+            - /url: /account/orders
+          - link "العناوين" [ref=e251] [cursor=pointer]:
+            - /url: /addresses
+        - generic [ref=e252]:
+          - heading "الدعم" [level=4] [ref=e253]
+          - link "مركز المساعدة" [ref=e254] [cursor=pointer]:
+            - /url: /help
+          - link "تذاكري" [ref=e255] [cursor=pointer]:
+            - /url: /help/my-tickets
+          - link "تتبع الطلب" [ref=e256] [cursor=pointer]:
+            - /url: /track-order
+          - link "support@welco.health" [ref=e257] [cursor=pointer]:
+            - /url: mailto:support@welco.health
+          - link "+971 50 000 0000" [ref=e258] [cursor=pointer]:
+            - /url: tel:+971500000000
+      - generic [ref=e259]:
+        - generic [ref=e260]:
+          - generic [ref=e261]: © 2026 Welco Surgical Instruments GmbH / FZ-LLC. All rights reserved.
+          - generic [ref=e262]: Passivated Stainless Steel DIN EN ISO 17664 · 134°C Autoclave Validated.
+        - generic [ref=e263]: خلايا الإنتاج متصلة
+    - link "تواصل واتساب" [ref=e267] [cursor=pointer]:
+      - /url: https://wa.me/971500000000?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%20%D9%81%D8%B1%D9%8A%D9%82%20%D9%88%D9%8A%D9%84%D9%83%D9%88%20%E2%80%94%20%D8%A3%D8%AD%D8%AA%D8%A7%D8%AC%20%D9%85%D8%B3%D8%A7%D8%B9%D8%AF%D8%A9%20%D8%A8%D8%AE%D8%B5%D9%88%D8%B5%20%D8%A7%D9%84%D8%A3%D8%AF%D9%88%D8%A7%D8%AA%20%D8%A7%D9%84%D8%AC%D8%B1%D8%A7%D8%AD%D9%8A%D8%A9.
+      - generic [ref=e272]: اتصل بنا
+  - generic [ref=e273]: الرئيسية

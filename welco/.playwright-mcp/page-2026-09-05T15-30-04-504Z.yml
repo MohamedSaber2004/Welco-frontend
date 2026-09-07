@@ -1,0 +1,89 @@
+- generic [ref=f8e2]:
+  - link "Skip to main content" [ref=f8e3] [cursor=pointer]:
+    - /url: "#main-content"
+  - banner [ref=f8e6]:
+    - generic [ref=f8e8]:
+      - link "Home" [ref=f8e9] [cursor=pointer]:
+        - /url: /
+        - img "Welco" [ref=f8e10]
+        - generic [ref=f8e11]: Welco
+      - navigation "Primary" [ref=f8e12]:
+        - link "Home" [ref=f8e13] [cursor=pointer]:
+          - /url: /
+        - link "Marketplace" [ref=f8e14] [cursor=pointer]:
+          - /url: /marketplace
+        - link "Quality & Certs" [ref=f8e15] [cursor=pointer]:
+          - /url: /certifications
+        - link "Help Center" [ref=f8e16] [cursor=pointer]:
+          - /url: /help
+      - search [ref=f8e17]:
+        - generic [aria-hidden] [ref=f8e18]: search
+        - textbox "Search implants, SKU, manufacturer, supplier…" [ref=f8e19]
+        - generic [ref=f8e20]: ⌘K
+      - generic [ref=f8e21]:
+        - link "Quote Cart" [ref=f8e22] [cursor=pointer]:
+          - /url: /cart
+          - generic [ref=f8e23]: shopping_bag
+        - button "Toggle theme" [ref=f8e24] [cursor=pointer]:
+          - generic [ref=f8e25]: dark_mode
+        - generic [ref=f8e26]:
+          - button "Login" [ref=f8e27] [cursor=pointer]
+          - button "Register" [ref=f8e28] [cursor=pointer]
+        - button "Login" [ref=f8e29] [cursor=pointer]:
+          - generic [ref=f8e30]: person
+  - main [ref=f8e31]
+  - contentinfo [ref=f8e32]:
+    - generic [ref=f8e33]:
+      - generic [ref=f8e34]:
+        - generic [ref=f8e35]:
+          - img "Welco" [ref=f8e36]
+          - generic [ref=f8e37]: Welco Surgical
+        - paragraph [ref=f8e38]: Precision surgical instrument manufacturer built for institutional operating rooms, hospital procurement desks, and private-label OEM partners worldwide.
+        - generic [ref=f8e39]:
+          - generic [ref=f8e40]: ISO 13485:2016
+          - generic [ref=f8e41]: CE MDR CLASS IIa
+          - generic [ref=f8e42]: UDI LOT-TRACEABLE
+      - generic [ref=f8e43]:
+        - heading "Product" [level=4] [ref=f8e44]
+        - link "Marketplace" [ref=f8e45] [cursor=pointer]:
+          - /url: /marketplace
+        - link "Quality & Certs" [ref=f8e46] [cursor=pointer]:
+          - /url: /certifications
+        - link "OEM / Private Label" [ref=f8e47] [cursor=pointer]:
+          - /url: /oem
+        - link "General Surgery" [ref=f8e48] [cursor=pointer]:
+          - /url: /marketplace
+        - link "Orthopedic Line" [ref=f8e49] [cursor=pointer]:
+          - /url: /marketplace
+      - generic [ref=f8e50]:
+        - heading "Account" [level=4] [ref=f8e51]
+        - link "Account" [ref=f8e52] [cursor=pointer]:
+          - /url: /account
+        - link "Quote requests" [ref=f8e53] [cursor=pointer]:
+          - /url: /account/rfqs
+        - link "Quotes" [ref=f8e54] [cursor=pointer]:
+          - /url: /account/quotes
+        - link "Order history" [ref=f8e55] [cursor=pointer]:
+          - /url: /account/orders
+        - link "Addresses" [ref=f8e56] [cursor=pointer]:
+          - /url: /addresses
+      - generic [ref=f8e57]:
+        - heading "Support" [level=4] [ref=f8e58]
+        - link "Help Center" [ref=f8e59] [cursor=pointer]:
+          - /url: /help
+        - link "My Tickets" [ref=f8e60] [cursor=pointer]:
+          - /url: /help/my-tickets
+        - link "Track Order" [ref=f8e61] [cursor=pointer]:
+          - /url: /track-order
+        - link "support@welco.health" [ref=f8e62] [cursor=pointer]:
+          - /url: mailto:support@welco.health
+        - link "+971 50 000 0000" [ref=f8e63] [cursor=pointer]:
+          - /url: tel:+971500000000
+    - generic [ref=f8e64]:
+      - generic [ref=f8e65]:
+        - generic [ref=f8e66]: © 2026 Welco Surgical Instruments GmbH / FZ-LLC. All rights reserved.
+        - generic [ref=f8e67]: Passivated Stainless Steel DIN EN ISO 17664 · 134°C Autoclave Validated.
+      - generic [ref=f8e68]: PRODUCTION CELLS ONLINE
+  - link "WhatsApp Inquiry" [ref=f8e72] [cursor=pointer]:
+    - /url: https://wa.me/971500000000?text=Hello%20Welco%20team%20%E2%80%94%20I%20need%20assistance%20with%20surgical%20instruments.
+    - generic [ref=f8e77]: Call Us

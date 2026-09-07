@@ -1,0 +1,29 @@
+@import './base.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+#app { min-height: 100vh; display: flex; flex-direction: column; background: var(--wl-paper); overflow-x: clip; }
+main { flex: 1; min-width: 0; overflow-x: clip; }
+@media (max-width: 768px) {
+  main {
+    padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* ── Page transitions — respects reduced motion ── */
+.page-enter-active { transition: opacity 0.26s ease, transform 0.26s cubic-bezier(0.16,1,0.3,1); }
+.page-leave-active { transition: opacity 0.16s ease; }
+.page-enter-from { opacity: 0; transform: translateY(7px); }
+.page-leave-to { opacity: 0; }
+@media (prefers-reduced-motion: reduce) {
+  .page-enter-active, .page-leave-active { transition: opacity 0.12s; }
+  .page-enter-from { transform: none; }
+}
+
+/* ── Professional selection & print ── */
+@media print {
+  .header, .footer { display: none; }
+  .page-shell { padding: 0; }
+}

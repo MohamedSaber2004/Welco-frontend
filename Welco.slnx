@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Welco/welco.esproj">
+    <Build />
+    <Deploy />
+  </Project>
+</Solution>

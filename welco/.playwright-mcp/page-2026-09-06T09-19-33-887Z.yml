@@ -1,0 +1,108 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - link "تخطي إلى المحتوى الرئيسي" [ref=e3] [cursor=pointer]:
+      - /url: "#main-content"
+    - banner [ref=e6]:
+      - generic [ref=e8]:
+        - link "الرئيسية" [ref=e9] [cursor=pointer]:
+          - /url: /
+          - img "Welco" [ref=e10]
+          - generic [ref=e11]: Welco
+        - navigation "التنقل" [ref=e12]:
+          - link "الرئيسية" [ref=e13] [cursor=pointer]:
+            - /url: /
+          - link "السوق الطبي" [ref=e14] [cursor=pointer]:
+            - /url: /marketplace
+          - link "الجودة والشهادات" [ref=e15] [cursor=pointer]:
+            - /url: /certifications
+          - link "مركز المساعدة" [ref=e16] [cursor=pointer]:
+            - /url: /help
+        - search [ref=e17]:
+          - generic [aria-hidden] [ref=e18]: search
+          - textbox "ابحث عن زرعات، كود SKU، مصنع أو مورد…" [ref=e19]
+        - generic [ref=e20]:
+          - link "سلة التسعير" [ref=e21] [cursor=pointer]:
+            - /url: /cart
+            - generic [ref=e22]: shopping_bag
+          - button "تبديل المظهر" [ref=e23] [cursor=pointer]:
+            - generic [ref=e24]: dark_mode
+          - generic [ref=e25]:
+            - button "تسجيل الدخول" [ref=e26] [cursor=pointer]
+            - button "إنشاء حساب" [ref=e27] [cursor=pointer]
+    - main [ref=e28]:
+      - generic [ref=e30]:
+        - complementary "نظرة على العلامة" [ref=e31]:
+          - generic [ref=e32]: تأسست ١٩٩٤ · أدوات جراحية
+          - generic [ref=e36]:
+            - generic [ref=e37]: مصنّع أدوات جراحية — تأسست ١٩٩٤
+            - heading "أدوات دقيقة، مصممة لغرفة العمليات." [level=2] [ref=e38]:
+              - text: أدوات دقيقة،
+              - generic [ref=e39]: مصممة لغرفة العمليات.
+            - paragraph [ref=e40]: أدوات جراحية مباشرة من المصنع للمستشفيات والموزعين والمستوردين — مع إنتاج علامة خاصة OEM وتوثيق كامل ISO / CE لكل خط.
+            - generic [ref=e41]:
+              - generic [ref=e42]:
+                - generic [ref=e43]: "METALLURGY:"
+                - strong [ref=e44]: AISI 420 Martensitic Steel
+              - generic [ref=e45]:
+                - generic [ref=e46]: "STANDARDS:"
+                - strong [ref=e47]: ISO 13485:2016 · CE MDR
+              - generic [ref=e48]:
+                - generic [ref=e49]: "AUTOCLAVE:"
+                - strong [ref=e50]: 134°C (273°F) Validated
+              - text: SIALKOT — TUTTLINGEN — LOT-TRACEABLE
+            - list [ref=e51]:
+              - listitem [ref=e52]:
+                - generic [ref=e53]: verified
+                - generic [ref=e54]: ٣٠+ سنة — خبرة في تصنيع الأدوات الجراحية
+              - listitem [ref=e55]:
+                - generic [ref=e56]: precision_manufacturing
+                - generic [ref=e57]: نظام إدارة جودة معتمد
+              - listitem [ref=e58]:
+                - generic [ref=e59]: shield
+                - generic [ref=e60]: ٤٠+ دولة في شبكة التصدير — واعٍ بالنطاق الجغرافي
+          - generic [ref=e61]:
+            - generic [ref=e62]: ISO 13485
+            - generic [ref=e63]: •
+            - generic [ref=e64]: CE معتمدة
+            - generic [ref=e65]: •
+            - generic [ref=e66]: ٤٠+ دولة
+        - main [ref=e67]:
+          - generic [ref=e68]:
+            - img "Welco — Surgical Instruments" [ref=e70]
+            - generic [ref=e71]:
+              - generic [ref=e72]: WelcoSurgical
+              - generic [ref=e73]: أدوات جراحية
+          - generic [ref=e74]:
+            - generic [ref=e75]: ISO 13485 · CE · خط موثّق
+            - heading "مرحبا بعودتك" [level=1] [ref=e76]
+            - paragraph [ref=e77]: سجل دخولك إلى حسابك
+          - generic [ref=e79]:
+            - generic [ref=e80]:
+              - generic [ref=e81]: البريد الإلكتروني
+              - generic [ref=e82]:
+                - generic: mail
+                - textbox "البريد الإلكتروني" [ref=e83]:
+                  - /placeholder: provider@medical.com
+            - generic [ref=e84]:
+              - generic [ref=e85]:
+                - generic [ref=e86]: كلمة المرور
+                - link "نسيت كلمة المرور؟" [ref=e87] [cursor=pointer]:
+                  - /url: /auth/forgot-password
+              - generic [ref=e88]:
+                - generic: lock
+                - textbox "كلمة المرور" [ref=e89]:
+                  - /placeholder: ••••••••
+                - button "إظهار كلمة المرور" [ref=e90] [cursor=pointer]:
+                  - generic [ref=e91]: visibility
+            - generic [ref=e93] [cursor=pointer]:
+              - checkbox "تذكرني" [ref=e94]
+              - generic [ref=e95]: تذكرني
+            - button "تسجيل الدخول arrow_forward" [ref=e96] [cursor=pointer]:
+              - generic [ref=e97]: تسجيل الدخول
+              - generic [ref=e98]: arrow_forward
+            - generic [ref=e99]:
+              - generic [ref=e100]: ليس لديك حساب؟
+              - link "إنشاء حساب" [ref=e101] [cursor=pointer]:
+                - /url: /auth/register
+          - generic [ref=e102]: مباشر من المصنع · واعٍ بالنطاق · سلسلة توريد موثّقة
+  - generic [ref=e103]: مرحبا بعودتك

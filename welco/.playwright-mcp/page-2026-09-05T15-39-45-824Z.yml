@@ -1,0 +1,86 @@
+- generic [ref=f11e2]:
+  - link "Skip to main content" [ref=f11e3] [cursor=pointer]:
+    - /url: "#main-content"
+  - banner [ref=f11e6]:
+    - generic [ref=f11e8]:
+      - link "Home" [ref=f11e9] [cursor=pointer]:
+        - /url: /
+        - img "Welco" [ref=f11e10]
+        - generic [ref=f11e11]: Welco
+      - navigation "Primary" [ref=f11e12]:
+        - link "Home" [ref=f11e13] [cursor=pointer]:
+          - /url: /
+        - link "Marketplace" [ref=f11e14] [cursor=pointer]:
+          - /url: /marketplace
+        - link "Quality & Certs" [ref=f11e15] [cursor=pointer]:
+          - /url: /certifications
+        - link "Help Center" [ref=f11e16] [cursor=pointer]:
+          - /url: /help
+      - search [ref=f11e17]:
+        - generic [aria-hidden] [ref=f11e18]: search
+        - textbox "Search implants, SKU, manufacturer, supplier…" [ref=f11e19]
+      - generic [ref=f11e20]:
+        - link "Quote Cart" [ref=f11e21] [cursor=pointer]:
+          - /url: /cart
+          - generic [ref=f11e22]: shopping_bag
+        - button "Toggle theme" [ref=f11e23] [cursor=pointer]:
+          - generic [ref=f11e24]: dark_mode
+        - generic [ref=f11e25]:
+          - button "Login" [ref=f11e26] [cursor=pointer]
+          - button "Register" [ref=f11e27] [cursor=pointer]
+  - main [ref=f11e28]
+  - contentinfo [ref=f11e29]:
+    - generic [ref=f11e30]:
+      - generic [ref=f11e31]:
+        - generic [ref=f11e32]:
+          - img "Welco" [ref=f11e33]
+          - generic [ref=f11e34]: Welco Surgical
+        - paragraph [ref=f11e35]: Precision surgical instrument manufacturer built for institutional operating rooms, hospital procurement desks, and private-label OEM partners worldwide.
+        - generic [ref=f11e36]:
+          - generic [ref=f11e37]: ISO 13485:2016
+          - generic [ref=f11e38]: CE MDR CLASS IIa
+          - generic [ref=f11e39]: UDI LOT-TRACEABLE
+      - generic [ref=f11e40]:
+        - heading "Product" [level=4] [ref=f11e41]
+        - link "Marketplace" [ref=f11e42] [cursor=pointer]:
+          - /url: /marketplace
+        - link "Quality & Certs" [ref=f11e43] [cursor=pointer]:
+          - /url: /certifications
+        - link "OEM / Private Label" [ref=f11e44] [cursor=pointer]:
+          - /url: /oem
+        - link "General Surgery" [ref=f11e45] [cursor=pointer]:
+          - /url: /marketplace
+        - link "Orthopedic Line" [ref=f11e46] [cursor=pointer]:
+          - /url: /marketplace
+      - generic [ref=f11e47]:
+        - heading "Account" [level=4] [ref=f11e48]
+        - link "Account" [ref=f11e49] [cursor=pointer]:
+          - /url: /account
+        - link "Quote requests" [ref=f11e50] [cursor=pointer]:
+          - /url: /account/rfqs
+        - link "Quotes" [ref=f11e51] [cursor=pointer]:
+          - /url: /account/quotes
+        - link "Order history" [ref=f11e52] [cursor=pointer]:
+          - /url: /account/orders
+        - link "Addresses" [ref=f11e53] [cursor=pointer]:
+          - /url: /addresses
+      - generic [ref=f11e54]:
+        - heading "Support" [level=4] [ref=f11e55]
+        - link "Help Center" [ref=f11e56] [cursor=pointer]:
+          - /url: /help
+        - link "My Tickets" [ref=f11e57] [cursor=pointer]:
+          - /url: /help/my-tickets
+        - link "Track Order" [ref=f11e58] [cursor=pointer]:
+          - /url: /track-order
+        - link "support@welco.health" [ref=f11e59] [cursor=pointer]:
+          - /url: mailto:support@welco.health
+        - link "+971 50 000 0000" [ref=f11e60] [cursor=pointer]:
+          - /url: tel:+971500000000
+    - generic [ref=f11e61]:
+      - generic [ref=f11e62]:
+        - generic [ref=f11e63]: © 2026 Welco Surgical Instruments GmbH / FZ-LLC. All rights reserved.
+        - generic [ref=f11e64]: Passivated Stainless Steel DIN EN ISO 17664 · 134°C Autoclave Validated.
+      - generic [ref=f11e65]: PRODUCTION CELLS ONLINE
+  - link "WhatsApp Inquiry" [ref=f11e69] [cursor=pointer]:
+    - /url: https://wa.me/971500000000?text=Hello%20Welco%20team%20%E2%80%94%20I%20need%20assistance%20with%20surgical%20instruments.
+    - generic [ref=f11e74]: Call Us

@@ -9,6 +9,8 @@ export interface CategoryDto {
   imageName?: string | null
   icon?: string
   productCount?: number
+  parentCategoryId?: string | null
+  isActive?: boolean
 }
 
 export interface CurrencyDto {

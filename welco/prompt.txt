@@ -1,1 +1,2 @@
- @[src/utils/country-currency-map.ts]  if that not need remove it and if needed remove static data from here
+in admin page => product where is addproduct, deleteproduct, productdetails, activate, not activate actions????????
+handle that

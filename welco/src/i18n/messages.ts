@@ -542,6 +542,16 @@ export type Messages = {
     categoryUpdated: string
     categoryDeleted: string
     deleteProductConfirm: string
+    productDetails: string
+    activate: string
+    deactivate: string
+    activateProductConfirm: string
+    deactivateProductConfirm: string
+    productActivated: string
+    productDeactivated: string
+    productImage: string
+    productActive: string
+    currency: string
     productVideos: string
     addVideo: string
     videoTitle: string
@@ -554,6 +564,10 @@ export type Messages = {
     videoSyncFailed: string
     syncNotice: string
     deleteCategoryConfirm: string
+    categoryDetails: string
+    categoryImage: string
+    categoryActive: string
+    noParentCategory: string
     noProductsFound: string
     noCategoriesFound: string
     errBothNames: string

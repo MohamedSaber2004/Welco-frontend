@@ -90,7 +90,6 @@ export function parseVideoSource(rawUrl: string | null | undefined): ParsedVideo
   }
   const trimmed = rawUrl.trim()
 
-  // 1. YouTube
   const ytMatch = trimmed.match(
     /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/i,
   )

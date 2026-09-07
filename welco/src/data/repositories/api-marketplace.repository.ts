@@ -96,6 +96,35 @@ const normalizeProduct = (p: ProductDto): ProductDto => {
   return p
 }
 
+const normalizeCategory = (c: CategoryDto): CategoryDto => {
+  if (!c || typeof c !== 'object') return c
+  const raw = c as unknown as Record<string, unknown>
+  // Backend returns a single `Description`; frontend renders descriptionEn/Ar
+  const description =
+    (raw.description as string | undefined) ??
+    (raw.Description as string | undefined) ??
+    c.descriptionEn ??
+    c.descriptionAr ??
+    ''
+  if (!c.descriptionEn && description) c.descriptionEn = description
+  if (!c.descriptionAr && description) c.descriptionAr = description
+  const parentId =
+    (c.parentCategoryId as string | null | undefined) ??
+    (raw.parentCategoryId as string | null | undefined) ??
+    (raw.ParentCategoryId as string | null | undefined) ??
+    null
+  c.parentCategoryId = parentId
+  if (typeof c.isActive !== 'boolean') {
+    const rawActive = (raw.isActive ?? raw.IsActive) as boolean | undefined
+    c.isActive = typeof rawActive === 'boolean' ? rawActive : true
+  }
+  if (typeof c.productCount !== 'number') {
+    const rawCount = Number(raw.productCount ?? raw.ProductCount ?? 0)
+    c.productCount = Number.isFinite(rawCount) ? rawCount : 0
+  }
+  return c
+}
+
 export class ApiMarketplaceRepository implements MarketplaceRepository {
   constructor(private readonly http: HttpClient) {}
 
@@ -224,7 +253,7 @@ export class ApiMarketplaceRepository implements MarketplaceRepository {
         } else {
           list = raw as CategoryDto[]
         }
-        return list
+        return list.map(normalizeCategory)
       } catch (e) {
         if (e instanceof ApiError && e.status === 404 && path !== MARKETPLACE_ROUTES.catalogCategories) {
           continue
@@ -271,7 +300,8 @@ export class ApiMarketplaceRepository implements MarketplaceRepository {
 
   async getCategoryById(id: string): Promise<CategoryDto | null> {
     try {
-      return await this.http.get<CategoryDto>(MARKETPLACE_ROUTES.categoryById(id), { showFeedback: false })
+      const raw = await this.http.get<CategoryDto>(MARKETPLACE_ROUTES.categoryById(id), { showFeedback: false })
+      return normalizeCategory(raw)
     } catch (e) {
       if (e instanceof ApiError && e.status === 404) return null
       throw e
@@ -279,11 +309,13 @@ export class ApiMarketplaceRepository implements MarketplaceRepository {
   }
 
   async createCategory(payload: CreateCategoryPayload): Promise<CategoryDto> {
-    return await this.http.post<CategoryDto>(MARKETPLACE_ROUTES.categories, payload)
+    const raw = await this.http.post<CategoryDto>(MARKETPLACE_ROUTES.categories, payload)
+    return normalizeCategory(raw)
   }
 
   async updateCategory(id: string, payload: UpdateCategoryPayload): Promise<CategoryDto> {
-    return await this.http.put<CategoryDto>(MARKETPLACE_ROUTES.categoryById(id), { id, ...payload })
+    const raw = await this.http.put<CategoryDto>(MARKETPLACE_ROUTES.categoryById(id), { id, ...payload })
+    return normalizeCategory(raw)
   }
 
   async deleteCategory(id: string): Promise<void> {

@@ -112,12 +112,25 @@ const userTypeInfo = computed(() => {
       desc: locale.value === 'ar' ? 'فريق الدعم الفني والعمليات' : 'Welco Staff & Operational Specialist',
     }
   }
+  // 4-role model: OrganizationUser WITH a linked company is a
+  // Provider/Distributor (the company IS the provider); without one
+  // the user is a Customer (buyer, no company needed).
+  const hasCompany = !!(user.value?.companyId ?? myCompany.value?.id)
+  if (hasCompany) {
+    return {
+      type,
+      label: t('admin.roleProvider'),
+      icon: 'handshake',
+      pillClass: 'user-role-pill--org',
+      desc: locale.value === 'ar' ? 'مورّد / موزع معتمد — الشركة هي الجهة المورّدة' : 'Verified Provider / Distributor — your company is the supplying entity',
+    }
+  }
   return {
     type,
-    label: t('admin.roleOrganizationUser'),
-    icon: 'corporate_fare',
+    label: t('admin.roleCustomer'),
+    icon: 'shopping_bag',
     pillClass: 'user-role-pill--org',
-    desc: locale.value === 'ar' ? 'مستخدم معتمد لمنشأة طبية' : 'Verified Enterprise / Clinical Practitioner',
+    desc: locale.value === 'ar' ? 'عميل — مشترٍ مباشر بدون شركة' : 'Customer — direct buyer, no company needed',
   }
 })
 

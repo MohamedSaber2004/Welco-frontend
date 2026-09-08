@@ -4,7 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { authService, wishlistService } from '../../di/container'
 import { useCart } from '../../composables/useCart'
 import { t, locale, setLocale } from '../../i18n'
-import { AppLanguage, USER_TYPE_ROLE_KEY } from '../../domain/models/user'
+import { AppLanguage } from '../../domain/models/user'
 import { resolveFileUrl } from '../../utils/file-url'
 
 const route = useRoute()
@@ -69,7 +69,7 @@ const userRoleLabel = computed(() => {
   if (!user.value) return ''
   if (isAdmin.value) return t('admin.roleAdmin')
   if (isStaff.value) return t('admin.welcoStaff')
-  return t(`admin.${USER_TYPE_ROLE_KEY(user.value.userType)}`)
+  return t(`admin.${authService.resolveBusinessRoleKey()}`)
 })
 
 const avatarSrc = computed(() => {

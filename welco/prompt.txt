@@ -1,2 +1,3 @@
-in admin page => product where is addproduct, deleteproduct, productdetails, activate, not activate actions????????
-handle that
+the provider is company of distirbutor or organization user
+
+The code currently has only 3 user types (Admin, WelcoStaff, OrganizationUser = company-linked buyer). You mention five business roles plus new Customer (buys, no company needed?) and Provider (lists own products?). List your 5 roles and confirm what Customer/Provider mean, e.g.: Admin, WelcoStaff, Distributor, Hospital/Clinic buyer, + Customer (individual buyer, no company) + Provider (seller company)?

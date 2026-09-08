@@ -19,18 +19,31 @@ const isGuid = (val?: string | null): boolean => {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val.trim())
 }
 
-const formatRole = (user: UserDto | UserDetailsDto): { role: string; roleKey: string } => {
+/**
+ * 4-role model: OrganizationUser WITH a linked provider company renders as
+ * Provider/Distributor; without company knowledge it renders as Customer
+ * (the buyer). Pass the company when known for the precise label.
+ */
+const formatRole = (
+  user: UserDto | UserDetailsDto,
+  company?: { id?: string | null } | null,
+): { role: string; roleKey: string } => {
+  const hasCompany = !!(company?.id ?? (user as { companyId?: string | null }).companyId)
+  const orgLabel = hasCompany
+    ? { role: 'Provider / Distributor', roleKey: 'roleProvider' }
+    : { role: 'Customer', roleKey: 'roleCustomer' }
   if (user.roles && user.roles.length > 0) {
     const rawRole = user.roles[0] ?? ''
     if (rawRole.toLowerCase().includes('admin')) return { role: 'Admin', roleKey: 'roleAdmin' }
     if (rawRole.toLowerCase().includes('staff')) return { role: 'Welco Staff', roleKey: 'roleWelcoStaff' }
-    if (rawRole.toLowerCase().includes('org') || rawRole.toLowerCase().includes('user')) return { role: 'Organization', roleKey: 'roleOrganizationUser' }
+    if (rawRole.toLowerCase().includes('org') || rawRole.toLowerCase().includes('user')) return orgLabel
     return { role: rawRole, roleKey: rawRole }
   }
 
   if (user.userType === UserType.Admin) return { role: 'Admin', roleKey: 'roleAdmin' }
   if (user.userType === UserType.WelcoStaff) return { role: 'Welco Staff', roleKey: 'roleWelcoStaff' }
-  if (user.userType === UserType.OrganizationUser) return { role: 'Organization', roleKey: 'roleOrganizationUser' }
+  if (user.userType === UserType.Customer) return { role: 'Customer', roleKey: 'roleCustomer' }
+  if (user.userType === UserType.OrganizationUser) return orgLabel
 
   return { role: 'User', roleKey: 'roleUser' }
 }
@@ -138,6 +151,11 @@ export function useUserLookup() {
       case 'organization':
       case 'organization user':
       case 'roleorganizationuser':
+      case 'provider / distributor':
+      case 'roleprovider':
+      case 'roledistributor':
+      case 'customer':
+      case 'rolecustomer':
         return 'role-badge--org'
       case 'system':
         return 'role-badge--system'

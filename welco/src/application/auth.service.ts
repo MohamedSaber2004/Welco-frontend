@@ -18,6 +18,11 @@ import type { TokenStore } from '../infrastructure/http/token-store'
 import { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE, SESSION_COOKIE } from '../infrastructure/http/token-store'
 import type { AuthBridge } from '../infrastructure/http/auth-bridge'
 import type { AttachmentService } from './attachment.service'
+import {
+  resolveBusinessRole as resolveBusinessRoleFn,
+  resolveBusinessRoleKey as resolveBusinessRoleKeyFn,
+} from '../domain/models/business-role'
+import { syncPendingOrgMarker } from '../utils/pending-org-marker'
 import router from '../router'
 
 export type AuthResult = { ok: true } | { ok: false; error: string }
@@ -234,6 +239,56 @@ export class AuthService {
     return u.roles.map((r) => r.toLowerCase()).includes('welcostaff') || u.userType === 3
   })
 
+  /**
+   * 4 business roles derived on top of the 3 backend UserTypes:
+   * Admin, Provider/Distributor (OrgUser + company), Customer (buyer,
+   * OrgUser without company), WelcoStaff. The Provider IS the Company
+   * of a distributor / organization user (see business-role.ts).
+   */
+  private toBusinessCtx(company?: { id?: string | null; type?: number; status?: unknown } | null) {
+    const u = this.user.value
+    return {
+      userType: u?.userType ?? null,
+      roles: u?.roles ?? [],
+      companyId: u?.companyId ?? null,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      company: (company ?? null) as any,
+    }
+  }
+
+  /** Customer — the buyer (UserType.Customer, or legacy OrganizationUser with no linked company). */
+  readonly isCustomer = computed(() => {
+    const u = this.user.value
+    if (!u) return false
+    if (this.isAdmin.value || this.isWelcoStaff.value) return false
+    if (u.userType === 4) return true
+    if (!this.isOrganizationUser.value) return false
+    return !u.companyId
+  })
+
+  /** Provider/Distributor — OrganizationUser WITH a linked provider company. */
+  readonly isProvider = computed(() => {
+    const u = this.user.value
+    if (!u) return false
+    if (this.isAdmin.value || this.isWelcoStaff.value) return false
+    if (u.userType === 4) return false
+    if (!this.isOrganizationUser.value) return false
+    return !!u.companyId
+  })
+
+  /** Whether the signed-in user already has a linked provider company. */
+  readonly hasLinkedCompany = computed(() => !!this.user.value?.companyId)
+
+  /** Precise business role once the company detail is known (pass myCompany). */
+  resolveBusinessRole(company?: { id?: string | null; type?: number; status?: unknown } | null) {
+    return resolveBusinessRoleFn(this.toBusinessCtx(company))
+  }
+
+  /** i18n key (under `admin.*`) for the current business role. */
+  resolveBusinessRoleKey(company?: { id?: string | null; type?: number; status?: unknown } | null) {
+    return resolveBusinessRoleKeyFn(this.toBusinessCtx(company))
+  }
+
   hasRole(role: string): boolean {
     return this.user.value?.roles.map((r) => r.toLowerCase()).includes(role.toLowerCase()) ?? false
   }
@@ -277,6 +332,9 @@ export class AuthService {
 
   private persistSession(auth: AuthResponseDto): void {
     const user = nameToUser(auth)
+    // Approval self-heals the pending-org marker (Customer vs pending org
+    // can't be told apart by the backend — it has no Customer role).
+    syncPendingOrgMarker(user)
     const accessExp = new Date(decodeJwtExp(auth.accessToken)).toISOString()
     this.session = {
       accessToken: auth.accessToken,
@@ -296,6 +354,7 @@ export class AuthService {
 
   private updateUserFromProfile(profile: UserProfileDto): void {
     const user = nameToUser(profile)
+    syncPendingOrgMarker(user)
     if (this.session) {
       this.session.user = user
       this.tokenStore.saveSession(this.session)

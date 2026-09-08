@@ -6,6 +6,7 @@ import { confirmService } from '../../infrastructure/feedback/confirm.service'
 import { toastService } from '../../infrastructure/feedback/toast.service'
 import { t } from '../../i18n'
 import AuthShell from '../../components/auth/AuthShell.vue'
+import { isPendingOrg } from '../../utils/pending-org-marker'
 
 const router = useRouter()
 const route = useRoute()
@@ -25,11 +26,17 @@ const handleLogin = async () => {
   const res = await authService.login({ email: email.value.trim(), password: password.value })
   loading.value = false
   if (res.ok) {
+    // No-company OrganizationUser = either a Customer (buyer, allowed in) or
+    // a pending Organization signup awaiting admin approval (bounced out).
+    // The backend has no Customer role, so the pending-org marker (set at
+    // Organization registration) tells them apart.
     if (authService.isOrganizationUser.value && !authService.user.value?.companyId) {
-      await authService.logout().catch(() => {})
-      toastService.info(t('distributor.pendingApproval'))
-      error.value = t('distributor.pendingApproval')
-      return
+      if (isPendingOrg(authService.user.value?.email)) {
+        await authService.logout().catch(() => {})
+        toastService.info(t('distributor.pendingApproval'))
+        error.value = t('distributor.pendingApproval')
+        return
+      }
     }
     const redirect = (route.query.redirect as string) || ''
     if (redirect) await router.push(redirect)

@@ -5,7 +5,7 @@ import { authService } from '../../di/container'
 import { t, locale, setLocale } from '../../i18n'
 import { theme, toggleTheme } from '../../application/theme.service'
 import { resolveFileUrl, PLACEHOLDER } from '../../utils/file-url'
-import { AppLanguage, USER_TYPE_ROLE_KEY } from '../../domain/models/user'
+import { AppLanguage } from '../../domain/models/user'
 import { useCart } from '../../composables/useCart'
 import { wishlistService } from '../../di/container'
 
@@ -48,7 +48,8 @@ const avatarInitials = computed(() => {
 const avatarFailed = ref(false)
 const hasAvatar = computed(() => !!avatarSrc.value && !avatarFailed.value)
 const userRoleLabel = computed(() =>
-  user.value ? t(`admin.${USER_TYPE_ROLE_KEY(user.value.userType)}`) : '',
+  // 4-role model: Provider/Distributor (has company) vs Customer (buyer) vs Admin/Staff.
+  user.value ? t(`admin.${authService.resolveBusinessRoleKey()}`) : '',
 )
 const { count: cartCount } = useCart()
 const wishlistCount = computed(() => wishlistService.count.value)

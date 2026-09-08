@@ -40,6 +40,10 @@ export function useUsers() {
       let role = ''
       try {
         role = u.userType !== undefined ? USER_TYPE_ROLE_KEY(u.userType).toLowerCase() : ''
+        // 4-role model: an OrganizationUser is either a Provider/Distributor
+        // (linked company) or a Customer (buyer) — match those labels too.
+        if (u.userType === UserType.OrganizationUser) role += ' provider distributor customer'
+        if (u.userType === UserType.Customer) role += ' customer buyer'
       } catch {
         role = ''
       }

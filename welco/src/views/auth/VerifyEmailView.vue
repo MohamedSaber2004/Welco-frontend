@@ -6,6 +6,7 @@ import { toastService } from '../../infrastructure/feedback/toast.service'
 import { t } from '../../i18n'
 import AuthShell from '../../components/auth/AuthShell.vue'
 import { UserType } from '../../domain/models/user'
+import { isPendingOrg } from '../../utils/pending-org-marker'
 
 const router = useRouter()
 const route = useRoute()
@@ -62,21 +63,27 @@ const handleVerify = async () => {
   loading.value = false
 
   if (res.ok) {
-    let pendingRegisterUserType: number | undefined
+    // Organization path = the signup was UserType.OrganizationUser WITH company
+    // fields (or a pending-org marker was set): an admin must accept the
+    // request to join the platform. Customer path (UserType.Customer = 4,
+    // buyer without company) goes straight in.
+    let registeredAsOrg = false
     try {
       const raw = sessionStorage.getItem('welco-pending-register')
       if (raw) {
-        const parsed = JSON.parse(raw)
-        pendingRegisterUserType = parsed.userType
+        const parsed = JSON.parse(raw) as { companyName?: unknown; userType?: unknown }
+        const sentCustomerType =
+          parsed.userType === UserType.Customer || (parsed.userType as number) === 4
+        const sentCompany =
+          typeof parsed.companyName === 'string' && parsed.companyName.trim().length > 0
+        registeredAsOrg = !sentCustomerType && sentCompany
       }
       sessionStorage.removeItem('welco-pending-email')
       sessionStorage.removeItem('welco-pending-register')
     } catch {}
+    if (!registeredAsOrg && isPendingOrg(email.value)) registeredAsOrg = true
 
-    const isPendingOrg = (authService.isOrganizationUser.value && !authService.user.value?.companyId) ||
-      pendingRegisterUserType === UserType.OrganizationUser
-
-    if (isPendingOrg) {
+    if (registeredAsOrg) {
       if (authService.isAuthenticated) {
         await authService.logout().catch(() => {})
       }

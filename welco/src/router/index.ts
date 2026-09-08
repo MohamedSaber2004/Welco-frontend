@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { t, type MessageKey } from '../i18n'
 import { services } from '../di/container'
+import { isPendingOrg } from '../utils/pending-org-marker'
 import { toastService } from '../infrastructure/feedback/toast.service'
 
 declare module 'vue-router' {
@@ -315,11 +316,17 @@ router.beforeEach(async (to) => {
   if (isAuthenticated && !isSeller && to.path.startsWith('/admin')) {
     return { name: 'home' }
   }
+  // 4-role model: Provider/Distributor = OrganizationUser WITH a linked provider
+  // company (B2B portal open); Customer = buyer without a company (direct
+  // cart/checkout/wishlist open, no company needed). Only a KNOWN pending
+  // Organization signup (pending-org marker from registration — the backend
+  // has no Customer role to tell them apart) is bounced until an admin
+  // accepts its request to join the platform.
   if (isAuthenticated && auth.isOrganizationUser.value) {
     const user = auth.user.value
     const hasCompany = !!(user?.companyId)
     const buyerGuarded = to.path.startsWith('/account') || to.path === '/cart' || to.path === '/checkout' || to.path === '/wishlist'
-    if (!hasCompany && buyerGuarded) {
+    if (!hasCompany && buyerGuarded && isPendingOrg(user?.email)) {
       await auth.loadProfile().catch(() => null)
       if (auth.user.value?.companyId) return true
       toastService.info(t('distributor.pendingApproval'))

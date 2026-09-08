@@ -376,6 +376,7 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
                 <option :value="UserType.Admin">{{ t('admin.roleAdmin') }}</option>
                 <option :value="UserType.WelcoStaff">{{ t('admin.roleWelcoStaff') }}</option>
                 <option :value="UserType.OrganizationUser">{{ t('admin.roleOrganizationUser') }}</option>
+                <option :value="UserType.Customer">{{ t('admin.roleCustomer') }}</option>
               </select>
             </div>
           </div>

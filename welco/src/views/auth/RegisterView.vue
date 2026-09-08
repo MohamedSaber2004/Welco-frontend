@@ -8,8 +8,11 @@ import AuthShell from '../../components/auth/AuthShell.vue'
 import PhoneInput from '../../components/ui/PhoneInput.vue'
 import { AppLanguage, UserType } from '../../domain/models/user'
 import type { CountryDto } from '../../domain/models/location'
+import { setPendingOrg, clearPendingOrg } from '../../utils/pending-org-marker'
 
 const router = useRouter()
+const accountType = ref<'customer' | 'organization'>('customer')
+const isOrg = computed(() => accountType.value === 'organization')
 const fullName = ref('')
 const email = ref('')
 const password = ref('')
@@ -69,17 +72,19 @@ const handleRegister = async () => {
     error.value = t('auth.errEmailInvalid')
     return
   }
-  if (!companyName.value.trim()) {
-    error.value = t('auth.errCompanyRequired')
-    return
-  }
-  if (!distributorCountryId.value) {
-    error.value = t('auth.errCountryRequired')
-    return
-  }
-  if (!salesVolumeBand.value) {
-    error.value = t('auth.errVolumeRequired')
-    return
+  if (isOrg.value) {
+    if (!companyName.value.trim()) {
+      error.value = t('auth.errCompanyRequired')
+      return
+    }
+    if (!distributorCountryId.value) {
+      error.value = t('auth.errCountryRequired')
+      return
+    }
+    if (!salesVolumeBand.value) {
+      error.value = t('auth.errVolumeRequired')
+      return
+    }
   }
   if (password.value !== confirmPassword.value) {
     error.value = t('auth.errPasswordMismatch')
@@ -89,11 +94,11 @@ const handleRegister = async () => {
     error.value = t('auth.errPasswordMin')
     return
   }
-  if (companyEmail.value && !companyEmailValid.value) {
+  if (isOrg.value && companyEmail.value && !companyEmailValid.value) {
     error.value = t('auth.errEmailInvalid')
     return
   }
-  if (website.value && website.value.trim() && !/^https?:\/\/.+/i.test(website.value.trim())) {
+  if (isOrg.value && website.value && website.value.trim() && !/^https?:\/\/.+/i.test(website.value.trim())) {
     error.value = t('auth.errWebsiteInvalid')
     return
   }
@@ -108,13 +113,19 @@ const handleRegister = async () => {
     phoneNumber: phoneNumber.value.trim() || undefined,
     phoneCountryId: phoneCountryId ?? undefined,
     phoneCountryCode: phoneCountry.value?.code ?? undefined,
-    userType: UserType.OrganizationUser,
+    userType: isOrg.value ? UserType.OrganizationUser : UserType.Customer,
     language: locale.value === 'ar' ? AppLanguage.Ar : AppLanguage.En,
-    companyName: companyName.value.trim(),
-    companyEmail: companyEmail.value.trim() || undefined,
-    distributorCountryId: distributorCountryId.value,
-    salesVolumeBand: salesVolumeBand.value,
-    website: website.value.trim() || undefined,
+    // Company fields ride along ONLY for the Organization path — their
+    // presence is what later marks this signup as "pending admin approval".
+    ...(isOrg.value
+      ? {
+          companyName: companyName.value.trim(),
+          companyEmail: companyEmail.value.trim() || undefined,
+          distributorCountryId: distributorCountryId.value,
+          salesVolumeBand: salesVolumeBand.value,
+          website: website.value.trim() || undefined,
+        }
+      : {}),
   } as Parameters<typeof authService.register>[0]
 
   const res = await authService.register(payload)
@@ -125,6 +136,8 @@ const handleRegister = async () => {
       sessionStorage.setItem('welco-pending-email', payload.email)
       sessionStorage.setItem('welco-pending-register', JSON.stringify(payload))
     } catch {}
+    if (isOrg.value) setPendingOrg(payload.email)
+    else clearPendingOrg(payload.email)
     toastService.success(t('auth.registrationSuccess'))
     await router.push({ name: 'verify-email', query: { email: payload.email } })
   } else {
@@ -136,6 +149,43 @@ const handleRegister = async () => {
 <template>
   <AuthShell :title="t('auth.registerTitle')" :subtitle="t('auth.registerSubtitle')">
     <form class="reg-form" @submit.prevent="handleRegister" novalidate>
+      <section class="reg-card">
+        <header class="reg-card-head">
+          <span class="reg-card-step mono">0</span>
+          <div>
+            <h3 class="reg-card-title">{{ t('auth.accountType') }}</h3>
+            <p class="reg-card-subtitle">{{ t('auth.registerSubtitle') }}</p>
+          </div>
+        </header>
+
+        <div class="acct-type-grid" role="radiogroup" :aria-label="t('auth.accountType')">
+          <button
+            type="button"
+            class="acct-type-opt"
+            :class="{ 'is-active': accountType === 'customer' }"
+            role="radio"
+            :aria-checked="accountType === 'customer'"
+            @click="accountType = 'customer'"
+          >
+            <span class="material-symbols-outlined acct-type-icon">shopping_bag</span>
+            <span class="acct-type-label">{{ t('auth.registerAsCustomer') }}</span>
+            <span class="acct-type-desc">{{ t('auth.registerAsCustomerDesc') }}</span>
+          </button>
+          <button
+            type="button"
+            class="acct-type-opt"
+            :class="{ 'is-active': accountType === 'organization' }"
+            role="radio"
+            :aria-checked="accountType === 'organization'"
+            @click="accountType = 'organization'"
+          >
+            <span class="material-symbols-outlined acct-type-icon">domain</span>
+            <span class="acct-type-label">{{ t('auth.registerAsOrganization') }}</span>
+            <span class="acct-type-desc">{{ t('auth.registerAsOrganizationDesc') }}</span>
+          </button>
+        </div>
+      </section>
+
       <section class="reg-card">
         <header class="reg-card-head">
           <span class="reg-card-step mono">1</span>
@@ -258,7 +308,7 @@ const handleRegister = async () => {
         </div>
       </section>
 
-      <section class="reg-card">
+      <section v-if="isOrg" class="reg-card">
         <header class="reg-card-head">
           <span class="reg-card-step mono">2</span>
           <div>
@@ -629,7 +679,58 @@ const handleRegister = async () => {
   text-decoration: underline;
 }
 
+.acct-type-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.acct-type-opt {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3rem;
+  padding: 0.9rem 1rem;
+  background: #FFFFFF;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: start;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.acct-type-opt:hover {
+  border-color: #A5B4FC;
+  transform: translateY(-1px);
+}
+
+.acct-type-opt.is-active {
+  border-color: #4F46E5;
+  background: rgba(79, 70, 229, 0.05);
+  box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.12);
+}
+
+.acct-type-icon {
+  font-size: 22px;
+  color: #4F46E5;
+}
+
+.acct-type-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0F172A;
+}
+
+.acct-type-desc {
+  font-size: 11.5px;
+  color: #64748B;
+  line-height: 1.45;
+}
+
 @media (max-width: 640px) {
+  .acct-type-grid {
+    grid-template-columns: 1fr;
+  }
   .reg-grid {
     grid-template-columns: 1fr;
   }

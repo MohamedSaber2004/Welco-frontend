@@ -301,6 +301,11 @@ export type Messages = {
     errCountryRequired: string
     errVolumeRequired: string
     errWebsiteInvalid: string
+    accountType: string
+    registerAsCustomer: string
+    registerAsCustomerDesc: string
+    registerAsOrganization: string
+    registerAsOrganizationDesc: string
     verifyNoticeTitle: string
     verifyNoticeDesc: string
     verifyFallbackEmail: string
@@ -482,6 +487,9 @@ export type Messages = {
     roleOrganizationUser: string
     roleWelcoStaff: string
     roleAdmin: string
+    roleProvider: string
+    roleDistributor: string
+    roleCustomer: string
     welcoStaff: string
     organizationUser: string
     products: string

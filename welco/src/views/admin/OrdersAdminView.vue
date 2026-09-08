@@ -58,8 +58,7 @@ const filteredOrders = computed(() => {
         const pid = it.productId ? String(it.productId).toLowerCase().includes(q) : false
         return en || ar || pid
       })
-      const matchIncoterm = o.incotermCode ? String(o.incotermCode).toLowerCase().includes(q) : false
-      return matchNum || matchId || matchItems || matchIncoterm
+      return matchNum || matchId || matchItems
     })
   }
   return list
@@ -199,8 +198,8 @@ function goPage(p: number) {
                   <th>{{ t('marketplace.products') }}</th>
                   <th>{{ t('commerce.total') }}</th>
                   <th>{{ t('commerce.status') }}</th>
-                  <th>{{ t('commerce.incoterm') }}</th>
-                  <th class="text-end">{{ t('admin.actions') }}</th>
+                  <th class="text-end">{{ t('admin.viewDetails') }}</th>
+                  <th class="text-end">{{ t('admin.quickActions') }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -230,32 +229,29 @@ function goPage(p: number) {
                   <td>
                     <StatusPill :status="o.status" />
                   </td>
-                  <td>
-                    <span class="mono incoterm-tag">{{ o.incotermCode || t('checkout.incotermExw') }}</span>
+                  <td class="text-end">
+                    <button
+                      type="button"
+                      class="row-action-btn"
+                      :title="t('admin.viewDetails')"
+                      :aria-label="t('admin.viewDetails')"
+                      @click="openDetails(o)"
+                    >
+                      <span class="material-symbols-outlined text-[18px]">visibility</span>
+                    </button>
                   </td>
                   <td class="text-end">
-                    <div class="row-actions">
-                      <button
-                        type="button"
-                        class="row-action-btn"
-                        :title="t('admin.viewDetails')"
-                        :aria-label="t('admin.viewDetails')"
-                        @click="openDetails(o)"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">visibility</span>
-                      </button>
-                      <button
-                        v-if="NEXT[o.status]"
-                        type="button"
-                        class="btn-advance mono"
-                        :disabled="acting === o.id"
-                        @click="advance(o)"
-                      >
-                        <span class="material-symbols-outlined text-[15px]">arrow_forward</span>
-                        <span>{{ t('commerce.markAs', { status: NEXT[o.status] as string }) }}</span>
-                      </button>
-                      <span v-else class="mono text-xs text-slate-400">{{ t('admin.orderCompleted') }}</span>
-                    </div>
+                    <button
+                      v-if="NEXT[o.status]"
+                      type="button"
+                      class="btn-advance mono"
+                      :disabled="acting === o.id"
+                      @click="advance(o)"
+                    >
+                      <span class="material-symbols-outlined text-[15px]">arrow_forward</span>
+                      <span>{{ t('commerce.markAs', { status: NEXT[o.status] as string }) }}</span>
+                    </button>
+                    <span v-else class="mono text-xs text-slate-400">{{ t('admin.orderCompleted') }}</span>
                   </td>
                 </tr>
               </tbody>
@@ -309,10 +305,6 @@ function goPage(p: number) {
             <div class="detail-item">
               <span class="detail-k mono">{{ t('commerce.status') }}</span>
               <strong class="detail-v">{{ selectedOrder.status }}</strong>
-            </div>
-            <div class="detail-item">
-              <span class="detail-k mono">{{ t('commerce.incoterm') }}</span>
-              <strong class="detail-v mono">{{ selectedOrder.incotermCode || t('checkout.incotermExw') }}</strong>
             </div>
             <div class="detail-item">
               <span class="detail-k mono">{{ t('commerce.total') }}</span>

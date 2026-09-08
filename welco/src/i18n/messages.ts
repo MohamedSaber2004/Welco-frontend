@@ -887,6 +887,10 @@ export type Messages = {
     helpArticleDetails: string
     faqDetails: string
     helpCategoryIcon: string
+    confirmActivate: string
+    confirmDeactivate: string
+    activated: string
+    deactivated: string
     companiesEyebrow: string
     inquiriesCount: string
     citiesEyebrow: string

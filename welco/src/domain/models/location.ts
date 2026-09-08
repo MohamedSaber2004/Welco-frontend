@@ -42,6 +42,7 @@ export interface UpdateCountryPayload {
   nameAr?: string
   code?: string
   phoneCode?: string
+  isActive?: boolean
 }
 
 export interface CreateCityPayload {
@@ -54,6 +55,7 @@ export interface UpdateCityPayload {
   countryId?: string
   nameEn?: string
   nameAr?: string
+  isActive?: boolean
 }
 
 export interface CreateZonePayload {
@@ -66,6 +68,7 @@ export interface UpdateZonePayload {
   cityId?: string
   nameEn?: string
   nameAr?: string
+  isActive?: boolean
 }
 
 export function localizedName(

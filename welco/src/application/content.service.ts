@@ -91,8 +91,8 @@ export class ContentService {
     this.helpCategories.value.push(created)
     return created
   }
-  async updateHelpCategory(id: string, name: string, icon?: string) {
-    const updated = await this.repo.updateHelpCategory(id, { name, icon })
+  async updateHelpCategory(id: string, name: string, icon?: string, isActive?: boolean) {
+    const updated = await this.repo.updateHelpCategory(id, { name, icon, isActive })
     this.helpCategories.value = this.helpCategories.value.map((c) => (c.id === id ? updated : c))
     return updated
   }
@@ -106,7 +106,7 @@ export class ContentService {
     this.helpArticles.value.unshift(created)
     return created
   }
-  async updateHelpArticle(id: string, payload: { categoryId: string; title: string; body: string; slug: string }) {
+  async updateHelpArticle(id: string, payload: { categoryId: string; title: string; body: string; slug: string; isActive?: boolean }) {
     const updated = await this.repo.updateHelpArticle(id, payload)
     this.helpArticles.value = this.helpArticles.value.map((a) => (a.id === id ? updated : a))
     return updated
@@ -121,8 +121,8 @@ export class ContentService {
     this.faqs.value.push(created)
     return created
   }
-  async updateFaq(id: string, question: string, answer: string, sortOrder = 0) {
-    const updated = await this.repo.updateFaq(id, { question, answer, sortOrder })
+  async updateFaq(id: string, question: string, answer: string, sortOrder = 0, isActive?: boolean) {
+    const updated = await this.repo.updateFaq(id, { question, answer, sortOrder, isActive })
     this.faqs.value = this.faqs.value.map((f) => (f.id === id ? updated : f))
     return updated
   }

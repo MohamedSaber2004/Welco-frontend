@@ -145,6 +145,30 @@ const submitCategoryForm = async () => {
   }
 }
 
+const toggleCategoryActive = async (c: HelpCategoryDto) => {
+  const nextActive = !(c.isActive ?? true)
+  const ok = await confirmService.confirmAction(
+    nextActive ? t('admin.confirmActivate') : t('admin.confirmDeactivate'),
+    {
+      title: nextActive ? t('admin.activate') : t('admin.deactivate'),
+      variant: nextActive ? 'primary' : 'warning',
+      icon: nextActive ? 'check_circle' : 'block',
+      confirmText: nextActive ? t('admin.activate') : t('admin.deactivate'),
+      cancelText: t('common.cancel'),
+    },
+  )
+  if (!ok) return
+  categoryPendingId.value = c.id
+  try {
+    await contentService.updateHelpCategory(c.id, c.name, c.icon || undefined, nextActive)
+    toastService.success(nextActive ? t('admin.activated') : t('admin.deactivated'))
+  } catch (e) {
+    toastService.error(e instanceof Error ? e.message : t('common.error'))
+  } finally {
+    categoryPendingId.value = null
+  }
+}
+
 const confirmDeleteCategory = async (c: HelpCategoryDto) => {
   const ok = await confirmService.confirmDelete(
     `${t('admin.deleteHelpCategoryConfirm')}\n${c.name}`,
@@ -257,6 +281,36 @@ const submitArticleForm = async () => {
   }
 }
 
+const toggleArticleActive = async (a: HelpArticleDto) => {
+  const nextActive = !(a.isActive ?? true)
+  const ok = await confirmService.confirmAction(
+    nextActive ? t('admin.confirmActivate') : t('admin.confirmDeactivate'),
+    {
+      title: nextActive ? t('admin.activate') : t('admin.deactivate'),
+      variant: nextActive ? 'primary' : 'warning',
+      icon: nextActive ? 'check_circle' : 'block',
+      confirmText: nextActive ? t('admin.activate') : t('admin.deactivate'),
+      cancelText: t('common.cancel'),
+    },
+  )
+  if (!ok) return
+  articlePendingId.value = a.id
+  try {
+    await contentService.updateHelpArticle(a.id, {
+      categoryId: a.categoryId,
+      title: a.title,
+      body: a.body,
+      slug: a.slug,
+      isActive: nextActive,
+    })
+    toastService.success(nextActive ? t('admin.activated') : t('admin.deactivated'))
+  } catch (e) {
+    toastService.error(e instanceof Error ? e.message : t('common.error'))
+  } finally {
+    articlePendingId.value = null
+  }
+}
+
 const confirmDeleteArticle = async (a: HelpArticleDto) => {
   const ok = await confirmService.confirmDelete(
     `${t('admin.deleteHelpArticleConfirm')}\n${a.title}`,
@@ -334,6 +388,30 @@ const submitFaqForm = async () => {
     faqFormError.value = e instanceof Error ? e.message : t('common.error')
   } finally {
     faqFormLoading.value = false
+  }
+}
+
+const toggleFaqActive = async (f: FaqItemDto) => {
+  const nextActive = !(f.isActive ?? true)
+  const ok = await confirmService.confirmAction(
+    nextActive ? t('admin.confirmActivate') : t('admin.confirmDeactivate'),
+    {
+      title: nextActive ? t('admin.activate') : t('admin.deactivate'),
+      variant: nextActive ? 'primary' : 'warning',
+      icon: nextActive ? 'check_circle' : 'block',
+      confirmText: nextActive ? t('admin.activate') : t('admin.deactivate'),
+      cancelText: t('common.cancel'),
+    },
+  )
+  if (!ok) return
+  faqPendingId.value = f.id
+  try {
+    await contentService.updateFaq(f.id, f.question, f.answer, f.sortOrder ?? 0, nextActive)
+    toastService.success(nextActive ? t('admin.activated') : t('admin.deactivated'))
+  } catch (e) {
+    toastService.error(e instanceof Error ? e.message : t('common.error'))
+  } finally {
+    faqPendingId.value = null
   }
 }
 
@@ -458,6 +536,7 @@ const closeFaqDetails = () => {
                     <th>{{ t('help.colIcon') }}</th>
                     <th>{{ t('help.colCategoryTitle') }}</th>
                     <th>{{ t('help.colArticleCount') }}</th>
+                    <th>{{ t('commerce.status') }}</th>
                     <th class="text-end">{{ t('common.actions') }}</th>
                   </tr>
                 </thead>
@@ -483,6 +562,15 @@ const closeFaqDetails = () => {
                       <span class="mono count-pill">{{ t('help.articleCount', { count: c.articleCount ?? 0 }) }}</span>
                     </td>
                     <td>
+                      <span
+                        class="status-dot-badge mono"
+                        :class="(c.isActive ?? true) ? 'status-dot-badge--active' : 'status-dot-badge--inactive'"
+                      >
+                        <span class="dot"></span>
+                        <span>{{ (c.isActive ?? true) ? t('admin.active') : t('admin.inactive') }}</span>
+                      </span>
+                    </td>
+                    <td>
                       <div class="row-actions">
                         <button
                           type="button"
@@ -501,6 +589,19 @@ const closeFaqDetails = () => {
                           @click="openEditCategory(c)"
                         >
                           <span class="material-symbols-outlined text-[18px]">edit</span>
+                        </button>
+                        <button
+                          type="button"
+                          class="row-action-btn"
+                          :class="(c.isActive ?? true) ? 'row-action-btn--deactivate' : 'row-action-btn--activate'"
+                          :title="(c.isActive ?? true) ? t('admin.deactivate') : t('admin.activate')"
+                          :aria-label="(c.isActive ?? true) ? t('admin.deactivate') : t('admin.activate')"
+                          :disabled="categoryPendingId === c.id"
+                          @click="toggleCategoryActive(c)"
+                        >
+                          <span class="material-symbols-outlined text-[18px]">{{
+                            (c.isActive ?? true) ? 'block' : 'check_circle'
+                          }}</span>
                         </button>
                         <button
                           type="button"
@@ -565,6 +666,7 @@ const closeFaqDetails = () => {
                     <th>{{ t('help.colArticleTitle') }}</th>
                     <th>{{ t('help.colCategory') }}</th>
                     <th>{{ t('help.colSlug') }}</th>
+                    <th>{{ t('commerce.status') }}</th>
                     <th class="text-end">{{ t('common.actions') }}</th>
                   </tr>
                 </thead>
@@ -578,6 +680,15 @@ const closeFaqDetails = () => {
                     </td>
                     <td>
                       <span class="mono slug-badge">/{{ a.slug }}</span>
+                    </td>
+                    <td>
+                      <span
+                        class="status-dot-badge mono"
+                        :class="(a.isActive ?? true) ? 'status-dot-badge--active' : 'status-dot-badge--inactive'"
+                      >
+                        <span class="dot"></span>
+                        <span>{{ (a.isActive ?? true) ? t('admin.active') : t('admin.inactive') }}</span>
+                      </span>
                     </td>
                     <td>
                       <div class="row-actions">
@@ -598,6 +709,19 @@ const closeFaqDetails = () => {
                           @click="openEditArticle(a)"
                         >
                           <span class="material-symbols-outlined text-[18px]">edit</span>
+                        </button>
+                        <button
+                          type="button"
+                          class="row-action-btn"
+                          :class="(a.isActive ?? true) ? 'row-action-btn--deactivate' : 'row-action-btn--activate'"
+                          :title="(a.isActive ?? true) ? t('admin.deactivate') : t('admin.activate')"
+                          :aria-label="(a.isActive ?? true) ? t('admin.deactivate') : t('admin.activate')"
+                          :disabled="articlePendingId === a.id"
+                          @click="toggleArticleActive(a)"
+                        >
+                          <span class="material-symbols-outlined text-[18px]">{{
+                            (a.isActive ?? true) ? 'block' : 'check_circle'
+                          }}</span>
                         </button>
                         <button
                           type="button"
@@ -660,6 +784,13 @@ const closeFaqDetails = () => {
                 <div class="faq-q-line">
                   <span class="material-symbols-outlined text-[18px] text-indigo-600">help</span>
                   <strong class="faq-q-text">{{ f.question }}</strong>
+                  <span
+                    class="status-dot-badge mono"
+                    :class="(f.isActive ?? true) ? 'status-dot-badge--active' : 'status-dot-badge--inactive'"
+                  >
+                    <span class="dot"></span>
+                    <span>{{ (f.isActive ?? true) ? t('admin.active') : t('admin.inactive') }}</span>
+                  </span>
                 </div>
                 <div class="row-actions">
                   <button
@@ -679,6 +810,19 @@ const closeFaqDetails = () => {
                     @click="openEditFaq(f)"
                   >
                     <span class="material-symbols-outlined text-[18px]">edit</span>
+                  </button>
+                  <button
+                    type="button"
+                    class="row-action-btn"
+                    :class="(f.isActive ?? true) ? 'row-action-btn--deactivate' : 'row-action-btn--activate'"
+                    :title="(f.isActive ?? true) ? t('admin.deactivate') : t('admin.activate')"
+                    :aria-label="(f.isActive ?? true) ? t('admin.deactivate') : t('admin.activate')"
+                    :disabled="faqPendingId === f.id"
+                    @click="toggleFaqActive(f)"
+                  >
+                    <span class="material-symbols-outlined text-[18px]">{{
+                      (f.isActive ?? true) ? 'block' : 'check_circle'
+                    }}</span>
                   </button>
                   <button
                     type="button"

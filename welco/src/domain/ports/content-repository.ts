@@ -27,15 +27,15 @@ export interface ContentRepository {
   deleteLandingPage(id: string): Promise<void>
   getHelpCategories(): Promise<HelpCategoryDto[]>
   createHelpCategory(payload: { name: string; icon?: string }): Promise<HelpCategoryDto>
-  updateHelpCategory(id: string, payload: { name: string; icon?: string }): Promise<HelpCategoryDto>
+  updateHelpCategory(id: string, payload: { name: string; icon?: string; isActive?: boolean }): Promise<HelpCategoryDto>
   deleteHelpCategory(id: string): Promise<void>
   getHelpArticles(categoryId?: string): Promise<HelpArticleDto[]>
   createHelpArticle(payload: { categoryId: string; title: string; body: string; slug: string }): Promise<HelpArticleDto>
-  updateHelpArticle(id: string, payload: { categoryId: string; title: string; body: string; slug: string }): Promise<HelpArticleDto>
+  updateHelpArticle(id: string, payload: { categoryId: string; title: string; body: string; slug: string; isActive?: boolean }): Promise<HelpArticleDto>
   deleteHelpArticle(id: string): Promise<void>
   getFaqs(): Promise<FaqItemDto[]>
   createFaq(payload: { question: string; answer: string; sortOrder?: number }): Promise<FaqItemDto>
-  updateFaq(id: string, payload: { question: string; answer: string; sortOrder?: number }): Promise<FaqItemDto>
+  updateFaq(id: string, payload: { question: string; answer: string; sortOrder?: number; isActive?: boolean }): Promise<FaqItemDto>
   deleteFaq(id: string): Promise<void>
   getTradeShows(): Promise<TradeShowEventDto[]>
   getMyTickets(): Promise<SupportTicketDto[]>

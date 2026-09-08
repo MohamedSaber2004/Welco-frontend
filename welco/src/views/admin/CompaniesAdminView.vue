@@ -166,6 +166,41 @@ const submitCompanyForm = async () => {
   }
 }
 
+const toggleCompanyActive = async (c: CompanyDto) => {
+  const nextActive = !(c.isActive ?? true)
+  const ok = await confirmService.confirmAction(
+    nextActive ? t('admin.confirmActivate') : t('admin.confirmDeactivate'),
+    {
+      title: nextActive ? t('admin.activate') : t('admin.deactivate'),
+      variant: nextActive ? 'primary' : 'warning',
+      icon: nextActive ? 'check_circle' : 'block',
+      confirmText: nextActive ? t('admin.activate') : t('admin.deactivate'),
+      cancelText: t('common.cancel'),
+    },
+  )
+  if (!ok) return
+  companyActionPendingId.value = c.id
+  try {
+    const payload: UpdateCompanyPayload = {
+      name: c.name,
+      email: c.email ?? null,
+      type: c.type,
+      countryId: c.countryId ?? '',
+      tierLevel: c.tierLevel ?? 1,
+      status: c.status,
+      accountManagerId: c.accountManagerId ?? null,
+      isActive: nextActive,
+    }
+    await companyRepository.updateCompany(c.id, payload)
+    toastService.success(nextActive ? t('admin.activated') : t('admin.deactivated'))
+    await loadCompanies()
+  } catch (e) {
+    toastService.error(e instanceof Error ? e.message : t('common.error'))
+  } finally {
+    companyActionPendingId.value = null
+  }
+}
+
 const confirmDeleteCompany = async (c: CompanyDto) => {
   const ok = await confirmService.confirmDelete(
     `${t('admin.deleteCompanyConfirm')}\n${c.name}`,
@@ -470,6 +505,19 @@ watch([applicationSearch, statusFilter], () => {
                           @click="openEditCompany(c)"
                         >
                           <span class="material-symbols-outlined text-[18px]">edit</span>
+                        </button>
+                        <button
+                          type="button"
+                          class="row-action-btn"
+                          :class="(c.isActive ?? true) ? 'row-action-btn--deactivate' : 'row-action-btn--activate'"
+                          :title="(c.isActive ?? true) ? t('admin.deactivate') : t('admin.activate')"
+                          :aria-label="(c.isActive ?? true) ? t('admin.deactivate') : t('admin.activate')"
+                          :disabled="companyActionPendingId === c.id"
+                          @click="toggleCompanyActive(c)"
+                        >
+                          <span class="material-symbols-outlined text-[18px]">{{
+                            (c.isActive ?? true) ? 'block' : 'check_circle'
+                          }}</span>
                         </button>
                         <button
                           type="button"

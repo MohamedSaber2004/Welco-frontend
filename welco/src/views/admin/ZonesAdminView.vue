@@ -137,6 +137,31 @@ const submitForm = async () => {
   }
 }
 
+const toggleActive = async (z: ZoneDto) => {
+  const nextActive = !(z.isActive ?? true)
+  const ok = await confirmService.confirmAction(
+    nextActive ? t('admin.confirmActivate') : t('admin.confirmDeactivate'),
+    {
+      title: nextActive ? t('admin.activate') : t('admin.deactivate'),
+      variant: nextActive ? 'primary' : 'warning',
+      icon: nextActive ? 'check_circle' : 'block',
+      confirmText: nextActive ? t('admin.activate') : t('admin.deactivate'),
+      cancelText: t('common.cancel'),
+    },
+  )
+  if (!ok) return
+  actionPendingId.value = z.id
+  try {
+    await locationRepository.updateZone(z.id, { isActive: nextActive })
+    toastService.success(nextActive ? t('admin.activated') : t('admin.deactivated'))
+    await load()
+  } catch (e) {
+    toastService.error(e instanceof Error ? e.message : t('common.error'))
+  } finally {
+    actionPendingId.value = null
+  }
+}
+
 const confirmDelete = async (z: ZoneDto) => {
   const ok = await confirmService.confirmDelete(
     `${t('admin.deleteZoneConfirm')}\n${z.nameEn}`,
@@ -278,6 +303,19 @@ const closeDetails = () => {
                         @click="openEdit(z)"
                       >
                         <span class="material-symbols-outlined text-[18px]">edit</span>
+                      </button>
+                      <button
+                        type="button"
+                        class="row-action-btn"
+                        :class="(z.isActive ?? true) ? 'row-action-btn--deactivate' : 'row-action-btn--activate'"
+                        :title="(z.isActive ?? true) ? t('admin.deactivate') : t('admin.activate')"
+                        :aria-label="(z.isActive ?? true) ? t('admin.deactivate') : t('admin.activate')"
+                        :disabled="actionPendingId === z.id"
+                        @click="toggleActive(z)"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">{{
+                          (z.isActive ?? true) ? 'block' : 'check_circle'
+                        }}</span>
                       </button>
                       <button
                         type="button"

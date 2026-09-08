@@ -101,7 +101,7 @@ export class ApiContentRepository implements ContentRepository {
     return await this.http.post<HelpCategoryDto>(CONTENT_ROUTES.helpCategories, payload)
   }
 
-  async updateHelpCategory(id: string, payload: { name: string; icon?: string }): Promise<HelpCategoryDto> {
+  async updateHelpCategory(id: string, payload: { name: string; icon?: string; isActive?: boolean }): Promise<HelpCategoryDto> {
     return await this.http.put<HelpCategoryDto>(CONTENT_ROUTES.helpCategoryById(id), payload)
   }
 
@@ -124,7 +124,7 @@ export class ApiContentRepository implements ContentRepository {
     return await this.http.post<HelpArticleDto>(CONTENT_ROUTES.helpArticles, payload)
   }
 
-  async updateHelpArticle(id: string, payload: { categoryId: string; title: string; body: string; slug: string }): Promise<HelpArticleDto> {
+  async updateHelpArticle(id: string, payload: { categoryId: string; title: string; body: string; slug: string; isActive?: boolean }): Promise<HelpArticleDto> {
     return await this.http.put<HelpArticleDto>(CONTENT_ROUTES.helpArticleById(id), payload)
   }
 
@@ -146,7 +146,7 @@ export class ApiContentRepository implements ContentRepository {
     return await this.http.post<FaqItemDto>(CONTENT_ROUTES.faqs, payload)
   }
 
-  async updateFaq(id: string, payload: { question: string; answer: string; sortOrder?: number }): Promise<FaqItemDto> {
+  async updateFaq(id: string, payload: { question: string; answer: string; sortOrder?: number; isActive?: boolean }): Promise<FaqItemDto> {
     return await this.http.put<FaqItemDto>(CONTENT_ROUTES.faqById(id), payload)
   }
 

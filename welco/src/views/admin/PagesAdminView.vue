@@ -174,8 +174,40 @@ const submit = async () => {
   }
 }
 
-// --- Delete ---
+// --- Delete / Activate ---
 const deletePendingId = ref<string | null>(null)
+
+const toggleActive = async (p: LandingPageDto) => {
+  const nextActive = !(p.isActive ?? true)
+  const ok = await confirmService.confirmAction(
+    nextActive ? t('admin.confirmActivate') : t('admin.confirmDeactivate'),
+    {
+      title: nextActive ? t('admin.activate') : t('admin.deactivate'),
+      variant: nextActive ? 'primary' : 'warning',
+      icon: nextActive ? 'check_circle' : 'block',
+      confirmText: nextActive ? t('admin.activate') : t('admin.deactivate'),
+      cancelText: t('common.cancel'),
+    },
+  )
+  if (!ok) return
+  deletePendingId.value = p.id
+  try {
+    await services.contentRepository.updateLandingPage(p.id, {
+      type: p.type,
+      slug: p.slug,
+      heroTitle: p.heroTitle,
+      heroBody: p.heroBody || undefined,
+      contentBlock: p.contentBlock ?? null,
+      isActive: nextActive,
+    })
+    toastService.success(nextActive ? t('admin.activated') : t('admin.deactivated'))
+    await load()
+  } catch (e) {
+    toastService.error(e instanceof Error ? e.message : t('common.error'))
+  } finally {
+    deletePendingId.value = null
+  }
+}
 
 const confirmDeletePage = async (p: LandingPageDto) => {
   const ok = await confirmService.confirmDelete(
@@ -317,6 +349,19 @@ onMounted(load)
                         @click="openEdit(p)"
                       >
                         <span class="material-symbols-outlined text-[18px]">edit</span>
+                      </button>
+                      <button
+                        type="button"
+                        class="row-action-btn"
+                        :class="(p.isActive ?? true) ? 'row-action-btn--deactivate' : 'row-action-btn--activate'"
+                        :title="(p.isActive ?? true) ? t('admin.deactivate') : t('admin.activate')"
+                        :aria-label="(p.isActive ?? true) ? t('admin.deactivate') : t('admin.activate')"
+                        :disabled="deletePendingId === p.id"
+                        @click="toggleActive(p)"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">{{
+                          (p.isActive ?? true) ? 'block' : 'check_circle'
+                        }}</span>
                       </button>
                       <button
                         type="button"

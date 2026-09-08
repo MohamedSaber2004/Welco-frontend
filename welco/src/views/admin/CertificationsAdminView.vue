@@ -194,6 +194,41 @@ const submitForm = async () => {
   }
 }
 
+const toggleActive = async (c: CertificationDto) => {
+  const next = !(c.isActive ?? true)
+  const ok = await confirmService.confirmAction(
+    next ? t('admin.confirmActivate') : t('admin.confirmDeactivate'),
+    {
+      title: next ? t('admin.activate') : t('admin.deactivate'),
+      variant: next ? 'primary' : 'warning',
+      icon: next ? 'check_circle' : 'block',
+      confirmText: next ? t('admin.activate') : t('admin.deactivate'),
+      cancelText: t('common.cancel'),
+    },
+  )
+  if (!ok) return
+  actionPendingId.value = c.id
+  try {
+    await services.certificationRepository.updateCertification(c.id, {
+      certificateNumber: c.certificateNumber,
+      title: c.title,
+      issuedTo: c.issuedTo,
+      issuer: c.issuer,
+      issueDate: toDateInput(c.issueDate),
+      expiryDate: toDateInput(c.expiryDate) || null,
+      description: c.description ?? null,
+      certificationImageName: c.certificationImageName ?? null,
+      isActive: next,
+    })
+    toastService.success(next ? t('admin.activated') : t('admin.deactivated'))
+    await loadCertifications()
+  } catch (e) {
+    toastService.error(e instanceof Error ? e.message : t('common.error'))
+  } finally {
+    actionPendingId.value = null
+  }
+}
+
 const confirmDelete = async (c: CertificationDto) => {
   const ok = await confirmService.confirmDelete(
     `${t('admin.deleteCertConfirm')}\n${c.title} (${c.certificateNumber})`,
@@ -348,6 +383,19 @@ onMounted(async () => {
                           @click="openEdit(c)"
                         >
                           <span class="material-symbols-outlined text-[18px]">edit</span>
+                        </button>
+                        <button
+                          type="button"
+                          class="row-action-btn"
+                          :class="(c.isActive ?? true) ? 'row-action-btn--deactivate' : 'row-action-btn--activate'"
+                          :title="(c.isActive ?? true) ? t('admin.deactivate') : t('admin.activate')"
+                          :aria-label="(c.isActive ?? true) ? t('admin.deactivate') : t('admin.activate')"
+                          :disabled="actionPendingId === c.id"
+                          @click="toggleActive(c)"
+                        >
+                          <span class="material-symbols-outlined text-[18px]">{{
+                            (c.isActive ?? true) ? 'block' : 'check_circle'
+                          }}</span>
                         </button>
                         <button
                           type="button"

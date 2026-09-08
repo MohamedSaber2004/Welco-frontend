@@ -10,7 +10,8 @@ import { useUsers } from '../../composables/useUsers'
 import { t } from '../../i18n'
 import { UserType, USER_TYPE_ROLE_KEY } from '../../domain/models/user'
 import type { UserDto } from '../../domain/models/user'
-import { locationService, userRepository } from '../../di/container'
+import { authService, locationService, userRepository } from '../../di/container'
+import { confirmService } from '../../infrastructure/feedback/confirm.service'
 import { ATTACHMENT_PLACE, MEDIA_TYPE } from '../../config/api.config'
 import { toastService } from '../../infrastructure/feedback/toast.service'
 import { resolveFileUrl, PLACEHOLDER } from '../../utils/file-url'
@@ -50,6 +51,36 @@ const openDetails = (u: UserDto) => {
 const closeDetails = () => {
   showDetailsModal.value = false
   selectedUser.value = null
+}
+
+// --- Activate / Deactivate (never yourself — backend rejects self-deactivation) ---
+const togglePendingId = ref<string | null>(null)
+const isSelf = (u: UserDto): boolean => authService.user.value?.id === u.id
+
+const toggleActive = async (u: UserDto) => {
+  if (isSelf(u)) return
+  const nextActive = !u.isActive
+  const ok = await confirmService.confirmAction(
+    nextActive ? t('admin.confirmActivate') : t('admin.confirmDeactivate'),
+    {
+      title: nextActive ? t('admin.activate') : t('admin.deactivate'),
+      variant: nextActive ? 'primary' : 'warning',
+      icon: nextActive ? 'check_circle' : 'block',
+      confirmText: nextActive ? t('admin.activate') : t('admin.deactivate'),
+      cancelText: t('common.cancel'),
+    },
+  )
+  if (!ok) return
+  togglePendingId.value = u.id
+  try {
+    await userRepository.updateUser(u.id, { isActive: nextActive })
+    toastService.success(nextActive ? t('admin.activated') : t('admin.deactivated'))
+    await load()
+  } catch (e) {
+    toastService.error(e instanceof Error ? e.message : t('common.error'))
+  } finally {
+    togglePendingId.value = null
+  }
 }
 
 // --- Change password modal ---
@@ -258,6 +289,19 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
                         @click="openEdit(u)"
                       >
                         <span class="material-symbols-outlined text-[18px]">edit</span>
+                      </button>
+                      <button
+                        type="button"
+                        class="row-action-btn"
+                        :class="u.isActive ? 'row-action-btn--deactivate' : 'row-action-btn--activate'"
+                        :title="u.isActive ? t('admin.deactivate') : t('admin.activate')"
+                        :aria-label="u.isActive ? t('admin.deactivate') : t('admin.activate')"
+                        :disabled="togglePendingId === u.id || isSelf(u)"
+                        @click="toggleActive(u)"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">{{
+                          u.isActive ? 'block' : 'check_circle'
+                        }}</span>
                       </button>
                       <button
                         type="button"

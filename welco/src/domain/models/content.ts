@@ -58,6 +58,7 @@ export interface HelpCategoryDto {
   name: string
   icon: string
   articleCount?: number
+  isActive?: boolean
 }
 
 export interface HelpArticleDto {
@@ -66,12 +67,15 @@ export interface HelpArticleDto {
   title: string
   body: string
   slug: string
+  isActive?: boolean
 }
 
 export interface FaqItemDto {
   id: string
   question: string
   answer: string
+  sortOrder?: number
+  isActive?: boolean
 }
 
 export interface TradeShowEventDto {

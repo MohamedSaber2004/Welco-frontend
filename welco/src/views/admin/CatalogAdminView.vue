@@ -556,6 +556,38 @@ const submitCategory = async () => {
 
 const categoryActionPendingId = ref<string | null>(null)
 
+const toggleCategoryActive = async (c: CategoryDto) => {
+  const nextActive = !(c.isActive ?? true)
+  const ok = await confirmService.confirmAction(
+    nextActive ? t('admin.confirmActivate') : t('admin.confirmDeactivate'),
+    {
+      title: nextActive ? t('admin.activate') : t('admin.deactivate'),
+      variant: nextActive ? 'primary' : 'warning',
+      icon: nextActive ? 'check_circle' : 'block',
+      confirmText: nextActive ? t('admin.activate') : t('admin.deactivate'),
+      cancelText: t('common.cancel'),
+    },
+  )
+  if (!ok) return
+  categoryActionPendingId.value = c.id
+  try {
+    await services.marketplaceRepository.updateCategory(c.id, {
+      nameEn: c.nameEn,
+      nameAr: c.nameAr,
+      description: c.descriptionEn || undefined,
+      imageName: c.imageName ?? null,
+      parentCategoryId: c.parentCategoryId ?? null,
+      isActive: nextActive,
+    })
+    toastService.success(nextActive ? t('admin.activated') : t('admin.deactivated'))
+    await loadCategories()
+  } catch (e) {
+    toastService.error(e instanceof Error ? e.message : t('common.error'))
+  } finally {
+    categoryActionPendingId.value = null
+  }
+}
+
 const confirmDeleteCategory = async (c: CategoryDto) => {
   const ok = await confirmService.confirmDelete(
     `${t('admin.deleteCategoryConfirm')}\n${localized(c.nameEn, c.nameAr)}`,
@@ -891,6 +923,19 @@ onMounted(async () => {
                         @click="openEditCategory(c)"
                       >
                         <span class="material-symbols-outlined text-[18px]">edit</span>
+                      </button>
+                      <button
+                        type="button"
+                        class="action-btn"
+                        :class="(c.isActive ?? true) ? 'action-btn--deactivate' : 'action-btn--activate'"
+                        :title="(c.isActive ?? true) ? t('admin.deactivate') : t('admin.activate')"
+                        :aria-label="(c.isActive ?? true) ? t('admin.deactivate') : t('admin.activate')"
+                        :disabled="categoryActionPendingId === c.id"
+                        @click="toggleCategoryActive(c)"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">{{
+                          (c.isActive ?? true) ? 'block' : 'check_circle'
+                        }}</span>
                       </button>
                       <button
                         type="button"

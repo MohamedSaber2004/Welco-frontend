@@ -61,7 +61,7 @@ const filteredArticles = computed(() => {
   const rawList = Array.isArray(articles.value) ? articles.value : []
   const q = search.value.trim().toLowerCase()
   return rawList.filter((a) => {
-    if (!a) return false
+    if (!a || a.isActive === false) return false
     if (activeCategory.value !== 'all' && a.categoryId !== activeCategory.value) return false
     if (q) {
       const matchTitle = a.title ? String(a.title).toLowerCase().includes(q) : false
@@ -75,9 +75,14 @@ const filteredArticles = computed(() => {
 
 const COLOR_PALETTE = ['#4F46E5', '#0D9488', '#F43F5E', '#10B981', '#6366F1', '#D97706', '#0284C7', '#8B5CF6']
 
+const visibleFaqs = computed(() => {
+  const list = Array.isArray(faqs.value) ? faqs.value : []
+  return list.filter((f) => f && f.isActive !== false)
+})
+
 const guideCards = computed(() => {
-  const allCats = Array.isArray(categories.value) ? categories.value : []
-  const allArts = Array.isArray(articles.value) ? articles.value : []
+  const allCats = Array.isArray(categories.value) ? categories.value.filter((c) => c && c.isActive !== false) : []
+  const allArts = Array.isArray(articles.value) ? articles.value.filter((a) => a && a.isActive !== false) : []
 
   return allCats.map((cat, idx) => {
     const arts = allArts.filter((a) => a && a.categoryId === cat.id)
@@ -487,12 +492,12 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
             </div>
             <h2 class="section-title">{{ t('help.faq') }}</h2>
           </div>
-          <span class="article-counter mono">{{ t('help.articlesLoaded', { count: faqs.length }) }}</span>
+          <span class="article-counter mono">{{ t('help.articlesLoaded', { count: visibleFaqs.length }) }}</span>
         </div>
 
         <div class="faq-accordion-box">
           <div
-            v-for="(f, idx) in faqs"
+            v-for="(f, idx) in visibleFaqs"
             :key="f.id"
             class="faq-item"
             :class="{ open: openFaq === f.id }"

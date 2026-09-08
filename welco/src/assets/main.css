@@ -80,6 +80,16 @@ table thead th.text-center {
   border-color: #dc2626;
 }
 
+.row-action-btn--activate:hover {
+  color: #059669;
+  border-color: #059669;
+}
+
+.row-action-btn--deactivate:hover {
+  color: #d97706;
+  border-color: #d97706;
+}
+
 .row-action-btn:disabled {
   opacity: 0.45;
   cursor: not-allowed;

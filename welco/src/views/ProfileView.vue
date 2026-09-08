@@ -10,6 +10,7 @@ import type { CompanyDto } from '../domain/models/company'
 import { CompanyType, CompanyStatus } from '../domain/models/company'
 import { resolveFileUrl, PLACEHOLDER } from '../utils/file-url'
 import { resolvePhoneDetails, type DetailedPhoneInfo } from '../utils/phone'
+import { theme, toggleTheme } from '../application/theme.service'
 
 const fullName = ref('')
 const phoneNumber = ref('')
@@ -370,6 +371,36 @@ const setLang = async (v: AppLanguage) => {
               @click="setLang(AppLanguage.Ar)"
             >
               العربية
+            </button>
+          </div>
+        </div>
+
+        <!-- Appearance / Theme Preference Card -->
+        <div class="card lang-card">
+          <div class="card-mini-head">
+            <span class="material-symbols-outlined text-[18px] text-indigo-600">dark_mode</span>
+            <h3 class="card-mini-title">{{ locale === 'ar' ? 'سمة المظهر' : 'Appearance' }}</h3>
+          </div>
+          <p class="card-mini-desc">{{ locale === 'ar' ? 'اختر بين المظهر الفاتح والمظهر الداكن' : 'Select your preferred visual mode' }}</p>
+
+          <div class="lang-switch-box" dir="ltr">
+            <button
+              type="button"
+              class="lang-btn mono"
+              :class="{ 'is-active': theme === 'light' }"
+              @click="theme !== 'light' && toggleTheme()"
+            >
+              <span class="material-symbols-outlined text-[14px]">light_mode</span>
+              <span>{{ locale === 'ar' ? 'فاتح' : 'Light' }}</span>
+            </button>
+            <button
+              type="button"
+              class="lang-btn mono"
+              :class="{ 'is-active': theme === 'dark' }"
+              @click="theme !== 'dark' && toggleTheme()"
+            >
+              <span class="material-symbols-outlined text-[14px]">dark_mode</span>
+              <span>{{ locale === 'ar' ? 'داكن' : 'Dark' }}</span>
             </button>
           </div>
         </div>
@@ -984,6 +1015,10 @@ const setLang = async (v: AppLanguage) => {
 .lang-btn {
   flex: 1;
   height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
   border: none;
   background: transparent;
   font-size: 12.5px;

@@ -907,11 +907,11 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
   width: 100%;
   height: 38px;
   padding: 0 2.2rem 0 2.5rem;
-  border: 1px solid #E2E8F0;
+  border: 1px solid var(--wl-border);
   border-radius: 10px;
   font-size: 12.5px;
-  color: #0F172A;
-  background: #F8FAFC;
+  color: var(--wl-ink-strong);
+  background: var(--wl-surface-soft);
   outline: none;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
@@ -919,7 +919,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 .search-input:focus {
   border-color: #6366F1;
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
-  background: #fff;
+  background: var(--wl-surface);
 }
 
 .clear-btn {
@@ -940,11 +940,11 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 .filter-select {
   height: 38px;
   padding: 0 0.85rem;
-  border: 1px solid #E2E8F0;
+  border: 1px solid var(--wl-border);
   border-radius: 10px;
   font-size: 12.5px;
-  color: #475569;
-  background: #F8FAFC;
+  color: var(--wl-ink-soft);
+  background: var(--wl-surface-soft);
   outline: none;
   cursor: pointer;
   transition: border-color 0.15s;
@@ -984,9 +984,9 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
   gap: 0.35rem;
   font-size: 12px;
   font-weight: 600;
-  color: #1E293B;
-  background: #F8FAFC;
-  border: 1px solid #E2E8F0;
+  color: var(--wl-ink);
+  background: var(--wl-surface-soft);
+  border: 1px solid var(--wl-border);
   padding: 0.15rem 0.5rem;
   border-radius: 6px;
   white-space: nowrap;
@@ -997,8 +997,8 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 .qty-tag {
   font-size: 10px;
   font-weight: 700;
-  color: #4F46E5;
-  background: #EEF2FF;
+  color: var(--wl-primary);
+  background: var(--wl-primary-soft);
   padding: 0.05rem 0.3rem;
   border-radius: 4px;
 }
@@ -1006,8 +1006,8 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 .more-badge {
   font-size: 10px;
   font-weight: 700;
-  color: #64748B;
-  background: #F1F5F9;
+  color: var(--wl-muted);
+  background: var(--wl-surface-soft);
   padding: 0.1rem 0.35rem;
   border-radius: 4px;
   align-self: flex-start;
@@ -1027,9 +1027,9 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
   gap: 0.45rem;
   font-size: 10px;
   font-weight: 700;
-  color: #4F46E5;
-  background: #EEF2FF;
-  border: 1px solid #C7D2FE;
+  color: var(--wl-primary);
+  background: var(--wl-primary-soft);
+  border: 1px solid rgba(var(--wl-primary-rgb), 0.3);
   padding: 0.2rem 0.6rem;
   border-radius: 9999px;
   letter-spacing: 0.06em;
@@ -1048,7 +1048,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
   font-size: 1.68rem;
   font-weight: 800;
   letter-spacing: -0.025em;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   margin: 0;
   line-height: 1.1;
 }
@@ -1062,17 +1062,17 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 .count-badge {
   font-size: 11.5px;
   font-weight: 700;
-  color: #475569;
-  background: #F1F5F9;
-  border: 1px solid #E2E8F0;
+  color: var(--wl-ink-soft);
+  background: var(--wl-surface-soft);
+  border: 1px solid var(--wl-border);
   padding: 0.35rem 0.75rem;
   border-radius: 8px;
 }
 
 /* Pipeline Conversion Card */
 .pipeline-card {
-  background: #FFFFFF;
-  border: 1px solid #E2E8F0;
+  background: var(--wl-surface);
+  border: 1px solid var(--wl-border);
   border-radius: 16px;
   padding: 1.25rem 1.5rem;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
@@ -1100,7 +1100,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 .pipeline-title {
   font-size: 1.15rem;
   font-weight: 800;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   margin: 0.2rem 0 0;
 }
 
@@ -1117,8 +1117,8 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 }
 
 .pipeline-cell {
-  background: #F8FAFC;
-  border: 1px solid #E2E8F0;
+  background: var(--wl-surface-soft);
+  border: 1px solid var(--wl-border);
   border-radius: 12px;
   padding: 0.85rem 1rem;
   display: flex;
@@ -1151,7 +1151,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 .step-num {
   font-size: 1.4rem;
   font-weight: 800;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
 }
 
 .step-pct {
@@ -1175,8 +1175,8 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 
 /* Executive Table */
 .table-card {
-  background: #FFFFFF;
-  border: 1px solid #E2E8F0;
+  background: var(--wl-surface);
+  border: 1px solid var(--wl-border);
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
@@ -1193,25 +1193,25 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 }
 
 .exec-table thead th {
-  background: #F8FAFC;
-  border-bottom: 1px solid #E2E8F0;
+  background: var(--wl-surface-soft);
+  border-bottom: 1px solid var(--wl-border);
   padding: 0.85rem 1.25rem;
   font-family: var(--wl-font-mono, monospace);
   font-size: 11px;
   font-weight: 700;
-  color: #64748B;
+  color: var(--wl-muted);
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
 .exec-row {
   height: 52px;
-  border-bottom: 1px solid #F1F5F9;
+  border-bottom: 1px solid var(--wl-border);
   transition: background 0.15s ease;
 }
 
 .exec-row:hover {
-  background: #F8FAFC;
+  background: var(--wl-surface-soft);
 }
 
 .exec-row td {
@@ -1221,27 +1221,27 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 
 .rfq-num {
   font-size: 13px;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   font-weight: 700;
 }
 
 .company-name {
   font-size: 13.5px;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
 }
 
 .items-pill {
   font-size: 11px;
-  color: #475569;
-  background: #F1F5F9;
-  border: 1px solid #E2E8F0;
+  color: var(--wl-ink-soft);
+  background: var(--wl-surface-soft);
+  border: 1px solid var(--wl-border);
   padding: 0.2rem 0.55rem;
   border-radius: 6px;
 }
 
 .amount-num {
   font-size: 13.5px;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
 }
 
 .btn-issue-quote {
@@ -1275,7 +1275,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 }
 
 .pricing-table-wrap {
-  border: 1px solid #E2E8F0;
+  border: 1px solid var(--wl-border);
   border-radius: 10px;
   overflow: hidden;
 }
@@ -1287,13 +1287,13 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 }
 
 .modal-pricing-table th {
-  background: #F8FAFC;
+  background: var(--wl-surface-soft);
   padding: 0.6rem 0.85rem;
   font-size: 11px;
-  color: #64748B;
+  color: var(--wl-muted);
   font-weight: 700;
   text-transform: uppercase;
-  border-bottom: 1px solid #E2E8F0;
+  border-bottom: 1px solid var(--wl-border);
 }
 
 .modal-pricing-table td {
@@ -1304,7 +1304,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 
 .product-title-cell {
   font-weight: 600;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
 }
 
 .pricing-input {
@@ -1312,11 +1312,11 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
   height: 36px;
   padding: 0 8px;
   text-align: end;
-  background: #FFFFFF;
-  border: 1.5px solid #E2E8F0;
+  background: var(--wl-surface);
+  border: 1.5px solid var(--wl-border);
   border-radius: 6px;
   font-size: 13px;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   outline: none;
 }
 
@@ -1326,15 +1326,15 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 
 .subtotal-num {
   font-weight: 700;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
 }
 
 .quote-summary-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #F8FAFC;
-  border: 1px solid #E2E8F0;
+  background: var(--wl-surface-soft);
+  border: 1px solid var(--wl-border);
   border-radius: 10px;
   padding: 0.85rem 1.15rem;
 }
@@ -1355,11 +1355,11 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 .validity-date-input {
   height: 38px;
   padding: 0 10px;
-  background: #FFFFFF;
-  border: 1.5px solid #E2E8F0;
+  background: var(--wl-surface);
+  border: 1.5px solid var(--wl-border);
   border-radius: 8px;
   font-size: 12.5px;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   outline: none;
 }
 
@@ -1423,19 +1423,19 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
   width: 34px;
   height: 34px;
   border-radius: 8px;
-  background: #EEF2FF;
-  border: 1px solid #C7D2FE;
+  background: var(--wl-primary-soft);
+  border: 1px solid rgba(var(--wl-primary-rgb), 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #4F46E5;
+  color: var(--wl-primary);
   flex-shrink: 0;
 }
 
 .workflow-banner__title {
   font-size: 13.5px;
   font-weight: 800;
-  color: #1E293B;
+  color: var(--wl-ink);
   margin: 0;
 }
 
@@ -1457,8 +1457,8 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
   display: flex;
   align-items: center;
   gap: 0.55rem;
-  background: #FFFFFF;
-  border: 1px solid #E2E8F0;
+  background: var(--wl-surface);
+  border: 1px solid var(--wl-border);
   border-radius: 10px;
   padding: 0.45rem 0.75rem;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
@@ -1494,7 +1494,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 .chip-title {
   font-size: 11.5px;
   font-weight: 700;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
 }
 
 .chip-sub {
@@ -1533,14 +1533,14 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 }
 
 .sales-tab:hover {
-  background: #F1F5F9;
-  color: #1E293B;
+  background: var(--wl-surface-soft);
+  color: var(--wl-ink);
 }
 
 .sales-tab.is-active {
-  background: #EEF2FF;
-  border-color: #C7D2FE;
-  color: #4F46E5;
+  background: var(--wl-primary-soft);
+  border-color: rgba(var(--wl-primary-rgb), 0.3);
+  color: var(--wl-primary);
 }
 
 .tab-icon {
@@ -1573,8 +1573,8 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  background: #F1F5F9;
-  color: #334155;
+  background: var(--wl-surface-soft);
+  color: var(--wl-ink-soft);
   border: 1px solid #CBD5E1;
   border-radius: 7px;
   padding: 0.35rem 0.65rem;
@@ -1585,8 +1585,8 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 }
 
 .btn-view-quote:hover {
-  background: #E2E8F0;
-  color: #0F172A;
+  background: var(--wl-surface-hover);
+  color: var(--wl-ink-strong);
 }
 
 .btn-reprice {
@@ -1595,18 +1595,18 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
   justify-content: center;
   width: 28px;
   height: 28px;
-  background: #FFFFFF;
-  color: #64748B;
-  border: 1px solid #E2E8F0;
+  background: var(--wl-surface);
+  color: var(--wl-muted);
+  border: 1px solid var(--wl-border);
   border-radius: 7px;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .btn-reprice:hover {
-  background: #F8FAFC;
+  background: var(--wl-surface-soft);
   color: #4F46E5;
-  border-color: #C7D2FE;
+  border-color: rgba(var(--wl-primary-rgb), 0.3);
 }
 
 .btn-quick-approve {
@@ -1682,9 +1682,9 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 }
 
 .quote-workflow-alert.is-expired {
-  background: #F8FAFC;
-  border-color: #E2E8F0;
-  color: #64748B;
+  background: var(--wl-surface-soft);
+  border-color: var(--wl-border);
+  color: var(--wl-muted);
 }
 
 .alert-icon-box {
@@ -1705,7 +1705,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
   font-size: 12px;
   margin: 0.2rem 0 0;
   line-height: 1.45;
-  color: #334155;
+  color: var(--wl-ink-soft);
 }
 
 .quote-summary-grid {
@@ -1715,8 +1715,8 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 }
 
 .summary-tile {
-  background: #F8FAFC;
-  border: 1px solid #E2E8F0;
+  background: var(--wl-surface-soft);
+  border: 1px solid var(--wl-border);
   border-radius: 8px;
   padding: 0.65rem 0.85rem;
   display: flex;
@@ -1733,15 +1733,15 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 
 .summary-value {
   font-size: 12.5px;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
 }
 
 .quote-modal-total-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #F8FAFC;
-  border: 1px solid #E2E8F0;
+  background: var(--wl-surface-soft);
+  border: 1px solid var(--wl-border);
   border-radius: 10px;
   padding: 0.75rem 1.15rem;
 }

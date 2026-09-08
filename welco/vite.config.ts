@@ -25,6 +25,7 @@ export default defineConfig(({ mode }) => {
         '/api/v1/categories':      { target: productTarget,  changeOrigin: true, secure: false },
         '/api/v1/currencies':      { target: productTarget,  changeOrigin: true, secure: false },
         '/api/v1/exchange-rates':  { target: productTarget,  changeOrigin: true, secure: false },
+        '/hangfire':               { target: productTarget,  changeOrigin: true, secure: false },
         '/api/v1/catalog':         { target: productTarget,  changeOrigin: true, secure: false },
         '/api/v1/certifications':  { target: certTarget,     changeOrigin: true, secure: false },
         '/api/v1/documents':       { target: contentTarget,  changeOrigin: true, secure: false },

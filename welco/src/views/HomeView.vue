@@ -289,6 +289,9 @@ const navigateToOemFromModal = () => {
               <span>{{ t('home.browseComplete') }}</span>
               <span class="icon--directional">→</span>
             </router-link>
+            <router-link to="/about" class="btn btn-secondary">
+              <span>{{ t('home.learnMoreAbout') }}</span>
+            </router-link>
             <router-link to="/oem" class="btn btn-secondary">
               <span>{{ t('nav.oem') }}</span>
             </router-link>
@@ -1299,7 +1302,7 @@ const navigateToOemFromModal = () => {
 .modal-inp:focus,
 .modal-sel:focus,
 .modal-txt:focus {
-  background: #FFFFFF;
+  background: var(--wl-surface);
   border-color: var(--wl-teal, #0D9488);
   box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
 }

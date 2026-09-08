@@ -1,5 +1,5 @@
 import { EXCHANGE_RATE_ROUTES, PRODUCT_API_BASE_URL } from '../../config/api.config'
-import type { ConversionResultDto, ExchangeRateDto } from '../../domain/models/exchange-rate'
+import type { ConversionResultDto, ExchangeRateDto, ExchangeRateSyncLogDto } from '../../domain/models/exchange-rate'
 import type { ExchangeRateRepository } from '../../domain/ports/exchange-rate-repository'
 import type { HttpClient } from '../../infrastructure/http/http-client'
 import { ApiError } from '../../infrastructure/http/api-error'
@@ -236,6 +236,35 @@ export class ApiExchangeRateRepository implements ExchangeRateRepository {
       success: Boolean((unwrapped as Record<string, unknown>)?.success ?? (unwrapped as Record<string, unknown>)?.isSuccess ?? true),
       ratesCount: Number((unwrapped as Record<string, unknown>)?.ratesCount ?? 0),
       baseCurrency: String((unwrapped as Record<string, unknown>)?.baseCurrency ?? 'USD'),
+    }
+  }
+
+  async syncEnqueue(): Promise<{ isSuccess: boolean; data?: string; message?: string }> {
+    const raw = await this.http.post<unknown>(EXCHANGE_RATE_ROUTES.syncEnqueue, {})
+    const unwrapped = unwrap<Record<string, unknown>>(raw)
+    return {
+      isSuccess: Boolean((unwrapped as Record<string, unknown>)?.isSuccess ?? true),
+      data: String((unwrapped as Record<string, unknown>)?.data ?? ''),
+      message: String((unwrapped as Record<string, unknown>)?.message ?? 'Exchange rate sync job enqueued in Hangfire'),
+    }
+  }
+
+  async getSyncLogs(take = 20): Promise<ExchangeRateSyncLogDto[]> {
+    const qs = `?take=${take}`
+    const candidates = [
+      this.productUrl(`${EXCHANGE_RATE_ROUTES.syncLogs}${qs}`),
+      `${EXCHANGE_RATE_ROUTES.syncLogs}${qs}`,
+    ]
+    try {
+      const raw = await this.getFirst(candidates)
+      const list = unwrap<ExchangeRateSyncLogDto[]>(raw)
+      if (Array.isArray(list)) return list
+      if (list && typeof list === 'object' && Array.isArray((list as Record<string, unknown>).data)) {
+        return (list as Record<string, unknown>).data as ExchangeRateSyncLogDto[]
+      }
+      return []
+    } catch {
+      return []
     }
   }
 }

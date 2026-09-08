@@ -207,7 +207,7 @@ const goDetail = (id: string) => {
 }
 
 .crumb-active {
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   font-weight: 700;
 }
 
@@ -225,9 +225,9 @@ const goDetail = (id: string) => {
   gap: 0.45rem;
   font-size: 10px;
   font-weight: 700;
-  color: #4F46E5;
-  background: #EEF2FF;
-  border: 1px solid #C7D2FE;
+  color: var(--wl-primary);
+  background: var(--wl-primary-soft);
+  border: 1px solid rgba(var(--wl-primary-rgb), 0.3);
   padding: 0.2rem 0.6rem;
   border-radius: 9999px;
   letter-spacing: 0.06em;
@@ -246,7 +246,7 @@ const goDetail = (id: string) => {
   font-size: 1.68rem;
   font-weight: 800;
   letter-spacing: -0.025em;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   margin: 0;
   line-height: 1.1;
 }
@@ -277,7 +277,7 @@ const goDetail = (id: string) => {
   gap: 0.35rem;
   height: 44px;
   padding: 0 1rem;
-  background: #FFFFFF;
+  background: var(--wl-surface);
   border: 1.5px solid #FECDD3;
   color: #E11D48;
   border-radius: 10px;
@@ -321,8 +321,8 @@ const goDetail = (id: string) => {
 }
 
 .product-card {
-  background: #FFFFFF;
-  border: 1px solid #E2E8F0;
+  background: var(--wl-surface);
+  border: 1px solid var(--wl-border);
   border-radius: 16px;
   overflow: hidden;
   display: flex;
@@ -343,8 +343,8 @@ const goDetail = (id: string) => {
   position: relative;
   display: grid;
   place-items: center;
-  background: #F8FAFC;
-  border-bottom: 1px solid #F1F5F9;
+  background: var(--wl-surface-soft);
+  border-bottom: 1px solid var(--wl-border);
   overflow: hidden;
 }
 
@@ -379,8 +379,8 @@ const goDetail = (id: string) => {
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  background: #FFFFFF;
-  border: 1px solid #E2E8F0;
+  background: var(--wl-surface);
+  border: 1px solid var(--wl-border);
   color: #E11D48;
   display: grid;
   place-items: center;
@@ -413,7 +413,7 @@ const goDetail = (id: string) => {
 .product-name {
   font-size: 14.5px;
   font-weight: 700;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   margin: 0;
   line-height: 1.35;
 }
@@ -447,7 +447,7 @@ const goDetail = (id: string) => {
 .price-val {
   font-size: 15px;
   font-weight: 800;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
 }
 
 .unit-text {

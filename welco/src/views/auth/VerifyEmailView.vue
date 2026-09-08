@@ -251,8 +251,8 @@ const handleResend = async () => {
 
 .email-highlight {
   font-weight: 700;
-  color: #0F172A;
-  background: #FFFFFF;
+  color: var(--wl-ink-strong);
+  background: var(--wl-surface);
   padding: 1px 5px;
   border-radius: 4px;
   border: 1px solid #DCFCE7;
@@ -288,12 +288,12 @@ const handleResend = async () => {
   width: 100%;
   height: 48px;
   padding: 0 14px;
-  background: #FFFFFF;
-  border: 1.5px solid #E2E8F0;
+  background: var(--wl-surface);
+  border: 1.5px solid var(--wl-border);
   border-radius: 12px;
   font-size: 14px;
   font-family: var(--wl-font-body, system-ui);
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   outline: none;

@@ -446,9 +446,9 @@ const closeDetails = () => {
   gap: 0.45rem;
   font-size: 10px;
   font-weight: 700;
-  color: #4F46E5;
-  background: #EEF2FF;
-  border: 1px solid #C7D2FE;
+  color: var(--wl-primary);
+  background: var(--wl-primary-soft);
+  border: 1px solid rgba(var(--wl-primary-rgb), 0.3);
   padding: 0.2rem 0.6rem;
   border-radius: 9999px;
   letter-spacing: 0.06em;
@@ -467,7 +467,7 @@ const closeDetails = () => {
   font-size: 1.68rem;
   font-weight: 800;
   letter-spacing: -0.025em;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   margin: 0;
   line-height: 1.1;
 }
@@ -516,11 +516,11 @@ const closeDetails = () => {
   height: 44px;
   padding: 0 14px;
   padding-inline-start: 38px;
-  background: #FFFFFF;
-  border: 1.5px solid #E2E8F0;
+  background: var(--wl-surface);
+  border: 1.5px solid var(--wl-border);
   border-radius: 10px;
   font-size: 13.5px;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   outline: none;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
@@ -534,12 +534,12 @@ const closeDetails = () => {
 .toolbar-select {
   height: 44px;
   padding: 0 14px;
-  background: #FFFFFF;
-  border: 1.5px solid #E2E8F0;
+  background: var(--wl-surface);
+  border: 1.5px solid var(--wl-border);
   border-radius: 10px;
   font-size: 13px;
   font-weight: 600;
-  color: #334155;
+  color: var(--wl-ink-soft);
   outline: none;
   cursor: pointer;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
@@ -576,25 +576,25 @@ const closeDetails = () => {
 }
 
 .exec-table thead th {
-  background: #F8FAFC;
-  border-bottom: 1px solid #E2E8F0;
+  background: var(--wl-surface-soft);
+  border-bottom: 1px solid var(--wl-border);
   padding: 0.85rem 1.25rem;
   font-family: var(--wl-font-mono, monospace);
   font-size: 11px;
   font-weight: 700;
-  color: #64748B;
+  color: var(--wl-muted);
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
 .exec-row {
   height: 52px;
-  border-bottom: 1px solid #F1F5F9;
+  border-bottom: 1px solid var(--wl-border);
   transition: background 0.15s ease;
 }
 
 .exec-row:hover {
-  background: #F8FAFC;
+  background: var(--wl-surface-soft);
 }
 
 .exec-row td {
@@ -615,20 +615,20 @@ const closeDetails = () => {
 
 .zone-name {
   font-size: 13.5px;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
 }
 
 .arabic-name {
   font-size: 14px;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
 }
 
 .city-pill {
   font-size: 11.5px;
   font-weight: 700;
-  color: #4F46E5;
-  background: #EEF2FF;
-  border: 1px solid #C7D2FE;
+  color: var(--wl-primary);
+  background: var(--wl-primary-soft);
+  border: 1px solid rgba(var(--wl-primary-rgb), 0.3);
   padding: 0.2rem 0.5rem;
   border-radius: 6px;
 }

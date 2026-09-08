@@ -2,6 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { authService, wishlistService } from '../../di/container'
+import { theme, toggleTheme } from '../../application/theme.service'
 import { useCart } from '../../composables/useCart'
 import { t, locale, setLocale } from '../../i18n'
 import { AppLanguage } from '../../domain/models/user'
@@ -467,6 +468,16 @@ const isPathActive = (path: string, exact = false) => {
                 </span>
               </button>
 
+              <button type="button" class="sheet-item" @click="navigateTo('/about')">
+                <span class="sheet-icon-box sheet-icon--primary">
+                  <span class="material-symbols-outlined">info</span>
+                </span>
+                <span class="sheet-item__text">
+                  <strong>{{ t('nav.about') }}</strong>
+                  <small>{{ locale === 'ar' ? 'تراثنا وقصة التصنيع الجراحي' : 'Heritage & manufacturing story' }}</small>
+                </span>
+              </button>
+
               <button type="button" class="sheet-item" @click="navigateTo('/track-order')">
                 <span class="sheet-icon-box sheet-icon--slate">
                   <span class="material-symbols-outlined">local_shipping</span>
@@ -522,6 +533,10 @@ const isPathActive = (path: string, exact = false) => {
             <button type="button" class="sheet-foot-btn" @click="navigateTo('/profile')">
               <span class="material-symbols-outlined text-[18px]">manage_accounts</span>
               <span>{{ t('nav.profile') }}</span>
+            </button>
+            <button type="button" class="sheet-foot-btn" :aria-label="t('nav.toggleTheme')" @click="toggleTheme">
+              <span class="material-symbols-outlined text-[18px]">{{ theme === 'light' ? 'dark_mode' : 'light_mode' }}</span>
+              <span>{{ theme === 'light' ? (locale === 'ar' ? 'الوضع الداكن' : 'Dark') : (locale === 'ar' ? 'الوضع الفاتح' : 'Light') }}</span>
             </button>
             <button type="button" class="sheet-foot-btn" @click="toggleLang">
               <span class="material-symbols-outlined text-[18px]">language</span>
@@ -896,6 +911,7 @@ const isPathActive = (path: string, exact = false) => {
 
 .sheet-foot {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.6rem;
   padding: 0.85rem 1.15rem;
   border-top: 1px solid var(--wl-border);
@@ -904,6 +920,7 @@ const isPathActive = (path: string, exact = false) => {
 
 .sheet-foot-btn {
   flex: 1;
+  min-width: calc(50% - 0.3rem);
   display: inline-flex;
   align-items: center;
   justify-content: center;

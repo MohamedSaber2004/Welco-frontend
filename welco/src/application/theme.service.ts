@@ -37,7 +37,7 @@ const resolveSessionTheme = (): Theme => {
   return readStoredTheme()
 }
 
-const THEME_COLOR: Record<Theme, string> = { light: '#F8FAFC', dark: '#09090B' }
+const THEME_COLOR: Record<Theme, string> = { light: '#F8FAFC', dark: '#1E1F22' }
 
 const applyTheme = (next: Theme) => {
   if (typeof document === 'undefined') return

@@ -256,11 +256,11 @@ async function closeTicket(id: string) {
   width: 100%;
   height: 38px;
   padding: 0 2.2rem 0 2.5rem;
-  border: 1px solid #E2E8F0;
+  border: 1px solid var(--wl-border);
   border-radius: 10px;
   font-size: 12.5px;
-  color: #0F172A;
-  background: #F8FAFC;
+  color: var(--wl-ink-strong);
+  background: var(--wl-surface-soft);
   outline: none;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
@@ -268,7 +268,7 @@ async function closeTicket(id: string) {
 .search-input:focus {
   border-color: #6366F1;
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
-  background: #fff;
+  background: var(--wl-surface);
 }
 
 .clear-btn {
@@ -289,11 +289,11 @@ async function closeTicket(id: string) {
 .filter-select {
   height: 38px;
   padding: 0 0.85rem;
-  border: 1px solid #E2E8F0;
+  border: 1px solid var(--wl-border);
   border-radius: 10px;
   font-size: 12.5px;
-  color: #475569;
-  background: #F8FAFC;
+  color: var(--wl-ink-soft);
+  background: var(--wl-surface-soft);
   outline: none;
   cursor: pointer;
   transition: border-color 0.15s;
@@ -342,7 +342,7 @@ async function closeTicket(id: string) {
 }
 
 .crumb-active {
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   font-weight: 700;
 }
 
@@ -360,9 +360,9 @@ async function closeTicket(id: string) {
   gap: 0.45rem;
   font-size: 10px;
   font-weight: 700;
-  color: #4F46E5;
-  background: #EEF2FF;
-  border: 1px solid #C7D2FE;
+  color: var(--wl-primary);
+  background: var(--wl-primary-soft);
+  border: 1px solid rgba(var(--wl-primary-rgb), 0.3);
   padding: 0.2rem 0.6rem;
   border-radius: 9999px;
   letter-spacing: 0.06em;
@@ -382,7 +382,7 @@ async function closeTicket(id: string) {
   font-size: 1.68rem;
   font-weight: 800;
   letter-spacing: -0.025em;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   margin: 0;
   line-height: 1.1;
 }
@@ -396,9 +396,9 @@ async function closeTicket(id: string) {
 .count-badge {
   font-size: 11.5px;
   font-weight: 700;
-  color: #475569;
-  background: #F1F5F9;
-  border: 1px solid #E2E8F0;
+  color: var(--wl-ink-soft);
+  background: var(--wl-surface-soft);
+  border: 1px solid var(--wl-border);
   padding: 0.35rem 0.75rem;
   border-radius: 8px;
 }
@@ -437,7 +437,7 @@ async function closeTicket(id: string) {
 .form-title {
   font-size: 14.5px;
   font-weight: 800;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   margin: 0;
 }
 
@@ -465,11 +465,11 @@ async function closeTicket(id: string) {
   width: 100%;
   height: 48px;
   padding: 0 14px;
-  background: #F8FAFC;
-  border: 1.5px solid #E2E8F0;
+  background: var(--wl-surface-soft);
+  border: 1.5px solid var(--wl-border);
   border-radius: 10px;
   font-size: 13.5px;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   outline: none;
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -477,11 +477,11 @@ async function closeTicket(id: string) {
 .vip-textarea {
   width: 100%;
   padding: 12px 14px;
-  background: #F8FAFC;
-  border: 1.5px solid #E2E8F0;
+  background: var(--wl-surface-soft);
+  border: 1.5px solid var(--wl-border);
   border-radius: 10px;
   font-size: 13.5px;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   outline: none;
   resize: vertical;
   line-height: 1.55;
@@ -490,7 +490,7 @@ async function closeTicket(id: string) {
 
 .vip-48-input:focus,
 .vip-textarea:focus {
-  background: #FFFFFF;
+  background: var(--wl-surface);
   border-color: #4F46E5;
   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
 }
@@ -538,7 +538,7 @@ async function closeTicket(id: string) {
 .history-title {
   font-size: 14.5px;
   font-weight: 800;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   margin: 0;
 }
 
@@ -588,7 +588,7 @@ async function closeTicket(id: string) {
 .ticket-subject {
   font-size: 14.5px;
   font-weight: 700;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   margin: 0;
 }
 
@@ -632,14 +632,14 @@ async function closeTicket(id: string) {
 .status-pill--answered .dot { background: #10B981; }
 
 .status-pill--closed {
-  background: #F1F5F9;
-  color: #64748B;
+  background: var(--wl-surface-soft);
+  color: var(--wl-muted);
 }
 .status-pill--closed .dot { background: #94A3B8; }
 
 .btn-close-ticket {
   border: 1px solid #FECDD3;
-  background: #FFFFFF;
+  background: var(--wl-surface);
   color: #E11D48;
   padding: 0.25rem 0.6rem;
   border-radius: 6px;
@@ -655,15 +655,15 @@ async function closeTicket(id: string) {
 
 .ticket-body-text {
   font-size: 13px;
-  color: #334155;
+  color: var(--wl-ink-soft);
   line-height: 1.6;
   white-space: pre-wrap;
   margin: 0;
 }
 
 .reply-thread-card {
-  background: #F8FAFC;
-  border: 1px solid #E2E8F0;
+  background: var(--wl-surface-soft);
+  border: 1px solid var(--wl-border);
   border-radius: 12px;
   padding: 0.85rem 1.15rem;
 }
@@ -680,7 +680,7 @@ async function closeTicket(id: string) {
 
 .reply-body-text {
   font-size: 13px;
-  color: #1E293B;
+  color: var(--wl-ink);
   line-height: 1.55;
   white-space: pre-wrap;
   margin: 0;

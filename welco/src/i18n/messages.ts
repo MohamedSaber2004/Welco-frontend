@@ -39,6 +39,9 @@ export type Messages = {
     all: string
     verified: string
     pending: string
+    failed: string
+    details: string
+    refresh: string
     change: string
     approvedSuccessfully: string
     savedSuccessfully: string
@@ -98,6 +101,7 @@ export type Messages = {
     help: string
     checkout: string
     more: string
+    about: string
   }
   home: {
     title: string
@@ -152,6 +156,7 @@ export type Messages = {
     aboutEyebrow: string
     aboutTitle: string
     aboutBody: string
+    learnMoreAbout: string
     moreCount: string
     tradeShowsEyebrow: string
     tradeShowsTitle: string
@@ -189,6 +194,28 @@ export type Messages = {
     metricsHeading: string
     newBadge: string
     docsEyebrow: string
+  }
+  about: {
+    title: string
+    subtitle: string
+    ourStory: string
+    pillarsTitle: string
+    mfgTitle: string
+    mfgDesc: string
+    qualityTitle: string
+    qualityDesc: string
+    globalTitle: string
+    globalDesc: string
+    oemTitle: string
+    oemDesc: string
+    exploreCerts: string
+    exploreOem: string
+    browseCatalog: string
+    contactSupport: string
+    statEst: string
+    statYears: string
+    statCerts: string
+    statGlobal: string
   }
   auth: {
     brandOverview: string
@@ -417,6 +444,41 @@ export type Messages = {
   }
   admin: {
     dashboard: string
+    backgroundJobs: string
+    backgroundJobsSubtitle: string
+    hangfireDashboard: string
+    openHangfireDashboard: string
+    triggerHangfireSync: string
+    hangfireServer: string
+    jobStorage: string
+    queues: string
+    recurringSchedule: string
+    totalRuns: string
+    successfulRuns: string
+    failedRuns: string
+    ratesCount: string
+    recurringJobsList: string
+    activeJobs: string
+    dailySchedule: string
+    manualDirectSync: string
+    syncHistoryLogs: string
+    records: string
+    noSyncLogsTitle: string
+    noSyncLogsDesc: string
+    startedAt: string
+    duration: string
+    baseCurrency: string
+    source: string
+    syncLogDetailsTitle: string
+    logId: string
+    completedAt: string
+    errorDetails: string
+    inProgress: string
+    hangfireEnqueuedSuccess: string
+    hangfireEnqueueFailed: string
+    syncSuccessMsg: string
+    syncFailedMsg: string
+    recurringActive: string
     adminPanel: string
     overview: string
     overviewDesc: string

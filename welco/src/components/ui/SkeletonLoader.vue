@@ -527,6 +527,10 @@
     align-items: center;
   }
 
+  :root[data-theme='dark'] .sk-table__head, :root.dark .sk-table__head {
+    background: #111214;
+  }
+
     .sk-table__head .sk {
       background: rgba(255,255,255,0.12);
       border: none;

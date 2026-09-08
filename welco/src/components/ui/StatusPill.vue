@@ -7,6 +7,9 @@ const props = defineProps<{
 }>()
 
 const TONE: Record<string, string> = {
+  Success: 'emerald',
+  Failed: 'rose',
+  Partial: 'amber',
   Pending: 'amber',
   Draft: 'slate',
   Sent: 'indigo',
@@ -66,9 +69,9 @@ const tone = computed(() => TONE[props.status] ?? 'slate')
   border-color: rgba(16, 185, 129, 0.2);
 }
 :root[data-theme='dark'] .status-pill--emerald {
-  color: #34D399;
-  background: rgba(16, 185, 129, 0.12);
-  border-color: rgba(16, 185, 129, 0.25);
+  color: #57F287;
+  background: rgba(87, 242, 135, 0.12);
+  border-color: rgba(87, 242, 135, 0.25);
 }
 
 .status-pill--indigo {
@@ -77,9 +80,9 @@ const tone = computed(() => TONE[props.status] ?? 'slate')
   border-color: rgba(99, 102, 241, 0.2);
 }
 :root[data-theme='dark'] .status-pill--indigo {
-  color: #A5B4FC;
-  background: rgba(99, 102, 241, 0.14);
-  border-color: rgba(99, 102, 241, 0.25);
+  color: #949CF7;
+  background: rgba(88, 101, 242, 0.16);
+  border-color: rgba(88, 101, 242, 0.3);
 }
 
 .status-pill--amber {
@@ -88,9 +91,9 @@ const tone = computed(() => TONE[props.status] ?? 'slate')
   border-color: rgba(245, 158, 11, 0.22);
 }
 :root[data-theme='dark'] .status-pill--amber {
-  color: #FBBF24;
-  background: rgba(245, 158, 11, 0.12);
-  border-color: rgba(245, 158, 11, 0.25);
+  color: #FEE75C;
+  background: rgba(254, 231, 92, 0.12);
+  border-color: rgba(254, 231, 92, 0.3);
 }
 
 .status-pill--rose {
@@ -99,9 +102,9 @@ const tone = computed(() => TONE[props.status] ?? 'slate')
   border-color: rgba(244, 63, 94, 0.2);
 }
 :root[data-theme='dark'] .status-pill--rose {
-  color: #FDA4AF;
-  background: rgba(244, 63, 94, 0.14);
-  border-color: rgba(244, 63, 94, 0.25);
+  color: #F23F43;
+  background: rgba(237, 66, 69, 0.14);
+  border-color: rgba(237, 66, 69, 0.3);
 }
 
 .status-pill--slate {
@@ -110,8 +113,8 @@ const tone = computed(() => TONE[props.status] ?? 'slate')
   border-color: var(--wl-border);
 }
 :root[data-theme='dark'] .status-pill--slate {
-  color: #94A3B8;
-  background: #1E293B;
+  color: #B5BAC1;
+  background: #383A40;
   border-color: rgba(255, 255, 255, 0.08);
 }
 </style>

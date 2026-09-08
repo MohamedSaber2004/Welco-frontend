@@ -95,6 +95,7 @@ watch(isAuthed, (v) => {
         <template v-if="isBuyer && isAuthed">
           <router-link to="/" class="menu__link">{{ t('nav.home') }}</router-link>
           <router-link to="/marketplace" class="menu__link">{{ t('nav.marketplace') }}</router-link>
+          <router-link to="/about" class="menu__link">{{ t('nav.about') }}</router-link>
           <router-link to="/account" class="menu__link">{{ t('nav.account') }}</router-link>
           <router-link to="/wishlist" class="menu__link">{{ t('nav.wishlist') }}</router-link>
           <router-link to="/help/my-tickets" class="menu__link">{{ t('help.myTickets') }}</router-link>
@@ -103,6 +104,7 @@ watch(isAuthed, (v) => {
         <template v-else>
           <router-link to="/" class="menu__link">{{ t('nav.home') }}</router-link>
           <router-link to="/marketplace" class="menu__link">{{ t('nav.marketplace') }}</router-link>
+          <router-link to="/about" class="menu__link">{{ t('nav.about') }}</router-link>
           <router-link to="/certifications" class="menu__link">{{ t('nav.certifications') }}</router-link>
           <router-link to="/help" class="menu__link">{{ t('nav.help') }}</router-link>
         </template>
@@ -197,6 +199,7 @@ watch(isAuthed, (v) => {
         <template v-if="isBuyer && isAuthed">
           <router-link to="/" class="header__drawer-link" @click="closeMobile">{{ t('nav.home') }}</router-link>
           <router-link to="/marketplace" class="header__drawer-link" @click="closeMobile">{{ t('nav.marketplace') }}</router-link>
+          <router-link to="/about" class="header__drawer-link" @click="closeMobile">{{ t('nav.about') }}</router-link>
           <router-link to="/account" class="header__drawer-link" @click="closeMobile">{{ t('nav.account') }}</router-link>
           <router-link to="/account/orders" class="header__drawer-link" @click="closeMobile">{{ t('account.myOrders') }}</router-link>
           <router-link to="/wishlist" class="header__drawer-link" @click="closeMobile">{{ t('nav.wishlist') }}</router-link>
@@ -207,6 +210,7 @@ watch(isAuthed, (v) => {
         <template v-else>
           <router-link to="/" class="header__drawer-link" @click="closeMobile">{{ t('nav.home') }}</router-link>
           <router-link to="/marketplace" class="header__drawer-link" @click="closeMobile">{{ t('nav.marketplace') }}</router-link>
+          <router-link to="/about" class="header__drawer-link" @click="closeMobile">{{ t('nav.about') }}</router-link>
           <router-link to="/certifications" class="header__drawer-link" @click="closeMobile">{{ t('nav.certifications') }}</router-link>
           <router-link to="/help" class="header__drawer-link" @click="closeMobile">{{ t('nav.help') }}</router-link>
           <router-link v-if="!isAuthed" to="/auth/login" class="header__drawer-link" @click="closeMobile">{{ t('nav.login') }}</router-link>

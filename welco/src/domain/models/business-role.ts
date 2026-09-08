@@ -1,19 +1,6 @@
 import { UserType } from './user'
 import { CompanyStatus, type CompanyDto } from './company'
 
-/**
- * 4 business roles derived from the backend `UserType` values:
- *  1. Admin                — UserType.Admin (full privileges)
- *  2. Provider/Distributor — OrganizationUser WITH a linked company.
- *                            The provider IS the company of the distributor /
- *                            organization user. B2B portal (RFQ / quotes /
- *                            orders) unlocked once the company is approved.
- *  3. Customer             — the buyer (UserType.Customer = 4: registers
- *                            WITHOUT company, needs NO admin approval).
- *                            Legacy fallback: an OrganizationUser WITHOUT a
- *                            linked company is also treated as Customer.
- *  4. WelcoStaff           — UserType.WelcoStaff (internal ops)
- */
 export enum BusinessRole {
   Admin = 'Admin',
   Provider = 'Provider',
@@ -66,9 +53,7 @@ export const isDistributorContext = isProviderContext
 
 export function isCustomerContext(ctx: BusinessRoleContext): boolean {
   if (isAdminContext(ctx) || isStaffContext(ctx)) return false
-  // First-class Customer type needs no company at all.
   if (isCustomerTypeContext(ctx)) return true
-  // Legacy fallback: OrganizationUser WITHOUT a linked company.
   if (!isOrganizationUserContext(ctx)) return false
   return !(ctx.companyId ?? ctx.company?.id)
 }

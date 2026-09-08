@@ -276,7 +276,7 @@ async function submit() {
 }
 
 .crumb-active {
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   font-weight: 700;
 }
 
@@ -286,9 +286,9 @@ async function submit() {
   gap: 0.45rem;
   font-size: 10px;
   font-weight: 700;
-  color: #4F46E5;
-  background: #EEF2FF;
-  border: 1px solid #C7D2FE;
+  color: var(--wl-primary);
+  background: var(--wl-primary-soft);
+  border: 1px solid rgba(var(--wl-primary-rgb), 0.3);
   padding: 0.2rem 0.6rem;
   border-radius: 9999px;
   letter-spacing: 0.06em;
@@ -304,8 +304,8 @@ async function submit() {
 }
 
 .oem-hero {
-  background: #FFFFFF;
-  border: 1px solid #E2E8F0;
+  background: var(--wl-surface);
+  border: 1px solid var(--wl-border);
   border-radius: 20px;
   padding: 2.5rem;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
@@ -329,7 +329,7 @@ async function submit() {
   font-size: clamp(1.85rem, 3.5vw, 2.5rem);
   font-weight: 800;
   letter-spacing: -0.03em;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   margin: 0;
   line-height: 1.1;
 }
@@ -454,7 +454,7 @@ async function submit() {
   font-size: 1.6rem;
   font-weight: 800;
   letter-spacing: -0.025em;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   margin: 0.2rem 0 0;
 }
 
@@ -471,8 +471,8 @@ async function submit() {
 }
 
 .service-card {
-  background: #FFFFFF;
-  border: 1px solid #E2E8F0;
+  background: var(--wl-surface);
+  border: 1px solid var(--wl-border);
   border-radius: 16px;
   padding: 1.5rem;
   display: flex;
@@ -498,8 +498,8 @@ async function submit() {
   width: 44px;
   height: 44px;
   border-radius: 12px;
-  background: #EEF2FF;
-  color: #4F46E5;
+  background: var(--wl-primary-soft);
+  color: var(--wl-primary);
   display: grid;
   place-items: center;
 }
@@ -507,8 +507,8 @@ async function submit() {
 .service-line-pill {
   font-size: 10px;
   font-weight: 800;
-  color: #475569;
-  background: #F1F5F9;
+  color: var(--wl-ink-soft);
+  background: var(--wl-surface-soft);
   padding: 0.15rem 0.5rem;
   border-radius: 4px;
 }
@@ -516,7 +516,7 @@ async function submit() {
 .service-name {
   font-size: 15px;
   font-weight: 800;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   margin: 0;
 }
 
@@ -555,7 +555,7 @@ async function submit() {
 .inquiry-title {
   font-size: 1.6rem;
   font-weight: 800;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   margin: 0.2rem 0 0;
 }
 
@@ -575,8 +575,8 @@ async function submit() {
 .perk-card {
   display: flex;
   gap: 0.85rem;
-  background: #FFFFFF;
-  border: 1px solid #E2E8F0;
+  background: var(--wl-surface);
+  border: 1px solid var(--wl-border);
   border-radius: 12px;
   padding: 1rem;
 }
@@ -589,7 +589,7 @@ async function submit() {
 
 .perk-heading {
   font-size: 12.5px;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   display: block;
 }
 
@@ -600,8 +600,8 @@ async function submit() {
 }
 
 .inquiry-form-card {
-  background: #FFFFFF;
-  border: 1px solid #E2E8F0;
+  background: var(--wl-surface);
+  border: 1px solid var(--wl-border);
   border-radius: 20px;
   padding: 2rem;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
@@ -632,11 +632,11 @@ async function submit() {
   width: 100%;
   height: 48px;
   padding: 0 14px;
-  background: #F8FAFC;
-  border: 1.5px solid #E2E8F0;
+  background: var(--wl-surface-soft);
+  border: 1.5px solid var(--wl-border);
   border-radius: 10px;
   font-size: 14px;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   outline: none;
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -644,11 +644,11 @@ async function submit() {
 .vip-textarea {
   width: 100%;
   padding: 12px 14px;
-  background: #F8FAFC;
-  border: 1.5px solid #E2E8F0;
+  background: var(--wl-surface-soft);
+  border: 1.5px solid var(--wl-border);
   border-radius: 10px;
   font-size: 13.5px;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   outline: none;
   resize: vertical;
   line-height: 1.55;
@@ -658,7 +658,7 @@ async function submit() {
 .vip-48-input:focus,
 .vip-select:focus,
 .vip-textarea:focus {
-  background: #FFFFFF;
+  background: var(--wl-surface);
   border-color: #4F46E5;
   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
 }
@@ -723,7 +723,7 @@ async function submit() {
 .success-title {
   font-size: 1.25rem;
   font-weight: 800;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   margin: 0 0 0.4rem;
 }
 

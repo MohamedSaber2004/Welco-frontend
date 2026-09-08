@@ -240,7 +240,7 @@ const isOrganizationUser = computed(() => authService.isOrganizationUser.value)
 }
 
 .crumb-active {
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   font-weight: 700;
 }
 
@@ -264,9 +264,9 @@ const isOrganizationUser = computed(() => authService.isOrganizationUser.value)
   gap: 0.45rem;
   font-size: 10px;
   font-weight: 700;
-  color: #4F46E5;
-  background: #EEF2FF;
-  border: 1px solid #C7D2FE;
+  color: var(--wl-primary);
+  background: var(--wl-primary-soft);
+  border: 1px solid rgba(var(--wl-primary-rgb), 0.3);
   padding: 0.2rem 0.6rem;
   border-radius: 9999px;
   letter-spacing: 0.06em;
@@ -286,7 +286,7 @@ const isOrganizationUser = computed(() => authService.isOrganizationUser.value)
   font-size: 1.68rem;
   font-weight: 800;
   letter-spacing: -0.025em;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   margin: 0;
   line-height: 1.1;
 }
@@ -311,11 +311,11 @@ const isOrganizationUser = computed(() => authService.isOrganizationUser.value)
   gap: 0.35rem;
   font-size: 11px;
   font-weight: 700;
-  color: #94A3B8;
+  color: var(--wl-muted-soft);
   padding: 0.15rem 0.5rem;
   border-radius: 6px;
-  background: #F1F5F9;
-  border: 1px solid #E2E8F0;
+  background: var(--wl-surface-soft);
+  border: 1px solid var(--wl-border);
 }
 
 .pill-node .dot {
@@ -326,9 +326,9 @@ const isOrganizationUser = computed(() => authService.isOrganizationUser.value)
 }
 
 .pill-node.is-active {
-  color: #4F46E5;
-  background: #EEF2FF;
-  border-color: #C7D2FE;
+  color: var(--wl-primary);
+  background: var(--wl-primary-soft);
+  border-color: rgba(var(--wl-primary-rgb), 0.3);
 }
 
 .pill-node.is-active .dot {
@@ -357,11 +357,11 @@ const isOrganizationUser = computed(() => authService.isOrganizationUser.value)
   height: 44px;
   padding: 0 14px;
   padding-inline-start: 38px;
-  background: #FFFFFF;
-  border: 1.5px solid #E2E8F0;
+  background: var(--wl-surface);
+  border: 1.5px solid var(--wl-border);
   border-radius: 10px;
   font-size: 13.5px;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   outline: none;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
@@ -381,8 +381,8 @@ const isOrganizationUser = computed(() => authService.isOrganizationUser.value)
 }
 
 .territory-col {
-  background: #FFFFFF;
-  border: 1px solid #E2E8F0;
+  background: var(--wl-surface);
+  border: 1px solid var(--wl-border);
   border-radius: 16px;
   padding: 1.25rem;
   display: flex;
@@ -415,16 +415,16 @@ const isOrganizationUser = computed(() => authService.isOrganizationUser.value)
 .col-title {
   font-size: 14.5px;
   font-weight: 800;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   margin: 0;
 }
 
 .count-pill {
   font-size: 11px;
   font-weight: 700;
-  color: #475569;
-  background: #F1F5F9;
-  border: 1px solid #E2E8F0;
+  color: var(--wl-ink-soft);
+  background: var(--wl-surface-soft);
+  border: 1px solid var(--wl-border);
   padding: 0.15rem 0.5rem;
   border-radius: 9999px;
 }
@@ -451,10 +451,10 @@ const isOrganizationUser = computed(() => authService.isOrganizationUser.value)
   align-items: center;
   gap: 0.65rem;
   padding: 0.65rem 0.85rem;
-  border: 1px solid #E2E8F0;
-  background: #FFFFFF;
+  border: 1px solid var(--wl-border);
+  background: var(--wl-surface);
   border-radius: 10px;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   font-size: 13.5px;
   font-weight: 600;
   cursor: pointer;
@@ -464,8 +464,8 @@ const isOrganizationUser = computed(() => authService.isOrganizationUser.value)
 }
 
 .territory-item:hover {
-  border-color: #CBD5E1;
-  background: #F8FAFC;
+  border-color: var(--wl-border-strong);
+  background: var(--wl-surface-soft);
 }
 
 .territory-item.is-selected {
@@ -479,8 +479,8 @@ const isOrganizationUser = computed(() => authService.isOrganizationUser.value)
   font-size: 10px;
   font-weight: 700;
   padding: 0.15rem 0.45rem;
-  background: #F1F5F9;
-  color: #475569;
+  background: var(--wl-surface-soft);
+  color: var(--wl-ink-soft);
   border-radius: 4px;
   letter-spacing: 0.04em;
 }
@@ -518,10 +518,10 @@ const isOrganizationUser = computed(() => authService.isOrganizationUser.value)
   align-items: center;
   gap: 0.6rem;
   padding: 0.65rem 0.85rem;
-  border: 1px solid #F1F5F9;
-  background: #F8FAFC;
+  border: 1px solid var(--wl-border);
+  background: var(--wl-surface-soft);
   border-radius: 10px;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   font-size: 13.5px;
   font-weight: 600;
 }

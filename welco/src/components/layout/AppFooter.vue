@@ -42,6 +42,7 @@ const isAuthed = computed(() => authService.isAuthenticated)
 
       <div class="footer__col">
         <h4>{{ t('footer.support') }}</h4>
+        <router-link to="/about" class="footer__link">{{ t('nav.about') }}</router-link>
         <router-link to="/help" class="footer__link">{{ t('footer.helpCenter') }}</router-link>
         <router-link v-if="isAuthed" to="/help/my-tickets" class="footer__link">{{ t('help.myTickets') }}</router-link>
         <a v-if="support.supportEmail" class="footer__link" :href="'mailto:' + support.supportEmail">

@@ -152,6 +152,10 @@ const toggleSection = (key: string) => {
             <span class="material-symbols-outlined nav-icon">history</span>
             <span v-if="!collapsed" class="admin-link__label">{{ t('admin.auditLogs') }}</span>
           </router-link>
+          <router-link v-if="isAdmin" to="/admin/background-jobs" class="admin-link" active-class="admin-link--active">
+            <span class="material-symbols-outlined nav-icon">schedule</span>
+            <span v-if="!collapsed" class="admin-link__label">{{ t('admin.backgroundJobs') }}</span>
+          </router-link>
         </div>
       </nav>
 

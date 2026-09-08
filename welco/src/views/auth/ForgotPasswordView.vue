@@ -123,8 +123,8 @@ const handleSubmit = async () => {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: #F8FAFC;
-  border: 1px solid #E2E8F0;
+  background: var(--wl-surface-soft);
+  border: 1px solid var(--wl-border);
   border-radius: 12px;
   padding: 0.6rem 0.85rem;
   font-size: 11px;
@@ -147,8 +147,8 @@ const handleSubmit = async () => {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #E2E8F0;
-  color: #64748B;
+  background: var(--wl-surface-hover);
+  color: var(--wl-muted);
   display: grid;
   place-items: center;
   font-size: 10px;
@@ -215,12 +215,12 @@ const handleSubmit = async () => {
   height: 48px;
   padding: 0 14px;
   padding-inline-start: 42px;
-  background: #FFFFFF;
-  border: 1.5px solid #E2E8F0;
+  background: var(--wl-surface);
+  border: 1.5px solid var(--wl-border);
   border-radius: 12px;
   font-size: 14px;
   font-family: var(--wl-font-body, system-ui);
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   outline: none;

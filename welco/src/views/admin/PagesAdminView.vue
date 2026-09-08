@@ -179,8 +179,14 @@ const deletePendingId = ref<string | null>(null)
 
 const toggleActive = async (p: LandingPageDto) => {
   const nextActive = !(p.isActive ?? true)
+  const isAboutUs = p.slug === 'about-us'
+  const message = nextActive
+    ? t('admin.confirmActivate')
+    : isAboutUs
+      ? `${t('admin.confirmDeactivate')}\n\n⚠️ Note: "${p.slug}" powers the public About page (/about) and home section. Deactivating will cause them to show default fallback content.`
+      : t('admin.confirmDeactivate')
   const ok = await confirmService.confirmAction(
-    nextActive ? t('admin.confirmActivate') : t('admin.confirmDeactivate'),
+    message,
     {
       title: nextActive ? t('admin.activate') : t('admin.deactivate'),
       variant: nextActive ? 'primary' : 'warning',
@@ -210,8 +216,12 @@ const toggleActive = async (p: LandingPageDto) => {
 }
 
 const confirmDeletePage = async (p: LandingPageDto) => {
+  const isAboutUs = p.slug === 'about-us'
+  const warning = isAboutUs
+    ? `\n\n⚠️ Note: Deleting "${p.slug}" removes dynamic content from the public About page (/about) and home section (will revert to default fallback content).`
+    : ''
   const ok = await confirmService.confirmDelete(
-    `${t('admin.deletePageConfirm')}\n${p.heroTitle} (/${p.slug})`,
+    `${t('admin.deletePageConfirm')}\n${p.heroTitle} (/${p.slug})${warning}`,
     t('common.delete'),
   )
   if (!ok) return
@@ -283,6 +293,7 @@ onMounted(load)
         <select v-model="typeFilter" class="toolbar-select mono" :aria-label="t('admin.pageType')">
           <option value="all">{{ t('common.all') }}</option>
           <option value="Brand">Brand</option>
+          <option value="About">About</option>
           <option value="Specialty">Specialty</option>
           <option value="Procedure">Procedure</option>
         </select>
@@ -403,6 +414,7 @@ onMounted(load)
               <label class="field-label" for="page-type">{{ t('admin.pageType') }} *</label>
               <select id="page-type" v-model="form.type" class="field-input">
                 <option value="Brand">Brand</option>
+                <option value="About">About</option>
                 <option value="Specialty">Specialty</option>
                 <option value="Procedure">Procedure</option>
               </select>
@@ -507,9 +519,9 @@ onMounted(load)
   gap: 0.45rem;
   font-size: 10px;
   font-weight: 700;
-  color: #4f46e5;
-  background: #eef2ff;
-  border: 1px solid #c7d2fe;
+  color: var(--wl-primary);
+  background: var(--wl-primary-soft);
+  border: 1px solid rgba(var(--wl-primary-rgb), 0.3);
   padding: 0.2rem 0.6rem;
   border-radius: 9999px;
   letter-spacing: 0.06em;
@@ -528,7 +540,7 @@ onMounted(load)
   font-size: 1.68rem;
   font-weight: 800;
   letter-spacing: -0.025em;
-  color: #0f172a;
+  color: var(--wl-ink-strong);
   margin: 0;
   line-height: 1.1;
 }
@@ -559,8 +571,8 @@ onMounted(load)
 }
 
 .toolbar-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: var(--wl-surface);
+  border: 1px solid var(--wl-border);
   border-radius: 14px;
   padding: 0.85rem 1.25rem;
   display: flex;
@@ -591,11 +603,11 @@ onMounted(load)
   height: 44px;
   padding: 0 14px;
   padding-inline-start: 38px;
-  background: #ffffff;
-  border: 1.5px solid #e2e8f0;
+  background: var(--wl-surface);
+  border: 1.5px solid var(--wl-border);
   border-radius: 10px;
   font-size: 13.5px;
-  color: #0f172a;
+  color: var(--wl-ink-strong);
   outline: none;
 }
 
@@ -607,11 +619,11 @@ onMounted(load)
 .toolbar-select {
   height: 44px;
   padding: 0 12px;
-  background: #ffffff;
-  border: 1.5px solid #e2e8f0;
+  background: var(--wl-surface);
+  border: 1.5px solid var(--wl-border);
   border-radius: 10px;
   font-size: 12.5px;
-  color: #0f172a;
+  color: var(--wl-ink-strong);
   cursor: pointer;
 }
 
@@ -641,23 +653,23 @@ onMounted(load)
 }
 
 .exec-table thead th {
-  background: #f8fafc;
-  border-bottom: 1px solid #e2e8f0;
+  background: var(--wl-surface-soft);
+  border-bottom: 1px solid var(--wl-border);
   padding: 0.85rem 1.25rem;
   font-family: var(--wl-font-mono, monospace);
   font-size: 11px;
   font-weight: 700;
-  color: #64748b;
+  color: var(--wl-muted);
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
 .exec-row {
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--wl-border);
 }
 
 .exec-row:hover {
-  background: #f8fafc;
+  background: var(--wl-surface-soft);
 }
 
 .exec-row td {
@@ -684,7 +696,7 @@ onMounted(load)
 
 .page-title {
   font-size: 13.5px;
-  color: #0f172a;
+  color: var(--wl-ink-strong);
 }
 
 .page-sub {
@@ -709,9 +721,9 @@ onMounted(load)
 .type-tag {
   font-size: 11px;
   font-weight: 700;
-  color: #475569;
-  background: #f1f5f9;
-  border: 1px solid #e2e8f0;
+  color: var(--wl-ink-soft);
+  background: var(--wl-surface-soft);
+  border: 1px solid var(--wl-border);
   padding: 0.2rem 0.55rem;
   border-radius: 6px;
 }
@@ -730,9 +742,9 @@ onMounted(load)
   width: 32px;
   height: 32px;
   border-radius: 8px;
-  border: 1px solid #e2e8f0;
-  background: #ffffff;
-  color: #64748b;
+  border: 1px solid var(--wl-border);
+  background: var(--wl-surface);
+  color: var(--wl-muted);
   display: grid;
   place-items: center;
   cursor: pointer;

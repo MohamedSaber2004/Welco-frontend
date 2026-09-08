@@ -180,7 +180,7 @@ function isPdfDoc(name: string | null | undefined): boolean {
 }
 
 .crumb-active {
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   font-weight: 700;
 }
 
@@ -190,9 +190,9 @@ function isPdfDoc(name: string | null | undefined): boolean {
   gap: 0.45rem;
   font-size: 10px;
   font-weight: 700;
-  color: #4F46E5;
-  background: #EEF2FF;
-  border: 1px solid #C7D2FE;
+  color: var(--wl-primary);
+  background: var(--wl-primary-soft);
+  border: 1px solid rgba(var(--wl-primary-rgb), 0.3);
   padding: 0.2rem 0.6rem;
   border-radius: 9999px;
   letter-spacing: 0.06em;
@@ -208,8 +208,8 @@ function isPdfDoc(name: string | null | undefined): boolean {
 }
 
 .cert-hero {
-  background: #FFFFFF;
-  border: 1px solid #E2E8F0;
+  background: var(--wl-surface);
+  border: 1px solid var(--wl-border);
   border-radius: 20px;
   padding: 2.5rem;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
@@ -235,7 +235,7 @@ function isPdfDoc(name: string | null | undefined): boolean {
   font-size: clamp(1.85rem, 3.5vw, 2.5rem);
   font-weight: 800;
   letter-spacing: -0.03em;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   margin: 0;
   line-height: 1.1;
 }
@@ -267,8 +267,8 @@ function isPdfDoc(name: string | null | undefined): boolean {
 .telemetry-box {
   display: flex;
   align-items: center;
-  background: #F8FAFC;
-  border: 1px solid #E2E8F0;
+  background: var(--wl-surface-soft);
+  border: 1px solid var(--wl-border);
   border-radius: 14px;
   padding: 1.25rem 1.75rem;
   gap: 1.5rem;
@@ -284,7 +284,7 @@ function isPdfDoc(name: string | null | undefined): boolean {
 .telemetry-val {
   font-size: 1.4rem;
   font-weight: 800;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
 }
 
 .telemetry-lbl {
@@ -318,16 +318,16 @@ function isPdfDoc(name: string | null | undefined): boolean {
   font-size: 1.6rem;
   font-weight: 800;
   letter-spacing: -0.025em;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   margin: 0.2rem 0 0;
 }
 
 .count-badge {
   font-size: 11.5px;
   font-weight: 700;
-  color: #475569;
-  background: #F1F5F9;
-  border: 1px solid #E2E8F0;
+  color: var(--wl-ink-soft);
+  background: var(--wl-surface-soft);
+  border: 1px solid var(--wl-border);
   padding: 0.35rem 0.75rem;
   border-radius: 8px;
 }
@@ -339,8 +339,8 @@ function isPdfDoc(name: string | null | undefined): boolean {
 }
 
 .cert-card {
-  background: #FFFFFF;
-  border: 1px solid #E2E8F0;
+  background: var(--wl-surface);
+  border: 1px solid var(--wl-border);
   border-radius: 16px;
   padding: 1.5rem;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
@@ -365,8 +365,8 @@ function isPdfDoc(name: string | null | undefined): boolean {
   width: 48px;
   height: 48px;
   border-radius: 12px;
-  background: #F8FAFC;
-  border: 1px solid #E2E8F0;
+  background: var(--wl-surface-soft);
+  border: 1px solid var(--wl-border);
   display: grid;
   place-items: center;
   overflow: hidden;
@@ -427,7 +427,7 @@ function isPdfDoc(name: string | null | undefined): boolean {
 .cert-title-text {
   font-size: 15px;
   font-weight: 800;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   margin: 0;
 }
 
@@ -469,7 +469,7 @@ function isPdfDoc(name: string | null | undefined): boolean {
 }
 
 .meta-item dd {
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   margin: 0;
   font-weight: 500;
 }

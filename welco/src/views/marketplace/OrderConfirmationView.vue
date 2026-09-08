@@ -161,13 +161,13 @@ onMounted(async () => {
 }
 
 .crumb-active {
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   font-weight: 700;
 }
 
 .confirm-hero-card {
-  background: #FFFFFF;
-  border: 1px solid #E2E8F0;
+  background: var(--wl-surface);
+  border: 1px solid var(--wl-border);
   border-radius: 20px;
   padding: 2.5rem 1.5rem;
   text-align: center;
@@ -196,9 +196,9 @@ onMounted(async () => {
   gap: 0.45rem;
   font-size: 10px;
   font-weight: 700;
-  color: #4F46E5;
-  background: #EEF2FF;
-  border: 1px solid #C7D2FE;
+  color: var(--wl-primary);
+  background: var(--wl-primary-soft);
+  border: 1px solid rgba(var(--wl-primary-rgb), 0.3);
   padding: 0.2rem 0.6rem;
   border-radius: 9999px;
   letter-spacing: 0.06em;
@@ -216,7 +216,7 @@ onMounted(async () => {
   font-size: 1.85rem;
   font-weight: 800;
   letter-spacing: -0.025em;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   margin: 0.2rem 0 0;
 }
 
@@ -231,8 +231,8 @@ onMounted(async () => {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: #F8FAFC;
-  border: 1px solid #E2E8F0;
+  background: var(--wl-surface-soft);
+  border: 1px solid var(--wl-border);
   padding: 0.4rem 0.85rem;
   border-radius: 8px;
   margin: 0.5rem 0;
@@ -246,13 +246,13 @@ onMounted(async () => {
 
 .id-num {
   font-size: 14px;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   font-weight: 800;
 }
 
 .stepper-card {
-  background: #FFFFFF;
-  border: 1px solid #E2E8F0;
+  background: var(--wl-surface);
+  border: 1px solid var(--wl-border);
   border-radius: 16px;
   padding: 1.25rem 1.5rem;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
@@ -266,8 +266,8 @@ onMounted(async () => {
 }
 
 .order-summary-card {
-  background: #FFFFFF;
-  border: 1px solid #E2E8F0;
+  background: var(--wl-surface);
+  border: 1px solid var(--wl-border);
   border-radius: 16px;
   padding: 1.5rem;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
@@ -287,7 +287,7 @@ onMounted(async () => {
 .summary-title {
   font-size: 14px;
   font-weight: 700;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   margin: 0;
 }
 
@@ -309,7 +309,7 @@ onMounted(async () => {
 .item-name {
   font-size: 13.5px;
   font-weight: 600;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
 }
 
 .item-calc {
@@ -324,7 +324,7 @@ onMounted(async () => {
 }
 
 .item-subtotal {
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   font-weight: 700;
 }
 
@@ -346,12 +346,12 @@ onMounted(async () => {
 .total-value {
   font-size: 1.45rem;
   font-weight: 800;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
 }
 
 .actions-card {
-  background: #FFFFFF;
-  border: 1px solid #E2E8F0;
+  background: var(--wl-surface);
+  border: 1px solid var(--wl-border);
   border-radius: 16px;
   padding: 1.5rem;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
@@ -413,9 +413,9 @@ onMounted(async () => {
   gap: 0.45rem;
   height: 48px;
   padding: 0 1.25rem;
-  background: #FFFFFF;
-  color: #0F172A;
-  border: 1.5px solid #E2E8F0;
+  background: var(--wl-surface);
+  color: var(--wl-ink-strong);
+  border: 1.5px solid var(--wl-border);
   border-radius: 10px;
   font-size: 13px;
   font-weight: 700;
@@ -425,8 +425,8 @@ onMounted(async () => {
 
 .btn-secondary-action:hover {
   border-color: #4F46E5;
-  color: #4F46E5;
-  background: #EEF2FF;
+  color: var(--wl-primary);
+  background: var(--wl-primary-soft);
 }
 
 @media (max-width: 768px) {

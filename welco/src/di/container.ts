@@ -174,3 +174,5 @@ export const contentRepository = container.resolve<ApiContentRepository>(ApiCont
 export const certificationRepository = container.resolve<ApiCertificationRepository>(ApiCertificationRepository)
 export const companyRepository = container.resolve<ApiCompanyRepository>(ApiCompanyRepository)
 export const auditLogService = container.resolve<AuditLogService>(AuditLogService)
+export const exchangeRateService = services.exchangeRateService
+export const exchangeRateRepository = services.exchangeRateRepository

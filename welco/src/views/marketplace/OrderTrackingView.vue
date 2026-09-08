@@ -190,7 +190,7 @@ async function track() {
 }
 
 .crumb-active {
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   font-weight: 700;
 }
 
@@ -206,9 +206,9 @@ async function track() {
   gap: 0.45rem;
   font-size: 10px;
   font-weight: 700;
-  color: #4F46E5;
-  background: #EEF2FF;
-  border: 1px solid #C7D2FE;
+  color: var(--wl-primary);
+  background: var(--wl-primary-soft);
+  border: 1px solid rgba(var(--wl-primary-rgb), 0.3);
   padding: 0.2rem 0.6rem;
   border-radius: 9999px;
   letter-spacing: 0.06em;
@@ -228,7 +228,7 @@ async function track() {
   font-size: 1.68rem;
   font-weight: 800;
   letter-spacing: -0.025em;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   margin: 0;
   line-height: 1.1;
 }
@@ -241,8 +241,8 @@ async function track() {
 
 /* Track Search Card */
 .track-search-card {
-  background: #FFFFFF;
-  border: 1px solid #E2E8F0;
+  background: var(--wl-surface);
+  border: 1px solid var(--wl-border);
   border-radius: 16px;
   padding: 1.25rem;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
@@ -276,17 +276,17 @@ async function track() {
   height: 48px;
   padding: 0 14px;
   padding-inline-start: 42px;
-  background: #F8FAFC;
-  border: 1.5px solid #E2E8F0;
+  background: var(--wl-surface-soft);
+  border: 1.5px solid var(--wl-border);
   border-radius: 10px;
   font-size: 14px;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   outline: none;
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .vip-track-input:focus {
-  background: #FFFFFF;
+  background: var(--wl-surface);
   border-color: #4F46E5;
   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
 }
@@ -329,8 +329,8 @@ async function track() {
 
 /* Not Found Card */
 .result-not-found-card {
-  background: #FFFFFF;
-  border: 1px solid #E2E8F0;
+  background: var(--wl-surface);
+  border: 1px solid var(--wl-border);
   border-radius: 16px;
   padding: 3.5rem 1.5rem;
   text-align: center;
@@ -351,7 +351,7 @@ async function track() {
 .not-found-title {
   font-size: 1.25rem;
   font-weight: 800;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   margin: 0 0 0.4rem;
 }
 
@@ -369,8 +369,8 @@ async function track() {
 }
 
 .result-card {
-  background: #FFFFFF;
-  border: 1px solid #E2E8F0;
+  background: var(--wl-surface);
+  border: 1px solid var(--wl-border);
   border-radius: 16px;
   padding: 1.5rem;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
@@ -396,7 +396,7 @@ async function track() {
 .order-heading {
   font-size: 1.45rem;
   font-weight: 800;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   margin: 0.15rem 0;
 }
 
@@ -426,7 +426,7 @@ async function track() {
 
 .foot-total {
   font-size: 1.4rem;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   font-weight: 800;
 }
 
@@ -442,7 +442,7 @@ async function track() {
 .items-title {
   font-size: 13.5px;
   font-weight: 700;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   margin: 0;
 }
 
@@ -469,7 +469,7 @@ async function track() {
 .line-item-name {
   font-size: 13.5px;
   font-weight: 600;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
 }
 
 .line-item-meta {
@@ -506,20 +506,20 @@ async function track() {
   gap: 0.4rem;
   height: 44px;
   padding: 0 1.25rem;
-  background: #FFFFFF;
-  border: 1.5px solid #E2E8F0;
+  background: var(--wl-surface);
+  border: 1.5px solid var(--wl-border);
   border-radius: 10px;
   font-size: 13px;
   font-weight: 700;
-  color: #475569;
+  color: var(--wl-ink-soft);
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .btn-action-ghost:hover {
   border-color: #4F46E5;
-  color: #4F46E5;
-  background: #EEF2FF;
+  color: var(--wl-primary);
+  background: var(--wl-primary-soft);
 }
 
 @media (max-width: 640px) {

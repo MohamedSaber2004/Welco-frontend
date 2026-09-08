@@ -418,8 +418,8 @@ const handleRegister = async () => {
 }
 
 .reg-card {
-  background: #F8FAFC;
-  border: 1px solid #E2E8F0;
+  background: var(--wl-surface-soft);
+  border: 1px solid var(--wl-border);
   border-radius: 14px;
   padding: 1.25rem 1.4rem;
   display: flex;
@@ -452,13 +452,13 @@ const handleRegister = async () => {
   font-family: var(--wl-font-display, system-ui);
   font-size: 1.05rem;
   font-weight: 700;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   margin: 0;
 }
 
 .reg-card-subtitle {
   font-size: 12px;
-  color: #64748B;
+  color: var(--wl-muted);
   margin: 0;
 }
 
@@ -481,7 +481,7 @@ const handleRegister = async () => {
 .form-label {
   font-size: 11px;
   font-weight: 700;
-  color: #475569;
+  color: var(--wl-ink-soft);
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
@@ -506,7 +506,7 @@ const handleRegister = async () => {
   top: 50%;
   transform: translateY(-50%);
   font-size: 19px;
-  color: #94A3B8;
+  color: var(--wl-muted-soft);
   pointer-events: none;
   line-height: 1;
 }
@@ -515,12 +515,12 @@ const handleRegister = async () => {
   width: 100%;
   height: 48px;
   padding: 0 14px;
-  background: #FFFFFF;
-  border: 1.5px solid #E2E8F0;
+  background: var(--wl-surface);
+  border: 1.5px solid var(--wl-border);
   border-radius: 12px;
   font-size: 14px;
   font-family: var(--wl-font-body, system-ui);
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   outline: none;
@@ -556,7 +556,7 @@ const handleRegister = async () => {
   transform: translateY(-50%);
   background: none;
   border: none;
-  color: #94A3B8;
+  color: var(--wl-muted-soft);
   cursor: pointer;
   display: grid;
   place-items: center;
@@ -586,7 +586,7 @@ const handleRegister = async () => {
   flex: 1;
   height: 4px;
   border-radius: 9999px;
-  background: #E2E8F0;
+  background: var(--wl-surface-hover);
   transition: background 0.2s ease;
 }
 
@@ -598,7 +598,7 @@ const handleRegister = async () => {
 .strength-label {
   font-size: 10px;
   font-weight: 700;
-  color: #64748B;
+  color: var(--wl-muted);
 }
 
 .field-error-text {
@@ -609,7 +609,7 @@ const handleRegister = async () => {
 
 .phone-hint {
   font-size: 11px;
-  color: #64748B;
+  color: var(--wl-muted);
   margin-top: 0.25rem;
 }
 
@@ -666,7 +666,7 @@ const handleRegister = async () => {
   align-items: center;
   gap: 0.45rem;
   font-size: 12.5px;
-  color: #64748B;
+  color: var(--wl-muted);
 }
 
 .switch-link {
@@ -691,8 +691,8 @@ const handleRegister = async () => {
   align-items: flex-start;
   gap: 0.3rem;
   padding: 0.9rem 1rem;
-  background: #FFFFFF;
-  border: 1.5px solid #E2E8F0;
+  background: var(--wl-surface);
+  border: 1.5px solid var(--wl-border);
   border-radius: 12px;
   cursor: pointer;
   text-align: start;
@@ -718,12 +718,12 @@ const handleRegister = async () => {
 .acct-type-label {
   font-size: 14px;
   font-weight: 700;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
 }
 
 .acct-type-desc {
   font-size: 11.5px;
-  color: #64748B;
+  color: var(--wl-muted);
   line-height: 1.45;
 }
 

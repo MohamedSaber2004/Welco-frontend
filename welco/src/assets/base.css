@@ -120,7 +120,7 @@ html.theme-transition, html.theme-transition *, html.theme-transition *::before,
   align-items: center;
   gap: 0.5rem;
 }
-.eyebrow.on-dark { color: #A5B4FC; }
+.eyebrow.on-dark { color: #949CF7; }
 
 .page-head {
   display: flex;
@@ -201,14 +201,19 @@ html.theme-transition, html.theme-transition *, html.theme-transition *::before,
 .badge--accent { background: var(--wl-accent-soft); color: var(--wl-accent); border-color: rgba(99, 102, 241, 0.2); }
 .badge--success { background: var(--wl-success-soft); color: var(--wl-success); border-color: rgba(16, 185, 129, 0.2); }
 .badge--warning { background: var(--wl-warning-soft); color: #B45309; border-color: #FDE68A; }
-:root.dark .badge--warning, :root[data-theme='dark'] .badge--warning { color: #FBBF24; border-color: rgba(251,191,36,0.25); background: var(--wl-warning-soft); }
+:root.dark .badge--warning, :root[data-theme='dark'] .badge--warning { color: #FEE75C; border-color: rgba(254,231,92,0.3); background: var(--wl-warning-soft); }
 .badge--danger { background: var(--wl-danger-soft); color: var(--wl-danger); border-color: rgba(244, 63, 94, 0.2); }
 .badge--muted { background: var(--wl-surface-soft); color: var(--wl-ink-soft); border-color: var(--wl-border); }
 .badge--ink { background: var(--wl-ink-strong); color: white; border-color: var(--wl-ink-strong); }
+:root.dark .badge--ink, :root[data-theme='dark'] .badge--ink { background: #F2F3F5; color: #1E1F22; border-color: #F2F3F5; }
 .badge--indigo { background: #EEF2FF; color: #4338CA; border-color: #C7D2FE; }
+:root.dark .badge--indigo, :root[data-theme='dark'] .badge--indigo { background: rgba(88, 101, 242, 0.16); color: #949CF7; border-color: rgba(88, 101, 242, 0.3); }
 .badge--emerald { background: #ECFDF5; color: #047857; border-color: #A7F3D0; }
+:root.dark .badge--emerald, :root[data-theme='dark'] .badge--emerald { background: rgba(87, 242, 135, 0.14); color: #57F287; border-color: rgba(87, 242, 135, 0.25); }
 .badge--teal { background: #F0FDFA; color: #0F766E; border-color: #99F6E4; }
+:root.dark .badge--teal, :root[data-theme='dark'] .badge--teal { background: rgba(0, 168, 252, 0.14); color: #00A8FC; border-color: rgba(0, 168, 252, 0.25); }
 .badge--amber { background: #FFFBEB; color: #B45309; border-color: #FDE68A; }
+:root.dark .badge--amber, :root[data-theme='dark'] .badge--amber { background: rgba(254, 231, 92, 0.14); color: #FEE75C; border-color: rgba(254, 231, 92, 0.3); }
 
 /* ── Forms ── */
 input[type="text"],
@@ -450,7 +455,7 @@ input[type="checkbox"]:focus-visible, input[type="radio"]:focus-visible { box-sh
 .table tr:last-child td, .data-table tr:last-child td { border-bottom: none; }
 .table tbody tr, .data-table tbody tr { transition: background 0.12s ease; }
 .table tbody tr:hover, .data-table tbody tr:hover { background: rgba(79, 70, 229, 0.035); }
-:root[data-theme='dark'] .table tbody tr:hover, :root[data-theme='dark'] .data-table tbody tr:hover { background: rgba(129, 140, 248, 0.08); }
+:root[data-theme='dark'] .table tbody tr:hover, :root[data-theme='dark'] .data-table tbody tr:hover { background: rgba(78, 80, 88, 0.3); }
 .count { font-size: 0.72rem; color: var(--wl-muted); font-weight: 600; font-variant-numeric: tabular-nums; }
 .actions { display: flex; gap: 0.4rem; }
 
@@ -465,8 +470,8 @@ input[type="checkbox"]:focus-visible, input[type="radio"]:focus-visible { box-sh
 *::-webkit-scrollbar-track { background: transparent; }
 *::-webkit-scrollbar-thumb { background: var(--zinc-300); border-radius: 999px; }
 *::-webkit-scrollbar-thumb:hover { background: var(--zinc-400); }
-:root.dark *::-webkit-scrollbar-thumb, :root[data-theme='dark'] *::-webkit-scrollbar-thumb { background: #3F3F46; }
-:root.dark *::-webkit-scrollbar-thumb:hover, :root[data-theme='dark'] *::-webkit-scrollbar-thumb:hover { background: #52525B; }
+:root.dark *::-webkit-scrollbar-thumb, :root[data-theme='dark'] *::-webkit-scrollbar-thumb { background: #4E5058; }
+:root.dark *::-webkit-scrollbar-thumb:hover, :root[data-theme='dark'] *::-webkit-scrollbar-thumb:hover { background: #6D6F78; }
 
 /* ── Page Animation ── */
 .page-shell { animation: pageIn 0.3s ease both; }
@@ -531,12 +536,12 @@ html[dir='rtl'] input.mono-num::placeholder {
 :root[data-theme='dark'], :root.dark { color-scheme: dark; }
 :root[data-theme='dark'] .card::before, :root.dark .card::before { opacity: 0.35; }
 :root[data-theme='dark'] .card, :root.dark .card { border-color: rgba(255,255,255,0.07); }
-:root[data-theme='dark'] .card:hover, :root.dark .card:hover { border-color: rgba(129,140,248,0.28); box-shadow: 0 4px 20px rgba(0,0,0,0.35); }
-:root[data-theme='dark'] .table th, :root.dark .table th { background: #27272A; color: #A1A1AA; border-bottom: 1px solid rgba(255, 255, 255, 0.07); }
+:root[data-theme='dark'] .card:hover, :root.dark .card:hover { border-color: rgba(88,101,242,0.5); box-shadow: 0 4px 20px rgba(0,0,0,0.35); }
+:root[data-theme='dark'] .table th, :root.dark .table th { background: #1E1F22; color: #949BA4; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
 :root[data-theme='dark'] .table td, :root.dark .table td { border-bottom-color: rgba(255, 255, 255, 0.05); }
-:root[data-theme='dark'] .table tbody tr:hover, :root.dark .table tbody tr:hover { background: rgba(129,140,248,0.06); }
-:root[data-theme='dark'] ::selection, :root.dark ::selection { background: rgba(129,140,248,0.22); color: #FAFAFA; }
-:root[data-theme='dark'] .shimmer, :root.dark .shimmer { background: linear-gradient(90deg, #27272A 25%, #3F3F46 50%, #27272A 75%); background-size: 200% 100%; }
+:root[data-theme='dark'] .table tbody tr:hover, :root.dark .table tbody tr:hover { background: rgba(78,80,88,0.3); }
+:root[data-theme='dark'] ::selection, :root.dark ::selection { background: rgba(88,101,242,0.3); color: #FFFFFF; }
+:root[data-theme='dark'] .shimmer, :root.dark .shimmer { background: linear-gradient(90deg, #2B2D31 25%, #383A40 50%, #2B2D31 75%); background-size: 200% 100%; }
 :root[data-theme='dark'] .page-shell, :root.dark .page-shell { animation: pageInDark 0.32s ease both; }
 @keyframes pageInDark { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 

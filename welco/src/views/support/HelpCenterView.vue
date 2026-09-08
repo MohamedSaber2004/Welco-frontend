@@ -1641,9 +1641,9 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
   gap: 0.6rem;
   padding: 0.6rem 1.15rem;
   border-radius: 9999px;
-  background: rgba(79, 70, 229, 0.08);
-  border: 1px solid rgba(79, 70, 229, 0.22);
-  color: #4F46E5;
+  background: var(--wl-primary-soft);
+  border: 1px solid rgba(var(--wl-primary-rgb), 0.22);
+  color: var(--wl-primary);
   font-size: 0.84rem;
   font-weight: 700;
   text-decoration: none;
@@ -1651,7 +1651,7 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
 }
 
 .my-tickets-badge-link:hover {
-  background: #4F46E5;
+  background: var(--wl-primary);
   color: #fff;
   transform: translateY(-1px);
 }
@@ -1660,15 +1660,20 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
   padding: 0.15rem 0.55rem;
   border-radius: 9999px;
   font-size: 0.72rem;
-  background: #4F46E5;
+  background: var(--wl-primary);
   color: #fff;
   font-weight: 800;
   transition: all 0.2s ease;
 }
 
 .my-tickets-badge-link:hover .tickets-count-pill {
-  background: #fff;
-  color: #4F46E5;
+  background: var(--wl-surface);
+  color: var(--wl-primary);
+}
+:root.dark .my-tickets-badge-link:hover .tickets-count-pill,
+:root[data-theme='dark'] .my-tickets-badge-link:hover .tickets-count-pill {
+  background: var(--wl-surface);
+  color: var(--wl-primary);
 }
 
 /* 2-Column Escalation Grid */

@@ -815,8 +815,8 @@ const submitRfq = async () => {
   font-size: 10.5px;
   font-weight: 700;
   color: var(--wl-primary, #4F46E5);
-  background: #EEF2FF;
-  border: 1px solid #C7D2FE;
+  background: var(--wl-primary-soft);
+  border: 1px solid rgba(var(--wl-primary-rgb), 0.3);
   padding: 0.18rem 0.55rem;
   border-radius: 9999px;
 }
@@ -857,8 +857,8 @@ const submitRfq = async () => {
   font-size: 12px;
   font-weight: 800;
   color: var(--wl-primary, #4F46E5);
-  background: #EEF2FF;
-  border: 1px solid #C7D2FE;
+  background: var(--wl-primary-soft);
+  border: 1px solid rgba(var(--wl-primary-rgb), 0.3);
   padding: 0.1rem 0.45rem;
   border-radius: 6px;
   line-height: 1.2;
@@ -926,7 +926,7 @@ const submitRfq = async () => {
 
 .btn-refresh-rates:hover:not(:disabled) {
   color: var(--wl-primary, #4F46E5);
-  background: #EEF2FF;
+  background: var(--wl-primary-soft);
 }
 
 .btn-refresh-rates:disabled {
@@ -1001,7 +1001,7 @@ const submitRfq = async () => {
 .pill-sym {
   font-size: 11px;
   opacity: 0.85;
-  background: #F1F5F9;
+  background: var(--wl-surface-soft);
   padding: 0.1rem 0.35rem;
   border-radius: 4px;
 }
@@ -1011,7 +1011,7 @@ const submitRfq = async () => {
 }
 
 .curr-pill--more {
-  background: #F8FAFC;
+  background: var(--wl-surface-soft);
   border-style: dashed;
   color: var(--wl-muted, #64748B);
 }
@@ -1021,7 +1021,7 @@ const submitRfq = async () => {
   border-style: solid;
   border-color: var(--wl-primary, #4F46E5);
   color: var(--wl-primary, #4F46E5);
-  background: #EEF2FF;
+  background: var(--wl-primary-soft);
 }
 
 .chev-icon {
@@ -1080,8 +1080,8 @@ const submitRfq = async () => {
   padding: 0 10px;
   padding-inline-start: 34px;
   padding-inline-end: 28px;
-  background: #F8FAFC;
-  border: 1.5px solid var(--wl-border, #E2E8F0);
+  background: var(--wl-surface-soft);
+  border: 1.5px solid var(--wl-border, var(--wl-border));
   border-radius: 8px;
   font-size: 12.5px;
   color: var(--wl-ink-strong, #0F172A);
@@ -1090,7 +1090,7 @@ const submitRfq = async () => {
 }
 
 .popover-search-input:focus {
-  background: #FFFFFF;
+  background: var(--wl-surface);
   border-color: var(--wl-primary, #4F46E5);
   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
@@ -1139,13 +1139,13 @@ const submitRfq = async () => {
 }
 
 .popover-item-btn:hover {
-  background: #F8FAFC;
-  border-color: var(--wl-border, #E2E8F0);
+  background: var(--wl-surface-soft);
+  border-color: var(--wl-border, var(--wl-border));
 }
 
 .popover-item-btn.is-active {
-  background: #EEF2FF;
-  border-color: #C7D2FE;
+  background: var(--wl-primary-soft);
+  border-color: rgba(var(--wl-primary-rgb), 0.3);
 }
 
 .p-flag {
@@ -1194,7 +1194,7 @@ const submitRfq = async () => {
   font-size: 11px;
   font-weight: 800;
   color: var(--wl-ink-strong, #0F172A);
-  background: #F1F5F9;
+  background: var(--wl-surface-soft);
   padding: 0.15rem 0.4rem;
   border-radius: 5px;
 }
@@ -1203,7 +1203,7 @@ const submitRfq = async () => {
   font-size: 11px;
   font-weight: 700;
   color: var(--wl-primary, #4F46E5);
-  background: #EEF2FF;
+  background: var(--wl-primary-soft);
   padding: 0.15rem 0.35rem;
   border-radius: 5px;
 }

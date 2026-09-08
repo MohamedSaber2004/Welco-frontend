@@ -555,9 +555,9 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
   gap: 0.45rem;
   font-size: 10px;
   font-weight: 700;
-  color: #4F46E5;
-  background: #EEF2FF;
-  border: 1px solid #C7D2FE;
+  color: var(--wl-primary);
+  background: var(--wl-primary-soft);
+  border: 1px solid rgba(var(--wl-primary-rgb), 0.3);
   padding: 0.2rem 0.6rem;
   border-radius: 9999px;
   letter-spacing: 0.06em;
@@ -576,7 +576,7 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
   font-size: 1.68rem;
   font-weight: 800;
   letter-spacing: -0.025em;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   margin: 0;
   line-height: 1.1;
 }
@@ -589,8 +589,8 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
 
 /* Toolbar */
 .toolbar-card {
-  background: #FFFFFF;
-  border: 1px solid #E2E8F0;
+  background: var(--wl-surface);
+  border: 1px solid var(--wl-border);
   border-radius: 14px;
   padding: 0.85rem 1.25rem;
   display: flex;
@@ -622,11 +622,11 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
   height: 44px;
   padding: 0 14px;
   padding-inline-start: 38px;
-  background: #FFFFFF;
-  border: 1.5px solid #E2E8F0;
+  background: var(--wl-surface);
+  border: 1.5px solid var(--wl-border);
   border-radius: 10px;
   font-size: 13.5px;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   outline: none;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
@@ -663,25 +663,25 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
 }
 
 .exec-table thead th {
-  background: #F8FAFC;
-  border-bottom: 1px solid #E2E8F0;
+  background: var(--wl-surface-soft);
+  border-bottom: 1px solid var(--wl-border);
   padding: 0.85rem 1.25rem;
   font-family: var(--wl-font-mono, monospace);
   font-size: 11px;
   font-weight: 700;
-  color: #64748B;
+  color: var(--wl-muted);
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
 .exec-row {
   height: 56px;
-  border-bottom: 1px solid #F1F5F9;
+  border-bottom: 1px solid var(--wl-border);
   transition: background 0.15s ease;
 }
 
 .exec-row:hover {
-  background: #F8FAFC;
+  background: var(--wl-surface-soft);
 }
 
 .exec-row td {
@@ -728,7 +728,7 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
 
 .user-name {
   font-size: 13.5px;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
 }
 
 .user-phone-line {
@@ -750,7 +750,7 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
 }
 
 .phone-number {
-  color: #334155;
+  color: var(--wl-ink-soft);
 }
 
 .user-phone {
@@ -768,9 +768,9 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
 }
 
 .role-pill--admin {
-  background: #EEF2FF;
-  color: #4F46E5;
-  border: 1px solid #C7D2FE;
+  background: var(--wl-primary-soft);
+  color: var(--wl-primary);
+  border: 1px solid rgba(var(--wl-primary-rgb), 0.3);
 }
 
 .role-pill--staff {
@@ -780,9 +780,9 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
 }
 
 .role-pill--org {
-  background: #F8FAFC;
-  color: #475569;
-  border: 1px solid #E2E8F0;
+  background: var(--wl-surface-soft);
+  color: var(--wl-ink-soft);
+  border: 1px solid var(--wl-border);
 }
 
 .status-dot-badge {
@@ -808,8 +808,8 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
 .status-dot-badge--active .dot { background: #10B981; }
 
 .status-dot-badge--inactive {
-  background: #F1F5F9;
-  color: #64748B;
+  background: var(--wl-surface-soft);
+  color: var(--wl-muted);
 }
 .status-dot-badge--inactive .dot { background: #94A3B8; }
 
@@ -826,7 +826,7 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
 
 .user-details-name {
   font-size: 1.1rem;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
 }
 
 .user-details-badges {

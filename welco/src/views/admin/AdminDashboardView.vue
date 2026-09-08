@@ -487,6 +487,17 @@ onUnmounted(_removeListeners)
       >
         <template #icon><span class="material-symbols-outlined text-[18px]">inventory_2</span></template>
       </StatCard>
+
+      <StatCard
+        v-if="!isStaffOnly"
+        :label="t('admin.backgroundJobs')"
+        value="Hangfire"
+        to="/admin/background-jobs"
+        :trend="t('admin.recurringActive')"
+        tone="indigo"
+      >
+        <template #icon><span class="material-symbols-outlined text-[18px]">schedule</span></template>
+      </StatCard>
     </div>
 
     <!-- Staff Operational Triage Queues (Exclusive to Welco Staff) -->

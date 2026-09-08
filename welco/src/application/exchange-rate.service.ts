@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import type { ConversionResultDto, ExchangeRateDto } from '../domain/models/exchange-rate'
+import type { ConversionResultDto, ExchangeRateDto, ExchangeRateSyncLogDto } from '../domain/models/exchange-rate'
 import type { ExchangeRateRepository } from '../domain/ports/exchange-rate-repository'
 
 
@@ -47,6 +47,9 @@ export class ExchangeRateService {
   /** 'live' | 'public' | 'static' | null — lets UI badge offline rates honestly. */
   readonly lastUpdatedSource = ref<'live' | 'public' | 'static' | null>(null)
   readonly loading = ref(false)
+  readonly syncLogs = ref<ExchangeRateSyncLogDto[]>([])
+  readonly syncing = ref(false)
+  readonly loadingLogs = ref(false)
   private cache = new Map<string, { rates: Map<string, number>; fetchedAt: number; source: 'live' | 'public' | 'static' }>()
   private readonly TTL_MS = 60 * 60 * 1000 // 60 min for live rates
   private readonly FALLBACK_TTL_MS = 10 * 60 * 1000 // 10 min negative-cache so we don't spam a broken backend
@@ -157,5 +160,48 @@ export class ExchangeRateService {
   async getRate(from: string, to: string): Promise<number> {
     const res = await this.convert(1, from, to)
     return res.rate
+  }
+
+  clearCache(): void {
+    this.cache.clear()
+    this.latestRates.value = new Map()
+    this.lastUpdated.value = null
+    this.lastUpdatedSource.value = null
+  }
+
+  async fetchSyncLogs(take = 20): Promise<ExchangeRateSyncLogDto[]> {
+    this.loadingLogs.value = true
+    try {
+      const logs = await this.repo.getSyncLogs(take)
+      this.syncLogs.value = logs
+      return logs
+    } finally {
+      this.loadingLogs.value = false
+    }
+  }
+
+  async enqueueHangfireSync(): Promise<{ isSuccess: boolean; data?: string; message?: string }> {
+    this.syncing.value = true
+    try {
+      const res = await this.repo.syncEnqueue()
+      this.cache.clear()
+      setTimeout(() => { void this.fetchSyncLogs() }, 1000)
+      setTimeout(() => { void this.fetchSyncLogs(); void this.loadLatest('USD') }, 3500)
+      return res
+    } finally {
+      this.syncing.value = false
+    }
+  }
+
+  async triggerDirectSync(): Promise<{ success: boolean; ratesCount: number; baseCurrency: string }> {
+    this.syncing.value = true
+    try {
+      const res = await this.repo.sync()
+      this.cache.clear()
+      await Promise.all([this.fetchSyncLogs(), this.loadLatest('USD')])
+      return res
+    } finally {
+      this.syncing.value = false
+    }
   }
 }

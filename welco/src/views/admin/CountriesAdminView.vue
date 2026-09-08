@@ -56,7 +56,6 @@ const load = async () => {
 
 onMounted(load)
 
-// --- Add / Edit / Delete / Details ---
 const showFormModal = ref(false)
 const editingCountry = ref<CountryDto | null>(null)
 const formLoading = ref(false)
@@ -184,7 +183,6 @@ const closeDetails = () => {
 <template>
   <AdminLayout>
     <div class="countries-view">
-      <!-- Executive Header -->
       <header class="countries-head">
         <div>
           <div class="head-chip mono">
@@ -200,7 +198,6 @@ const closeDetails = () => {
         </BaseButton>
       </header>
 
-      <!-- 44px Search & Counts Toolbar -->
       <div class="toolbar-card">
         <div class="search-input-wrap">
           <span class="material-symbols-outlined search-icon">search</span>
@@ -214,7 +211,6 @@ const closeDetails = () => {
         <span class="mono counter-text">{{ filtered.length }} {{ t('common.of') }} {{ countries.length }} {{ t('admin.countries') }}</span>
       </div>
 
-      <!-- Executive Data Table -->
       <DataState
         :loading="loading && !countries.length"
         :error="fetchError && !countries.length ? fetchError : null"
@@ -325,7 +321,6 @@ const closeDetails = () => {
         </div>
       </DataState>
 
-      <!-- Add / Edit Modal -->
       <BaseModal
         v-model="showFormModal"
         :title="editingCountry ? t('admin.editCountry') : t('admin.newCountry')"
@@ -367,7 +362,6 @@ const closeDetails = () => {
         </form>
       </BaseModal>
 
-      <!-- Details Modal -->
       <BaseModal
         v-model="showDetailsModal"
         :title="t('admin.countryDetails')"
@@ -428,9 +422,9 @@ const closeDetails = () => {
   gap: 0.45rem;
   font-size: 10px;
   font-weight: 700;
-  color: #4F46E5;
-  background: #EEF2FF;
-  border: 1px solid #C7D2FE;
+  color: var(--wl-primary);
+  background: var(--wl-primary-soft);
+  border: 1px solid rgba(var(--wl-primary-rgb), 0.3);
   padding: 0.2rem 0.6rem;
   border-radius: 9999px;
   letter-spacing: 0.06em;
@@ -449,7 +443,7 @@ const closeDetails = () => {
   font-size: 1.68rem;
   font-weight: 800;
   letter-spacing: -0.025em;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   margin: 0;
   line-height: 1.1;
 }
@@ -490,11 +484,11 @@ const closeDetails = () => {
   height: 44px;
   padding: 0 14px;
   padding-inline-start: 38px;
-  background: #FFFFFF;
-  border: 1.5px solid #E2E8F0;
+  background: var(--wl-surface);
+  border: 1.5px solid var(--wl-border);
   border-radius: 10px;
   font-size: 13.5px;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   outline: none;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
@@ -531,25 +525,25 @@ const closeDetails = () => {
 }
 
 .exec-table thead th {
-  background: #F8FAFC;
-  border-bottom: 1px solid #E2E8F0;
+  background: var(--wl-surface-soft);
+  border-bottom: 1px solid var(--wl-border);
   padding: 0.85rem 1.25rem;
   font-family: var(--wl-font-mono, monospace);
   font-size: 11px;
   font-weight: 700;
-  color: #64748B;
+  color: var(--wl-muted);
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
 .exec-row {
   height: 52px;
-  border-bottom: 1px solid #F1F5F9;
+  border-bottom: 1px solid var(--wl-border);
   transition: background 0.15s ease;
 }
 
 .exec-row:hover {
-  background: #F8FAFC;
+  background: var(--wl-surface-soft);
 }
 
 .exec-row td {
@@ -570,20 +564,20 @@ const closeDetails = () => {
 
 .country-name {
   font-size: 13.5px;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
 }
 
 .arabic-name {
   font-size: 14px;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
 }
 
 .code-pill {
   font-size: 11.5px;
   font-weight: 700;
-  color: #4F46E5;
-  background: #EEF2FF;
-  border: 1px solid #C7D2FE;
+  color: var(--wl-primary);
+  background: var(--wl-primary-soft);
+  border: 1px solid rgba(var(--wl-primary-rgb), 0.3);
   padding: 0.2rem 0.5rem;
   border-radius: 6px;
 }
@@ -591,10 +585,10 @@ const closeDetails = () => {
 .phone-pill {
   font-size: 11.5px;
   font-weight: 700;
-  color: #0F172A;
-  background: #F1F5F9;
+  color: var(--wl-ink-strong);
+  background: var(--wl-surface-soft);
   padding: 0.2rem 0.5rem;
   border-radius: 6px;
-  border: 1px solid #E2E8F0;
+  border: 1px solid var(--wl-border);
 }
 </style>

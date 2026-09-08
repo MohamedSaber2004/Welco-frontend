@@ -176,6 +176,12 @@ const router = createRouter({
       meta: { titleKey: 'nav.certifications', isLandingPage: true },
     },
     {
+      path: '/about',
+      name: 'about',
+      component: () => import('../views/AboutView.vue'),
+      meta: { titleKey: 'nav.about', isLandingPage: true },
+    },
+    {
       path: '/help',
       name: 'help',
       component: () => import('../views/support/HelpCenterView.vue'),
@@ -286,6 +292,20 @@ const router = createRouter({
       meta: { titleKey: 'admin.auditLogs', requiresAuth: true, requiresAdmin: true },
     },
     {
+      path: '/admin/background-jobs',
+      name: 'admin-background-jobs',
+      component: () => import('../views/admin/BackgroundJobsAdminView.vue'),
+      meta: { titleKey: 'admin.backgroundJobs', requiresAuth: true, requiresAdmin: true },
+    },
+    {
+      path: '/admin/jobs',
+      redirect: '/admin/background-jobs',
+    },
+    {
+      path: '/admin/hangfire',
+      redirect: '/admin/background-jobs',
+    },
+    {
       path: '/admin/documents',
       redirect: '/admin/certifications?tab=documents',
     },
@@ -316,12 +336,6 @@ router.beforeEach(async (to) => {
   if (isAuthenticated && !isSeller && to.path.startsWith('/admin')) {
     return { name: 'home' }
   }
-  // 4-role model: Provider/Distributor = OrganizationUser WITH a linked provider
-  // company (B2B portal open); Customer = buyer without a company (direct
-  // cart/checkout/wishlist open, no company needed). Only a KNOWN pending
-  // Organization signup (pending-org marker from registration — the backend
-  // has no Customer role to tell them apart) is bounced until an admin
-  // accepts its request to join the platform.
   if (isAuthenticated && auth.isOrganizationUser.value) {
     const user = auth.user.value
     const hasCompany = !!(user?.companyId)

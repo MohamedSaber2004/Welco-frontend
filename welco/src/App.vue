@@ -54,7 +54,9 @@ const showFooter = computed(() => {
     name === 'oem' ||
     path === '/oem' ||
     name === 'certifications' ||
-    path === '/certifications'
+    path === '/certifications' ||
+    name === 'about' ||
+    path === '/about'
   )
 })
 

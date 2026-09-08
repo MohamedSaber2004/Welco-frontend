@@ -1789,11 +1789,11 @@ onMounted(async () => {
 }
 
 .status-dot-badge--inactive {
-  background: #f1f5f9;
-  color: #64748b;
+  background: var(--wl-surface-soft);
+  color: var(--wl-muted);
 }
 .status-dot-badge--inactive .dot {
-  background: #94a3b8;
+  background: var(--wl-muted-soft);
 }
 
 .form-error {

@@ -321,6 +321,7 @@ const showDrop = computed(() => !hasMediaType.value || effectiveFileType.value =
 .fup__preview:hover .fup__overlay { opacity: 1; }
 .fup__action { display: inline-flex; align-items: center; gap: 0.3rem; background: rgba(11, 28, 44, 0.85); color: #fff; border: 1px solid rgba(255, 255, 255, 0.25); padding: 0.35rem 0.7rem; font-size: 0.75rem; font-weight: 600; cursor: pointer; border-radius: 6px; text-decoration: none; transition: all 0.15s ease; }
 .fup__action:hover { background: var(--wl-ink-strong); color: #fff; border-color: rgba(255, 255, 255, 0.5); }
+:root[data-theme='dark'] .fup__action:hover, :root.dark .fup__action:hover { background: #4E5058; color: #fff; }
 .fup__action--view { background: rgba(14, 165, 233, 0.85); }
 .fup__action--view:hover { background: #0284c7; }
 .fup__action--danger:hover { background: #dc2626; }
@@ -464,7 +465,7 @@ const showDrop = computed(() => !hasMediaType.value || effectiveFileType.value =
 
 .fup__inline-viewer {
   border-top: 1px solid var(--wl-border);
-  background: #f8fafc;
+  background: var(--wl-surface-soft);
   padding: 0.5rem;
 }
 .fup__pdf-iframe {
@@ -472,7 +473,7 @@ const showDrop = computed(() => !hasMediaType.value || effectiveFileType.value =
   height: 320px;
   border: 1px solid var(--wl-border);
   border-radius: 6px;
-  background: #fff;
+  background: var(--wl-surface);
 }
 
 .fup__drop {

@@ -56,7 +56,6 @@ defineProps<{ title: string; subtitle: string }>()
   overflow: hidden;
 }
 
-/* Left logo panel */
 .auth-brand {
   background: var(--wl-ink-strong);
   color: #FFFFFF;
@@ -75,6 +74,23 @@ defineProps<{ title: string; subtitle: string }>()
   inset-inline: 0;
   height: 3px;
   background: linear-gradient(90deg, #4F46E5, #6366F1, #818CF8);
+}
+
+/* Dark mode: --wl-ink-strong flips to near-white text color, so pin the
+   brand panel to Discord floating (#111214) instead. */
+:root[data-theme='dark'] .auth-brand,
+:root.dark .auth-brand {
+  background: #111214;
+}
+
+:root[data-theme='dark'] .auth-brand::before,
+:root.dark .auth-brand::before {
+  background: linear-gradient(90deg, #5865F2, #949CF7, #5865F2);
+}
+
+:root[data-theme='dark'] .auth-brand::after,
+:root.dark .auth-brand::after {
+  background: radial-gradient(circle, rgba(88, 101, 242, 0.22) 0%, transparent 70%);
 }
 
 .auth-brand::after {
@@ -102,7 +118,7 @@ defineProps<{ title: string; subtitle: string }>()
   justify-content: center;
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.12),
-    0 0 60px rgba(79, 70, 229, 0.35),
+    0 0 60px rgba(88, 101, 242, 0.4),
     0 20px 45px -12px rgba(0, 0, 0, 0.5);
 }
 

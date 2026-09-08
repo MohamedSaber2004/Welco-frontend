@@ -491,7 +491,7 @@ const totalCompany = computed(() => company.addresses.value.length)
 }
 
 .crumb-active {
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   font-weight: 700;
 }
 
@@ -509,9 +509,9 @@ const totalCompany = computed(() => company.addresses.value.length)
   gap: 0.45rem;
   font-size: 10px;
   font-weight: 700;
-  color: #4F46E5;
-  background: #EEF2FF;
-  border: 1px solid #C7D2FE;
+  color: var(--wl-primary);
+  background: var(--wl-primary-soft);
+  border: 1px solid rgba(var(--wl-primary-rgb), 0.3);
   padding: 0.2rem 0.6rem;
   border-radius: 9999px;
   letter-spacing: 0.06em;
@@ -530,7 +530,7 @@ const totalCompany = computed(() => company.addresses.value.length)
   font-size: 1.68rem;
   font-weight: 800;
   letter-spacing: -0.025em;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   margin: 0;
   line-height: 1.1;
 }
@@ -598,16 +598,16 @@ const totalCompany = computed(() => company.addresses.value.length)
 .tab-chip {
   font-size: 10px;
   font-weight: 700;
-  background: #F1F5F9;
-  color: #475569;
+  background: var(--wl-surface-soft);
+  color: var(--wl-ink-soft);
   padding: 0.1rem 0.45rem;
   border-radius: 9999px;
 }
 
 /* Territory Info Banner */
 .territory-info-banner {
-  background: #F8FAFC;
-  border: 1px solid #E2E8F0;
+  background: var(--wl-surface-soft);
+  border: 1px solid var(--wl-border);
   border-radius: 12px;
   padding: 0.85rem 1.15rem;
   display: flex;
@@ -650,7 +650,7 @@ const totalCompany = computed(() => company.addresses.value.length)
 .cluster-title {
   font-size: 14.5px;
   font-weight: 800;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   margin: 0;
 }
 
@@ -713,8 +713,8 @@ const totalCompany = computed(() => company.addresses.value.length)
   width: 40px;
   height: 40px;
   border-radius: 10px;
-  background: #EEF2FF;
-  color: #4F46E5;
+  background: var(--wl-primary-soft);
+  color: var(--wl-primary);
   display: grid;
   place-items: center;
   flex-shrink: 0;
@@ -742,7 +742,7 @@ const totalCompany = computed(() => company.addresses.value.length)
 .street-name {
   font-size: 14.5px;
   font-weight: 700;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   margin: 0;
   white-space: nowrap;
   overflow: hidden;
@@ -775,15 +775,15 @@ const totalCompany = computed(() => company.addresses.value.length)
 .geo-pill {
   font-size: 10px;
   font-weight: 700;
-  color: #475569;
-  background: #F1F5F9;
+  color: var(--wl-ink-soft);
+  background: var(--wl-surface-soft);
   padding: 0.15rem 0.5rem;
   border-radius: 6px;
 }
 
 .geo-pill--subtle {
-  background: #F8FAFC;
-  border: 1px solid #E2E8F0;
+  background: var(--wl-surface-soft);
+  border: 1px solid var(--wl-border);
 }
 
 .geo-pill--teal {
@@ -805,20 +805,20 @@ const totalCompany = computed(() => company.addresses.value.length)
   align-items: center;
   justify-content: center;
   gap: 0.3rem;
-  background: #FFFFFF;
-  border: 1px solid #E2E8F0;
+  background: var(--wl-surface);
+  border: 1px solid var(--wl-border);
   border-radius: 8px;
   font-size: 12px;
   font-weight: 600;
-  color: #475569;
+  color: var(--wl-ink-soft);
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .btn-action-ghost:hover {
   border-color: #4F46E5;
-  color: #4F46E5;
-  background: #EEF2FF;
+  color: var(--wl-primary);
+  background: var(--wl-primary-soft);
 }
 
 .btn-action-danger {
@@ -828,7 +828,7 @@ const totalCompany = computed(() => company.addresses.value.length)
   align-items: center;
   justify-content: center;
   gap: 0.3rem;
-  background: #FFFFFF;
+  background: var(--wl-surface);
   border: 1px solid #FECDD3;
   border-radius: 8px;
   font-size: 12px;
@@ -868,18 +868,18 @@ const totalCompany = computed(() => company.addresses.value.length)
   width: 100%;
   height: 48px;
   padding: 0 14px;
-  background: #F8FAFC;
-  border: 1.5px solid #E2E8F0;
+  background: var(--wl-surface-soft);
+  border: 1.5px solid var(--wl-border);
   border-radius: 10px;
   font-size: 13.5px;
-  color: #0F172A;
+  color: var(--wl-ink-strong);
   outline: none;
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .vip-select:focus,
 .vip-input:focus {
-  background: #FFFFFF;
+  background: var(--wl-surface);
   border-color: #4F46E5;
   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
 }
@@ -901,7 +901,7 @@ const totalCompany = computed(() => company.addresses.value.length)
   align-items: center;
   gap: 0.5rem;
   font-size: 12.5px;
-  color: #334155;
+  color: var(--wl-ink-soft);
   cursor: pointer;
 }
 
@@ -945,9 +945,9 @@ const totalCompany = computed(() => company.addresses.value.length)
 
 .btn-modal-cancel {
   height: 48px;
-  background: #FFFFFF;
-  border: 1.5px solid #E2E8F0;
-  color: #0F172A;
+  background: var(--wl-surface);
+  border: 1.5px solid var(--wl-border);
+  color: var(--wl-ink-strong);
   border-radius: 10px;
   font-size: 13.5px;
   font-weight: 700;
@@ -956,6 +956,6 @@ const totalCompany = computed(() => company.addresses.value.length)
 }
 
 .btn-modal-cancel:hover {
-  background: #F8FAFC;
+  background: var(--wl-surface-soft);
 }
 </style>

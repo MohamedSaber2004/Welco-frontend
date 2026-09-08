@@ -28,3 +28,27 @@ export interface LatestRatesResponse {
   count: number
   baseCurrency?: string
 }
+
+export type SyncStatusType = 'Pending' | 'Success' | 'Failed' | 'Partial'
+
+export interface ExchangeRateSyncLogDto {
+  id: string
+  baseCurrency: string
+  status: number | SyncStatusType
+  ratesCount: number
+  source: string
+  startedAt: string
+  completedAt?: string | null
+  errorMessage?: string | null
+  createdAt?: string
+}
+
+export interface HangfireJobInfo {
+  id: string
+  name: string
+  cron: string
+  queue: string
+  lastExecution?: string | null
+  nextExecution?: string | null
+  status: 'Active' | 'Running' | 'Failed' | 'Idle'
+}

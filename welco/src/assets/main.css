@@ -27,3 +27,19 @@ main { flex: 1; min-width: 0; overflow-x: clip; }
   .header, .footer { display: none; }
   .page-shell { padding: 0; }
 }
+
+/* Table header/cell horizontal alignment — every row cell lines up with
+   its column header. Browser stylesheets center `th` content, which beats
+   the `text-align: start` inherited from table classes, so headers must be
+   aligned explicitly. Logical properties keep LTR/RTL correct. */
+table thead th {
+  text-align: start;
+  vertical-align: middle;
+}
+table thead th.text-end,
+table thead th.text-right {
+  text-align: end;
+}
+table thead th.text-center {
+  text-align: center;
+}

@@ -685,7 +685,7 @@ onMounted(async () => {
                   <th>{{ t('admin.price') }}</th>
                   <th>{{ t('admin.stock') }}</th>
                   <th>{{ t('admin.status') }}</th>
-                  <th class="text-right">{{ t('common.actions') }}</th>
+                  <th class="text-end">{{ t('common.actions') }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -833,7 +833,7 @@ onMounted(async () => {
                   <th>{{ t('admin.categoryNameAr') }}</th>
                   <th>{{ t('admin.productsTitle') }}</th>
                   <th>{{ t('admin.status') }}</th>
-                  <th class="text-right">{{ t('common.actions') }}</th>
+                  <th class="text-end">{{ t('common.actions') }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -1686,7 +1686,7 @@ onMounted(async () => {
   cursor: not-allowed;
 }
 
-.text-right {
+.text-end {
   text-align: end;
 }
 

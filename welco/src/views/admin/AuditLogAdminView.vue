@@ -237,14 +237,17 @@ watch([() => filters.value.entity, () => filters.value.action, () => filters.val
                     </div>
                   </td>
                   <td class="text-end">
-                    <button
-                      type="button"
-                      class="row-action-btn mono"
-                      @click="openDetails(log)"
-                    >
-                      <span class="material-symbols-outlined text-[16px]">visibility</span>
-                      <span>{{ t('admin.viewDetails') }}</span>
-                    </button>
+                    <div class="row-actions">
+                      <button
+                        type="button"
+                        class="row-action-btn"
+                        :title="t('admin.viewDetails')"
+                        :aria-label="t('admin.viewDetails')"
+                        @click="openDetails(log)"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">visibility</span>
+                      </button>
+                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -528,25 +531,44 @@ watch([() => filters.value.entity, () => filters.value.action, () => filters.val
   color: #94A3B8;
 }
 
-.row-action-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  background: #FFFFFF;
-  border: 1px solid #E2E8F0;
-  border-radius: 8px;
-  padding: 0.35rem 0.75rem;
-  font-size: 11.5px;
-  font-weight: 600;
-  color: #475569;
-  cursor: pointer;
-  transition: all 0.15s ease;
+.role-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 0.12rem 0.45rem;
+  border-radius: 4px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  display: inline-block;
 }
 
-.row-action-btn:hover {
-  border-color: #4F46E5;
+.role-badge--admin {
+  background: rgba(99, 102, 241, 0.12);
   color: #4F46E5;
-  background: #EEF2FF;
+  border: 1px solid rgba(99, 102, 241, 0.25);
+}
+
+.role-badge--staff {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.role-badge--org {
+  background: rgba(245, 158, 11, 0.12);
+  color: #D97706;
+  border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.role-badge--system {
+  background: rgba(100, 116, 139, 0.12);
+  color: #475569;
+  border: 1px solid rgba(100, 116, 139, 0.25);
+}
+
+.role-badge--default {
+  background: #F8FAFC;
+  color: #64748B;
+  border: 1px solid #E2E8F0;
 }
 
 .text-end {

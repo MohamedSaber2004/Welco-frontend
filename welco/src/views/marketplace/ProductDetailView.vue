@@ -540,7 +540,7 @@ const resolvedDescription = computed(() => {
             <div class="pdp-price-header">
               <div class="price-figure-wrap">
                 <strong class="pdp-price-figure mono">
-                  {{ product.price.toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}
+                  {{ Math.ceil(product.price).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}
                 </strong>
                 <span class="pdp-currency-unit mono">{{ currencySymbol }}</span>
                 <span class="pdp-unit-caption mono">
@@ -889,7 +889,7 @@ const resolvedDescription = computed(() => {
               </div>
               <div class="rel-foot">
                 <strong class="mono rel-price">
-                  {{ p.price.toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ p.currencySymbol || p.currencyCode || p.currency || '$' }}
+                  {{ Math.ceil(p.price).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ p.currencySymbol || p.currencyCode || p.currency || '$' }}
                 </strong>
                 <span class="rel-cta-hint mono">{{ t('admin.certView') }} <span class="icon--directional">→</span></span>
               </div>

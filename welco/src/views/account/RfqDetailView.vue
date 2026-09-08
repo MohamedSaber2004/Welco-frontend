@@ -112,7 +112,7 @@ onMounted(async () => {
 
               <div class="rfq-item-details">
                 <h3 class="rfq-item-name">{{ localized(it.productNameEn, it.productNameAr || it.productNameEn) }}</h3>
-                <div class="rfq-item-qty mono">{{ t('account.qtyUnits', { count: it.quantity }) }} · {{ Math.round(it.unitPrice ?? 0).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} USD {{ t('account.perUnitShort') }}</div>
+                <div class="rfq-item-qty mono">{{ t('account.qtyUnits', { count: it.quantity }) }} · {{ Math.ceil(it.unitPrice ?? 0).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} USD {{ t('account.perUnitShort') }}</div>
                 <div v-if="it.notes" class="rfq-item-notes mono">
                   <span class="font-bold">{{ t('account.specLabel') }}</span> {{ it.notes }}
                 </div>
@@ -133,7 +133,7 @@ onMounted(async () => {
             <h2 class="side-title mono">{{ t('commerce.total') }}</h2>
             <div class="amount-val-box">
               <span class="mono amount-label">{{ t('sales.amount') }}</span>
-              <strong class="mono amount-big">${{ Math.round(rfq.total ?? 0).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} USD</strong>
+              <strong class="mono amount-big">${{ Math.ceil(rfq.total ?? 0).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} USD</strong>
             </div>
           </section>
 

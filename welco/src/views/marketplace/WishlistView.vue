@@ -163,7 +163,7 @@ const goDetail = (id: string) => {
           <div class="product-footer">
             <div class="price-stack">
               <strong class="price-val mono">
-                {{ p.price.toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ p.currencySymbol || p.currencyCode || '$' }}
+                {{ Math.ceil(p.price).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ p.currencySymbol || p.currencyCode || '$' }}
               </strong>
               <span v-if="p.unit" class="unit-text mono">
                 {{ t('marketplace.perUnit', { unit: locale === 'ar' ? (p.unitAr || p.unit) : p.unit }) }}

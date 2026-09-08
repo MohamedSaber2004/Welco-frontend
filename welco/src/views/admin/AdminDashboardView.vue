@@ -570,7 +570,7 @@ onUnmounted(_removeListeners)
               <div class="dash-mini-main">
                 <div class="flex items-center gap-2">
                   <strong class="dash-mini-id mono">{{ order.orderNumber }}</strong>
-                  <span class="priority-chip priority-chip--order mono text-[10px]">{{ order.currencySymbol || '$' }}{{ order.totalAmount?.toLocaleString() }}</span>
+                  <span class="priority-chip priority-chip--order mono text-[10px]">{{ order.currencySymbol || '$' }}{{ Math.ceil(order.totalAmount ?? 0).toLocaleString() }}</span>
                 </div>
                 <span class="dash-mini-sub mono">{{ t('account.lineItemsCount', { count: order.items?.length || 0 }) }}</span>
               </div>

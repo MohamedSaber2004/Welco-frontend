@@ -209,7 +209,7 @@ function goPage(p: number) {
                   <td class="mono text-xs text-slate-500">{{ new Date(o.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</td>
                   <td>
                     <strong class="mono amount-num">
-                      {{ Math.round(o.totalAmount).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ o.currencyCode }}
+                      {{ Math.ceil(o.totalAmount).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ o.currencyCode }}
                     </strong>
                   </td>
                   <td>
@@ -295,7 +295,7 @@ function goPage(p: number) {
             <div class="detail-item">
               <span class="detail-k mono">{{ t('commerce.total') }}</span>
               <strong class="detail-v mono"
-                >{{ Math.round(selectedOrder.totalAmount).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}
+                >{{ Math.ceil(selectedOrder.totalAmount).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}
                 {{ selectedOrder.currencyCode }}</strong
               >
             </div>
@@ -315,8 +315,8 @@ function goPage(p: number) {
                 <tr v-for="it in selectedOrder.items ?? []" :key="it?.id || it?.productId">
                   <td>{{ locale === 'ar' ? (it?.productNameAr || it?.productNameEn) : (it?.productNameEn || it?.productNameAr) }}</td>
                   <td class="text-end mono">{{ it?.quantity ?? 0 }}</td>
-                  <td class="text-end mono">{{ (it?.unitPrice ?? 0).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</td>
-                  <td class="text-end mono">{{ ((it?.quantity ?? 0) * (it?.unitPrice ?? 0)).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</td>
+                  <td class="text-end mono">{{ Math.ceil(it?.unitPrice ?? 0).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</td>
+                  <td class="text-end mono">{{ Math.ceil((it?.quantity ?? 0) * (it?.unitPrice ?? 0)).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</td>
                 </tr>
               </tbody>
             </table>
@@ -325,7 +325,7 @@ function goPage(p: number) {
           <div class="order-total-bar">
             <span class="mono total-label">{{ t('commerce.total') }}</span>
             <strong class="mono total-value"
-              >{{ Math.round(detailsSubtotal(selectedOrder)).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}
+              >{{ Math.ceil(detailsSubtotal(selectedOrder)).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}
               {{ selectedOrder.currencyCode }}</strong
             >
           </div>

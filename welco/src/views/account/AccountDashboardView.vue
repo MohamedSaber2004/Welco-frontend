@@ -211,7 +211,7 @@ onMounted(loadDashboard)
 
         <StatCard
           :label="t('account.statYtd')"
-          :value="`${Math.round(ytdValue).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US')} ${orderCurrency}`"
+          :value="`${Math.ceil(ytdValue).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US')} ${orderCurrency}`"
           tone="slate"
           :trend="t('account.trendYtd')"
           :sparkline="realOrderSpendSparkline"
@@ -292,7 +292,7 @@ onMounted(loadDashboard)
 
               <div class="quote-right">
                 <span class="quote-amount mono-num">
-                  {{ Math.round(q.amount).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ q.currency || 'USD' }}
+                  {{ Math.ceil(q.amount).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ q.currency || 'USD' }}
                 </span>
                 <StatusPill :status="q.status" />
               </div>
@@ -344,7 +344,7 @@ onMounted(loadDashboard)
 
               <div class="quote-right">
                 <span class="quote-amount mono-num">
-                  ${{ Math.round(r.total ?? 0).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}
+                  ${{ Math.ceil(r.total ?? 0).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}
                 </span>
                 <StatusPill :status="r.status" />
               </div>

@@ -163,7 +163,7 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
                 <h3 class="product-card__name" dir="auto">{{ localized(p.nameEn, p.nameAr) }}</h3>
                 <div class="product-card__meta mono">{{ p.material || '—' }} <span class="meta-dot">·</span> {{ p.lengthCm ? `${p.lengthCm} cm` : '—' }}</div>
                 <div class="product-card__bottom">
-                  <span class="price-val mono-num">{{ p.price.toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ p.currencySymbol || p.currencyCode || '$' }}</span>
+                  <span class="price-val mono-num">{{ Math.ceil(p.price).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ p.currencySymbol || p.currencyCode || '$' }}</span>
                   <button class="add-quote-btn" type="button" @click="handleAddToQuote($event, p)">{{ t('marketplace.addToQuote') }}</button>
                 </div>
               </div>

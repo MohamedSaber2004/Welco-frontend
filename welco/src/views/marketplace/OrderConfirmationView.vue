@@ -76,9 +76,9 @@ onMounted(async () => {
             <div v-for="it in order.items" :key="it.id" class="item-row">
               <div class="item-name">{{ it.productNameEn }}</div>
               <div class="item-calc mono">
-                <span class="item-qty">{{ it.quantity }} × {{ it.unitPrice.toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</span>
+                <span class="item-qty">{{ it.quantity }} × {{ Math.ceil(it.unitPrice).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</span>
                 <strong class="item-subtotal">
-                  {{ (it.quantity * it.unitPrice).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ order.currencyCode }}
+                  {{ Math.ceil(it.quantity * it.unitPrice).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ order.currencyCode }}
                 </strong>
               </div>
             </div>
@@ -87,7 +87,7 @@ onMounted(async () => {
           <div class="total-row">
             <span class="total-label mono">{{ t('commerce.total') }}</span>
             <strong class="total-value mono">
-              {{ Math.round(order.totalAmount).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ order.currencyCode }}
+              {{ Math.ceil(order.totalAmount).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ order.currencyCode }}
             </strong>
           </div>
         </section>

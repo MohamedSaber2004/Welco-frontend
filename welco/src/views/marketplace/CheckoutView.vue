@@ -20,7 +20,7 @@ const submittingRfq = ref(false)
 const error = ref<string | null>(null)
 
 const selectedCurrency = computed(() => targetCurrency.value)
-const displayTotal = computed(() => Math.round(convertedTotal.value).toLocaleString(locale.value === 'ar' ? 'ar-EG' : 'en-US'))
+const displayTotal = computed(() => Math.ceil(convertedTotal.value).toLocaleString(locale.value === 'ar' ? 'ar-EG' : 'en-US'))
 const addressCurrencyOptions = ref<string[]>([])
 
 onMounted(async () => {
@@ -188,11 +188,11 @@ async function convertToQuote() {
 
               <div class="line-item__pricing">
                 <div class="mono line-item__calc">
-                  <span v-if="(it.product.currencyCode||'USD').toUpperCase()!==targetCurrency"> {{ it.product.price.toLocaleString(locale==='ar'?'ar-EG':'en-US') }} {{ it.product.currencyCode }} → </span>
-                  {{ it.quantity }} × {{ getConvertedPrice(it.product).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ targetCurrency }}
+                  <span v-if="(it.product.currencyCode||'USD').toUpperCase()!==targetCurrency"> {{ Math.ceil(it.product.price).toLocaleString(locale==='ar'?'ar-EG':'en-US') }} {{ it.product.currencyCode }} → </span>
+                  {{ it.quantity }} × {{ Math.ceil(getConvertedPrice(it.product)).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ targetCurrency }}
                 </div>
                 <strong class="mono line-item__total">
-                  {{ (it.quantity * getConvertedPrice(it.product)).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ targetCurrency }}
+                  {{ Math.ceil(it.quantity * getConvertedPrice(it.product)).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ targetCurrency }}
                 </strong>
               </div>
             </article>
@@ -212,7 +212,7 @@ async function convertToQuote() {
           <div class="summary-rows">
             <div class="summary-row">
               <span class="mono">{{ t('commerce.subtotal') }}</span>
-              <strong class="mono">{{ convertedTotal.toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ targetCurrency }}</strong>
+              <strong class="mono">{{ Math.ceil(convertedTotal).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ targetCurrency }}</strong>
             </div>
 
             <div class="summary-row">
@@ -225,7 +225,7 @@ async function convertToQuote() {
             <div class="summary-row summary-row--total">
               <span class="total-label mono">{{ t('commerce.total') }}</span>
               <strong class="total-val mono">
-                {{ Math.round(convertedTotal).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} <span class="total-curr">{{ targetCurrency }}</span>
+                {{ Math.ceil(convertedTotal).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} <span class="total-curr">{{ targetCurrency }}</span>
               </strong>
             </div>
           </div>

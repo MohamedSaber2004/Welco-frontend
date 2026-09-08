@@ -108,12 +108,12 @@ function statusIndex(o: OrderDto): number {
                 <div class="item-math mono">
                   <span>{{ t('account.qtyUnits', { count: it.quantity }) }}</span>
                   <span>•</span>
-                  <span>{{ it.unitPrice.toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ order.currencyCode }} {{ t('account.perUnitShort') }}</span>
+                  <span>{{ Math.ceil(it.unitPrice).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ order.currencyCode }} {{ t('account.perUnitShort') }}</span>
                 </div>
               </div>
 
               <div class="item-subtotal mono">
-                {{ (it.quantity * it.unitPrice).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ order.currencyCode }}
+                {{ Math.ceil(it.quantity * it.unitPrice).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ order.currencyCode }}
               </div>
             </article>
           </div>
@@ -121,7 +121,7 @@ function statusIndex(o: OrderDto): number {
           <div class="manifest-foot">
             <span class="mono foot-label">{{ t('commerce.total') }}</span>
             <strong class="mono foot-total">
-              {{ Math.round(order.totalAmount).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ order.currencyCode }}
+              {{ Math.ceil(order.totalAmount).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ order.currencyCode }}
             </strong>
           </div>
         </main>

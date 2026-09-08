@@ -173,12 +173,12 @@ async function placeOrderFromQuote() {
                 <div class="item-math mono">
                   <span>{{ t('account.qtyUnits', { count: it.quantity }) }}</span>
                   <span>•</span>
-                  <span>{{ it.unitPrice.toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ quote.currency || 'USD' }} {{ t('account.perUnitShort') }}</span>
+                  <span>{{ Math.ceil(it.unitPrice).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ quote.currency || 'USD' }} {{ t('account.perUnitShort') }}</span>
                 </div>
               </div>
 
               <div class="item-subtotal mono">
-                {{ (it.quantity * it.unitPrice).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ quote.currency || 'USD' }}
+                {{ Math.ceil(it.quantity * it.unitPrice).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ quote.currency || 'USD' }}
               </div>
             </article>
           </div>
@@ -191,7 +191,7 @@ async function placeOrderFromQuote() {
             <div class="amount-val-box">
               <span class="mono amount-label">{{ t('commerce.total') }}</span>
               <strong class="mono amount-big">
-                ${{ Math.round(quote.amount).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ quote.currency || 'USD' }}
+                ${{ Math.ceil(quote.amount).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ quote.currency || 'USD' }}
               </strong>
             </div>
             <div class="validity-row mono">

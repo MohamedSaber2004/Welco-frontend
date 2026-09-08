@@ -717,7 +717,7 @@ onMounted(async () => {
                       {{ localized(p.categoryNameEn, p.categoryNameAr) }}</span>
                   </td>
                   <td>
-                    <strong class="mono price-val">{{ p.price.toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ p.currencySymbol || p.currencyCode || p.currency }}</strong>
+                    <strong class="mono price-val">{{ Math.ceil(p.price).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ p.currencySymbol || p.currencyCode || p.currency }}</strong>
                   </td>
                   <td>
                     <span
@@ -1128,7 +1128,7 @@ onMounted(async () => {
             <div class="detail-item">
               <span class="detail-k mono">{{ t('admin.price') }}</span>
               <strong class="detail-v mono"
-                >{{ selectedProduct.price.toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}
+                >{{ Math.ceil(selectedProduct.price).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}
                 {{
                   selectedProduct.currencySymbol ||
                   selectedProduct.currencyCode ||

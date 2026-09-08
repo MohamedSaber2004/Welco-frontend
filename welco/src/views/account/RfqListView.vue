@@ -181,7 +181,7 @@ onMounted(() => {
                   </div>
                 </td>
                 <td>
-                  <strong class="mono amount-text">${{ Math.round(r.total ?? 0).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</strong>
+                  <strong class="mono amount-text">${{ Math.ceil(r.total ?? 0).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</strong>
                 </td>
                 <td>
                   <StatusPill :status="r.status" />

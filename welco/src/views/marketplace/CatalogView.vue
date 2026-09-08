@@ -259,7 +259,7 @@ const hasMadeToOrder = computed(() => products.value.some((p) => p.stock === 0))
                 <div class="catalog-card__origin mono">{{ p.manufacturerEn || t('catalog.fallbackMfr') }} · {{ p.isActive ? t('catalog.ceMarked') : '' }}<span v-if="p.lengthCm" class="length-chip mono"><span class="length-dot" aria-hidden="true"></span>{{ p.lengthCm }} cm</span></div>
                 <div class="catalog-card__foot">
                   <div class="price-col">
-                    <strong class="catalog-card__price mono">{{ p.price.toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} <span class="currency-tag">{{ p.currencySymbol || p.currencyCode || p.currency || '$' }}</span></strong>
+                    <strong class="catalog-card__price mono">{{ Math.ceil(p.price).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} <span class="currency-tag">{{ p.currencySymbol || p.currencyCode || p.currency || '$' }}</span></strong>
                     <span v-if="p.unit" class="unit-tag mono">/ {{ p.unit }}</span>
                   </div>
                   <span v-if="p.rating" class="rating-tag mono">★ {{ p.rating.toFixed(1) }}</span>

@@ -533,11 +533,11 @@ const submitRfq = async () => {
                   </div>
                   <div class="cart-line__price mono">
                     <div v-if="(it.product.currencyCode||'USD').toUpperCase()!==targetCurrency" class="orig-price-wrap">
-                      <span class="orig-pill">{{ t('cart.originalPrice') }} {{ it.product.price.toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ it.product.currencyCode || 'USD' }}</span>
+                      <span class="orig-pill">{{ t('cart.originalPrice') }} {{ Math.ceil(it.product.price).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ it.product.currencyCode || 'USD' }}</span>
                       <span class="material-symbols-outlined text-[12px] conv-arrow icon--directional">arrow_forward</span>
                     </div>
                     <div class="active-unit-price">
-                      <strong class="active-unit-val">{{ activeCurrencyMeta.symbol }} {{ getConvertedPrice(it.product).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</strong>
+                      <strong class="active-unit-val">{{ activeCurrencyMeta.symbol }} {{ Math.ceil(getConvertedPrice(it.product)).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</strong>
                       <span class="active-unit-code">{{ targetCurrency }}</span>
                       <span class="active-unit-per">{{ t('account.perUnitShort') }}</span>
                     </div>
@@ -557,7 +557,7 @@ const submitRfq = async () => {
                   <span class="total-lbl">{{ t('commerce.subtotal') }}</span>
                   <strong class="total-fig">
                     <span class="total-sym">{{ activeCurrencyMeta.symbol }}</span>
-                    <span>{{ (getConvertedPrice(it.product) * it.quantity).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</span>
+                    <span>{{ Math.ceil(getConvertedPrice(it.product) * it.quantity).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</span>
                     <span class="total-code">{{ targetCurrency }}</span>
                   </strong>
                 </div>
@@ -588,7 +588,7 @@ const submitRfq = async () => {
           <div class="summary-rows">
             <div class="summary-row">
               <span class="mono">{{ count }} {{ t('marketplace.products') }}</span>
-              <strong class="mono">{{ activeCurrencyMeta.symbol }} {{ convertedTotal.toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ targetCurrency }}</strong>
+              <strong class="mono">{{ activeCurrencyMeta.symbol }} {{ Math.ceil(convertedTotal).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ targetCurrency }}</strong>
             </div>
 
             <div class="summary-divider"></div>
@@ -597,7 +597,7 @@ const submitRfq = async () => {
               <span class="total-lbl mono">{{ t('commerce.total') }}</span>
               <strong class="total-val mono">
                 <span class="total-sym">{{ activeCurrencyMeta.symbol }}</span>
-                <span>{{ Math.round(convertedTotal).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</span>
+                <span>{{ Math.ceil(convertedTotal).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</span>
                 <span class="total-curr">{{ targetCurrency }}</span>
               </strong>
             </div>
@@ -625,7 +625,7 @@ const submitRfq = async () => {
           <div class="summary-actions">
             <button class="btn btn-primary btn-block btn-lg" type="button" @click="goCheckout">
               <span class="material-symbols-outlined text-[18px]">shopping_cart_checkout</span>
-              <span>{{ t('commerce.placeOrder') }} · {{ activeCurrencyMeta.symbol }} {{ Math.round(convertedTotal).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ targetCurrency }}</span>
+              <span>{{ t('commerce.placeOrder') }} · {{ activeCurrencyMeta.symbol }} {{ Math.ceil(convertedTotal).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ targetCurrency }}</span>
             </button>
 
             <button

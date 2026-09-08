@@ -265,7 +265,7 @@ const navigateToOemFromModal = () => {
                 <div class="mono product-card__meta-alt" dir="auto">{{ locale === 'en' ? p.nameAr : p.nameEn }}</div>
                 <div class="mono product-card__meta">{{ p.manufacturerEn || 'Welco Surgical' }} · CE Class IIa</div>
                 <div class="product-card__foot">
-                  <strong class="mono-num">{{ p.price.toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ p.currencySymbol || '$' }}</strong>
+                  <strong class="mono-num">{{ Math.ceil(p.price).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ p.currencySymbol || '$' }}</strong>
                   <button class="btn btn-primary btn-sm" type="button" @click.stop="handleAdd(p.id)">
                     <span class="material-symbols-outlined text-[15px]">add_shopping_cart</span>
                     <span>{{ t('marketplace.addToQuote') }}</span>

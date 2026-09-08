@@ -110,7 +110,7 @@ async function track() {
         <div class="card-foot-summary">
           <span class="mono foot-label">{{ t('commerce.total') }}</span>
           <strong class="mono foot-total">
-            {{ Math.round(order.totalAmount).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ order.currencyCode }}
+            {{ Math.ceil(order.totalAmount).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ order.currencyCode }}
           </strong>
         </div>
       </div>
@@ -127,7 +127,7 @@ async function track() {
           <div v-for="it in order.items" :key="it.id" class="line-item-row">
             <div class="line-item-name">{{ localized(it.productNameEn, it.productNameEn) }}</div>
             <div class="line-item-meta mono">
-              <span>{{ it.quantity }} × {{ it.unitPrice.toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ order.currencyCode }}</span>
+              <span>{{ it.quantity }} × {{ Math.ceil(it.unitPrice).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ order.currencyCode }}</span>
               <button
                 type="button"
                 class="view-link-btn"

@@ -176,7 +176,7 @@ onMounted(() => {
                 </td>
                 <td>
                   <strong class="mono amount-text">
-                    {{ Math.round(o.totalAmount).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ o.currencyCode }}
+                    {{ Math.ceil(o.totalAmount).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ o.currencyCode }}
                   </strong>
                 </td>
                 <td>

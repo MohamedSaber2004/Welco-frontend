@@ -159,7 +159,7 @@ onMounted(() => {
                 <td class="mono text-xs text-slate-500">{{ new Date(q.validUntil).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</td>
                 <td>
                   <strong class="mono amount-text">
-                    {{ Math.round(q.amount).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ q.currency || 'USD' }}
+                    {{ Math.ceil(q.amount).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ q.currency || 'USD' }}
                   </strong>
                 </td>
                 <td>

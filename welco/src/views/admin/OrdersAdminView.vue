@@ -195,7 +195,6 @@ function goPage(p: number) {
                 <tr>
                   <th>{{ t('commerce.orderNumber') }}</th>
                   <th>{{ t('commerce.placed') }}</th>
-                  <th>{{ t('marketplace.products') }}</th>
                   <th>{{ t('commerce.total') }}</th>
                   <th>{{ t('commerce.status') }}</th>
                   <th class="text-end">{{ t('admin.viewDetails') }}</th>
@@ -208,19 +207,6 @@ function goPage(p: number) {
                     <strong class="mono order-num">{{ o.orderNumber || '—' }}</strong>
                   </td>
                   <td class="mono text-xs text-slate-500">{{ new Date(o.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</td>
-                  <td>
-                    <div class="product-names-cell">
-                      <span
-                        v-for="(item, idx) in (o.items ?? []).slice(0, 2)"
-                        :key="item?.id || idx"
-                        class="product-name-pill"
-                      >
-                        {{ locale === 'ar' ? (item?.productNameAr || item?.productNameEn || '—') : (item?.productNameEn || item?.productNameAr || '—') }}
-                        <span v-if="item && item.quantity > 1" class="qty-tag">×{{ item.quantity }}</span>
-                      </span>
-                      <span v-if="(o.items ?? []).length > 2" class="more-badge mono">+{{ (o.items ?? []).length - 2 }} {{ t('common.more') }}</span>
-                    </div>
-                  </td>
                   <td>
                     <strong class="mono amount-num">
                       {{ Math.round(o.totalAmount).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ o.currencyCode }}

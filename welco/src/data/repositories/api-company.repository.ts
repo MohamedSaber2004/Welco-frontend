@@ -2,6 +2,8 @@ import { COMPANY_ROUTES } from '../../config/api.config'
 import type { PaginatedResult } from '../../domain/models/location'
 import {
   type CompanyDto,
+  type CreateCompanyPayload,
+  type UpdateCompanyPayload,
   type DistributorApplicationDto,
   type DistributorApplicationPayload,
   type OemInquiryPayload,
@@ -31,6 +33,18 @@ export class ApiCompanyRepository implements CompanyRepository {
 
   async getCompanyById(id: string): Promise<CompanyDto> {
     return await this.http.get<CompanyDto>(COMPANY_ROUTES.companyById(id), { showFeedback: false })
+  }
+
+  async createCompany(payload: CreateCompanyPayload): Promise<CompanyDto> {
+    return await this.http.post<CompanyDto>(COMPANY_ROUTES.companies, payload)
+  }
+
+  async updateCompany(id: string, payload: UpdateCompanyPayload): Promise<CompanyDto> {
+    return await this.http.put<CompanyDto>(COMPANY_ROUTES.companyById(id), { id, ...payload })
+  }
+
+  async deleteCompany(id: string): Promise<void> {
+    await this.http.del<void>(COMPANY_ROUTES.companyById(id))
   }
 
   async getMyCompany(): Promise<CompanyDto | null> {

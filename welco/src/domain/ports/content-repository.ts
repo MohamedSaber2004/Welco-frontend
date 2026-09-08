@@ -24,6 +24,7 @@ export interface ContentRepository {
   getLandingPageBySlug(slug: string): Promise<LandingPageDto | null>
   createLandingPage(payload: CreateLandingPagePayload): Promise<LandingPageDto>
   updateLandingPage(id: string, payload: UpdateLandingPagePayload): Promise<LandingPageDto>
+  deleteLandingPage(id: string): Promise<void>
   getHelpCategories(): Promise<HelpCategoryDto[]>
   createHelpCategory(payload: { name: string; icon?: string }): Promise<HelpCategoryDto>
   updateHelpCategory(id: string, payload: { name: string; icon?: string }): Promise<HelpCategoryDto>

@@ -1,6 +1,8 @@
 import type { PaginatedResult } from '../models/location'
 import type {
   CompanyDto,
+  CreateCompanyPayload,
+  UpdateCompanyPayload,
   DistributorApplicationDto,
   DistributorApplicationPayload,
   OemInquiryPayload,
@@ -35,12 +37,15 @@ export interface OemInquiryDto {
   createdAt: string
 }
 
-export interface OemInquiryQuery extends CompanyQuery {}
+export type OemInquiryQuery = CompanyQuery
 
 export interface CompanyRepository {
   getCompanies(query?: CompanyQuery): Promise<PaginatedResult<CompanyDto>>
   getCompanyById(id: string): Promise<CompanyDto>
   getMyCompany(): Promise<CompanyDto | null>
+  createCompany(payload: CreateCompanyPayload): Promise<CompanyDto>
+  updateCompany(id: string, payload: UpdateCompanyPayload): Promise<CompanyDto>
+  deleteCompany(id: string): Promise<void>
   submitDistributorApplication(payload: DistributorApplicationPayload): Promise<DistributorApplicationDto>
   getDistributorApplications(query?: DistributorApplicationQuery): Promise<PaginatedResult<DistributorApplicationDto>>
   getDistributorApplicationById(id: string): Promise<DistributorApplicationDto>

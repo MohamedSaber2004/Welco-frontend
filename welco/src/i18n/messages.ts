@@ -820,6 +820,73 @@ export type Messages = {
     createAboutUs: string
     errPageSlug: string
     errPageTitle: string
+    deletePageConfirm: string
+    pageDeleted: string
+    countryDetails: string
+    cityDetails: string
+    zoneDetails: string
+    deleteCountryConfirm: string
+    deleteCityConfirm: string
+    deleteZoneConfirm: string
+    countryCreated: string
+    countryUpdated: string
+    countryDeleted: string
+    cityCreated: string
+    cityUpdated: string
+    cityDeleted: string
+    zoneCreated: string
+    zoneUpdated: string
+    zoneDeleted: string
+    errCountry: string
+    errCity: string
+    userDetails: string
+    deleteUserConfirm: string
+    userCreated: string
+    userUpdated: string
+    userDeleted: string
+    userFullName: string
+    userPassword: string
+    userAvatar: string
+    changeUserPassword: string
+    certDetails: string
+    newCertification: string
+    editCertification: string
+    deleteCertConfirm: string
+    certCreated: string
+    certUpdated: string
+    certDeleted: string
+    errCertFields: string
+    certIssuedTo: string
+    certIssueDate: string
+    certExpiryDate: string
+    certDescription: string
+    certImage: string
+    newCompany: string
+    editCompany: string
+    companyName: string
+    companyEmail: string
+    companyTier: string
+    companyDetails: string
+    deleteCompanyConfirm: string
+    companyCreated: string
+    companyUpdated: string
+    companyDeleted: string
+    deleteHelpCategoryConfirm: string
+    helpCategoryCreated: string
+    helpCategoryUpdated: string
+    helpCategoryDeleted: string
+    deleteHelpArticleConfirm: string
+    helpArticleCreated: string
+    helpArticleUpdated: string
+    helpArticleDeleted: string
+    deleteFaqConfirm: string
+    faqCreated: string
+    faqUpdated: string
+    faqDeleted: string
+    helpCategoryDetails: string
+    helpArticleDetails: string
+    faqDetails: string
+    helpCategoryIcon: string
     companiesEyebrow: string
     inquiriesCount: string
     citiesEyebrow: string

@@ -7,6 +7,7 @@ import BaseModal from '../../components/ui/BaseModal.vue'
 import BaseButton from '../../components/ui/BaseButton.vue'
 import StatusPill from '../../components/ui/StatusPill.vue'
 import { services } from '../../di/container'
+import { confirmService } from '../../infrastructure/feedback/confirm.service'
 import { toastService } from '../../infrastructure/feedback/toast.service'
 import { t } from '../../i18n'
 import type {
@@ -173,6 +174,27 @@ const submit = async () => {
   }
 }
 
+// --- Delete ---
+const deletePendingId = ref<string | null>(null)
+
+const confirmDeletePage = async (p: LandingPageDto) => {
+  const ok = await confirmService.confirmDelete(
+    `${t('admin.deletePageConfirm')}\n${p.heroTitle} (/${p.slug})`,
+    t('common.delete'),
+  )
+  if (!ok) return
+  deletePendingId.value = p.id
+  try {
+    await services.contentRepository.deleteLandingPage(p.id)
+    toastService.success(t('admin.pageDeleted'))
+    await load()
+  } catch (e) {
+    toastService.error(e instanceof Error ? e.message : t('common.error'))
+  } finally {
+    deletePendingId.value = null
+  }
+}
+
 // --- Details ---
 const showDetailsModal = ref(false)
 const selectedPage = ref<LandingPageDto | null>(null)
@@ -295,6 +317,16 @@ onMounted(load)
                         @click="openEdit(p)"
                       >
                         <span class="material-symbols-outlined text-[18px]">edit</span>
+                      </button>
+                      <button
+                        type="button"
+                        class="row-action-btn row-action-btn--danger"
+                        :title="t('common.delete')"
+                        :aria-label="t('common.delete')"
+                        :disabled="deletePendingId === p.id"
+                        @click="confirmDeletePage(p)"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">delete</span>
                       </button>
                     </div>
                   </td>
@@ -665,6 +697,16 @@ onMounted(load)
 .row-action-btn:hover {
   color: #4f46e5;
   border-color: #4f46e5;
+}
+
+.row-action-btn--danger:hover {
+  color: #dc2626;
+  border-color: #dc2626;
+}
+
+.row-action-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 .modal-form {

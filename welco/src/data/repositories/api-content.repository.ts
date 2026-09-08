@@ -83,6 +83,10 @@ export class ApiContentRepository implements ContentRepository {
     return await this.http.put<LandingPageDto>(CONTENT_ROUTES.landingPageById(id), { id, ...payload })
   }
 
+  async deleteLandingPage(id: string): Promise<void> {
+    await this.http.del<void>(CONTENT_ROUTES.landingPageById(id))
+  }
+
   async getHelpCategories(): Promise<HelpCategoryDto[]> {
     try {
       const raw = await this.http.get<unknown>(CONTENT_ROUTES.helpCategories, { showFeedback: false })

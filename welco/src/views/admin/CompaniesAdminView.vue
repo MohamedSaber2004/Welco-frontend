@@ -4,12 +4,19 @@ import { useRoute, useRouter } from 'vue-router'
 import AdminLayout from '../../components/layout/AdminLayout.vue'
 import DataState from '../../components/ui/DataState.vue'
 import AppPagination from '../../components/ui/AppPagination.vue'
-import { companyRepository, companyService } from '../../di/container'
+import { companyRepository, companyService, locationService } from '../../di/container'
+import BaseModal from '../../components/ui/BaseModal.vue'
+import BaseButton from '../../components/ui/BaseButton.vue'
 import { confirmService } from '../../infrastructure/feedback/confirm.service'
 import { toastService } from '../../infrastructure/feedback/toast.service'
 import { t, locale } from '../../i18n'
-import { COMPANY_TYPE_LABEL } from '../../domain/models/company'
-import type { CompanyDto, DistributorApplicationDto } from '../../domain/models/company'
+import { COMPANY_TYPE_LABEL, CompanyStatus, CompanyType } from '../../domain/models/company'
+import type {
+  CompanyDto,
+  CreateCompanyPayload,
+  UpdateCompanyPayload,
+  DistributorApplicationDto,
+} from '../../domain/models/company'
 
 const route = useRoute()
 const router = useRouter()
@@ -59,6 +66,151 @@ const loadCompanies = async () => {
     loadingCompanies.value = false
   }
 }
+
+// --- Company Add / Edit / Delete / Details ---
+const showCompanyModal = ref(false)
+const editingCompany = ref<CompanyDto | null>(null)
+const companyFormLoading = ref(false)
+const companyFormError = ref('')
+const companyActionPendingId = ref<string | null>(null)
+
+const companyForm = ref({
+  name: '',
+  email: '',
+  type: CompanyType.Distributor as CompanyType,
+  countryId: '',
+  tierLevel: 1,
+  status: CompanyStatus.Pending as CompanyStatus,
+  isActive: true,
+})
+
+const openCreateCompany = () => {
+  editingCompany.value = null
+  companyForm.value = {
+    name: '',
+    email: '',
+    type: CompanyType.Distributor,
+    countryId: '',
+    tierLevel: 1,
+    status: CompanyStatus.Pending,
+    isActive: true,
+  }
+  companyFormError.value = ''
+  showCompanyModal.value = true
+}
+
+const openEditCompany = (c: CompanyDto) => {
+  editingCompany.value = c
+  companyForm.value = {
+    name: c.name ?? '',
+    email: c.email ?? '',
+    type: c.type,
+    countryId: c.countryId ?? '',
+    tierLevel: c.tierLevel ?? 1,
+    status: c.status,
+    isActive: c.isActive ?? true,
+  }
+  companyFormError.value = ''
+  showCompanyModal.value = true
+}
+
+const closeCompanyForm = () => {
+  showCompanyModal.value = false
+  companyFormError.value = ''
+}
+
+const submitCompanyForm = async () => {
+  const f = companyForm.value
+  if (!f.name.trim()) {
+    companyFormError.value = t('admin.companyName')
+    return
+  }
+  if (!f.countryId) {
+    companyFormError.value = t('admin.errCountry')
+    return
+  }
+  companyFormLoading.value = true
+  companyFormError.value = ''
+  try {
+    if (editingCompany.value) {
+      const payload: UpdateCompanyPayload = {
+        name: f.name.trim(),
+        email: f.email.trim() || null,
+        type: f.type,
+        countryId: f.countryId,
+        tierLevel: Number(f.tierLevel) || 1,
+        status: f.status,
+        accountManagerId: editingCompany.value.accountManagerId ?? null,
+        isActive: f.isActive,
+      }
+      await companyRepository.updateCompany(editingCompany.value.id, payload)
+      toastService.success(t('admin.companyUpdated'))
+    } else {
+      const payload: CreateCompanyPayload = {
+        name: f.name.trim(),
+        email: f.email.trim() || null,
+        type: f.type,
+        countryId: f.countryId,
+        tierLevel: Number(f.tierLevel) || 1,
+        status: f.status,
+      }
+      await companyRepository.createCompany(payload)
+      toastService.success(t('admin.companyCreated'))
+    }
+    closeCompanyForm()
+    await loadCompanies()
+  } catch (e) {
+    companyFormError.value = e instanceof Error ? e.message : t('common.error')
+  } finally {
+    companyFormLoading.value = false
+  }
+}
+
+const confirmDeleteCompany = async (c: CompanyDto) => {
+  const ok = await confirmService.confirmDelete(
+    `${t('admin.deleteCompanyConfirm')}\n${c.name}`,
+    t('common.delete'),
+  )
+  if (!ok) return
+  companyActionPendingId.value = c.id
+  try {
+    await companyRepository.deleteCompany(c.id)
+    toastService.success(t('admin.companyDeleted'))
+    await loadCompanies()
+  } catch (e) {
+    toastService.error(e instanceof Error ? e.message : t('common.error'))
+  } finally {
+    companyActionPendingId.value = null
+  }
+}
+
+const showCompanyDetails = ref(false)
+const selectedCompany = ref<CompanyDto | null>(null)
+
+const openCompanyDetails = (c: CompanyDto) => {
+  selectedCompany.value = c
+  showCompanyDetails.value = true
+}
+
+const closeCompanyDetails = () => {
+  showCompanyDetails.value = false
+  selectedCompany.value = null
+}
+
+const companyCountryName = (c: CompanyDto): string => {
+  const localizedName = locale.value === 'ar' ? (c.countryNameAr || c.countryNameEn) : (c.countryNameEn || c.countryNameAr)
+  if (localizedName) return localizedName
+  const found = locationService.countries.value.find((x) => x.id === c.countryId)
+  if (!found) return '—'
+  return locale.value === 'ar' ? (found.nameAr || found.nameEn) : (found.nameEn || found.nameAr)
+}
+
+const companyStatusLabel = (c: CompanyDto): string =>
+  c.status === CompanyStatus.Approved
+    ? t('common.verified')
+    : c.status === CompanyStatus.Rejected
+      ? t('sales.statusDeclined')
+      : t('common.pending')
 
 const applications = ref<DistributorApplicationDto[]>([])
 const loadingApplications = ref(false)
@@ -171,6 +323,9 @@ const setTab = (tab: 'companies' | 'applications') => {
 onMounted(() => {
   void loadCompanies()
   void loadApplications()
+  if (!locationService.countries.value.length) {
+    void locationService.loadCountries().catch(() => {})
+  }
 })
 
 const isPending = (status: string | number) => {
@@ -244,6 +399,10 @@ watch([applicationSearch, statusFilter], () => {
               class="toolbar-input"
             />
           </div>
+          <BaseButton variant="primary" @click="openCreateCompany">
+            <span class="material-symbols-outlined text-[18px]">add</span>
+            <span>{{ t('admin.newCompany') }}</span>
+          </BaseButton>
           <span class="mono counter-text">{{ filteredCompanies.length }} {{ t('common.of') }} {{ companyTotalCount }} {{ t('admin.companies') }}</span>
         </div>
 
@@ -267,6 +426,7 @@ watch([applicationSearch, statusFilter], () => {
                     <th>{{ t('admin.companyType') }}</th>
                     <th>{{ t('distributor.country') }}</th>
                     <th class="text-end">{{ t('commerce.status') }}</th>
+                    <th class="text-end">{{ t('common.actions') }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -291,6 +451,38 @@ watch([applicationSearch, statusFilter], () => {
                         <span>{{ c.status === 2 ? t('common.verified') : c.status === 3 ? t('sales.statusDeclined') : t('common.pending') }}</span>
                       </span>
                     </td>
+                    <td>
+                      <div class="row-actions">
+                        <button
+                          type="button"
+                          class="row-action-btn"
+                          :title="t('admin.viewDetails')"
+                          :aria-label="t('admin.viewDetails')"
+                          @click="openCompanyDetails(c)"
+                        >
+                          <span class="material-symbols-outlined text-[18px]">visibility</span>
+                        </button>
+                        <button
+                          type="button"
+                          class="row-action-btn"
+                          :title="t('common.edit')"
+                          :aria-label="t('common.edit')"
+                          @click="openEditCompany(c)"
+                        >
+                          <span class="material-symbols-outlined text-[18px]">edit</span>
+                        </button>
+                        <button
+                          type="button"
+                          class="row-action-btn row-action-btn--danger"
+                          :title="t('common.delete')"
+                          :aria-label="t('common.delete')"
+                          :disabled="companyActionPendingId === c.id"
+                          @click="confirmDeleteCompany(c)"
+                        >
+                          <span class="material-symbols-outlined text-[18px]">delete</span>
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -307,6 +499,7 @@ watch([applicationSearch, statusFilter], () => {
           </div>
         </DataState>
       </div>
+
 
       <!-- TAB 2: Applications -->
       <div v-else-if="activeTab === 'applications'" class="tab-content">
@@ -455,6 +648,129 @@ watch([applicationSearch, statusFilter], () => {
         </DataState>
       </div>
     </div>
+
+      <!-- Add / Edit Company Modal -->
+      <BaseModal
+        v-model="showCompanyModal"
+        :title="editingCompany ? t('admin.editCompany') : t('admin.newCompany')"
+        max-width="640px"
+        @close="closeCompanyForm"
+      >
+        <form class="admin-modal-form" @submit.prevent="submitCompanyForm">
+          <div class="form-row two-cols">
+            <div class="form-field">
+              <label class="field-label" for="company-name">{{ t('admin.companyName') }} *</label>
+              <input id="company-name" v-model="companyForm.name" type="text" class="field-input" required />
+            </div>
+            <div class="form-field">
+              <label class="field-label" for="company-email">{{ t('admin.companyEmail') }}</label>
+              <input id="company-email" v-model="companyForm.email" type="email" class="field-input mono" />
+            </div>
+          </div>
+          <div class="form-row two-cols">
+            <div class="form-field">
+              <label class="field-label" for="company-type">{{ t('admin.companyType') }} *</label>
+              <select id="company-type" v-model="companyForm.type" class="field-select">
+                <option :value="CompanyType.Hospital">{{ COMPANY_TYPE_LABEL[CompanyType.Hospital] }}</option>
+                <option :value="CompanyType.Distributor">{{ COMPANY_TYPE_LABEL[CompanyType.Distributor] }}</option>
+                <option :value="CompanyType.Clinic">{{ COMPANY_TYPE_LABEL[CompanyType.Clinic] }}</option>
+                <option :value="CompanyType.Importer">{{ COMPANY_TYPE_LABEL[CompanyType.Importer] }}</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label class="field-label" for="company-country">{{ t('distributor.country') }} *</label>
+              <select id="company-country" v-model="companyForm.countryId" class="field-select" required>
+                <option value="" disabled>{{ t('distributor.country') }}</option>
+                <option v-for="co in locationService.countries.value" :key="co.id" :value="co.id">
+                  {{ locale === 'ar' ? (co.nameAr || co.nameEn) : (co.nameEn || co.nameAr) }}
+                </option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row two-cols">
+            <div class="form-field">
+              <label class="field-label" for="company-tier">{{ t('admin.companyTier') }}</label>
+              <select id="company-tier" v-model.number="companyForm.tierLevel" class="field-select">
+                <option :value="1">1</option>
+                <option :value="2">2</option>
+                <option :value="3">3</option>
+                <option :value="4">4</option>
+                <option :value="5">5</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label class="field-label" for="company-status">{{ t('commerce.status') }} *</label>
+              <select id="company-status" v-model="companyForm.status" class="field-select">
+                <option :value="CompanyStatus.Pending">{{ t('common.pending') }}</option>
+                <option :value="CompanyStatus.Approved">{{ t('common.verified') }}</option>
+                <option :value="CompanyStatus.Rejected">{{ t('sales.statusDeclined') }}</option>
+              </select>
+            </div>
+          </div>
+          <div v-if="editingCompany" class="form-field">
+            <label class="toggle-label">
+              <input v-model="companyForm.isActive" type="checkbox" />
+              <span>{{ t('admin.active') }}</span>
+            </label>
+          </div>
+
+          <p v-if="companyFormError" class="form-error" role="alert">{{ companyFormError }}</p>
+
+          <div class="modal-foot">
+            <BaseButton variant="secondary" type="button" @click="closeCompanyForm">
+              {{ t('common.cancel') }}
+            </BaseButton>
+            <BaseButton variant="primary" type="submit" :loading="companyFormLoading">
+              {{ t('common.save') }}
+            </BaseButton>
+          </div>
+        </form>
+      </BaseModal>
+
+      <!-- Company Details Modal -->
+      <BaseModal
+        v-model="showCompanyDetails"
+        :title="t('admin.companyDetails')"
+        max-width="560px"
+        @close="closeCompanyDetails"
+      >
+        <div v-if="selectedCompany" class="admin-details">
+          <div class="details-grid">
+            <div class="detail-item">
+              <span class="detail-k mono">{{ t('admin.companyName') }}</span>
+              <strong class="detail-v">{{ selectedCompany.name }}</strong>
+            </div>
+            <div class="detail-item">
+              <span class="detail-k mono">{{ t('admin.companyEmail') }}</span>
+              <strong class="detail-v mono">{{ selectedCompany.email || '—' }}</strong>
+            </div>
+            <div class="detail-item">
+              <span class="detail-k mono">{{ t('admin.companyType') }}</span>
+              <strong class="detail-v">{{ COMPANY_TYPE_LABEL[selectedCompany.type] ?? selectedCompany.type }}</strong>
+            </div>
+            <div class="detail-item">
+              <span class="detail-k mono">{{ t('distributor.country') }}</span>
+              <strong class="detail-v">{{ companyCountryName(selectedCompany) }}</strong>
+            </div>
+            <div class="detail-item">
+              <span class="detail-k mono">{{ t('admin.companyTier') }}</span>
+              <strong class="detail-v mono">{{ selectedCompany.tierLevel }}</strong>
+            </div>
+            <div class="detail-item">
+              <span class="detail-k mono">{{ t('commerce.status') }}</span>
+              <strong class="detail-v">{{ companyStatusLabel(selectedCompany) }}</strong>
+            </div>
+          </div>
+          <div class="modal-foot">
+            <BaseButton variant="secondary" @click="selectedCompany && openEditCompany(selectedCompany)">
+              {{ t('common.edit') }}
+            </BaseButton>
+            <BaseButton variant="secondary" @click="closeCompanyDetails">
+              {{ t('common.close') }}
+            </BaseButton>
+          </div>
+        </div>
+      </BaseModal>
   </AdminLayout>
 </template>
 

@@ -3,7 +3,11 @@ import { onMounted, ref, computed, watch } from 'vue'
 import AdminLayout from '../../components/layout/AdminLayout.vue'
 import DataState from '../../components/ui/DataState.vue'
 import AppPagination from '../../components/ui/AppPagination.vue'
+import BaseModal from '../../components/ui/BaseModal.vue'
+import BaseButton from '../../components/ui/BaseButton.vue'
 import { locationRepository } from '../../di/container'
+import { confirmService } from '../../infrastructure/feedback/confirm.service'
+import { toastService } from '../../infrastructure/feedback/toast.service'
 import { t, locale } from '../../i18n'
 import type { CityDto, CountryDto } from '../../domain/models/location'
 
@@ -67,6 +71,102 @@ const getCountryName = (countryId: string) => {
   if (!co) return '—'
   return localized(co.nameEn, co.nameAr)
 }
+
+// --- Add / Edit / Delete / Details ---
+const showFormModal = ref(false)
+const editingCity = ref<CityDto | null>(null)
+const formLoading = ref(false)
+const formError = ref('')
+const actionPendingId = ref<string | null>(null)
+
+const form = ref({ nameEn: '', nameAr: '', countryId: '' })
+
+const openCreate = () => {
+  editingCity.value = null
+  form.value = { nameEn: '', nameAr: '', countryId: filterCountry.value || '' }
+  formError.value = ''
+  showFormModal.value = true
+}
+
+const openEdit = (c: CityDto) => {
+  editingCity.value = c
+  form.value = { nameEn: c.nameEn ?? '', nameAr: c.nameAr ?? '', countryId: c.countryId ?? '' }
+  formError.value = ''
+  showFormModal.value = true
+}
+
+const closeForm = () => {
+  showFormModal.value = false
+  formError.value = ''
+}
+
+const submitForm = async () => {
+  const f = form.value
+  if (!f.nameEn.trim() || !f.nameAr.trim()) {
+    formError.value = t('admin.errBothNames')
+    return
+  }
+  if (!f.countryId) {
+    formError.value = t('admin.errCountry')
+    return
+  }
+  formLoading.value = true
+  formError.value = ''
+  try {
+    if (editingCity.value) {
+      await locationRepository.updateCity(editingCity.value.id, {
+        nameEn: f.nameEn.trim(),
+        nameAr: f.nameAr.trim(),
+        countryId: f.countryId,
+      })
+      toastService.success(t('admin.cityUpdated'))
+    } else {
+      await locationRepository.createCity({
+        nameEn: f.nameEn.trim(),
+        nameAr: f.nameAr.trim(),
+        countryId: f.countryId,
+      })
+      toastService.success(t('admin.cityCreated'))
+    }
+    closeForm()
+    await load()
+  } catch (e) {
+    formError.value = e instanceof Error ? e.message : t('common.error')
+  } finally {
+    formLoading.value = false
+  }
+}
+
+const confirmDelete = async (c: CityDto) => {
+  const ok = await confirmService.confirmDelete(
+    `${t('admin.deleteCityConfirm')}\n${c.nameEn}`,
+    t('common.delete'),
+  )
+  if (!ok) return
+  actionPendingId.value = c.id
+  try {
+    await locationRepository.deleteCity(c.id)
+    toastService.success(t('admin.cityDeleted'))
+    await load()
+  } catch (e) {
+    toastService.error(e instanceof Error ? e.message : t('common.error'))
+  } finally {
+    actionPendingId.value = null
+  }
+}
+
+const showDetailsModal = ref(false)
+const selectedCity = ref<CityDto | null>(null)
+
+const openDetails = (c: CityDto) => {
+  selectedCity.value = c
+  showDetailsModal.value = true
+}
+
+const closeDetails = () => {
+  showDetailsModal.value = false
+  selectedCity.value = null
+}
 </script>
 
 <template>
@@ -82,6 +182,10 @@ const getCountryName = (countryId: string) => {
           <h1 class="head-title">{{ t('admin.cities') }}</h1>
           <p class="head-subtitle">{{ t('admin.citiesDesc') }}</p>
         </div>
+        <BaseButton variant="primary" @click="openCreate">
+          <span class="material-symbols-outlined text-[18px]">add</span>
+          <span>{{ t('admin.newCity') }}</span>
+        </BaseButton>
       </header>
 
       <!-- 44px Search & Filter Toolbar -->
@@ -130,6 +234,8 @@ const getCountryName = (countryId: string) => {
                   <th><span class="mono">EN</span> {{ t('admin.nameEn') }}</th>
                   <th><span class="mono">AR</span> {{ t('admin.nameAr') }}</th>
                   <th>{{ t('distributor.country') }}</th>
+                  <th>{{ t('commerce.status') }}</th>
+                  <th class="text-end">{{ t('common.actions') }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -143,6 +249,47 @@ const getCountryName = (countryId: string) => {
                   <td class="arabic-name">{{ c.nameAr }}</td>
                   <td>
                     <span class="country-pill mono">{{ getCountryName(c.countryId) }}</span>
+                  </td>
+                  <td>
+                    <span
+                      class="status-dot-badge mono"
+                      :class="(c.isActive ?? true) ? 'status-dot-badge--active' : 'status-dot-badge--inactive'"
+                    >
+                      <span class="dot"></span>
+                      <span>{{ (c.isActive ?? true) ? t('admin.active') : t('admin.inactive') }}</span>
+                    </span>
+                  </td>
+                  <td>
+                    <div class="row-actions">
+                      <button
+                        type="button"
+                        class="row-action-btn"
+                        :title="t('admin.viewDetails')"
+                        :aria-label="t('admin.viewDetails')"
+                        @click="openDetails(c)"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">visibility</span>
+                      </button>
+                      <button
+                        type="button"
+                        class="row-action-btn"
+                        :title="t('common.edit')"
+                        :aria-label="t('common.edit')"
+                        @click="openEdit(c)"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">edit</span>
+                      </button>
+                      <button
+                        type="button"
+                        class="row-action-btn row-action-btn--danger"
+                        :title="t('common.delete')"
+                        :aria-label="t('common.delete')"
+                        :disabled="actionPendingId === c.id"
+                        @click="confirmDelete(c)"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">delete</span>
+                      </button>
+                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -158,6 +305,84 @@ const getCountryName = (countryId: string) => {
           />
         </div>
       </DataState>
+
+      <!-- Add / Edit Modal -->
+      <BaseModal
+        v-model="showFormModal"
+        :title="editingCity ? t('admin.editCity') : t('admin.newCity')"
+        max-width="560px"
+        @close="closeForm"
+      >
+        <form class="admin-modal-form" @submit.prevent="submitForm">
+          <div class="form-row two-cols">
+            <div class="form-field">
+              <label class="field-label" for="city-name-en">{{ t('admin.nameEn') }} *</label>
+              <input id="city-name-en" v-model="form.nameEn" type="text" class="field-input" required />
+            </div>
+            <div class="form-field">
+              <label class="field-label" for="city-name-ar">{{ t('admin.nameAr') }} *</label>
+              <input id="city-name-ar" v-model="form.nameAr" type="text" class="field-input" required />
+            </div>
+          </div>
+          <div class="form-field">
+            <label class="field-label" for="city-country">{{ t('distributor.country') }} *</label>
+            <select id="city-country" v-model="form.countryId" class="field-select" required>
+              <option value="" disabled>{{ t('distributor.country') }}</option>
+              <option v-for="co in countries" :key="co.id" :value="co.id">
+                {{ localized(co.nameEn, co.nameAr) }}
+              </option>
+            </select>
+          </div>
+
+          <p v-if="formError" class="form-error" role="alert">{{ formError }}</p>
+
+          <div class="modal-foot">
+            <BaseButton variant="secondary" type="button" @click="closeForm">
+              {{ t('common.cancel') }}
+            </BaseButton>
+            <BaseButton variant="primary" type="submit" :loading="formLoading">
+              {{ t('common.save') }}
+            </BaseButton>
+          </div>
+        </form>
+      </BaseModal>
+
+      <!-- Details Modal -->
+      <BaseModal
+        v-model="showDetailsModal"
+        :title="t('admin.cityDetails')"
+        max-width="520px"
+        @close="closeDetails"
+      >
+        <div v-if="selectedCity" class="admin-details">
+          <div class="details-grid">
+            <div class="detail-item">
+              <span class="detail-k mono">EN</span>
+              <strong class="detail-v">{{ selectedCity.nameEn }}</strong>
+            </div>
+            <div class="detail-item">
+              <span class="detail-k mono">AR</span>
+              <strong class="detail-v">{{ selectedCity.nameAr }}</strong>
+            </div>
+            <div class="detail-item">
+              <span class="detail-k mono">{{ t('distributor.country') }}</span>
+              <strong class="detail-v">{{ getCountryName(selectedCity.countryId) }}</strong>
+            </div>
+            <div class="detail-item">
+              <span class="detail-k mono">{{ t('commerce.status') }}</span>
+              <strong class="detail-v">{{ (selectedCity.isActive ?? true) ? t('admin.active') : t('admin.inactive') }}</strong>
+            </div>
+          </div>
+          <div class="modal-foot">
+            <BaseButton variant="secondary" @click="selectedCity && openEdit(selectedCity)">
+              {{ t('common.edit') }}
+            </BaseButton>
+            <BaseButton variant="secondary" @click="closeDetails">
+              {{ t('common.close') }}
+            </BaseButton>
+          </div>
+        </div>
+      </BaseModal>
     </div>
   </AdminLayout>
 </template>

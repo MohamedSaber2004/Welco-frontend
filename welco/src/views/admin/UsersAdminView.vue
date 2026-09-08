@@ -1,12 +1,18 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import AdminLayout from '../../components/layout/AdminLayout.vue'
 import DataState from '../../components/ui/DataState.vue'
 import AppPagination from '../../components/ui/AppPagination.vue'
+import BaseModal from '../../components/ui/BaseModal.vue'
+import BaseButton from '../../components/ui/BaseButton.vue'
+import FileUpload from '../../components/ui/FileUpload.vue'
 import { useUsers } from '../../composables/useUsers'
 import { t } from '../../i18n'
 import { UserType, USER_TYPE_ROLE_KEY } from '../../domain/models/user'
-import { locationService } from '../../di/container'
+import type { UserDto } from '../../domain/models/user'
+import { locationService, userRepository } from '../../di/container'
+import { ATTACHMENT_PLACE, MEDIA_TYPE } from '../../config/api.config'
+import { toastService } from '../../infrastructure/feedback/toast.service'
 import { resolveFileUrl, PLACEHOLDER } from '../../utils/file-url'
 import { resolvePhoneDetails } from '../../utils/phone'
 
@@ -20,7 +26,76 @@ const {
   error,
   load,
   onSearch,
+  showForm,
+  editing,
+  form,
+  formLoading,
+  formError,
+  openCreate,
+  openEdit,
+  closeForm,
+  handleSubmit,
+  handleDelete,
 } = useUsers()
+
+// --- Details modal ---
+const showDetailsModal = ref(false)
+const selectedUser = ref<UserDto | null>(null)
+
+const openDetails = (u: UserDto) => {
+  selectedUser.value = u
+  showDetailsModal.value = true
+}
+
+const closeDetails = () => {
+  showDetailsModal.value = false
+  selectedUser.value = null
+}
+
+// --- Change password modal ---
+const showPasswordModal = ref(false)
+const passwordTarget = ref<UserDto | null>(null)
+const newPassword = ref('')
+const confirmPassword = ref('')
+const passwordError = ref('')
+const passwordLoading = ref(false)
+
+const openPasswordModal = (u: UserDto) => {
+  passwordTarget.value = u
+  newPassword.value = ''
+  confirmPassword.value = ''
+  passwordError.value = ''
+  showPasswordModal.value = true
+}
+
+const closePasswordModal = () => {
+  showPasswordModal.value = false
+  passwordTarget.value = null
+  passwordError.value = ''
+}
+
+const submitPassword = async () => {
+  if (!passwordTarget.value) return
+  if (newPassword.value.length < 8) {
+    passwordError.value = t('auth.errPasswordMin')
+    return
+  }
+  if (newPassword.value !== confirmPassword.value) {
+    passwordError.value = t('auth.errPasswordMismatch')
+    return
+  }
+  passwordLoading.value = true
+  passwordError.value = ''
+  try {
+    await userRepository.changePassword(passwordTarget.value.id, newPassword.value)
+    toastService.success(t('admin.updateSuccess'))
+    closePasswordModal()
+  } catch (e) {
+    passwordError.value = e instanceof Error ? e.message : t('common.error')
+  } finally {
+    passwordLoading.value = false
+  }
+}
 
 const getAvatarColor = (name?: string): string => {
   const colors = ['#4F46E5', '#0D9488', '#0284C7', '#7C3AED', '#D97706', '#E11D48']
@@ -55,6 +130,10 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
           <h1 class="head-title">{{ t('admin.users') }}</h1>
           <p class="head-subtitle">{{ t('admin.usersDesc') }}</p>
         </div>
+        <BaseButton variant="primary" @click="openCreate">
+          <span class="material-symbols-outlined text-[18px]">add</span>
+          <span>{{ t('admin.createUser') }}</span>
+        </BaseButton>
       </header>
 
       <!-- 44px Search & Counts Toolbar -->
@@ -93,6 +172,7 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
                   <th>{{ t('admin.email') }}</th>
                   <th>{{ t('admin.userType') }}</th>
                   <th>{{ t('commerce.status') }}</th>
+                  <th class="text-end">{{ t('common.actions') }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -159,6 +239,37 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
                       <span>{{ u.isActive ? t('admin.active') : t('admin.inactive') }}</span>
                     </span>
                   </td>
+                  <td>
+                    <div class="row-actions">
+                      <button
+                        type="button"
+                        class="row-action-btn"
+                        :title="t('admin.viewDetails')"
+                        :aria-label="t('admin.viewDetails')"
+                        @click="openDetails(u)"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">visibility</span>
+                      </button>
+                      <button
+                        type="button"
+                        class="row-action-btn"
+                        :title="t('common.edit')"
+                        :aria-label="t('common.edit')"
+                        @click="openEdit(u)"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">edit</span>
+                      </button>
+                      <button
+                        type="button"
+                        class="row-action-btn row-action-btn--danger"
+                        :title="t('common.delete')"
+                        :aria-label="t('common.delete')"
+                        @click="handleDelete(u)"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">delete</span>
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -174,6 +285,206 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
           />
         </div>
       </DataState>
+
+      <!-- Add / Edit Modal -->
+      <BaseModal
+        v-model="showForm"
+        :title="editing ? t('admin.editUser') : t('admin.createUser')"
+        max-width="600px"
+        @close="closeForm"
+      >
+        <form class="admin-modal-form" @submit.prevent="handleSubmit">
+          <div class="form-field">
+            <FileUpload
+              :model-value="form.profilePictureName"
+              :place="ATTACHMENT_PLACE.USERS"
+              :file-type="MEDIA_TYPE.IMAGE"
+              accept="image/*"
+              :label="t('admin.userAvatar')"
+              @update:modelValue="form.profilePictureName = $event"
+            />
+          </div>
+          <div class="form-row two-cols">
+            <div class="form-field">
+              <label class="field-label" for="user-fullname">{{ t('admin.userFullName') }} *</label>
+              <input id="user-fullname" v-model="form.fullName" type="text" class="field-input" required />
+            </div>
+            <div class="form-field">
+              <label class="field-label" for="user-email">{{ t('admin.email') }} *</label>
+              <input
+                id="user-email"
+                v-model="form.email"
+                type="email"
+                class="field-input mono"
+                required
+                :disabled="!!editing"
+              />
+            </div>
+          </div>
+          <div class="form-row two-cols">
+            <div class="form-field">
+              <label class="field-label" for="user-phone">{{ t('admin.phone') }}</label>
+              <input id="user-phone" v-model="form.phoneNumber" type="tel" class="field-input mono" />
+            </div>
+            <div class="form-field">
+              <label class="field-label" for="user-role">{{ t('admin.userType') }} *</label>
+              <select id="user-role" v-model="form.userType" class="field-select">
+                <option :value="UserType.Admin">{{ t('admin.roleAdmin') }}</option>
+                <option :value="UserType.WelcoStaff">{{ t('admin.roleWelcoStaff') }}</option>
+                <option :value="UserType.OrganizationUser">{{ t('admin.roleOrganizationUser') }}</option>
+              </select>
+            </div>
+          </div>
+          <div v-if="!editing" class="form-field">
+            <label class="field-label" for="user-password">{{ t('admin.userPassword') }} *</label>
+            <input
+              id="user-password"
+              v-model="form.password"
+              type="password"
+              class="field-input mono"
+              minlength="8"
+              autocomplete="new-password"
+            />
+          </div>
+          <div class="form-field">
+            <label class="toggle-label">
+              <input v-model="form.isActive" type="checkbox" />
+              <span>{{ t('admin.active') }}</span>
+            </label>
+          </div>
+
+          <p v-if="formError" class="form-error" role="alert">{{ formError }}</p>
+
+          <div class="modal-foot">
+            <BaseButton variant="secondary" type="button" @click="closeForm">
+              {{ t('common.cancel') }}
+            </BaseButton>
+            <BaseButton variant="primary" type="submit" :loading="formLoading">
+              {{ t('common.save') }}
+            </BaseButton>
+          </div>
+        </form>
+      </BaseModal>
+
+      <!-- Details Modal -->
+      <BaseModal
+        v-model="showDetailsModal"
+        :title="t('admin.userDetails')"
+        max-width="560px"
+        @close="closeDetails"
+      >
+        <div v-if="selectedUser" class="admin-details">
+          <div class="user-details-hero">
+            <div class="user-avatar-wrap user-avatar-wrap--lg">
+              <img
+                v-if="selectedUser.profilePictureName"
+                :src="resolveFileUrl(selectedUser.profilePictureName, PLACEHOLDER)"
+                :alt="selectedUser.fullName"
+                class="user-avatar-img"
+              />
+              <div
+                v-else
+                class="user-avatar-fallback mono"
+                :style="{ backgroundColor: getAvatarColor(selectedUser.fullName) }"
+              >
+                {{ (selectedUser.fullName || 'U').slice(0, 2).toUpperCase() }}
+              </div>
+            </div>
+            <div>
+              <strong class="user-details-name">{{ selectedUser.fullName }}</strong>
+              <div class="mono text-xs text-slate-600">{{ selectedUser.email }}</div>
+              <div class="user-details-badges">
+                <span
+                  class="role-pill mono"
+                  :class="{
+                    'role-pill--admin': selectedUser.userType === UserType.Admin,
+                    'role-pill--staff': selectedUser.userType === UserType.WelcoStaff,
+                    'role-pill--org': selectedUser.userType === UserType.OrganizationUser,
+                  }"
+                >
+                  {{ t(`admin.${USER_TYPE_ROLE_KEY(selectedUser.userType)}`) }}
+                </span>
+                <span
+                  class="status-dot-badge mono"
+                  :class="selectedUser.isActive ? 'status-dot-badge--active' : 'status-dot-badge--inactive'"
+                >
+                  <span class="dot"></span>
+                  <span>{{ selectedUser.isActive ? t('admin.active') : t('admin.inactive') }}</span>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="details-grid">
+            <div class="detail-item">
+              <span class="detail-k mono">{{ t('admin.phone') }}</span>
+              <strong class="detail-v mono">{{ selectedUser.phoneNumber || '—' }}</strong>
+            </div>
+            <div class="detail-item">
+              <span class="detail-k mono">{{ t('admin.email') }}</span>
+              <strong class="detail-v mono">{{ selectedUser.isEmailConfirmed ? t('common.verified') : t('common.pending') }}</strong>
+            </div>
+          </div>
+          <div class="modal-foot modal-foot--split">
+            <BaseButton variant="secondary" @click="selectedUser && openPasswordModal(selectedUser)">
+              <span class="material-symbols-outlined text-[16px]">key</span>
+              <span>{{ t('admin.changeUserPassword') }}</span>
+            </BaseButton>
+            <div class="modal-foot__group">
+              <BaseButton variant="secondary" @click="selectedUser && openEdit(selectedUser)">
+                {{ t('common.edit') }}
+              </BaseButton>
+              <BaseButton variant="secondary" @click="closeDetails">
+                {{ t('common.close') }}
+              </BaseButton>
+            </div>
+          </div>
+        </div>
+      </BaseModal>
+
+      <!-- Change Password Modal -->
+      <BaseModal
+        v-model="showPasswordModal"
+        :title="t('admin.changeUserPassword')"
+        max-width="440px"
+        @close="closePasswordModal"
+      >
+        <form class="admin-modal-form" @submit.prevent="submitPassword">
+          <div class="form-field">
+            <label class="field-label" for="new-password">{{ t('admin.userPassword') }} *</label>
+            <input
+              id="new-password"
+              v-model="newPassword"
+              type="password"
+              class="field-input mono"
+              minlength="8"
+              autocomplete="new-password"
+              required
+            />
+          </div>
+          <div class="form-field">
+            <label class="field-label" for="confirm-password">{{ t('auth.confirmNewPassword') }}</label>
+            <input
+              id="confirm-password"
+              v-model="confirmPassword"
+              type="password"
+              class="field-input mono"
+              autocomplete="new-password"
+              required
+            />
+          </div>
+
+          <p v-if="passwordError" class="form-error" role="alert">{{ passwordError }}</p>
+
+          <div class="modal-foot">
+            <BaseButton variant="secondary" type="button" @click="closePasswordModal">
+              {{ t('common.cancel') }}
+            </BaseButton>
+            <BaseButton variant="primary" type="submit" :loading="passwordLoading">
+              {{ t('common.save') }}
+            </BaseButton>
+          </div>
+        </form>
+      </BaseModal>
     </div>
   </AdminLayout>
 </template>
@@ -456,4 +767,36 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
   color: #64748B;
 }
 .status-dot-badge--inactive .dot { background: #94A3B8; }
+
+.user-details-hero {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.user-avatar-wrap--lg {
+  width: 64px;
+  height: 64px;
+}
+
+.user-details-name {
+  font-size: 1.1rem;
+  color: #0F172A;
+}
+
+.user-details-badges {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.4rem;
+}
+
+.modal-foot--split {
+  justify-content: space-between;
+}
+
+.modal-foot__group {
+  display: flex;
+  gap: 0.75rem;
+}
 </style>

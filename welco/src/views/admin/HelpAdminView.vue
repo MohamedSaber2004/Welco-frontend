@@ -4,7 +4,12 @@ import { t } from '../../i18n'
 import { contentService } from '../../di/container'
 import AdminLayout from '../../components/layout/AdminLayout.vue'
 import AppPagination from '../../components/ui/AppPagination.vue'
+import BaseModal from '../../components/ui/BaseModal.vue'
+import BaseButton from '../../components/ui/BaseButton.vue'
+import { confirmService } from '../../infrastructure/feedback/confirm.service'
+import { toastService } from '../../infrastructure/feedback/toast.service'
 import { resolveFileUrl, isStoredFileName, PLACEHOLDER } from '../../utils/file-url'
+import type { FaqItemDto, HelpArticleDto, HelpCategoryDto } from '../../domain/models/content'
 
 const activeTab = ref<'categories' | 'articles' | 'faqs'>('categories')
 const loading = ref(true)
@@ -79,6 +84,288 @@ onMounted(async () => {
   await contentService.loadSupport()
   loading.value = false
 })
+
+const slugify = (value: string): string =>
+  value.trim().toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/[\s_]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')
+
+// --- Category Add / Edit / Delete / Details ---
+const showCategoryModal = ref(false)
+const editingCategory = ref<HelpCategoryDto | null>(null)
+const categoryForm = ref({ name: '', icon: '' })
+const categoryFormLoading = ref(false)
+const categoryFormError = ref('')
+const categoryPendingId = ref<string | null>(null)
+
+const openCreateCategory = () => {
+  editingCategory.value = null
+  categoryForm.value = { name: '', icon: '' }
+  categoryFormError.value = ''
+  showCategoryModal.value = true
+}
+
+const openEditCategory = (c: HelpCategoryDto) => {
+  editingCategory.value = c
+  categoryForm.value = { name: c.name ?? '', icon: c.icon ?? '' }
+  categoryFormError.value = ''
+  showCategoryModal.value = true
+}
+
+const closeCategoryForm = () => {
+  showCategoryModal.value = false
+  categoryFormError.value = ''
+}
+
+const submitCategoryForm = async () => {
+  if (!categoryForm.value.name.trim()) {
+    categoryFormError.value = t('help.categoryName')
+    return
+  }
+  categoryFormLoading.value = true
+  categoryFormError.value = ''
+  try {
+    if (editingCategory.value) {
+      await contentService.updateHelpCategory(
+        editingCategory.value.id,
+        categoryForm.value.name.trim(),
+        categoryForm.value.icon.trim() || undefined,
+      )
+      toastService.success(t('admin.helpCategoryUpdated'))
+    } else {
+      await contentService.createHelpCategory(
+        categoryForm.value.name.trim(),
+        categoryForm.value.icon.trim() || undefined,
+      )
+      toastService.success(t('admin.helpCategoryCreated'))
+    }
+    closeCategoryForm()
+  } catch (e) {
+    categoryFormError.value = e instanceof Error ? e.message : t('common.error')
+  } finally {
+    categoryFormLoading.value = false
+  }
+}
+
+const confirmDeleteCategory = async (c: HelpCategoryDto) => {
+  const ok = await confirmService.confirmDelete(
+    `${t('admin.deleteHelpCategoryConfirm')}\n${c.name}`,
+    t('common.delete'),
+  )
+  if (!ok) return
+  categoryPendingId.value = c.id
+  try {
+    await contentService.deleteHelpCategory(c.id)
+    toastService.success(t('admin.helpCategoryDeleted'))
+  } catch (e) {
+    toastService.error(e instanceof Error ? e.message : t('common.error'))
+  } finally {
+    categoryPendingId.value = null
+  }
+}
+
+const showCategoryDetails = ref(false)
+const selectedCategory = ref<HelpCategoryDto | null>(null)
+
+const openCategoryDetails = (c: HelpCategoryDto) => {
+  selectedCategory.value = c
+  showCategoryDetails.value = true
+}
+
+const closeCategoryDetails = () => {
+  showCategoryDetails.value = false
+  selectedCategory.value = null
+}
+
+// --- Article Add / Edit / Delete / Details ---
+const showArticleModal = ref(false)
+const editingArticle = ref<HelpArticleDto | null>(null)
+const articleForm = ref({ categoryId: '', title: '', slug: '', body: '' })
+const articleSlugTouched = ref(false)
+const articleFormLoading = ref(false)
+const articleFormError = ref('')
+const articlePendingId = ref<string | null>(null)
+
+const onArticleTitleInput = () => {
+  if (!articleSlugTouched.value) articleForm.value.slug = slugify(articleForm.value.title)
+}
+
+const openCreateArticle = () => {
+  editingArticle.value = null
+  articleForm.value = { categoryId: '', title: '', slug: '', body: '' }
+  articleSlugTouched.value = false
+  articleFormError.value = ''
+  showArticleModal.value = true
+}
+
+const openEditArticle = (a: HelpArticleDto) => {
+  editingArticle.value = a
+  articleForm.value = {
+    categoryId: a.categoryId ?? '',
+    title: a.title ?? '',
+    slug: a.slug ?? '',
+    body: a.body ?? '',
+  }
+  articleSlugTouched.value = true
+  articleFormError.value = ''
+  showArticleModal.value = true
+}
+
+const closeArticleForm = () => {
+  showArticleModal.value = false
+  articleFormError.value = ''
+}
+
+const articleCategoryName = (categoryId?: string | null): string => {
+  if (!categoryId) return t('help.generalCategory')
+  return categories.value.find((c) => c.id === categoryId)?.name || t('help.generalCategory')
+}
+
+const submitArticleForm = async () => {
+  const f = articleForm.value
+  if (!f.title.trim() || !f.body.trim()) {
+    articleFormError.value = t('help.articleBody')
+    return
+  }
+  if (!f.categoryId) {
+    articleFormError.value = t('help.categories')
+    return
+  }
+  if (!f.slug.trim()) {
+    articleFormError.value = t('admin.pageSlug')
+    return
+  }
+  articleFormLoading.value = true
+  articleFormError.value = ''
+  try {
+    const payload = {
+      categoryId: f.categoryId,
+      title: f.title.trim(),
+      body: f.body.trim(),
+      slug: slugify(f.slug),
+    }
+    if (editingArticle.value) {
+      await contentService.updateHelpArticle(editingArticle.value.id, payload)
+      toastService.success(t('admin.helpArticleUpdated'))
+    } else {
+      await contentService.createHelpArticle(payload)
+      toastService.success(t('admin.helpArticleCreated'))
+    }
+    closeArticleForm()
+  } catch (e) {
+    articleFormError.value = e instanceof Error ? e.message : t('common.error')
+  } finally {
+    articleFormLoading.value = false
+  }
+}
+
+const confirmDeleteArticle = async (a: HelpArticleDto) => {
+  const ok = await confirmService.confirmDelete(
+    `${t('admin.deleteHelpArticleConfirm')}\n${a.title}`,
+    t('common.delete'),
+  )
+  if (!ok) return
+  articlePendingId.value = a.id
+  try {
+    await contentService.deleteHelpArticle(a.id)
+    toastService.success(t('admin.helpArticleDeleted'))
+  } catch (e) {
+    toastService.error(e instanceof Error ? e.message : t('common.error'))
+  } finally {
+    articlePendingId.value = null
+  }
+}
+
+const showArticleDetails = ref(false)
+const selectedArticle = ref<HelpArticleDto | null>(null)
+
+const openArticleDetails = (a: HelpArticleDto) => {
+  selectedArticle.value = a
+  showArticleDetails.value = true
+}
+
+const closeArticleDetails = () => {
+  showArticleDetails.value = false
+  selectedArticle.value = null
+}
+
+// --- FAQ Add / Edit / Delete / Details ---
+const showFaqModal = ref(false)
+const editingFaq = ref<FaqItemDto | null>(null)
+const faqForm = ref({ question: '', answer: '' })
+const faqFormLoading = ref(false)
+const faqFormError = ref('')
+const faqPendingId = ref<string | null>(null)
+
+const openCreateFaq = () => {
+  editingFaq.value = null
+  faqForm.value = { question: '', answer: '' }
+  faqFormError.value = ''
+  showFaqModal.value = true
+}
+
+const openEditFaq = (f: FaqItemDto) => {
+  editingFaq.value = f
+  faqForm.value = { question: f.question ?? '', answer: f.answer ?? '' }
+  faqFormError.value = ''
+  showFaqModal.value = true
+}
+
+const closeFaqForm = () => {
+  showFaqModal.value = false
+  faqFormError.value = ''
+}
+
+const submitFaqForm = async () => {
+  if (!faqForm.value.question.trim() || !faqForm.value.answer.trim()) {
+    faqFormError.value = t('help.faqQuestion')
+    return
+  }
+  faqFormLoading.value = true
+  faqFormError.value = ''
+  try {
+    if (editingFaq.value) {
+      await contentService.updateFaq(editingFaq.value.id, faqForm.value.question.trim(), faqForm.value.answer.trim())
+      toastService.success(t('admin.faqUpdated'))
+    } else {
+      await contentService.createFaq(faqForm.value.question.trim(), faqForm.value.answer.trim())
+      toastService.success(t('admin.faqCreated'))
+    }
+    closeFaqForm()
+  } catch (e) {
+    faqFormError.value = e instanceof Error ? e.message : t('common.error')
+  } finally {
+    faqFormLoading.value = false
+  }
+}
+
+const confirmDeleteFaq = async (f: FaqItemDto) => {
+  const ok = await confirmService.confirmDelete(
+    `${t('admin.deleteFaqConfirm')}\n${f.question}`,
+    t('common.delete'),
+  )
+  if (!ok) return
+  faqPendingId.value = f.id
+  try {
+    await contentService.deleteFaq(f.id)
+    toastService.success(t('admin.faqDeleted'))
+  } catch (e) {
+    toastService.error(e instanceof Error ? e.message : t('common.error'))
+  } finally {
+    faqPendingId.value = null
+  }
+}
+
+const showFaqDetails = ref(false)
+const selectedFaq = ref<FaqItemDto | null>(null)
+
+const openFaqDetails = (f: FaqItemDto) => {
+  selectedFaq.value = f
+  showFaqDetails.value = true
+}
+
+const closeFaqDetails = () => {
+  showFaqDetails.value = false
+  selectedFaq.value = null
+}
 </script>
 
 <template>
@@ -156,6 +443,10 @@ onMounted(async () => {
               <span class="material-symbols-outlined text-[14px]">filter_alt_off</span>
               {{ t('common.clearFilters') }}
             </button>
+            <BaseButton variant="primary" @click="openCreateCategory">
+              <span class="material-symbols-outlined text-[18px]">add</span>
+              <span>{{ t('help.addCategory') }}</span>
+            </BaseButton>
           </div>
 
           <!-- Categories List -->
@@ -167,6 +458,7 @@ onMounted(async () => {
                     <th>{{ t('help.colIcon') }}</th>
                     <th>{{ t('help.colCategoryTitle') }}</th>
                     <th>{{ t('help.colArticleCount') }}</th>
+                    <th class="text-end">{{ t('common.actions') }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -189,6 +481,38 @@ onMounted(async () => {
                     </td>
                     <td>
                       <span class="mono count-pill">{{ t('help.articleCount', { count: c.articleCount ?? 0 }) }}</span>
+                    </td>
+                    <td>
+                      <div class="row-actions">
+                        <button
+                          type="button"
+                          class="row-action-btn"
+                          :title="t('admin.viewDetails')"
+                          :aria-label="t('admin.viewDetails')"
+                          @click="openCategoryDetails(c)"
+                        >
+                          <span class="material-symbols-outlined text-[18px]">visibility</span>
+                        </button>
+                        <button
+                          type="button"
+                          class="row-action-btn"
+                          :title="t('common.edit')"
+                          :aria-label="t('common.edit')"
+                          @click="openEditCategory(c)"
+                        >
+                          <span class="material-symbols-outlined text-[18px]">edit</span>
+                        </button>
+                        <button
+                          type="button"
+                          class="row-action-btn row-action-btn--danger"
+                          :title="t('common.delete')"
+                          :aria-label="t('common.delete')"
+                          :disabled="categoryPendingId === c.id"
+                          @click="confirmDeleteCategory(c)"
+                        >
+                          <span class="material-symbols-outlined text-[18px]">delete</span>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 </tbody>
@@ -226,6 +550,10 @@ onMounted(async () => {
               <span class="material-symbols-outlined text-[14px]">filter_alt_off</span>
               {{ t('common.clearFilters') }}
             </button>
+            <BaseButton variant="primary" @click="openCreateArticle">
+              <span class="material-symbols-outlined text-[18px]">add</span>
+              <span>{{ t('help.addArticle') }}</span>
+            </BaseButton>
           </div>
 
           <!-- Articles Table -->
@@ -237,6 +565,7 @@ onMounted(async () => {
                     <th>{{ t('help.colArticleTitle') }}</th>
                     <th>{{ t('help.colCategory') }}</th>
                     <th>{{ t('help.colSlug') }}</th>
+                    <th class="text-end">{{ t('common.actions') }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -249,6 +578,38 @@ onMounted(async () => {
                     </td>
                     <td>
                       <span class="mono slug-badge">/{{ a.slug }}</span>
+                    </td>
+                    <td>
+                      <div class="row-actions">
+                        <button
+                          type="button"
+                          class="row-action-btn"
+                          :title="t('admin.viewDetails')"
+                          :aria-label="t('admin.viewDetails')"
+                          @click="openArticleDetails(a)"
+                        >
+                          <span class="material-symbols-outlined text-[18px]">visibility</span>
+                        </button>
+                        <button
+                          type="button"
+                          class="row-action-btn"
+                          :title="t('common.edit')"
+                          :aria-label="t('common.edit')"
+                          @click="openEditArticle(a)"
+                        >
+                          <span class="material-symbols-outlined text-[18px]">edit</span>
+                        </button>
+                        <button
+                          type="button"
+                          class="row-action-btn row-action-btn--danger"
+                          :title="t('common.delete')"
+                          :aria-label="t('common.delete')"
+                          :disabled="articlePendingId === a.id"
+                          @click="confirmDeleteArticle(a)"
+                        >
+                          <span class="material-symbols-outlined text-[18px]">delete</span>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 </tbody>
@@ -286,6 +647,10 @@ onMounted(async () => {
               <span class="material-symbols-outlined text-[14px]">filter_alt_off</span>
               {{ t('common.clearFilters') }}
             </button>
+            <BaseButton variant="primary" @click="openCreateFaq">
+              <span class="material-symbols-outlined text-[18px]">add</span>
+              <span>{{ t('help.addFaq') }}</span>
+            </BaseButton>
           </div>
 
           <!-- FAQ Cards Stack -->
@@ -295,6 +660,36 @@ onMounted(async () => {
                 <div class="faq-q-line">
                   <span class="material-symbols-outlined text-[18px] text-indigo-600">help</span>
                   <strong class="faq-q-text">{{ f.question }}</strong>
+                </div>
+                <div class="row-actions">
+                  <button
+                    type="button"
+                    class="row-action-btn"
+                    :title="t('admin.viewDetails')"
+                    :aria-label="t('admin.viewDetails')"
+                    @click="openFaqDetails(f)"
+                  >
+                    <span class="material-symbols-outlined text-[18px]">visibility</span>
+                  </button>
+                  <button
+                    type="button"
+                    class="row-action-btn"
+                    :title="t('common.edit')"
+                    :aria-label="t('common.edit')"
+                    @click="openEditFaq(f)"
+                  >
+                    <span class="material-symbols-outlined text-[18px]">edit</span>
+                  </button>
+                  <button
+                    type="button"
+                    class="row-action-btn row-action-btn--danger"
+                    :title="t('common.delete')"
+                    :aria-label="t('common.delete')"
+                    :disabled="faqPendingId === f.id"
+                    @click="confirmDeleteFaq(f)"
+                  >
+                    <span class="material-symbols-outlined text-[18px]">delete</span>
+                  </button>
                 </div>
               </div>
 
@@ -311,6 +706,222 @@ onMounted(async () => {
           </div>
         </section>
       </template>
+
+      <!-- Category Add / Edit Modal -->
+      <BaseModal
+        v-model="showCategoryModal"
+        :title="editingCategory ? t('help.editCategory') : t('help.addCategory')"
+        max-width="520px"
+        @close="closeCategoryForm"
+      >
+        <form class="admin-modal-form" @submit.prevent="submitCategoryForm">
+          <div class="form-field">
+            <label class="field-label" for="help-cat-name">{{ t('help.categoryName') }} *</label>
+            <input id="help-cat-name" v-model="categoryForm.name" type="text" class="field-input" required />
+          </div>
+          <div class="form-field">
+            <label class="field-label" for="help-cat-icon">{{ t('admin.helpCategoryIcon') }}</label>
+            <input
+              id="help-cat-icon"
+              v-model="categoryForm.icon"
+              type="text"
+              class="field-input mono"
+              placeholder="menu_book"
+            />
+          </div>
+
+          <p v-if="categoryFormError" class="form-error" role="alert">{{ categoryFormError }}</p>
+
+          <div class="modal-foot">
+            <BaseButton variant="secondary" type="button" @click="closeCategoryForm">
+              {{ t('common.cancel') }}
+            </BaseButton>
+            <BaseButton variant="primary" type="submit" :loading="categoryFormLoading">
+              {{ t('common.save') }}
+            </BaseButton>
+          </div>
+        </form>
+      </BaseModal>
+
+      <!-- Category Details Modal -->
+      <BaseModal
+        v-model="showCategoryDetails"
+        :title="t('admin.helpCategoryDetails')"
+        max-width="480px"
+        @close="closeCategoryDetails"
+      >
+        <div v-if="selectedCategory" class="admin-details">
+          <div class="details-grid">
+            <div class="detail-item">
+              <span class="detail-k mono">{{ t('help.categoryName') }}</span>
+              <strong class="detail-v">{{ selectedCategory.name }}</strong>
+            </div>
+            <div class="detail-item">
+              <span class="detail-k mono">{{ t('admin.helpCategoryIcon') }}</span>
+              <strong class="detail-v mono">{{ selectedCategory.icon || '—' }}</strong>
+            </div>
+          </div>
+          <div class="modal-foot">
+            <BaseButton variant="secondary" @click="selectedCategory && openEditCategory(selectedCategory)">
+              {{ t('common.edit') }}
+            </BaseButton>
+            <BaseButton variant="secondary" @click="closeCategoryDetails">
+              {{ t('common.close') }}
+            </BaseButton>
+          </div>
+        </div>
+      </BaseModal>
+
+      <!-- Article Add / Edit Modal -->
+      <BaseModal
+        v-model="showArticleModal"
+        :title="editingArticle ? t('help.editArticle') : t('help.addArticle')"
+        max-width="640px"
+        @close="closeArticleForm"
+      >
+        <form class="admin-modal-form" @submit.prevent="submitArticleForm">
+          <div class="form-field">
+            <label class="field-label" for="help-article-title">{{ t('help.colArticleTitle') }} *</label>
+            <input
+              id="help-article-title"
+              v-model="articleForm.title"
+              type="text"
+              class="field-input"
+              required
+              @input="onArticleTitleInput"
+            />
+          </div>
+          <div class="form-row two-cols">
+            <div class="form-field">
+              <label class="field-label" for="help-article-category">{{ t('help.colCategory') }} *</label>
+              <select id="help-article-category" v-model="articleForm.categoryId" class="field-select" required>
+                <option value="" disabled>{{ t('help.colCategory') }}</option>
+                <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.name }}</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label class="field-label" for="help-article-slug">{{ t('help.colSlug') }} *</label>
+              <input
+                id="help-article-slug"
+                v-model="articleForm.slug"
+                type="text"
+                class="field-input mono"
+                required
+                @input="articleSlugTouched = true"
+              />
+            </div>
+          </div>
+          <div class="form-field">
+            <label class="field-label" for="help-article-body">{{ t('help.articleBody') }} *</label>
+            <textarea id="help-article-body" v-model="articleForm.body" class="field-textarea" rows="5" required></textarea>
+          </div>
+
+          <p v-if="articleFormError" class="form-error" role="alert">{{ articleFormError }}</p>
+
+          <div class="modal-foot">
+            <BaseButton variant="secondary" type="button" @click="closeArticleForm">
+              {{ t('common.cancel') }}
+            </BaseButton>
+            <BaseButton variant="primary" type="submit" :loading="articleFormLoading">
+              {{ t('common.save') }}
+            </BaseButton>
+          </div>
+        </form>
+      </BaseModal>
+
+      <!-- Article Details Modal -->
+      <BaseModal
+        v-model="showArticleDetails"
+        :title="t('admin.helpArticleDetails')"
+        max-width="600px"
+        @close="closeArticleDetails"
+      >
+        <div v-if="selectedArticle" class="admin-details">
+          <div class="details-grid">
+            <div class="detail-item">
+              <span class="detail-k mono">{{ t('help.colArticleTitle') }}</span>
+              <strong class="detail-v">{{ selectedArticle.title }}</strong>
+            </div>
+            <div class="detail-item">
+              <span class="detail-k mono">{{ t('help.colCategory') }}</span>
+              <strong class="detail-v">{{ articleCategoryName(selectedArticle.categoryId) }}</strong>
+            </div>
+          </div>
+          <div class="detail-item">
+            <span class="detail-k mono">{{ t('help.colSlug') }}</span>
+            <strong class="detail-v mono">/{{ selectedArticle.slug }}</strong>
+          </div>
+          <div class="detail-item">
+            <span class="detail-k mono">{{ t('help.articleBody') }}</span>
+            <p class="detail-v detail-v--pre">{{ selectedArticle.body }}</p>
+          </div>
+          <div class="modal-foot">
+            <BaseButton variant="secondary" @click="selectedArticle && openEditArticle(selectedArticle)">
+              {{ t('common.edit') }}
+            </BaseButton>
+            <BaseButton variant="secondary" @click="closeArticleDetails">
+              {{ t('common.close') }}
+            </BaseButton>
+          </div>
+        </div>
+      </BaseModal>
+
+      <!-- FAQ Add / Edit Modal -->
+      <BaseModal
+        v-model="showFaqModal"
+        :title="editingFaq ? t('help.editFaq') : t('help.addFaq')"
+        max-width="560px"
+        @close="closeFaqForm"
+      >
+        <form class="admin-modal-form" @submit.prevent="submitFaqForm">
+          <div class="form-field">
+            <label class="field-label" for="help-faq-q">{{ t('help.faqQuestion') }} *</label>
+            <input id="help-faq-q" v-model="faqForm.question" type="text" class="field-input" required />
+          </div>
+          <div class="form-field">
+            <label class="field-label" for="help-faq-a">{{ t('help.faqAnswer') }} *</label>
+            <textarea id="help-faq-a" v-model="faqForm.answer" class="field-textarea" rows="4" required></textarea>
+          </div>
+
+          <p v-if="faqFormError" class="form-error" role="alert">{{ faqFormError }}</p>
+
+          <div class="modal-foot">
+            <BaseButton variant="secondary" type="button" @click="closeFaqForm">
+              {{ t('common.cancel') }}
+            </BaseButton>
+            <BaseButton variant="primary" type="submit" :loading="faqFormLoading">
+              {{ t('common.save') }}
+            </BaseButton>
+          </div>
+        </form>
+      </BaseModal>
+
+      <!-- FAQ Details Modal -->
+      <BaseModal
+        v-model="showFaqDetails"
+        :title="t('admin.faqDetails')"
+        max-width="560px"
+        @close="closeFaqDetails"
+      >
+        <div v-if="selectedFaq" class="admin-details">
+          <div class="detail-item">
+            <span class="detail-k mono">{{ t('help.faqQuestion') }}</span>
+            <strong class="detail-v">{{ selectedFaq.question }}</strong>
+          </div>
+          <div class="detail-item">
+            <span class="detail-k mono">{{ t('help.faqAnswer') }}</span>
+            <p class="detail-v detail-v--pre">{{ selectedFaq.answer }}</p>
+          </div>
+          <div class="modal-foot">
+            <BaseButton variant="secondary" @click="selectedFaq && openEditFaq(selectedFaq)">
+              {{ t('common.edit') }}
+            </BaseButton>
+            <BaseButton variant="secondary" @click="closeFaqDetails">
+              {{ t('common.close') }}
+            </BaseButton>
+          </div>
+        </div>
+      </BaseModal>
     </div>
   </AdminLayout>
 </template>

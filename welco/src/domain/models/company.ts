@@ -26,6 +26,20 @@ export interface CompanyDto {
   createdAt: string
 }
 
+export interface CreateCompanyPayload {
+  name: string
+  email?: string | null
+  type: CompanyType
+  countryId: string
+  tierLevel?: number
+  status?: CompanyStatus
+  accountManagerId?: string | null
+}
+
+export interface UpdateCompanyPayload extends CreateCompanyPayload {
+  isActive?: boolean
+}
+
 export interface DistributorApplicationPayload {
   companyName: string
   countryId: string

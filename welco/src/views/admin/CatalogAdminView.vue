@@ -12,7 +12,7 @@ import { services } from '../../di/container'
 import { confirmService } from '../../infrastructure/feedback/confirm.service'
 import { toastService } from '../../infrastructure/feedback/toast.service'
 import { t, locale } from '../../i18n'
-import { productMediaUrl, resolveFileUrl } from '../../utils/file-url'
+import { isVideoFile, parseVideoSource, productMediaUrl, resolveFileUrl } from '../../utils/file-url'
 import type {
   ProductDto,
   ProductMediaDto,
@@ -448,6 +448,12 @@ const detailsImageUrl = computed(() => {
   if (!p) return ''
   return resolveFileUrl(p.imageName ?? null, '')
 })
+
+const detailVideoItems = computed(() =>
+  selectedVideos.value.filter((v) => v && (v.type !== 1 || isVideoFile(v.url))),
+)
+
+const videoEmbed = (url: string) => parseVideoSource(url)
 
 // ----------------------------------------------------
 // 4. CATEGORY ACTIONS: add / details / edit / delete
@@ -1215,8 +1221,30 @@ onMounted(async () => {
             <p class="mono">{{ selectedProduct.specifications }}</p>
           </div>
 
-          <div v-if="selectedVideos.length" class="details-meta mono">
-            <span>{{ selectedVideos.length }} video(s)</span>
+          <div v-if="detailsLoading" class="details-loading">
+            {{ t('common.loading') }}
+          </div>
+          <div v-else-if="detailVideoItems.length" class="details-videos">
+            <span class="detail-k mono">{{ t('admin.productVideos') }} ({{ detailVideoItems.length }})</span>
+            <div v-for="v in detailVideoItems" :key="v.id || v.url" class="details-video-item">
+              <div class="details-video-title mono">{{ v.title || v.url }}</div>
+              <div v-if="videoEmbed(v.url).type !== 'html5'" class="details-video-frame">
+                <iframe
+                  :src="videoEmbed(v.url).embedUrl"
+                  class="details-video-frame__el"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowfullscreen
+                  :title="v.title || v.url"
+                />
+              </div>
+              <video
+                v-else
+                controls
+                preload="metadata"
+                :src="videoEmbed(v.url).src"
+                class="details-video-native"
+              />
+            </div>
           </div>
 
           <div class="modal-foot">
@@ -1884,6 +1912,51 @@ onMounted(async () => {
 .details-meta {
   font-size: 11px;
   color: var(--wl-muted);
+}
+
+.details-videos {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.details-video-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  background: var(--wl-paper);
+  border: 1px solid var(--wl-line);
+  border-radius: var(--wl-radius-sm);
+  padding: 0.6rem 0.75rem;
+}
+
+.details-video-title {
+  font-size: 11px;
+  color: var(--wl-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.details-video-frame {
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: #000;
+  border-radius: var(--wl-radius-sm);
+  overflow: hidden;
+}
+
+.details-video-frame__el {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.details-video-native {
+  width: 100%;
+  max-height: 320px;
+  background: #000;
+  border-radius: var(--wl-radius-sm);
 }
 
 /* Table Pagination */

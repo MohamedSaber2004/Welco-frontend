@@ -52,7 +52,7 @@ const localized = (en?: string | null, ar?: string | null): string => {
 
 const countryLabel = (countryId: string) => {
   const c = locationService.getCountryById(countryId)
-  if (!c) return countryId.slice(0, 8)
+  if (!c) return '—'
   return localized(c.nameEn, c.nameAr)
 }
 const countryPhone = (countryId: string) => locationService.getCountryPhoneCode(countryId)

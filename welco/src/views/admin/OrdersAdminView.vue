@@ -4,6 +4,8 @@ import AdminLayout from '../../components/layout/AdminLayout.vue'
 import StatusPill from '../../components/ui/StatusPill.vue'
 import DataState from '../../components/ui/DataState.vue'
 import AppPagination from '../../components/ui/AppPagination.vue'
+import BaseModal from '../../components/ui/BaseModal.vue'
+import BaseButton from '../../components/ui/BaseButton.vue'
 import { commerceService } from '../../di/container'
 import { toastService } from '../../infrastructure/feedback/toast.service'
 import { t, locale } from '../../i18n'
@@ -87,12 +89,44 @@ async function advance(o: OrderDto) {
   if (!next) return
   acting.value = o.id
   try {
-    await commerceService.updateOrderStatus(o.id, next)
-    toastService.success(t('commerce.statusUpdated'))
+    const res = await commerceService.updateOrderStatus(o.id, next)
+    if (res.ok) {
+      // updateOrderStatus reloads a default page — restore the full admin list
+      await fetchOrders()
+      const fresh = commerceService.orders.value.find((x) => x.id === o.id) ?? null
+      if (fresh && selectedOrder.value?.id === o.id) selectedOrder.value = fresh
+    } else if (res.error) {
+      toastService.error(res.error)
+    }
   } finally {
     acting.value = ''
   }
 }
+
+// --- Order details modal ---
+const showDetailsModal = ref(false)
+const selectedOrder = ref<OrderDto | null>(null)
+const detailsLoading = ref(false)
+
+async function openDetails(o: OrderDto) {
+  selectedOrder.value = o
+  showDetailsModal.value = true
+  detailsLoading.value = true
+  try {
+    const fresh = await commerceService.getOrder(o.id)
+    if (fresh) selectedOrder.value = fresh
+  } finally {
+    detailsLoading.value = false
+  }
+}
+
+function closeDetails() {
+  showDetailsModal.value = false
+  selectedOrder.value = null
+}
+
+const detailsSubtotal = (order: OrderDto): number =>
+  (order.items ?? []).reduce((s, it) => s + (it?.quantity ?? 0) * (it?.unitPrice ?? 0), 0)
 
 function goPage(p: number) {
   if (p < 1 || p > totalPages.value) return
@@ -172,7 +206,7 @@ function goPage(p: number) {
               <tbody>
                 <tr v-for="o in paginatedOrders" :key="o.id" class="exec-row">
                   <td>
-                    <strong class="mono order-num">{{ o.orderNumber || o.id }}</strong>
+                    <strong class="mono order-num">{{ o.orderNumber || '—' }}</strong>
                   </td>
                   <td class="mono text-xs text-slate-500">{{ new Date(o.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</td>
                   <td>
@@ -200,17 +234,28 @@ function goPage(p: number) {
                     <span class="mono incoterm-tag">{{ o.incotermCode || t('checkout.incotermExw') }}</span>
                   </td>
                   <td class="text-end">
-                    <button
-                      v-if="NEXT[o.status]"
-                      type="button"
-                      class="btn-advance mono"
-                      :disabled="acting === o.id"
-                      @click="advance(o)"
-                    >
-                      <span class="material-symbols-outlined text-[15px]">arrow_forward</span>
-                      <span>{{ t('commerce.markAs', { status: NEXT[o.status] as string }) }}</span>
-                    </button>
-                    <span v-else class="mono text-xs text-slate-400">{{ t('admin.orderCompleted') }}</span>
+                    <div class="row-actions">
+                      <button
+                        type="button"
+                        class="row-action-btn"
+                        :title="t('admin.viewDetails')"
+                        :aria-label="t('admin.viewDetails')"
+                        @click="openDetails(o)"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">visibility</span>
+                      </button>
+                      <button
+                        v-if="NEXT[o.status]"
+                        type="button"
+                        class="btn-advance mono"
+                        :disabled="acting === o.id"
+                        @click="advance(o)"
+                      >
+                        <span class="material-symbols-outlined text-[15px]">arrow_forward</span>
+                        <span>{{ t('commerce.markAs', { status: NEXT[o.status] as string }) }}</span>
+                      </button>
+                      <span v-else class="mono text-xs text-slate-400">{{ t('admin.orderCompleted') }}</span>
+                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -227,6 +272,93 @@ function goPage(p: number) {
           />
         </div>
       </DataState>
+
+      <!-- Order Details Modal -->
+      <BaseModal
+        v-model="showDetailsModal"
+        :title="selectedOrder ? `${t('commerce.orderNumber')} ${selectedOrder.orderNumber || '—'}` : t('admin.orderDetails')"
+        max-width="720px"
+        @close="closeDetails"
+      >
+        <div v-if="detailsLoading && !selectedOrder" class="details-loading">
+          {{ t('common.loading') }}
+        </div>
+        <div v-else-if="selectedOrder" class="order-details">
+          <div class="order-status-bar">
+            <StatusPill :status="selectedOrder.status" />
+            <span class="mono order-date">{{
+              new Date(selectedOrder.createdAt).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US')
+            }}</span>
+            <BaseButton
+              v-if="NEXT[selectedOrder.status]"
+              variant="primary"
+              size="sm"
+              :loading="acting === selectedOrder.id"
+              @click="advance(selectedOrder)"
+            >
+              <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+              <span>{{ t('commerce.markAs', { status: NEXT[selectedOrder.status] as string }) }}</span>
+            </BaseButton>
+          </div>
+
+          <div class="details-grid">
+            <div class="detail-item">
+              <span class="detail-k mono">{{ t('commerce.orderNumber') }}</span>
+              <strong class="detail-v mono">{{ selectedOrder.orderNumber || '—' }}</strong>
+            </div>
+            <div class="detail-item">
+              <span class="detail-k mono">{{ t('commerce.status') }}</span>
+              <strong class="detail-v">{{ selectedOrder.status }}</strong>
+            </div>
+            <div class="detail-item">
+              <span class="detail-k mono">{{ t('commerce.incoterm') }}</span>
+              <strong class="detail-v mono">{{ selectedOrder.incotermCode || t('checkout.incotermExw') }}</strong>
+            </div>
+            <div class="detail-item">
+              <span class="detail-k mono">{{ t('commerce.total') }}</span>
+              <strong class="detail-v mono"
+                >{{ Math.round(selectedOrder.totalAmount).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}
+                {{ selectedOrder.currencyCode }}</strong
+              >
+            </div>
+          </div>
+
+          <div class="items-wrap">
+            <table class="modal-items-table">
+              <thead>
+                <tr>
+                  <th>{{ t('admin.quoteProduct') }}</th>
+                  <th class="text-end">{{ t('marketplace.quantity') }}</th>
+                  <th class="text-end">{{ t('admin.quoteUnitPrice') }}</th>
+                  <th class="text-end">{{ t('admin.quoteSubtotal') }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="it in selectedOrder.items ?? []" :key="it?.id || it?.productId">
+                  <td>{{ locale === 'ar' ? (it?.productNameAr || it?.productNameEn) : (it?.productNameEn || it?.productNameAr) }}</td>
+                  <td class="text-end mono">{{ it?.quantity ?? 0 }}</td>
+                  <td class="text-end mono">{{ (it?.unitPrice ?? 0).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</td>
+                  <td class="text-end mono">{{ ((it?.quantity ?? 0) * (it?.unitPrice ?? 0)).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="order-total-bar">
+            <span class="mono total-label">{{ t('commerce.total') }}</span>
+            <strong class="mono total-value"
+              >{{ Math.round(detailsSubtotal(selectedOrder)).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}
+              {{ selectedOrder.currencyCode }}</strong
+            >
+          </div>
+
+          <div class="modal-foot">
+            <BaseButton variant="secondary" @click="closeDetails">
+              {{ t('common.close') }}
+            </BaseButton>
+          </div>
+        </div>
+      </BaseModal>
     </div>
   </AdminLayout>
 </template>
@@ -530,5 +662,151 @@ function goPage(p: number) {
 
 .text-end {
   text-align: end;
+}
+
+.row-actions {
+  display: flex;
+  gap: 0.4rem;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.row-action-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #64748b;
+  display: inline-grid;
+  place-items: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.row-action-btn:hover {
+  color: #4f46e5;
+  border-color: #4f46e5;
+}
+
+.details-loading {
+  padding: 2rem;
+  text-align: center;
+  color: #64748b;
+}
+
+.order-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.order-status-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding: 0.75rem 1rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+}
+
+.order-date {
+  font-size: 11.5px;
+  color: #64748b;
+  margin-inline-start: auto;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  background: #f8fafc;
+  padding: 0.65rem 0.85rem;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+}
+
+.detail-k {
+  font-size: 10px;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.detail-v {
+  font-size: 0.85rem;
+  color: #0f172a;
+}
+
+.items-wrap {
+  overflow-x: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+}
+
+.modal-items-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.84rem;
+}
+
+.modal-items-table thead th {
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 0.6rem 0.9rem;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-align: start;
+}
+
+.modal-items-table tbody td {
+  padding: 0.6rem 0.9rem;
+  border-bottom: 1px solid #f1f5f9;
+  color: #0f172a;
+}
+
+.modal-items-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.order-total-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+  border-radius: 10px;
+}
+
+.total-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #4f46e5;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.total-value {
+  font-size: 1rem;
+  color: #0f172a;
+}
+
+.modal-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding-top: 0.25rem;
 }
 </style>

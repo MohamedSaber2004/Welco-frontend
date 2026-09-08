@@ -25,6 +25,8 @@ export interface LandingPageDto {
   slug: string
   heroTitle: string
   heroBody?: string
+  contentBlock?: string | null
+  isActive?: boolean
   categoryId?: string
   categoryName?: string
   procedure?: string
@@ -32,6 +34,23 @@ export interface LandingPageDto {
   relatedProductIds?: string[]
   featuredProductIds?: string[]
   createdAt: string
+}
+
+export interface CreateLandingPagePayload {
+  type: string
+  slug: string
+  heroTitle: string
+  heroBody?: string
+  contentBlock?: string | null
+}
+
+export interface UpdateLandingPagePayload {
+  type: string
+  slug: string
+  heroTitle: string
+  heroBody?: string
+  contentBlock?: string | null
+  isActive?: boolean
 }
 
 export interface HelpCategoryDto {

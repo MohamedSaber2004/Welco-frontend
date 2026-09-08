@@ -462,7 +462,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
               <tbody>
                 <tr v-for="r in paginatedRfqs" :key="r.id" class="exec-row">
                   <td>
-                    <strong class="mono rfq-num">{{ r.rfqNumber || r.id }}</strong>
+                    <strong class="mono rfq-num">{{ r.rfqNumber || '—' }}</strong>
                   </td>
                   <td>
                     <strong class="company-name">{{ r.companyName || '—' }}</strong>

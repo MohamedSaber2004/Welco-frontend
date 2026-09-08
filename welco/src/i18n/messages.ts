@@ -149,6 +149,9 @@ export type Messages = {
     trustedGlobal: string
     upcoming: string
     pastEvent: string
+    aboutEyebrow: string
+    aboutTitle: string
+    aboutBody: string
     moreCount: string
     tradeShowsEyebrow: string
     tradeShowsTitle: string
@@ -445,6 +448,7 @@ export type Messages = {
     status: string
     active: string
     inactive: string
+    unknownUser: string
     viewDetails: string
     cartographerControl: string
     territoryRule: string
@@ -795,6 +799,27 @@ export type Messages = {
     ordersEyebrow: string
     consignmentsTracked: string
     orderCompleted: string
+    orderDetails: string
+    contentEyebrow: string
+    pages: string
+    pagesDesc: string
+    newPage: string
+    editPage: string
+    pageDetails: string
+    pageType: string
+    pageSlug: string
+    pageTitle: string
+    heroBody: string
+    contentBlock: string
+    pageActive: string
+    pageCreated: string
+    pageUpdated: string
+    noPagesFound: string
+    noPagesDesc: string
+    aboutUsMissing: string
+    createAboutUs: string
+    errPageSlug: string
+    errPageTitle: string
     companiesEyebrow: string
     inquiriesCount: string
     citiesEyebrow: string

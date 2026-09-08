@@ -1170,9 +1170,8 @@ onMounted(async () => {
             <p class="mono">{{ selectedProduct.specifications }}</p>
           </div>
 
-          <div class="details-meta mono">
-            <span>ID: {{ selectedProduct.id }}</span>
-            <span v-if="selectedVideos.length">· {{ selectedVideos.length }} video(s)</span>
+          <div v-if="selectedVideos.length" class="details-meta mono">
+            <span>{{ selectedVideos.length }} video(s)</span>
           </div>
 
           <div class="modal-foot">
@@ -1322,10 +1321,6 @@ onMounted(async () => {
               <span class="detail-k mono">{{ t('admin.productsTitle') }}</span>
               <strong class="detail-v mono">{{ selectedCategory.productCount ?? 0 }}</strong>
             </div>
-          </div>
-
-          <div class="details-meta mono">
-            <span>ID: {{ selectedCategory.id }}</span>
           </div>
 
           <div class="modal-foot">

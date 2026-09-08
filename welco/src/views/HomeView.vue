@@ -29,6 +29,7 @@ const countries = ref<CountryDto[]>([])
 const certifications = ref<CertificationDto[]>([])
 const landingPages = ref<LandingPageDto[]>([])
 const tradeShows = ref<TradeShowEventDto[]>([])
+const aboutPage = ref<LandingPageDto | null>(null)
 const loading = ref(true)
 
 const FOUNDING_YEAR = 1994
@@ -44,6 +45,12 @@ onMounted(async () => {
       services.certificationService.load(),
       services.contentService.loadSupport(),
       contentRepository.getLandingPages({ pageNumber: 1, pageSize: 20 }).then((p) => (landingPages.value = p.data)).catch(() => []),
+      contentRepository
+        .getLandingPageBySlug('about-us')
+        .then((p) => {
+          aboutPage.value = p && p.isActive !== false ? p : null
+        })
+        .catch(() => null),
     ])
     if (svc.categories.value.length) cats.value = svc.categories.value.slice(0, 8)
     if (svc.featured.value.length) featured.value = svc.featured.value.slice(0, 3)
@@ -268,6 +275,29 @@ const navigateToOemFromModal = () => {
             </article>
           </div>
         </DataState>
+      </div>
+    </section>
+    <section class="section section--soft" aria-labelledby="about-heading">
+      <div class="section__inner about-grid">
+        <div>
+          <div class="mono section__eyebrow">{{ t('home.aboutEyebrow') }}</div>
+          <h2 id="about-heading" class="section-title">{{ aboutPage?.heroTitle || t('home.aboutTitle') }}</h2>
+          <p class="about-body">{{ aboutPage?.heroBody || t('home.aboutBody') }}</p>
+          <p v-if="aboutPage?.contentBlock" class="about-body">{{ aboutPage.contentBlock }}</p>
+          <div class="about-ctas">
+            <router-link to="/marketplace" class="btn btn-primary">
+              <span>{{ t('home.browseComplete') }}</span>
+              <span class="icon--directional">→</span>
+            </router-link>
+            <router-link to="/oem" class="btn btn-secondary">
+              <span>{{ t('nav.oem') }}</span>
+            </router-link>
+          </div>
+        </div>
+        <div class="about-media">
+          <img src="/logo.jpeg" alt="Welco" class="about-media__img" loading="lazy" />
+          <div class="mono about-media__badge">{{ yearsOfExperience }} · EST. 1994</div>
+        </div>
       </div>
     </section>
     <section class="trust" aria-labelledby="trust-heading">
@@ -1393,6 +1423,63 @@ const navigateToOemFromModal = () => {
   .modal-2col {
     grid-template-columns: 1fr;
     gap: 0;
+  }
+}
+
+.about-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 2.5rem;
+  align-items: center;
+}
+
+.about-body {
+  color: var(--wl-ink-soft, #334155);
+  line-height: 1.75;
+  font-size: 1rem;
+  margin: 1rem 0 0;
+  white-space: pre-wrap;
+}
+
+.about-ctas {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+}
+
+.about-media {
+  position: relative;
+  border-radius: var(--wl-radius-lg, 16px);
+  overflow: hidden;
+  border: 1px solid var(--wl-line, #e2e8f0);
+  background: var(--wl-surface, #fff);
+}
+
+.about-media__img {
+  width: 100%;
+  height: 100%;
+  min-height: 260px;
+  object-fit: cover;
+  display: block;
+}
+
+.about-media__badge {
+  position: absolute;
+  inset-inline-start: 1rem;
+  bottom: 1rem;
+  background: rgba(11, 29, 42, 0.85);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+}
+
+@media (max-width: 860px) {
+  .about-grid {
+    grid-template-columns: 1fr;
   }
 }
 </style>

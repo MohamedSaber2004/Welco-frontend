@@ -1,5 +1,6 @@
 import { ref } from 'vue'
 import { userRepository } from '../di/container'
+import { t } from '../i18n'
 import { UserType } from '../domain/models/user'
 import type { UserDetailsDto, UserDto } from '../domain/models/user'
 
@@ -50,8 +51,9 @@ export function useUserLookup() {
       }
     }
 
+    // Never surface raw identifiers — show a neutral label instead.
     return {
-      name: `${identifier.slice(0, 8)}…`,
+      name: t('admin.unknownUser'),
       role: 'User',
       roleKey: 'user',
     }
@@ -94,7 +96,7 @@ export function useUserLookup() {
       }
 
       const fallback: ResolvedUser = {
-        name: isGuid(identifier) ? `${identifier.slice(0, 8)}…` : identifier,
+        name: isGuid(identifier) ? t('admin.unknownUser') : identifier,
         role: 'User',
         roleKey: 'user',
       }

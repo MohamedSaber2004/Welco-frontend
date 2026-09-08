@@ -261,6 +261,12 @@ const router = createRouter({
       meta: { titleKey: 'certifications.title', requiresAuth: true, requiresAdmin: true },
     },
     {
+      path: '/admin/pages',
+      name: 'admin-pages',
+      component: () => import('../views/admin/PagesAdminView.vue'),
+      meta: { titleKey: 'admin.pages', requiresAuth: true, requiresAdmin: true },
+    },
+    {
       path: '/admin/help',
       name: 'admin-help',
       component: () => import('../views/admin/HelpAdminView.vue'),

@@ -30,7 +30,6 @@ const ticketMessage = ref('')
 const submittingTicket = ref(false)
 const ticketSuccess = ref(false)
 const ticketError = ref('')
-const createdTicketId = ref<string | null>(null)
 
 const ICONS: Record<string, string> = {
   cart: 'shopping_bag',
@@ -131,9 +130,8 @@ async function submitTicket() {
   ticketError.value = ''
   ticketSuccess.value = false
   try {
-    const created = await contentService.createTicket(ticketSubject.value.trim(), ticketMessage.value.trim())
+    await contentService.createTicket(ticketSubject.value.trim(), ticketMessage.value.trim())
     ticketSuccess.value = true
-    createdTicketId.value = created?.id || null
     ticketSubject.value = ''
     ticketMessage.value = ''
     toastService.success(t('help.ticketCreated'))
@@ -149,7 +147,6 @@ async function submitTicket() {
 function resetTicketForm() {
   ticketSuccess.value = false
   ticketError.value = ''
-  createdTicketId.value = null
   ticketSubject.value = ''
   ticketMessage.value = ''
 }
@@ -672,9 +669,6 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
                 </div>
                 <h3 class="success-title">{{ t('common.success') }}</h3>
                 <p class="success-desc">{{ t('help.ticketCreated') }}</p>
-                <div v-if="createdTicketId" class="ticket-id-tag mono">
-                  {{ t('help.ticketRef') }} #{{ createdTicketId.substring(0, 8).toUpperCase() }}
-                </div>
                 <div class="success-actions">
                   <button type="button" class="btn btn-primary" @click="router.push('/help/my-tickets')">
                     <span class="material-symbols-outlined text-[18px]">visibility</span>

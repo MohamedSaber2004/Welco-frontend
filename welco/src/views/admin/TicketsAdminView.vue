@@ -143,8 +143,6 @@ function clearFilters() {
                 <strong class="ticket-subject">{{ tk.subject }}</strong>
               </div>
               <div class="mono ticket-meta">
-                <span>{{ t('help.ticketRef') }} {{ tk.id }}</span>
-                <span>•</span>
                 <span>{{ new Date(tk.createdAt).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</span>
               </div>
             </div>

@@ -123,6 +123,17 @@ function goPage(p: number) {
   localPage.value = p
 }
 
+// Payload snapshots may embed raw database identifiers — mask any
+// GUID-shaped value so no internal IDs are shown to viewers.
+const maskedDetails = computed(() => {
+  const details = selectedLog.value?.details
+  if (!details) return ''
+  return details.replace(
+    /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi,
+    '••••••••',
+  )
+})
+
 onMounted(() => void loadLogs())
 watch([() => filters.value.entity, () => filters.value.action, () => filters.value.search], () => {
   localPage.value = 1
@@ -281,9 +292,9 @@ watch([() => filters.value.entity, () => filters.value.action, () => filters.val
             </div>
           </div>
 
-          <div v-if="selectedLog.details" class="detail-code-block">
+          <div v-if="maskedDetails" class="detail-code-block">
             <span class="detail-code-label mono">{{ t('admin.payloadSnapshot') }}</span>
-            <pre class="detail-pre mono">{{ selectedLog.details }}</pre>
+            <pre class="detail-pre mono">{{ maskedDetails }}</pre>
           </div>
         </div>
       </BaseModal>

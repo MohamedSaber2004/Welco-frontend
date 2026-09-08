@@ -9,6 +9,8 @@ import type {
   LandingPageQuery,
   TradeShowEventDto,
   CreateDocumentPayload,
+  CreateLandingPagePayload,
+  UpdateLandingPagePayload,
   SupportTicketDto,
   SupportContactDto,
   UpdateSupportContactPayload,
@@ -20,6 +22,8 @@ export interface ContentRepository {
   deleteDocument(id: string): Promise<void>
   getLandingPages(query?: LandingPageQuery): Promise<PaginatedResult<LandingPageDto>>
   getLandingPageBySlug(slug: string): Promise<LandingPageDto | null>
+  createLandingPage(payload: CreateLandingPagePayload): Promise<LandingPageDto>
+  updateLandingPage(id: string, payload: UpdateLandingPagePayload): Promise<LandingPageDto>
   getHelpCategories(): Promise<HelpCategoryDto[]>
   createHelpCategory(payload: { name: string; icon?: string }): Promise<HelpCategoryDto>
   updateHelpCategory(id: string, payload: { name: string; icon?: string }): Promise<HelpCategoryDto>

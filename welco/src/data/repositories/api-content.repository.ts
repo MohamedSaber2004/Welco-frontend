@@ -10,6 +10,8 @@ import type {
   LandingPageQuery,
   TradeShowEventDto,
   CreateDocumentPayload,
+  CreateLandingPagePayload,
+  UpdateLandingPagePayload,
   SupportContactDto,
   UpdateSupportContactPayload,
 } from '../../domain/models/content'
@@ -65,8 +67,20 @@ export class ApiContentRepository implements ContentRepository {
   }
 
   async getLandingPageBySlug(slug: string): Promise<LandingPageDto | null> {
-    const page = await this.http.get<LandingPageDto>(CONTENT_ROUTES.landingPageBySlug(slug), { showFeedback: false })
-    return page
+    try {
+      const page = await this.http.get<LandingPageDto>(CONTENT_ROUTES.landingPageBySlug(slug), { showFeedback: false })
+      return page ?? null
+    } catch {
+      return null
+    }
+  }
+
+  async createLandingPage(payload: CreateLandingPagePayload): Promise<LandingPageDto> {
+    return await this.http.post<LandingPageDto>(CONTENT_ROUTES.landingPages, payload)
+  }
+
+  async updateLandingPage(id: string, payload: UpdateLandingPagePayload): Promise<LandingPageDto> {
+    return await this.http.put<LandingPageDto>(CONTENT_ROUTES.landingPageById(id), { id, ...payload })
   }
 
   async getHelpCategories(): Promise<HelpCategoryDto[]> {

@@ -158,7 +158,7 @@ onMounted(() => {
                 @click="router.push({ name: 'account-order-detail', params: { id: o.id } })"
               >
                 <td>
-                  <strong class="mono order-num">{{ o.orderNumber || o.id }}</strong>
+                  <strong class="mono order-num">{{ o.orderNumber || '—' }}</strong>
                 </td>
                 <td class="mono text-xs text-slate-500">{{ new Date(o.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</td>
                 <td>

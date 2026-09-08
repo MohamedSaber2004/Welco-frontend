@@ -124,6 +124,10 @@ const toggleSection = (key: string) => {
             <span class="material-symbols-outlined nav-icon">verified</span>
             <span v-if="!collapsed" class="admin-link__label">{{ t('certifications.title') }}</span>
           </router-link>
+          <router-link to="/admin/pages" class="admin-link" active-class="admin-link--active">
+            <span class="material-symbols-outlined nav-icon">web</span>
+            <span v-if="!collapsed" class="admin-link__label">{{ t('admin.pages') }}</span>
+          </router-link>
         </div>
 
         <!-- Support, People & Audit Group -->
@@ -173,6 +177,7 @@ const toggleSection = (key: string) => {
       <router-link to="/admin/sales" class="admin-mobile-pill" active-class="is-active">{{ t('admin.sales') }}</router-link>
       <router-link to="/admin/orders" class="admin-mobile-pill" active-class="is-active">{{ t('admin.orders') }}</router-link>
       <router-link to="/admin/catalog" class="admin-mobile-pill" active-class="is-active">{{ t('nav.catalog') }}</router-link>
+      <router-link to="/admin/pages" class="admin-mobile-pill" active-class="is-active">{{ t('admin.pages') }}</router-link>
       <router-link v-if="canManageCompanies" to="/admin/companies" class="admin-mobile-pill" active-class="is-active">{{ t('admin.companies') }}</router-link>
       <router-link v-if="canManageTerritory" to="/admin/countries" class="admin-mobile-pill" active-class="is-active">{{ t('admin.countries') }}</router-link>
       <router-link v-if="canManageUsers" to="/admin/users" class="admin-mobile-pill" active-class="is-active">{{ t('admin.users') }}</router-link>

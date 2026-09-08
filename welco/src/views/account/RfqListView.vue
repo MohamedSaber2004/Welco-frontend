@@ -165,7 +165,7 @@ onMounted(() => {
               >
                 <td class="mono text-xs text-slate-500">{{ new Date(r.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</td>
                 <td>
-                  <strong class="mono rfq-num">{{ r.rfqNumber || r.id }}</strong>
+                  <strong class="mono rfq-num">{{ r.rfqNumber || '—' }}</strong>
                 </td>
                 <td>
                   <div class="product-names-cell">

@@ -14,7 +14,7 @@ import type {
 } from '../domain/models/auth'
 import { toastService } from '../infrastructure/feedback/toast.service'
 import { ApiError } from '../infrastructure/http/api-error'
-import type { TokenStore, TokenSet } from '../infrastructure/http/token-store'
+import type { TokenStore } from '../infrastructure/http/token-store'
 import { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE, SESSION_COOKIE } from '../infrastructure/http/token-store'
 import type { AuthBridge } from '../infrastructure/http/auth-bridge'
 import type { AttachmentService } from './attachment.service'
@@ -172,7 +172,6 @@ export class AuthService {
     this.restore()
     this.authBridge.bind({
       onSessionExpired: () => this.handleSessionExpired(),
-      onTokensRefreshed: (tokens) => this.onTokensRefreshed(tokens),
     })
     this.startSessionWatcher()
     this.bindCrossTabSync()
@@ -181,8 +180,7 @@ export class AuthService {
   /**
    * Keeps sibling tabs in sync through localStorage events:
    * - Session/tokens cleared elsewhere (logout in another tab) → log out here too.
-   * - Tokens rotated elsewhere (refresh rotation revokes the old refresh token)
-   *   → adopt the fresh set so this tab doesn't refresh with a stale token.
+   * - Tokens changed elsewhere → adopt them, then force logout if expired.
    */
   private bindCrossTabSync(): void {
     if (typeof window === 'undefined') return
@@ -192,6 +190,9 @@ export class AuthService {
         if (this.isAuthenticated) this.handleSessionExpired('auth.signedOutElsewhere')
       } else {
         this.tokenStore.reloadFromStorage()
+        if (this.isAuthenticated && this.tokenStore.isAccessTokenExpired()) {
+          this.handleSessionExpired()
+        }
       }
     })
   }
@@ -199,14 +200,12 @@ export class AuthService {
   private startSessionWatcher(): void {
     if (typeof window === 'undefined') return
     if (this.sessionTimer) clearInterval(this.sessionTimer)
+    // Expired access token → force logout; the user must sign in again.
+    // There is intentionally no silent refresh.
     this.sessionTimer = setInterval(() => {
       if (!this.isAuthenticated) return
-      if (this.tokenStore.isRefreshTokenExpired()) {
-        this.handleSessionExpired()
-        return
-      }
       if (this.tokenStore.isAccessTokenExpired()) {
-        void this.refreshToken()
+        this.handleSessionExpired()
       }
     }, 30_000)
   }
@@ -241,12 +240,10 @@ export class AuthService {
 
   async ensureValidSession(): Promise<boolean> {
     if (!this.user.value) return false
-    if (this.tokenStore.isRefreshTokenExpired()) {
+    // Expired access token → force logout; the user must sign in again.
+    if (this.tokenStore.isAccessTokenExpired()) {
       this.handleSessionExpired()
       return false
-    }
-    if (this.tokenStore.isAccessTokenExpired()) {
-      return await this.refreshToken()
     }
     return true
   }
@@ -254,27 +251,25 @@ export class AuthService {
   private restore(): void {
     const session = this.tokenStore.getSession<StoredSession>()
     if (session?.accessToken && session?.user) {
-      if (this.tokenStore.isRefreshTokenExpired()) {
-        this.expireSession()
-        return
-      }
-      this.session = session
-      this.user.value = session.user
       this.tokenStore.setTokens({
         accessToken: session.accessToken,
         refreshToken: session.refreshToken,
         refreshTokenExpiryTime: session.refreshTokenExpiryTime,
       })
-      // If access token is expired or near expiry, proactively refresh it right away
-      if (this.tokenStore.isAccessTokenExpired() && !this.tokenStore.isRefreshTokenExpired()) {
-        void this.refreshToken()
+      // Stored access token already expired (e.g. returning after a long
+      // absence) → drop the session; the user must sign in again.
+      if (this.tokenStore.isAccessTokenExpired()) {
+        this.expireSession()
+        return
       }
+      this.session = session
+      this.user.value = session.user
       // Hydrate full profile (with profilePictureName) in background after restore
       if (typeof window !== 'undefined') {
         setTimeout(() => void this.loadProfile().catch(() => {}), 300)
       }
     } else if (this.tokenStore.hasAccessToken()) {
-      if (this.tokenStore.isRefreshTokenExpired()) {
+      if (this.tokenStore.isAccessTokenExpired()) {
         this.expireSession()
       }
     }
@@ -297,18 +292,6 @@ export class AuthService {
       refreshTokenExpiryTime: auth.refreshTokenExpiryTime,
     })
     this.tokenStore.saveSession(this.session)
-  }
-
-  private onTokensRefreshed(tokens: TokenSet): void {
-    if (this.session) {
-      this.session.accessToken = tokens.accessToken
-      this.session.refreshToken = tokens.refreshToken
-      if (tokens.refreshTokenExpiryTime) {
-        this.session.refreshTokenExpiryTime = tokens.refreshTokenExpiryTime
-        this.session.accessTokenExpiresAt = new Date(decodeJwtExp(tokens.accessToken)).toISOString()
-      }
-      this.tokenStore.saveSession(this.session)
-    }
   }
 
   private updateUserFromProfile(profile: UserProfileDto): void {
@@ -431,24 +414,6 @@ export class AuthService {
     const update = await this.updateProfile({ profilePictureName: storedName })
     if (!update.ok) return { ok: false, error: update.error }
     return { ok: true, profilePictureName: storedName }
-  }
-
-  async refreshToken(): Promise<boolean> {
-    const refreshToken = this.tokenStore.getRefreshToken()
-    if (!refreshToken) return false
-    try {
-      const data = await this.authRepository.refreshToken({ refreshToken })
-      this.persistSession(data)
-      return true
-    } catch (err) {
-      // Revoked/unknown refresh token, or deleted/deactivated user: the session
-      // is dead server-side — drop it instead of lingering logged-in.
-      // Network failures (status 0) keep the session so it can retry later.
-      if (err instanceof ApiError && (err.status === 400 || err.status === 401 || err.status === 404)) {
-        this.handleSessionExpired()
-      }
-      return false
-    }
   }
 
   expireSession(): void {

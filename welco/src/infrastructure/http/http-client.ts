@@ -68,61 +68,11 @@ export class HttpClient {
   }
 
   private dedupeMap = new Map<string, Promise<unknown>>()
-  private refreshPromise: Promise<boolean> | null = null
 
   constructor(dependencies: HttpClientDependencies) {
     this.tokenStore = dependencies.tokenStore
     this.authBridge = dependencies.authBridge
     this.feedback = dependencies.feedback
-  }
-
-  async ensureFreshToken(): Promise<boolean> {
-    if (!this.tokenStore.hasAccessToken()) return false
-    if (!this.tokenStore.isAccessTokenExpired()) return true
-    const refreshToken = this.tokenStore.getRefreshToken()
-    if (!refreshToken || this.tokenStore.isRefreshTokenExpired()) return false
-    return this.tryRefreshToken()
-  }
-
-  private async tryRefreshToken(): Promise<boolean> {
-    if (this.refreshPromise) return this.refreshPromise
-    const refreshToken = this.tokenStore.getRefreshToken()
-    if (!refreshToken || this.tokenStore.isRefreshTokenExpired()) return false
-
-    this.refreshPromise = (async () => {
-      try {
-        const res = await fetch(`${API_BASE_URL}${AUTH_ROUTES.refreshToken}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Accept-Language': locale.value },
-          body: JSON.stringify({ refreshToken }),
-        })
-        const raw = (await res.json().catch(() => null)) as Record<string, unknown> | null
-        if (!res.ok || !raw) {
-          // If server explicitly rejects refresh token with 401/400, session is truly revoked
-          if (res.status === 401 || res.status === 400) {
-            this.tokenStore.clear()
-            this.authBridge.onSessionExpired()
-          }
-          return false
-        }
-        // Welco envelope: { isSuccess, data, ... } where data is AuthResponseDto
-        const dataRaw = (raw as Record<string, unknown>).data ?? (raw as Record<string, unknown>).Data ?? raw
-        const dto = dataRaw as Record<string, unknown>
-        const accessToken = (dto.accessToken ?? dto.AccessToken) as string | undefined
-        const newRefresh = (dto.refreshToken ?? dto.RefreshToken) as string | undefined
-        const expiry = (dto.refreshTokenExpiryTime ?? dto.RefreshTokenExpiryTime) as string | undefined
-        if (!accessToken || !newRefresh) return false
-        const tokens = { accessToken, refreshToken: newRefresh, refreshTokenExpiryTime: expiry ?? '' }
-        this.tokenStore.setTokens(tokens)
-        this.authBridge.onTokensRefreshed(tokens)
-        return true
-      } catch {
-        return false
-      } finally {
-        this.refreshPromise = null
-      }
-    })()
-    return this.refreshPromise
   }
 
   get<T>(path: string, options?: RequestOptions): Promise<T> {
@@ -167,12 +117,13 @@ export class HttpClient {
     const routingPath = isAbsoluteUrl(path) ? (() => { try { return new URL(path).pathname } catch { return path } })() : path
     const silentPath = NO_FEEDBACK_PATHS.some((candidate) => routingPath.startsWith(candidate))
 
-    // Preemptive token check: If token is expired or close to expiry, refresh BEFORE sending
-    const isAuthRoute = routingPath.startsWith('/api/v1/auth') && !routingPath.startsWith(AUTH_ROUTES.profile)
-    if (!isAuthRoute && this.tokenStore.hasAccessToken() && this.tokenStore.isAccessTokenExpired()) {
-      if (this.tokenStore.getRefreshToken() && !this.tokenStore.isRefreshTokenExpired()) {
-        await this.ensureFreshToken()
-      }
+    // Expired access token → force logout before sending; the user must
+    // sign in again. There is intentionally no silent refresh, so the
+    // request below goes out anonymous (GET resolves to a safe empty
+    // result, mutations surface the 401 as an error).
+    if (this.tokenStore.hasAccessToken() && this.tokenStore.isAccessTokenExpired()) {
+      this.tokenStore.clear()
+      this.authBridge.onSessionExpired()
     }
 
     const headers: Record<string, string> = { ...extraHeaders, 'Accept-Language': locale.value }
@@ -202,11 +153,6 @@ export class HttpClient {
     const run = async (): Promise<T> => {
       await this.waitForRateLimit(path)
 
-      // True once this request refreshed the access token successfully.
-      // A 401 AFTER a successful refresh means the endpoint rejects a valid
-      // token (permissions/gateway quirk) — that must NOT log the user out.
-      let refreshedThisRequest = false
-
       for (let attempt = 0; ; attempt++) {
         let response: Response
         try {
@@ -219,39 +165,24 @@ export class HttpClient {
           throw error
         }
 
-        if (response.status === 401 && !silentPath) {
-          const isRefresh = routingPath.startsWith(AUTH_ROUTES.refreshToken)
-          if (!isRefresh && attempt === 0 && this.tokenStore.getRefreshToken() && !this.tokenStore.isRefreshTokenExpired()) {
-            const refreshed = await this.tryRefreshToken()
-            if (refreshed) {
-              refreshedThisRequest = true
-              const newToken = this.tokenStore.getAccessToken()
-              if (newToken) headers['Authorization'] = `Bearer ${newToken}`
-              try {
-                response = await doFetch()
-              } catch (e) {
-                const isAbort = e instanceof DOMException && (e as DOMException).name === 'AbortError'
-                throw new ApiError(0, isAbort ? 'Request timed out — gateway is slow' : 'Unable to reach the server')
-              }
-            }
-          }
-          // Still 401 with a dead (unrefreshable) token: the session is dead
-          // server-side (revoked token, deleted user) — drop it.
-          // GET has its own silent-401 handling below; this covers the rest.
-          if (response.status === 401 && method !== 'GET' && this.tokenStore.hasAccessToken() && !refreshedThisRequest) {
-            this.tokenStore.clear()
-            this.authBridge.onSessionExpired()
-          }
+        // A 401 against an expired access token means the session is dead →
+        // force logout; the user must sign in again. Anonymous requests (no
+        // stored token) and the login/logout endpoints never trigger this.
+        // A 401 against a still-valid token is an endpoint permission quirk —
+        // surface the error without logging the user out.
+        if (
+          response.status === 401 &&
+          !silentPath &&
+          this.tokenStore.hasAccessToken() &&
+          this.tokenStore.isAccessTokenExpired()
+        ) {
+          this.tokenStore.clear()
+          this.authBridge.onSessionExpired()
         }
 
         // ── Silent 401 for GET requests (public/auth data without valid session) ──
         // Return a safe empty paginated result so callers don't crash.
-        // Never drop the session when the token just proved itself valid.
         if (response.status === 401 && method === 'GET') {
-          if (this.tokenStore.hasAccessToken() && !refreshedThisRequest) {
-            this.tokenStore.clear()
-            this.authBridge.onSessionExpired()
-          }
           const emptyResult = {
             isSuccess: false,
             data: [] as unknown[],

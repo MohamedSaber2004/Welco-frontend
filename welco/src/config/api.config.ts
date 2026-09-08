@@ -128,6 +128,7 @@ export const CONTENT_ROUTES = {
   documentById: (id: string) => `/api/v1/documents/${id}`,
   landingPages: '/api/v1/landing-pages',
   landingPageBySlug: (slug: string) => `/api/v1/landing-pages/slug/${slug}`,
+  landingPageById: (id: string) => `/api/v1/landing-pages/${id}`,
   helpCategories: '/api/v1/help/categories',
   helpCategoryById: (id: string) => `/api/v1/help/categories/${id}`,
   helpArticles: '/api/v1/help/articles',

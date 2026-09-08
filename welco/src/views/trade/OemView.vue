@@ -132,14 +132,14 @@ async function submit() {
       </div>
 
       <div class="services-grid">
-        <article v-for="s in services" :key="s.id" class="service-card">
+        <article v-for="(s, idx) in services" :key="s.id" class="service-card">
           <div class="service-card-top">
             <div class="service-icon-box">
               <span class="material-symbols-outlined text-[24px]">
                 {{ ICONS[s.icon] || 'precision_manufacturing' }}
               </span>
             </div>
-            <span class="mono service-line-pill">LINE {{ String(s.id || '').replace('oem-', '').padStart(2, '0') }}</span>
+            <span class="mono service-line-pill">LINE {{ String(idx + 1).padStart(2, '0') }}</span>
           </div>
 
           <h3 class="service-name">{{ locale === 'ar' && s.titleAr ? s.titleAr : s.title }}</h3>

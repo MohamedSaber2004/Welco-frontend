@@ -616,7 +616,6 @@ onUnmounted(_removeListeners)
                 <div class="flex items-center gap-2">
                   <strong class="dash-mini-id mono truncate max-w-[170px]">{{ tk.subject }}</strong>
                 </div>
-                <span class="dash-mini-sub mono">REF: {{ tk.id.slice(0, 8) }}</span>
               </div>
               <div class="dash-mini-action">
                 <StatusPill :status="tk.status" />

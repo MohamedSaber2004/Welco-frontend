@@ -42,6 +42,7 @@ export type Messages = {
     failed: string
     details: string
     refresh: string
+    noImage: string
     change: string
     approvedSuccessfully: string
     savedSuccessfully: string
@@ -90,6 +91,7 @@ export type Messages = {
     categories: string
     marketplace: string
     suppliers: string
+    providers: string
     cart: string
     wishlist: string
     orders: string
@@ -194,6 +196,10 @@ export type Messages = {
     metricsHeading: string
     newBadge: string
     docsEyebrow: string
+    ourProviders: string
+    ourProvidersEyebrow: string
+    ourProvidersSubtitle: string
+    verifiedSupplier: string
   }
   about: {
     title: string
@@ -444,41 +450,6 @@ export type Messages = {
   }
   admin: {
     dashboard: string
-    backgroundJobs: string
-    backgroundJobsSubtitle: string
-    hangfireDashboard: string
-    openHangfireDashboard: string
-    triggerHangfireSync: string
-    hangfireServer: string
-    jobStorage: string
-    queues: string
-    recurringSchedule: string
-    totalRuns: string
-    successfulRuns: string
-    failedRuns: string
-    ratesCount: string
-    recurringJobsList: string
-    activeJobs: string
-    dailySchedule: string
-    manualDirectSync: string
-    syncHistoryLogs: string
-    records: string
-    noSyncLogsTitle: string
-    noSyncLogsDesc: string
-    startedAt: string
-    duration: string
-    baseCurrency: string
-    source: string
-    syncLogDetailsTitle: string
-    logId: string
-    completedAt: string
-    errorDetails: string
-    inProgress: string
-    hangfireEnqueuedSuccess: string
-    hangfireEnqueueFailed: string
-    syncSuccessMsg: string
-    syncFailedMsg: string
-    recurringActive: string
     adminPanel: string
     overview: string
     overviewDesc: string
@@ -599,6 +570,7 @@ export type Messages = {
     categoryNameEn: string
     categoryNameAr: string
     parentCategory: string
+    hierarchy: string
     sku: string
     slug: string
     price: string
@@ -1040,6 +1012,19 @@ export type Messages = {
     featuredTitle: string
     featuredSubtitle: string
     categoriesTitle: string
+    categoriesSubtitle: string
+    searchCategories: string
+    exploreCategory: string
+    mainSpecialties: string
+    subcategories: string
+    allSpecialties: string
+    mainCategory: string
+    subcategory: string
+    viewSubcategories: string
+    parentSpecialty: string
+    filterBySpecialty: string
+    showingSubcategoriesOf: string
+    clearParentFilter: string
     suppliersTitle: string
     stock: string
     sku: string
@@ -1560,7 +1545,6 @@ export type Messages = {
     confirmRemove: string
     activeCurrency: string
     currenciesSupported: string
-    fallbackMfr: string
     itemsCount: string
     mixedCurrency: string
     trayEyebrow: string
@@ -1581,7 +1565,6 @@ export type Messages = {
     currency: string
     shippingCalc: string
     destCountry: string
-    fallbackUae: string
     shipMethod: string
     airExpress: string
     seaStandard: string
@@ -1623,5 +1606,25 @@ export type Messages = {
     noCompanyDescLong: string
     eyebrow: string
     hierarchyNote: string
+  }
+  providers: {
+    title: string
+    subtitle: string
+    eyebrow: string
+    searchPlaceholder: string
+    filterByType: string
+    filterByCountry: string
+    sortBy: string
+    allTypes: string
+    allCountries: string
+    verifiedBadge: string
+    providerCount: string
+    noProvidersFound: string
+    viewProducts: string
+    tier: string
+    hospital: string
+    distributor: string
+    clinic: string
+    importer: string
   }
 }

@@ -28,9 +28,9 @@ export function useBusinessRole() {
   const isAdmin = computed(() => role.value === BusinessRole.Admin)
   const isStaff = computed(() => role.value === BusinessRole.WelcoStaff)
   const isProvider = computed(() => role.value === BusinessRole.Provider)
-  const isCustomer = computed(() => role.value === BusinessRole.Customer)
+  const isCustomer = computed(() => false)
   const isBuyer = computed(
-    () => isProvider.value || isCustomer.value || authService.isOrganizationUser.value,
+    () => isProvider.value || authService.isOrganizationUser.value,
   )
   const isSeller = computed(() => isAdmin.value || isStaff.value)
   const isProviderCompanyLinked = computed(() => isProviderCompany(providerCompany.value))

@@ -11,6 +11,7 @@ import QuantityStepper from '../../components/ui/QuantityStepper.vue'
 import { productMediaUrl } from '../../utils/file-url'
 import type { CurrencyDto } from '../../domain/models/marketplace'
 import BackButton from '../../components/ui/BackButton.vue'
+import AppImage from '../../components/ui/AppImage.vue'
 import {
   distinctCurrenciesFromAddresses,
   resolveCurrencyCountry,
@@ -511,14 +512,14 @@ const submitRfq = async () => {
             <article v-for="it in items" :key="it.product.id" class="cart-line">
               <div class="cart-line__media">
                 <div class="cart-thumb" :style="{ background: it.product.imageGradient || 'var(--wl-surface-soft)' }">
-                  <img
-                    v-if="productMediaUrl(it.product.imageName, it.product.imageGradient).url"
-                    :src="productMediaUrl(it.product.imageName, it.product.imageGradient).url"
+                  <AppImage
+                    :src="it.product.imageName"
+                    placeholder-type="product"
+                    :placeholder-text="it.product.sku"
                     :alt="localized(it.product.nameEn, it.product.nameAr)"
+                    fit="contain"
                     class="cart-thumb__img"
-                    loading="lazy"
                   />
-                  <span v-else class="material-symbols-outlined text-[24px] text-muted">precision_manufacturing</span>
                 </div>
 
                 <div class="cart-line__details">
@@ -671,7 +672,7 @@ const submitRfq = async () => {
 }
 
 .breadcrumb a:hover {
-  color: var(--wl-teal);
+  color: var(--wl-primary);
 }
 
 .breadcrumb .sep {
@@ -700,7 +701,7 @@ const submitRfq = async () => {
   align-items: center;
   gap: 0.45rem;
   font-size: 10px;
-  color: #4F46E5;
+  color: var(--wl-primary);
   font-weight: 700;
   letter-spacing: 0.08em;
   margin-bottom: 0.35rem;
@@ -710,8 +711,8 @@ const submitRfq = async () => {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: var(--wl-teal);
-  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.2);
+  background: var(--wl-primary);
+  box-shadow: 0 0 0 3px var(--wl-primary-soft);
 }
 
 .cart-title {
@@ -957,7 +958,7 @@ const submitRfq = async () => {
   gap: 0.35rem;
   height: 38px;
   padding: 0 0.75rem;
-  background: var(--wl-surface, #FFFFFF);
+  background: var(--wl-surface);
   border: 1.5px solid var(--wl-border, #E2E8F0);
   border-radius: 9px;
   font-size: 12px;
@@ -1043,7 +1044,7 @@ const submitRfq = async () => {
   inset-inline-end: 0;
   width: 330px;
   max-width: 90vw;
-  background: var(--wl-surface, #FFFFFF);
+  background: var(--wl-surface);
   border: 1px solid var(--wl-border, #E2E8F0);
   border-radius: 12px;
   box-shadow: 0 14px 36px -4px rgba(15, 23, 42, 0.15), 0 4px 12px rgba(15, 23, 42, 0.08);
@@ -1463,8 +1464,8 @@ const submitRfq = async () => {
   position: absolute;
   top: 0;
   inset-inline: 0;
-  height: 2.5px;
-  background: linear-gradient(90deg, #4F46E5, var(--wl-teal));
+  height: 2px;
+  background: var(--wl-laser-sweep);
 }
 
 .summary-head {
@@ -1486,9 +1487,9 @@ const submitRfq = async () => {
 .summary-badge {
   font-size: 9.5px;
   font-weight: 700;
-  color: var(--wl-teal);
-  background: rgba(13, 148, 136, 0.08);
-  border: 1px solid rgba(13, 148, 136, 0.25);
+  color: var(--wl-primary);
+  background: var(--wl-primary-soft);
+  border: 1px solid var(--wl-border);
   padding: 0.15rem 0.5rem;
   border-radius: 9999px;
 }
@@ -1531,13 +1532,13 @@ const submitRfq = async () => {
 
 .total-curr {
   font-size: 0.95rem;
-  color: var(--wl-primary, #4F46E5);
+  color: var(--wl-primary);
 }
 
 .total-sym {
   font-size: 1.15rem;
   font-weight: 800;
-  color: var(--wl-primary, #4F46E5);
+  color: var(--wl-primary);
   margin-inline-end: 0.25rem;
 }
 
@@ -1560,11 +1561,11 @@ const submitRfq = async () => {
   align-items: center;
   gap: 0.45rem;
   padding: 0.65rem 0.85rem;
-  background: #F0FDF4;
-  border: 1px solid #BBF7D0;
+  background: var(--wl-success-soft);
+  border: 1px solid var(--wl-border);
   border-radius: 8px;
   font-size: 11.5px;
-  color: #166534;
+  color: var(--wl-success);
   margin-top: 0.75rem;
   line-height: 1.4;
 }
@@ -1599,7 +1600,7 @@ const submitRfq = async () => {
 
 .notes-textarea:focus {
   outline: none;
-  border-color: var(--wl-teal);
+  border-color: var(--wl-primary);
   box-shadow: var(--wl-focus-ring);
 }
 

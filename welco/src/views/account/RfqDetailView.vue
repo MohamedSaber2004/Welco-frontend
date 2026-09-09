@@ -21,13 +21,16 @@ const linkedQuote = ref<{ id: string; status: string } | null>(null)
 const localized = (en: string, ar: string) => (locale.value === 'ar' ? ar : en)
 
 onMounted(async () => {
-  const id = String(route.params.id)
-  const found = await salesService.getRfq(id)
-  rfq.value = found
-  if (found) {
-    linkedQuote.value = salesService.quotes.value.find((q) => q.rfqId === found.id) ?? null
+  try {
+    const id = String(route.params.id)
+    const found = await salesService.getRfq(id)
+    rfq.value = found
+    if (found) {
+      linkedQuote.value = salesService.quotes.value.find((q) => q.rfqId === found.id) ?? null
+    }
+  } finally {
+    loading.value = false
   }
-  loading.value = false
 })
 </script>
 
@@ -99,7 +102,7 @@ onMounted(async () => {
 
           <div class="items-stack">
             <article v-for="it in rfq.items" :key="it.id" class="rfq-item-card">
-              <div class="thumb-box" :style="{ background: it.imageGradient || '#F8FAFC' }">
+              <div class="thumb-box" :style="{ background: it.imageGradient || '#2B2D31' }">
                 <img
                   v-if="it.imageName"
                   :src="resolveFileUrl(it.imageName)"
@@ -270,7 +273,7 @@ onMounted(async () => {
 
 /* Stepper Card */
 .stepper-card {
-  background: var(--wl-surface, #FFFFFF);
+  background: var(--wl-surface);
   border: 1px solid var(--wl-border, #E2E8F0);
   border-radius: var(--wl-radius-card, 16px);
   padding: var(--wl-card-padding, 1.25rem 1.5rem);
@@ -286,7 +289,7 @@ onMounted(async () => {
 }
 
 .manifest-card {
-  background: var(--wl-surface, #FFFFFF);
+  background: var(--wl-surface);
   border: 1px solid var(--wl-border, #E2E8F0);
   border-radius: var(--wl-radius-card, 16px);
   padding: var(--wl-card-padding, 1.5rem);
@@ -410,7 +413,7 @@ onMounted(async () => {
 }
 
 .card {
-  background: var(--wl-surface, #FFFFFF);
+  background: var(--wl-surface);
   border: 1px solid var(--wl-border, #E2E8F0);
   border-radius: var(--wl-radius-card, 16px);
   padding: var(--wl-card-padding, 1.25rem);

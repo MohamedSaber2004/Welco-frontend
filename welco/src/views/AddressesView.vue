@@ -686,7 +686,7 @@ const totalCompany = computed(() => company.addresses.value.length)
 }
 
 .address-card {
-  background: var(--wl-surface, #FFFFFF);
+  background: var(--wl-surface);
   border: 1px solid var(--wl-border, #E2E8F0);
   border-radius: var(--wl-radius-card, 16px);
   padding: var(--wl-card-padding, 1.25rem);

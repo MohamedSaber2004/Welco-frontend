@@ -84,7 +84,7 @@ import { t } from '../../i18n'
 }
 
 .account-nav__link.is-active .nav-icon {
-  color: var(--wl-teal);
+  color: var(--wl-primary);
 }
 
 @media (max-width: 640px) {

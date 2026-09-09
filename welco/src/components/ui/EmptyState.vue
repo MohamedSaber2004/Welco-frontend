@@ -28,7 +28,6 @@ defineEmits<{ action: [] }>()
 
 <template>
   <div class="empty" :class="{ 'empty--fill': fill, 'empty--compact': compact, [`empty--${variant}`]: true }">
-    <!-- subtle blueprint grid -->
     <div class="empty__grid" aria-hidden="true"></div>
 
     <div class="empty__inner">
@@ -63,7 +62,6 @@ defineEmits<{ action: [] }>()
       </div>
     </div>
 
-    <!-- caliper ticks -->
     <div class="empty__ticks" aria-hidden="true">
       <span v-for="i in 18" :key="i" class="empty__tick" :class="{ 'empty__tick--major': i % 6 === 0 }"></span>
     </div>
@@ -80,15 +78,19 @@ defineEmits<{ action: [] }>()
   justify-content: center;
   text-align: center;
   padding: clamp(2.2rem, 5vw, 3.2rem) clamp(1.25rem, 4vw, 2.5rem) clamp(1.8rem, 3vw, 2.2rem);
-  background: linear-gradient(180deg, var(--wl-surface) 0%, #F8FBFA 100%);
-  border: 1px solid var(--wl-line);
-  border-radius: var(--wl-radius-xl);
+  background: var(--wl-surface);
+  border: 1px solid var(--wl-border);
+  border-radius: var(--radius-xl);
   box-shadow: var(--wl-shadow-card);
   overflow: hidden;
   isolation: isolate;
   min-height: 260px;
 }
-:root[data-theme='dark'] .empty { background: linear-gradient(180deg, var(--wl-surface) 0%, #0F1F1E 100%); }
+:root.dark .empty,
+:root[data-theme='dark'] .empty {
+  background: var(--wl-card);
+  border-color: var(--wl-border);
+}
 
 .empty__grid {
   position: absolute;
@@ -101,7 +103,8 @@ defineEmits<{ action: [] }>()
   mask: radial-gradient(680px 320px at 50% 38%, black 38%, transparent 82%);
   pointer-events: none;
 }
-:root[data-theme='dark'] .empty__grid { opacity: 0.07; }
+:root.dark .empty__grid,
+:root[data-theme='dark'] .empty__grid { opacity: 0.05; }
 
 .empty--fill { flex: 1; min-height: 320px; }
 .empty--compact { padding: 1.8rem 1.25rem 1.5rem; min-height: 180px; }
@@ -131,11 +134,11 @@ defineEmits<{ action: [] }>()
   color: var(--wl-muted);
   margin-bottom: 1.1rem;
   background: var(--wl-surface-soft);
-  border: 1px solid var(--wl-line);
-  border-radius: var(--wl-radius-full);
+  border: 1px solid var(--wl-border);
+  border-radius: var(--radius-full);
   padding: 0.28rem 0.7rem;
 }
-.empty__code-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--wl-teal); box-shadow: 0 0 0 3px rgba(14,113,105,0.14); }
+.empty__code-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--wl-primary); box-shadow: 0 0 0 3px var(--wl-primary-soft); }
 .empty__code-line { width: 14px; height: 1px; background: var(--wl-line-strong); margin-inline-start: 0.2rem; }
 
 /* — halo icon — */
@@ -153,11 +156,11 @@ defineEmits<{ action: [] }>()
   display: grid;
   place-items: center;
   background: var(--wl-surface);
-  border: 1px solid var(--wl-line);
-  border-radius: var(--wl-radius-lg);
-  color: var(--wl-teal);
+  border: 1px solid var(--wl-border);
+  border-radius: var(--radius-lg);
+  color: var(--wl-primary);
   font-size: 1.5rem;
-  box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,0.7);
+  box-shadow: var(--shadow-sm);
   position: relative;
   z-index: 2;
 }
@@ -165,12 +168,12 @@ defineEmits<{ action: [] }>()
 .empty__halo-ring {
   position: absolute;
   inset: 0;
-  border-radius: var(--wl-radius-lg);
-  border: 1px solid rgba(14,113,105,0.10);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(var(--wl-primary-rgb), 0.12);
   pointer-events: none;
 }
-.empty__halo-ring--1 { inset: 6px; border-color: rgba(14,113,105,0.07); }
-.empty__halo-ring--2 { inset: -6px; border-radius: 20px; border-style: dashed; border-color: rgba(203,213,216,0.55); opacity: 0.7; }
+.empty__halo-ring--1 { inset: 6px; border-color: rgba(var(--wl-primary-rgb), 0.08); }
+.empty__halo-ring--2 { inset: -6px; border-radius: 20px; border-style: dashed; border-color: var(--wl-border-strong); opacity: 0.7; }
 
 .empty__title {
   font-family: var(--wl-font-display);
@@ -207,16 +210,16 @@ defineEmits<{ action: [] }>()
   text-transform: uppercase;
   color: var(--wl-muted-soft);
   background: var(--wl-surface-soft);
-  border: 1px solid var(--wl-line);
-  border-radius: var(--wl-radius-full);
+  border: 1px solid var(--wl-border);
+  border-radius: var(--radius-full);
   padding: 0.32rem 0.65rem;
 }
 .empty__foot-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--wl-amber);
-  box-shadow: 0 0 0 3px var(--wl-amber-soft);
+  background: var(--wl-accent);
+  box-shadow: 0 0 0 3px var(--wl-accent-soft);
 }
 
 .empty__ticks {
@@ -229,7 +232,7 @@ defineEmits<{ action: [] }>()
   justify-content: center;
   padding: 0.65rem 1rem 0.75rem;
   border-top: 1px solid var(--wl-line);
-  background: linear-gradient(180deg, rgba(238,242,243,0.7), var(--wl-surface-soft));
+  background: linear-gradient(180deg, transparent, var(--wl-surface-soft));
   z-index: 1;
 }
 .empty__tick { width: 1px; height: 5px; background: var(--wl-line-strong); opacity: 0.5; }

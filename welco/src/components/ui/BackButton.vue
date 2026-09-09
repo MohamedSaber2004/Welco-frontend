@@ -75,12 +75,12 @@ const handleBack = async () => {
   gap: 0.4rem;
   border: 1px solid transparent;
   background: transparent;
-  color: var(--wl-teal);
+  color: var(--wl-primary);
   font-size: 0.8rem;
   font-weight: 600;
   line-height: 1;
   padding: 0.45rem 0.7rem;
-  border-radius: var(--wl-radius-full);
+  border-radius: var(--radius-full);
   cursor: pointer;
   transition: all 0.18s var(--wl-ease-spring);
   user-select: none;
@@ -92,7 +92,7 @@ const handleBack = async () => {
   transform: translateX(0);
 }
 .back-button:focus-visible {
-  outline: 2px solid var(--wl-teal);
+  outline: 2px solid var(--wl-primary);
   outline-offset: 2px;
 }
 .back-button__icon {
@@ -104,32 +104,33 @@ const handleBack = async () => {
   border-color: transparent;
 }
 .back-button--ghost:hover {
-  background: var(--wl-teal-soft);
-  border-color: var(--wl-line);
+  background: var(--wl-primary-soft);
+  border-color: var(--wl-border);
 }
 .back-button--outline {
   background: var(--wl-surface);
-  border-color: var(--wl-line);
+  border-color: var(--wl-border);
   box-shadow: var(--shadow-xs);
 }
 .back-button--outline:hover {
   background: var(--wl-surface-soft);
-  border-color: var(--wl-teal);
-  color: var(--wl-teal-hover);
+  border-color: var(--wl-primary);
+  color: var(--wl-primary-hover);
 }
 .back-button--minimal {
   padding: 0;
   border: none;
   background: none;
-  color: var(--wl-teal);
+  color: var(--wl-primary);
 }
 .back-button--minimal:hover {
-  color: var(--wl-teal-hover);
+  color: var(--wl-primary-hover);
   background: none;
   transform: translateX(calc(-3px * var(--wl-dir-sign, 1)));
 }
+:root.dark .back-button--outline,
 :root[data-theme='dark'] .back-button--outline {
   background: var(--wl-surface);
-  border-color: var(--wl-line);
+  border-color: var(--wl-border);
 }
 </style>

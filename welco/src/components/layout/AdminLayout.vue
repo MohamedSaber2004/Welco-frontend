@@ -152,10 +152,6 @@ const toggleSection = (key: string) => {
             <span class="material-symbols-outlined nav-icon">history</span>
             <span v-if="!collapsed" class="admin-link__label">{{ t('admin.auditLogs') }}</span>
           </router-link>
-          <router-link v-if="isAdmin" to="/admin/background-jobs" class="admin-link" active-class="admin-link--active">
-            <span class="material-symbols-outlined nav-icon">schedule</span>
-            <span v-if="!collapsed" class="admin-link__label">{{ t('admin.backgroundJobs') }}</span>
-          </router-link>
         </div>
       </nav>
 
@@ -248,8 +244,8 @@ const toggleSection = (key: string) => {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--wl-teal);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.16);
+  background: var(--wl-primary);
+  box-shadow: 0 0 0 3px rgba(var(--wl-primary-rgb), 0.16);
 }
 
 .rail__brand-text {
@@ -354,14 +350,14 @@ const toggleSection = (key: string) => {
 }
 
 .admin-link--active {
-  background: var(--wl-teal-soft) !important;
-  color: var(--wl-teal) !important;
-  border-color: rgba(99, 102, 241, 0.16) !important;
+  background: var(--wl-primary-soft) !important;
+  color: var(--wl-primary) !important;
+  border-color: rgba(var(--wl-primary-rgb), 0.16) !important;
   font-weight: 600;
 }
 
 .admin-link--active .nav-icon {
-  color: var(--wl-teal);
+  color: var(--wl-primary);
 }
 
 .rail__foot {
@@ -398,8 +394,8 @@ const toggleSection = (key: string) => {
 
 .rail__lang-btn:hover {
   background: var(--wl-surface);
-  color: var(--wl-teal);
-  border-color: var(--wl-teal);
+  color: var(--wl-primary);
+  border-color: var(--wl-primary);
 }
 
 .admin-rail--collapsed .rail__foot {
@@ -443,7 +439,7 @@ const toggleSection = (key: string) => {
 }
 
 .admin-main__inner {
-  max-width: var(--wl-max-width, 1280px);
+  max-width: var(--wl-max-width-admin, 1560px);
   margin: 0 auto;
   width: 100%;
   min-width: 0;
@@ -506,9 +502,9 @@ const toggleSection = (key: string) => {
     flex-shrink: 0;
   }
   .admin-mobile-pill.is-active {
-    background: var(--wl-teal-soft);
-    color: var(--wl-teal);
-    border-color: rgba(99, 102, 241, 0.25);
+    background: var(--wl-primary-soft);
+    color: var(--wl-primary);
+    border-color: rgba(var(--wl-primary-rgb), 0.25);
   }
   .admin-main {
     padding: 0;

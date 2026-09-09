@@ -296,8 +296,8 @@
   }
 
   .sk--btn-primary {
-    background: var(--wl-teal-soft);
-    border-color: rgba(14,113,105,.12);
+    background: var(--wl-primary-soft);
+    border-color: rgba(var(--wl-primary-rgb), 0.12);
   }
 
   .sk--badge {

@@ -59,19 +59,19 @@ const activeIndex = computed(() => Math.min(props.current, props.steps.length - 
   flex-shrink: 0;
 }
 .chain-steps__node.is-active .chain-steps__ring {
-  border-color: var(--wl-teal);
-  box-shadow: 0 0 0 4px rgba(14, 113, 105, 0.14);
+  border-color: var(--wl-primary);
+  box-shadow: 0 0 0 4px rgba(var(--wl-primary-rgb), 0.14);
 }
 .chain-steps__node.is-active .chain-steps__ring::after {
   content: '';
   position: absolute;
   inset: 3px;
   border-radius: 50%;
-  background: var(--wl-teal);
+  background: var(--wl-primary);
 }
 .chain-steps__node.is-done .chain-steps__ring {
-  border-color: var(--wl-teal);
-  background: var(--wl-teal);
+  border-color: var(--wl-primary);
+  background: var(--wl-primary);
 }
 .chain-steps__node.is-done .chain-steps__ring::after {
   content: '';
@@ -80,7 +80,7 @@ const activeIndex = computed(() => Math.min(props.current, props.steps.length - 
   border-radius: 50%;
   background: var(--wl-surface);
 }
-.chain-steps__node.is-done { color: var(--wl-teal); }
+.chain-steps__node.is-done { color: var(--wl-primary); }
 .chain-steps__node.is-active { color: var(--wl-ink-strong); }
 .chain-steps__link {
   flex: 1;

@@ -2,11 +2,10 @@
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { authService, wishlistService } from '../../di/container'
-import { theme, toggleTheme } from '../../application/theme.service'
 import { useCart } from '../../composables/useCart'
 import { t, locale, setLocale } from '../../i18n'
 import { AppLanguage } from '../../domain/models/user'
-import { resolveFileUrl } from '../../utils/file-url'
+import { resolveFileUrl, isKnownBrokenUrl, markBrokenUrl } from '../../utils/file-url'
 
 const route = useRoute()
 const router = useRouter()
@@ -73,16 +72,21 @@ const userRoleLabel = computed(() => {
   return t(`admin.${authService.resolveBusinessRoleKey()}`)
 })
 
+const avatarFailed = ref(false)
 const avatarSrc = computed(() => {
+  if (avatarFailed.value) return ''
   const name = user.value?.profilePictureName
   if (!name) return ''
-  return resolveFileUrl(name, '')
+  const url = resolveFileUrl(name, '')
+  if (!url || isKnownBrokenUrl(url)) return ''
+  return url
 })
 
 const avatarInitials = computed(() => {
   const n = user.value?.fullName?.trim() ?? user.value?.email ?? '?'
   return n.split(/\s+/).slice(0, 2).map((s) => s[0]?.toUpperCase()).join('') || '?'
 })
+watch(avatarSrc, () => { avatarFailed.value = false })
 
 // Check if a route is active
 const isPathActive = (path: string, exact = false) => {
@@ -137,7 +141,7 @@ const isPathActive = (path: string, exact = false) => {
 
         <router-link to="/admin/tickets" class="bar-tab" :class="{ 'is-active': isPathActive('/admin/tickets') }">
           <span class="material-symbols-outlined tab-icon">support_agent</span>
-          <span class="tab-label">Tickets</span>
+          <span class="tab-label">{{ t('help.tickets') }}</span>
         </router-link>
       </template>
 
@@ -226,12 +230,12 @@ const isPathActive = (path: string, exact = false) => {
         <header class="sheet-head">
           <div class="sheet-user">
             <div class="sheet-avatar" :style="{ background: user?.tint || '#4F46E5' }">
-              <img v-if="avatarSrc" :src="avatarSrc" :alt="user?.fullName ?? 'User'" class="sheet-avatar-img" />
+              <img v-if="avatarSrc" :src="avatarSrc" :alt="user?.fullName ?? 'User'" class="sheet-avatar-img" @error="avatarFailed = true; markBrokenUrl(avatarSrc)" />
               <span v-else class="sheet-avatar-text">{{ avatarInitials }}</span>
             </div>
             <div class="sheet-user__meta">
-              <strong class="sheet-user__name">{{ isAuthed ? user?.fullName : 'Guest Practitioner' }}</strong>
-              <span class="sheet-user__role mono">{{ isAuthed ? userRoleLabel : 'Welcome to Welco' }}</span>
+              <strong class="sheet-user__name">{{ isAuthed ? user?.fullName : (locale === 'ar' ? 'ممارس زائر' : 'Guest Practitioner') }}</strong>
+              <span class="sheet-user__role mono">{{ isAuthed ? userRoleLabel : (locale === 'ar' ? 'مرحباً بك في ويلكو' : 'Welcome to Welco') }}</span>
             </div>
           </div>
           <button type="button" class="sheet-close" aria-label="Close" @click="closeMore">
@@ -243,7 +247,7 @@ const isPathActive = (path: string, exact = false) => {
         <div class="sheet-body">
           <!-- Section: Admin & Staff Management (if seller) -->
           <div v-if="isSeller" class="sheet-section">
-            <div class="sheet-section-title mono">CONSOLE & OPERATIONS</div>
+            <div class="sheet-section-title mono">{{ locale === 'ar' ? 'لوحة التحكم والعمليات' : 'CONSOLE & OPERATIONS' }}</div>
             <div class="sheet-grid">
               <button type="button" class="sheet-item" @click="navigateTo('/admin')">
                 <span class="sheet-icon-box sheet-icon--primary">
@@ -251,7 +255,7 @@ const isPathActive = (path: string, exact = false) => {
                 </span>
                 <span class="sheet-item__text">
                   <strong>{{ t('admin.dashboard') }}</strong>
-                  <small>Overview & telemetry</small>
+                  <small>{{ locale === 'ar' ? 'نظرة عامة والقياسات' : 'Overview & telemetry' }}</small>
                 </span>
               </button>
 
@@ -261,7 +265,7 @@ const isPathActive = (path: string, exact = false) => {
                 </span>
                 <span class="sheet-item__text">
                   <strong>{{ t('admin.sales') }}</strong>
-                  <small>RFQ & Quote pipeline</small>
+                  <small>{{ locale === 'ar' ? 'مسار عروض الأسعار والطلبات' : 'RFQ & Quote pipeline' }}</small>
                 </span>
               </button>
 
@@ -271,7 +275,7 @@ const isPathActive = (path: string, exact = false) => {
                 </span>
                 <span class="sheet-item__text">
                   <strong>{{ t('admin.orders') }}</strong>
-                  <small>Order dispatch</small>
+                  <small>{{ locale === 'ar' ? 'تنفيذ وشحن الطلبات' : 'Order dispatch' }}</small>
                 </span>
               </button>
 
@@ -281,7 +285,7 @@ const isPathActive = (path: string, exact = false) => {
                 </span>
                 <span class="sheet-item__text">
                   <strong>{{ t('nav.catalog') }}</strong>
-                  <small>Products & categories</small>
+                  <small>{{ locale === 'ar' ? 'المنتجات والأقسام' : 'Products & categories' }}</small>
                 </span>
               </button>
 
@@ -291,7 +295,7 @@ const isPathActive = (path: string, exact = false) => {
                 </span>
                 <span class="sheet-item__text">
                   <strong>{{ t('admin.companies') }}</strong>
-                  <small>Distributors directory</small>
+                  <small>{{ locale === 'ar' ? 'دليل الشركات والموزعين' : 'Distributors directory' }}</small>
                 </span>
               </button>
 
@@ -301,7 +305,7 @@ const isPathActive = (path: string, exact = false) => {
                 </span>
                 <span class="sheet-item__text">
                   <strong>{{ t('admin.users') }}</strong>
-                  <small>Practitioners & access</small>
+                  <small>{{ locale === 'ar' ? 'الممارسون وإدارة الوصول' : 'Practitioners & access' }}</small>
                 </span>
               </button>
 
@@ -310,8 +314,8 @@ const isPathActive = (path: string, exact = false) => {
                   <span class="material-symbols-outlined">public</span>
                 </span>
                 <span class="sheet-item__text">
-                  <strong>Territory</strong>
-                  <small>Countries, cities, zones</small>
+                  <strong>{{ t('admin.territory') }}</strong>
+                  <small>{{ locale === 'ar' ? 'الدول، المدن، المناطق' : 'Countries, cities, zones' }}</small>
                 </span>
               </button>
 
@@ -321,7 +325,7 @@ const isPathActive = (path: string, exact = false) => {
                 </span>
                 <span class="sheet-item__text">
                   <strong>{{ t('admin.auditLogs') }}</strong>
-                  <small>Security ledger</small>
+                  <small>{{ locale === 'ar' ? 'سجل الأمان والتدقيق' : 'Security ledger' }}</small>
                 </span>
               </button>
 
@@ -330,8 +334,8 @@ const isPathActive = (path: string, exact = false) => {
                   <span class="material-symbols-outlined">support_agent</span>
                 </span>
                 <span class="sheet-item__text">
-                  <strong>Support Tickets</strong>
-                  <small>Inquiries queue</small>
+                  <strong>{{ t('help.tickets') }}</strong>
+                  <small>{{ locale === 'ar' ? 'قائمة الاستفسارات' : 'Inquiries queue' }}</small>
                 </span>
               </button>
 
@@ -340,8 +344,8 @@ const isPathActive = (path: string, exact = false) => {
                   <span class="material-symbols-outlined">help</span>
                 </span>
                 <span class="sheet-item__text">
-                  <strong>Help Management</strong>
-                  <small>Articles & guides</small>
+                  <strong>{{ t('nav.help') }}</strong>
+                  <small>{{ locale === 'ar' ? 'المقالات والأدلة' : 'Articles & guides' }}</small>
                 </span>
               </button>
             </div>
@@ -349,7 +353,7 @@ const isPathActive = (path: string, exact = false) => {
 
           <!-- Section: Institutional Desk (Buyer) -->
           <div v-if="isBuyer && isAuthed" class="sheet-section">
-            <div class="sheet-section-title mono">ORGANIZATION DESK</div>
+            <div class="sheet-section-title mono">{{ locale === 'ar' ? 'مكتب المؤسسة' : 'ORGANIZATION DESK' }}</div>
             <div class="sheet-grid">
               <button type="button" class="sheet-item" @click="navigateTo('/account')">
                 <span class="sheet-icon-box sheet-icon--primary">
@@ -357,7 +361,7 @@ const isPathActive = (path: string, exact = false) => {
                 </span>
                 <span class="sheet-item__text">
                   <strong>{{ t('account.dashboard') }}</strong>
-                  <small>Procurement overview</small>
+                  <small>{{ locale === 'ar' ? 'نظرة عامة على المشتريات' : 'Procurement overview' }}</small>
                 </span>
               </button>
 
@@ -367,7 +371,7 @@ const isPathActive = (path: string, exact = false) => {
                 </span>
                 <span class="sheet-item__text">
                   <strong>{{ t('sales.rfqTitle') }}</strong>
-                  <small>Active RFQ submissions</small>
+                  <small>{{ locale === 'ar' ? 'طلبات الأسعار المرسلة' : 'Active RFQ submissions' }}</small>
                 </span>
               </button>
 
@@ -377,7 +381,7 @@ const isPathActive = (path: string, exact = false) => {
                 </span>
                 <span class="sheet-item__text">
                   <strong>{{ t('sales.quoteTitle') }}</strong>
-                  <small>Issued proposals</small>
+                  <small>{{ locale === 'ar' ? 'عروض الأسعار المعتمدة' : 'Issued proposals' }}</small>
                 </span>
               </button>
 
@@ -387,7 +391,7 @@ const isPathActive = (path: string, exact = false) => {
                 </span>
                 <span class="sheet-item__text">
                   <strong>{{ t('commerce.ordersTitle') }}</strong>
-                  <small>Order history & dispatch</small>
+                  <small>{{ locale === 'ar' ? 'سجل وحالة الشحنات' : 'Order history & dispatch' }}</small>
                 </span>
               </button>
 
@@ -397,7 +401,7 @@ const isPathActive = (path: string, exact = false) => {
                 </span>
                 <span class="sheet-item__text">
                   <strong>{{ t('nav.addresses') }}</strong>
-                  <small>Delivery locations</small>
+                  <small>{{ locale === 'ar' ? 'عناوين التوصيل' : 'Delivery locations' }}</small>
                 </span>
               </button>
             </div>
@@ -405,7 +409,7 @@ const isPathActive = (path: string, exact = false) => {
 
           <!-- Section: Commercial & Catalog -->
           <div class="sheet-section">
-            <div class="sheet-section-title mono">MARKETPLACE & CATALOG</div>
+            <div class="sheet-section-title mono">{{ locale === 'ar' ? 'السوق والكتالوج' : 'MARKETPLACE & CATALOG' }}</div>
             <div class="sheet-grid">
               <button type="button" class="sheet-item" @click="navigateTo('/')">
                 <span class="sheet-icon-box sheet-icon--primary">
@@ -413,7 +417,7 @@ const isPathActive = (path: string, exact = false) => {
                 </span>
                 <span class="sheet-item__text">
                   <strong>{{ t('nav.home') }}</strong>
-                  <small>Main storefront</small>
+                  <small>{{ locale === 'ar' ? 'الواجهة الرئيسية' : 'Main storefront' }}</small>
                 </span>
               </button>
 
@@ -423,7 +427,7 @@ const isPathActive = (path: string, exact = false) => {
                 </span>
                 <span class="sheet-item__text">
                   <strong>{{ t('nav.marketplace') }}</strong>
-                  <small>Full instrument catalog</small>
+                  <small>{{ locale === 'ar' ? 'كتالوج الأدوات الكامل' : 'Full instrument catalog' }}</small>
                 </span>
               </button>
 
@@ -433,8 +437,8 @@ const isPathActive = (path: string, exact = false) => {
                 </span>
                 <span class="sheet-item__text">
                   <strong>{{ t('nav.cart') }}</strong>
-                  <small v-if="cartCount > 0">{{ cartCount }} item(s) in quote</small>
-                  <small v-else>Active quote basket</small>
+                  <small v-if="cartCount > 0">{{ locale === 'ar' ? `${cartCount} أداة في السلة` : `${cartCount} item(s) in quote` }}</small>
+                  <small v-else>{{ locale === 'ar' ? 'سلة عروض الأسعار' : 'Active quote basket' }}</small>
                 </span>
               </button>
 
@@ -444,7 +448,7 @@ const isPathActive = (path: string, exact = false) => {
                 </span>
                 <span class="sheet-item__text">
                   <strong>{{ t('nav.wishlist') }}</strong>
-                  <small>{{ wishlistCount }} saved instruments</small>
+                  <small>{{ locale === 'ar' ? `${wishlistCount} أداة محفوظة` : `${wishlistCount} saved instruments` }}</small>
                 </span>
               </button>
 
@@ -454,7 +458,7 @@ const isPathActive = (path: string, exact = false) => {
                 </span>
                 <span class="sheet-item__text">
                   <strong>{{ t('nav.oem') }}</strong>
-                  <small>Custom private label</small>
+                  <small>{{ locale === 'ar' ? 'تصنيع خاص بالعلامة التجارية' : 'Custom private label' }}</small>
                 </span>
               </button>
 
@@ -464,7 +468,7 @@ const isPathActive = (path: string, exact = false) => {
                 </span>
                 <span class="sheet-item__text">
                   <strong>{{ t('nav.certifications') }}</strong>
-                  <small>ISO & CE compliance</small>
+                  <small>{{ locale === 'ar' ? 'مطابقة ISO و CE' : 'ISO & CE compliance' }}</small>
                 </span>
               </button>
 
@@ -484,7 +488,7 @@ const isPathActive = (path: string, exact = false) => {
                 </span>
                 <span class="sheet-item__text">
                   <strong>{{ t('nav.trackOrder') }}</strong>
-                  <small>Live consignment status</small>
+                  <small>{{ locale === 'ar' ? 'تتبع الشحنات المباشر' : 'Live consignment status' }}</small>
                 </span>
               </button>
             </div>
@@ -492,7 +496,7 @@ const isPathActive = (path: string, exact = false) => {
 
           <!-- Section: Support & Help -->
           <div class="sheet-section">
-            <div class="sheet-section-title mono">SUPPORT & CLINICAL HELP</div>
+            <div class="sheet-section-title mono">{{ locale === 'ar' ? 'الدعم والمساعدة الطبية' : 'SUPPORT & CLINICAL HELP' }}</div>
             <div class="sheet-grid">
               <button type="button" class="sheet-item" @click="navigateTo('/help')">
                 <span class="sheet-icon-box sheet-icon--teal">
@@ -500,7 +504,7 @@ const isPathActive = (path: string, exact = false) => {
                 </span>
                 <span class="sheet-item__text">
                   <strong>{{ t('nav.help') }}</strong>
-                  <small>Guides & documentation</small>
+                  <small>{{ locale === 'ar' ? 'الأدلة والتوثيق' : 'Guides & documentation' }}</small>
                 </span>
               </button>
 
@@ -509,8 +513,8 @@ const isPathActive = (path: string, exact = false) => {
                   <span class="material-symbols-outlined">confirmation_number</span>
                 </span>
                 <span class="sheet-item__text">
-                  <strong>My Tickets</strong>
-                  <small>Track support inquiries</small>
+                  <strong>{{ t('help.myTickets') }}</strong>
+                  <small>{{ locale === 'ar' ? 'متابعة استفسارات الدعم' : 'Track support inquiries' }}</small>
                 </span>
               </button>
 
@@ -519,8 +523,8 @@ const isPathActive = (path: string, exact = false) => {
                   <span class="material-symbols-outlined">public</span>
                 </span>
                 <span class="sheet-item__text">
-                  <strong>Territory Coverage</strong>
-                  <small>Global clinical logistics</small>
+                  <strong>{{ locale === 'ar' ? 'التغطية الجغرافية' : 'Territory Coverage' }}</strong>
+                  <small>{{ locale === 'ar' ? 'اللوجستيات الطبية الإقليمية' : 'Global clinical logistics' }}</small>
                 </span>
               </button>
             </div>
@@ -533,10 +537,6 @@ const isPathActive = (path: string, exact = false) => {
             <button type="button" class="sheet-foot-btn" @click="navigateTo('/profile')">
               <span class="material-symbols-outlined text-[18px]">manage_accounts</span>
               <span>{{ t('nav.profile') }}</span>
-            </button>
-            <button type="button" class="sheet-foot-btn" :aria-label="t('nav.toggleTheme')" @click="toggleTheme">
-              <span class="material-symbols-outlined text-[18px]">{{ theme === 'light' ? 'dark_mode' : 'light_mode' }}</span>
-              <span>{{ theme === 'light' ? (locale === 'ar' ? 'الوضع الداكن' : 'Dark') : (locale === 'ar' ? 'الوضع الفاتح' : 'Light') }}</span>
             </button>
             <button type="button" class="sheet-foot-btn" @click="toggleLang">
               <span class="material-symbols-outlined text-[18px]">language</span>
@@ -552,13 +552,13 @@ const isPathActive = (path: string, exact = false) => {
               <span class="material-symbols-outlined text-[18px]">login</span>
               <span>{{ t('nav.login') }}</span>
             </button>
-            <button type="button" class="sheet-foot-btn" @click="toggleLang">
-              <span class="material-symbols-outlined text-[18px]">language</span>
-              <span>{{ locale === 'ar' ? 'English' : 'العربية' }}</span>
-            </button>
             <button type="button" class="sheet-foot-btn" @click="navigateTo('/auth/register')">
               <span class="material-symbols-outlined text-[18px]">person_add</span>
               <span>{{ t('nav.register') }}</span>
+            </button>
+            <button type="button" class="sheet-foot-btn" @click="toggleLang">
+              <span class="material-symbols-outlined text-[18px]">language</span>
+              <span>{{ locale === 'ar' ? 'English' : 'العربية' }}</span>
             </button>
           </template>
         </footer>
@@ -876,14 +876,14 @@ const isPathActive = (path: string, exact = false) => {
   font-size: 18px;
 }
 
-.sheet-icon--primary { background: rgba(79, 70, 229, 0.12); color: #4F46E5; }
-.sheet-icon--amber   { background: rgba(245, 158, 11, 0.12); color: #D97706; }
-.sheet-icon--indigo  { background: rgba(99, 102, 241, 0.12); color: #4F46E5; }
-.sheet-icon--teal    { background: rgba(13, 148, 136, 0.12); color: #0D9488; }
-.sheet-icon--emerald { background: rgba(16, 185, 129, 0.12); color: #059669; }
-.sheet-icon--purple  { background: rgba(147, 51, 234, 0.12); color: #9333EA; }
-.sheet-icon--rose    { background: rgba(225, 29, 72, 0.12); color: #E11D48; }
-.sheet-icon--slate   { background: rgba(100, 116, 139, 0.12); color: #475569; }
+.sheet-icon--primary { background: var(--wl-primary-soft); color: var(--wl-primary); }
+.sheet-icon--amber   { background: var(--wl-warning-soft); color: var(--wl-warning); }
+.sheet-icon--indigo  { background: var(--wl-primary-soft); color: var(--wl-primary); }
+.sheet-icon--teal    { background: var(--wl-accent-soft); color: var(--wl-accent); }
+.sheet-icon--emerald { background: var(--wl-success-soft); color: var(--wl-success); }
+.sheet-icon--purple  { background: var(--wl-primary-soft); color: var(--wl-primary); }
+.sheet-icon--rose    { background: var(--wl-danger-soft); color: var(--wl-danger); }
+.sheet-icon--slate   { background: var(--wl-surface-soft); color: var(--wl-muted); }
 
 .sheet-item__text {
   display: flex;

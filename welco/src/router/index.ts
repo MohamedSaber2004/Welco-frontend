@@ -80,6 +80,16 @@ const router = createRouter({
       meta: { titleKey: 'nav.locations', requiresAuth: true, requiresAdmin: true },
     },
     {
+      path: '/catalog',
+      redirect: '/marketplace',
+    },
+    {
+      path: '/categories',
+      name: 'categories',
+      component: () => import('../views/catalog/CategoriesView.vue'),
+      meta: { titleKey: 'marketplace.categoriesTitle' },
+    },
+    {
       path: '/marketplace',
       name: 'marketplace',
       component: () => import('../views/marketplace/CatalogView.vue'),
@@ -168,6 +178,12 @@ const router = createRouter({
       name: 'oem',
       component: () => import('../views/trade/OemView.vue'),
       meta: { titleKey: 'nav.oem', isLandingPage: true },
+    },
+    {
+      path: '/providers',
+      name: 'providers',
+      component: () => import('../views/trade/ProvidersView.vue'),
+      meta: { titleKey: 'nav.providers', isLandingPage: true },
     },
     {
       path: '/certifications',
@@ -292,20 +308,6 @@ const router = createRouter({
       meta: { titleKey: 'admin.auditLogs', requiresAuth: true, requiresAdmin: true },
     },
     {
-      path: '/admin/background-jobs',
-      name: 'admin-background-jobs',
-      component: () => import('../views/admin/BackgroundJobsAdminView.vue'),
-      meta: { titleKey: 'admin.backgroundJobs', requiresAuth: true, requiresAdmin: true },
-    },
-    {
-      path: '/admin/jobs',
-      redirect: '/admin/background-jobs',
-    },
-    {
-      path: '/admin/hangfire',
-      redirect: '/admin/background-jobs',
-    },
-    {
       path: '/admin/documents',
       redirect: '/admin/certifications?tab=documents',
     },
@@ -352,8 +354,7 @@ router.beforeEach(async (to) => {
     return { name: 'login', query: { redirect: to.fullPath } }
   }
   if (to.meta.guestOnly && isAuthenticated) {
-    if (isSeller) return { name: 'admin-dashboard' }
-    return { name: 'home' }
+    return { name: auth.getDashboardRouteName() }
   }
   if (to.meta.requiresAdmin) {
     if (!isSeller) return { name: 'home' }

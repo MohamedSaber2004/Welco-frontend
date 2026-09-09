@@ -1,11 +1,14 @@
-/* Welco — Surgical Precision Design System
- * Zinc & Slate neutral foundation · Electric Indigo #4F46E5 · Precision Cobalt #6366F1
+/* Welco — Surgical Precision Design System · DARK ONLY
+ * Deep charcoal foundation · Blurple #5865F2 · Periwinkle #949CF7
  * Plus Jakarta Sans & Sora Display · Inter Body · Alexandria & IBM Plex Sans Arabic · JetBrains Mono Data
  * Signature: Laser scalpel sweep, luminous micro-focus rings, 44px ergonomic controls
+ * NOTE: white/light mode has been removed — :root IS the dark theme.
  */
 @import url('https://fonts.googleapis.com/css2?family=Alexandria:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Sora:wght@500;600;700;800&display=swap');
 
 :root {
+  color-scheme: dark;
+
   /* ── Typography — Surgical Precision & High-Density Clinical Clarity ── */
   --wl-font-display: 'Plus Jakarta Sans', 'Sora', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --wl-font-body: 'Inter', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -23,19 +26,20 @@
   --wl-leading-body: 1.62;
 
   /* ── RGB channels for Tailwind opacity ── */
-  --wl-primary-rgb: 79, 70, 229;
-  --wl-accent-rgb: 99, 102, 241;
-  --wl-danger-rgb: 244, 63, 94;
-  --wl-success-rgb: 16, 185, 129;
-  --wl-warning-rgb: 245, 158, 11;
-  --wl-paper-rgb: 248, 250, 252;
-  --wl-surface-rgb: 255, 255, 255;
-  --wl-ink-rgb: 30, 41, 59;
-  --wl-ink-strong-rgb: 15, 23, 42;
-  --wl-ink-soft-rgb: 71, 85, 105;
-  --wl-muted-rgb: 100, 116, 139;
+  --wl-primary-rgb: 88, 101, 242;
+  --wl-accent-rgb: 148, 156, 247;
+  --wl-danger-rgb: 237, 66, 69;
+  --wl-success-rgb: 87, 242, 135;
+  --wl-warning-rgb: 254, 231, 92;
+  --wl-info-rgb: 0, 168, 252;
+  --wl-paper-rgb: 30, 31, 34;
+  --wl-surface-rgb: 43, 45, 49;
+  --wl-ink-rgb: 219, 222, 225;
+  --wl-ink-strong-rgb: 242, 243, 245;
+  --wl-ink-soft-rgb: 181, 186, 193;
+  --wl-muted-rgb: 148, 155, 164;
 
-  /* ── Zinc Neutrals ── */
+  /* ── Zinc Neutrals (kept for scrollbars / legacy refs) ── */
   --zinc-50: #FAFAFA;
   --zinc-100: #F4F4F5;
   --zinc-200: #E4E4E7;
@@ -48,66 +52,67 @@
   --zinc-900: #18181B;
   --zinc-950: #09090B;
 
-  /* ── Primary — Electric Indigo ── */
-  --wl-primary: #4F46E5;
-  --wl-primary-hover: #4338CA;
-  --wl-primary-active: #3730A3;
-  --wl-primary-soft: #EEF2FF;
-  --wl-primary-faint: #F5F3FF;
-  --wl-primary-ring: 0 0 0 4px rgba(79, 70, 229, 0.12);
-  --wl-primary-shadow: 0 4px 20px -2px rgba(79, 70, 229, 0.15), 0 2px 8px rgba(79, 70, 229, 0.08);
-  --wl-primary-glow: 0 0 0 3.5px rgba(79, 70, 229, 0.14), 0 2px 8px -2px rgba(79, 70, 229, 0.18);
+  /* ── Primary — Blurple ── */
+  --wl-primary: #5865F2;
+  --wl-primary-hover: #4752C4;
+  --wl-primary-active: #3C45A5;
+  --wl-primary-soft: rgba(88, 101, 242, 0.18);
+  --wl-primary-faint: rgba(88, 101, 242, 0.09);
+  --wl-primary-ring: 0 0 0 4px rgba(88, 101, 242, 0.28);
+  --wl-primary-shadow: 0 4px 22px rgba(88, 101, 242, 0.35), 0 2px 8px rgba(0, 0, 0, 0.4);
+  --wl-primary-glow: 0 0 0 3.5px rgba(88, 101, 242, 0.24), 0 2px 12px rgba(88, 101, 242, 0.3);
   --wl-on-primary: #FFFFFF;
 
-  /* ── Accent — Precision Cobalt ── */
-  --wl-accent: #6366F1;
-  --wl-accent-hover: #4F46E5;
-  --wl-accent-soft: #EEF2FF;
-  --wl-accent-faint: #F5F3FF;
-  --wl-accent-ring: 0 0 0 4px rgba(99, 102, 241, 0.12);
+  /* ── Accent — Periwinkle ── */
+  --wl-accent: #949CF7;
+  --wl-accent-hover: #A8B3FA;
+  --wl-accent-soft: rgba(148, 156, 247, 0.15);
+  --wl-accent-faint: rgba(148, 156, 247, 0.08);
+  --wl-accent-ring: 0 0 0 4px rgba(148, 156, 247, 0.2);
 
-  /* ── Semantic ── */
-  --wl-success: #10B981;
-  --wl-success-soft: #ECFDF5;
-  --wl-success-ring: 0 0 0 4px rgba(16, 185, 129, 0.12);
-  --wl-warning: #F59E0B;
-  --wl-warning-soft: #FFFBEB;
-  --wl-danger: #F43F5E;
-  --wl-danger-soft: #FFF1F2;
-  --wl-danger-ring: 0 0 0 4px rgba(244, 63, 94, 0.12);
-  --wl-info: #0EA5E9;
-  --wl-info-soft: #F0F9FF;
+  /* ── Semantic (dark-tuned, high contrast on charcoal) ── */
+  --wl-success: #57F287;
+  --wl-success-soft: rgba(87, 242, 135, 0.15);
+  --wl-success-ring: 0 0 0 4px rgba(87, 242, 135, 0.18);
+  --wl-warning: #FEE75C;
+  --wl-warning-soft: rgba(254, 231, 92, 0.15);
+  --wl-danger: #ED4245;
+  --wl-danger-soft: rgba(237, 66, 69, 0.15);
+  --wl-danger-ring: 0 0 0 4px rgba(237, 66, 69, 0.18);
+  --wl-info: #00A8FC;
+  --wl-info-soft: rgba(0, 168, 252, 0.15);
 
-  /* ── Ink & Line ── */
-  --wl-ink-strong: #0F172A;
-  --wl-ink: #1E293B;
-  --wl-ink-soft: #475569;
-  --wl-muted: #64748B;
-  --wl-muted-soft: #94A3B8;
-  --wl-line: #E2E8F0;
-  --wl-line-strong: #CBD5E1;
+  /* ── Ink & Line (font colors — all tuned for dark readability) ── */
+  --wl-ink-strong: #F2F3F5;
+  --wl-ink: #DBDEE1;
+  --wl-ink-soft: #B5BAC1;
+  --wl-muted: #949BA4;
+  --wl-muted-soft: #7E8590;
+  --wl-line: rgba(255, 255, 255, 0.09);
+  --wl-line-strong: rgba(255, 255, 255, 0.18);
 
-  /* ── Surfaces ── */
-  --wl-paper: #F8FAFC;
-  --wl-surface: #FFFFFF;
-  --wl-card: #FFFFFF;
-  --wl-surface-soft: #F1F5F9;
-  --wl-surface-hover: #E2E8F0;
-  --wl-surface-muted: #F8FAFC;
-  --wl-border: #E2E8F0;
-  --wl-border-strong: #CBD5E1;
-  --wl-header-bg: rgba(248, 250, 252, 0.8);
-  --wl-header-border: rgba(0, 0, 0, 0.06);
+  /* ── Surfaces (layered charcoal depth) ── */
+  --wl-paper: #1E1F22;
+  --wl-surface: #2B2D31;
+  --wl-card: #313338;
+  --wl-surface-soft: #383A40;
+  --wl-surface-hover: #404249;
+  --wl-surface-muted: #1E1F22;
+  --wl-border: rgba(255, 255, 255, 0.09);
+  --wl-border-strong: rgba(255, 255, 255, 0.18);
+  --wl-header-bg: rgba(30, 31, 34, 0.86);
+  --wl-header-border: rgba(255, 255, 255, 0.07);
+  --wl-app-glow: radial-gradient(1200px 500px at 50% -10%, rgba(88, 101, 242, 0.12), transparent 60%);
 
   /* ── Text Colors ── */
-  --wl-text-primary: var(--wl-ink-strong);
-  --wl-text-secondary: var(--wl-ink-soft);
-  --wl-text-muted: var(--wl-muted);
+  --wl-text-primary: #F2F3F5;
+  --wl-text-secondary: #B5BAC1;
+  --wl-text-muted: #949BA4;
 
   /* ── Background Colors ── */
-  --wl-bg-app: var(--wl-paper);
-  --wl-bg-surface: var(--wl-surface);
-  --wl-bg-surface-soft: var(--wl-surface-soft);
+  --wl-bg-app: #1E1F22;
+  --wl-bg-surface: #2B2D31;
+  --wl-bg-surface-soft: #383A40;
 
   /* ── Spacing Scale (4px harmonic base) ── */
   --space-0: 0px;
@@ -133,17 +138,18 @@
   --radius-2xl: 24px;
   --radius-full: 999px;
 
-  /* ── Shadows (Multi-stage ambient diffusion) ── */
-  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
-  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
-  --shadow-md: 0 4px 8px -2px rgba(15, 23, 42, 0.06), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
-  --shadow-lg: 0 12px 20px -4px rgba(15, 23, 42, 0.07), 0 4px 6px -2px rgba(15, 23, 42, 0.03);
-  --shadow-xl: 0 24px 36px -8px rgba(15, 23, 42, 0.09), 0 8px 16px -4px rgba(15, 23, 42, 0.04);
-  --wl-shadow-card: 0 0 0 1px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.04), 0 6px 18px -4px rgba(15, 23, 42, 0.03);
-  --wl-shadow-primary: 0 4px 16px -2px rgba(79, 70, 229, 0.28), 0 2px 6px -1px rgba(79, 70, 229, 0.18);
+  /* ── Shadows (deep ambient diffusion for dark depth) ── */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.45);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.55);
+  --shadow-xl: 0 24px 48px rgba(0, 0, 0, 0.6);
+  --wl-shadow-card: 0 0 0 1px rgba(0, 0, 0, 0.32), 0 2px 10px rgba(0, 0, 0, 0.45), 0 14px 32px -8px rgba(0, 0, 0, 0.55);
+  --wl-shadow-primary: 0 4px 22px rgba(88, 101, 242, 0.4);
 
   /* ── Layout & Semantic Spacing Tokens ── */
   --wl-max-width: 1280px;
+  --wl-max-width-admin: 1560px;
   --wl-header-height: 56px;
   --wl-touch-min: 44px;
   --wl-header-search-min: 170px;
@@ -177,8 +183,8 @@
   /* ── Motion ── */
   --wl-transition: 0.18s cubic-bezier(0.16, 1, 0.3, 1);
   --wl-ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
-  --wl-focus-ring: 0 0 0 3.5px rgba(79, 70, 229, 0.14), 0 2px 8px -2px rgba(79, 70, 229, 0.18);
-  --wl-focus-ring-danger: 0 0 0 3.5px rgba(244, 63, 94, 0.16);
+  --wl-focus-ring: 0 0 0 3.5px rgba(88, 101, 242, 0.28), 0 2px 12px rgba(88, 101, 242, 0.25);
+  --wl-focus-ring-danger: 0 0 0 3.5px rgba(237, 66, 69, 0.22);
 
   /* ── Backward-compatible aliases (consolidate to --wl-primary / --wl-accent) ── */
   --wl-teal: var(--wl-primary);
@@ -192,11 +198,10 @@
   --wl-amber-soft: var(--wl-accent-soft);
   --wl-brass: var(--wl-accent);
   --wl-brass-soft: var(--wl-accent-soft);
-  --wl-on-primary: #FFFFFF;
   --clinical-primary: var(--wl-primary);
   --clinical-primary-container: var(--wl-primary-soft);
-  --clinical-inverse-surface: var(--wl-ink-strong);
-  --clinical-inverse-primary: #A5B4FC;
+  --clinical-inverse-surface: #FAFAFA;
+  --clinical-inverse-primary: #4F46E5;
   --wl-medical-blue-soft: var(--wl-primary-soft);
   --wl-medical-blue-faint: var(--wl-primary-faint);
   --wl-steril-amber-soft: var(--wl-accent-soft);
@@ -211,44 +216,31 @@
   --wl-radius-xl: var(--radius-xl);
 
   /* ── Laser Sweep Gradient ── */
-  --wl-laser-sweep: linear-gradient(90deg, transparent, var(--wl-primary), var(--wl-accent), transparent);
+  --wl-laser-sweep: linear-gradient(90deg, transparent, #5865F2, #949CF7, transparent);
 }
 
-/* ── Dark Theme — Discord palette ─────────────────────────────
- * tertiary #1e1f22 · secondary #2b2d31 · primary #313338 · input #383a40
- * hover/selected modifier #4e5058 · text #dbdee1 / muted #949ba4
- * blurple #5865f2 · green #57f287 · yellow #fee75c · red #ed4245
- * ───────────────────────────────────────────────────────────── */
-:root.dark, :root[data-theme='dark'] {
+/* ── Dark-only compat: .dark / [data-theme] selectors resolve identically ──
+ * White mode removed — these blocks intentionally mirror :root so any
+ * legacy `dark` class handling keeps rendering the same rich dark theme. */
+:root.dark, :root[data-theme='dark'], :root[data-theme='light'] {
   color-scheme: dark;
-  --wl-paper-rgb: 30, 31, 34;
-  --wl-surface-rgb: 43, 45, 49;
-  --wl-ink-rgb: 219, 222, 225;
-  --wl-ink-strong-rgb: 242, 243, 245;
-  --wl-ink-soft-rgb: 181, 186, 193;
-  --wl-muted-rgb: 148, 155, 164;
-  --wl-primary-rgb: 88, 101, 242;
-  --wl-accent-rgb: 148, 156, 247;
-  --wl-success-rgb: 87, 242, 135;
-  --wl-danger-rgb: 237, 66, 69;
-  --wl-warning-rgb: 254, 231, 92;
-  --wl-ink-strong: #F2F3F5;
-  --wl-ink: #DBDEE1;
-  --wl-ink-soft: #B5BAC1;
-  --wl-muted: #949BA4;
-  --wl-muted-soft: #80848E;
   --wl-paper: #1E1F22;
   --wl-surface: #2B2D31;
   --wl-card: #313338;
   --wl-surface-soft: #383A40;
   --wl-surface-hover: #404249;
   --wl-surface-muted: #1E1F22;
-  --wl-border: rgba(255, 255, 255, 0.08);
-  --wl-border-strong: rgba(255, 255, 255, 0.16);
-  --wl-line: rgba(255, 255, 255, 0.08);
-  --wl-line-strong: rgba(255, 255, 255, 0.16);
-  --wl-header-bg: rgba(30, 31, 34, 0.85);
-  --wl-header-border: rgba(255, 255, 255, 0.06);
+  --wl-border: rgba(255, 255, 255, 0.09);
+  --wl-border-strong: rgba(255, 255, 255, 0.18);
+  --wl-line: rgba(255, 255, 255, 0.09);
+  --wl-line-strong: rgba(255, 255, 255, 0.18);
+  --wl-header-bg: rgba(30, 31, 34, 0.86);
+  --wl-header-border: rgba(255, 255, 255, 0.07);
+  --wl-ink-strong: #F2F3F5;
+  --wl-ink: #DBDEE1;
+  --wl-ink-soft: #B5BAC1;
+  --wl-muted: #949BA4;
+  --wl-muted-soft: #7E8590;
   --wl-text-primary: #F2F3F5;
   --wl-text-secondary: #B5BAC1;
   --wl-text-muted: #949BA4;
@@ -258,47 +250,28 @@
   --wl-primary: #5865F2;
   --wl-primary-hover: #4752C4;
   --wl-primary-active: #3C45A5;
-  --wl-primary-soft: rgba(88, 101, 242, 0.16);
-  --wl-primary-faint: rgba(88, 101, 242, 0.08);
-  --wl-primary-ring: 0 0 0 4px rgba(88, 101, 242, 0.25);
-  --wl-primary-shadow: 0 4px 20px rgba(88, 101, 242, 0.3);
-  --wl-primary-glow: 0 0 0 3.5px rgba(88, 101, 242, 0.22), 0 2px 10px rgba(88, 101, 242, 0.25);
-  --wl-on-primary: #FFFFFF;
+  --wl-primary-soft: rgba(88, 101, 242, 0.18);
+  --wl-primary-faint: rgba(88, 101, 242, 0.09);
   --wl-accent: #949CF7;
   --wl-accent-hover: #A8B3FA;
-  --wl-accent-soft: rgba(148, 156, 247, 0.14);
-  --wl-accent-faint: rgba(148, 156, 247, 0.07);
+  --wl-accent-soft: rgba(148, 156, 247, 0.15);
+  --wl-accent-faint: rgba(148, 156, 247, 0.08);
   --wl-success: #57F287;
-  --wl-success-soft: rgba(87, 242, 135, 0.14);
-  --wl-success-ring: 0 0 0 4px rgba(87, 242, 135, 0.16);
+  --wl-success-soft: rgba(87, 242, 135, 0.15);
   --wl-warning: #FEE75C;
-  --wl-warning-soft: rgba(254, 231, 92, 0.14);
+  --wl-warning-soft: rgba(254, 231, 92, 0.15);
   --wl-danger: #ED4245;
-  --wl-danger-soft: rgba(237, 66, 69, 0.14);
-  --wl-danger-ring: 0 0 0 4px rgba(237, 66, 69, 0.16);
+  --wl-danger-soft: rgba(237, 66, 69, 0.15);
   --wl-info: #00A8FC;
-  --wl-info-soft: rgba(0, 168, 252, 0.14);
-  --wl-focus-ring: 0 0 0 3.5px rgba(88, 101, 242, 0.25), 0 2px 10px rgba(88, 101, 242, 0.2);
-  --wl-focus-ring-danger: 0 0 0 3.5px rgba(237, 66, 69, 0.2);
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.45), 0 1px 2px rgba(0, 0, 0, 0.35);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
-  --shadow-lg: 0 10px 28px rgba(0, 0, 0, 0.5);
-  --shadow-xl: 0 20px 44px rgba(0, 0, 0, 0.55);
-  --wl-shadow-card: 0 0 0 1px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.4), 0 12px 28px -6px rgba(0, 0, 0, 0.5);
-  --wl-shadow-primary: 0 4px 20px rgba(88, 101, 242, 0.35);
-  --wl-laser-sweep: linear-gradient(90deg, transparent, #5865F2, #949CF7, transparent);
-  /* Alias sync for dark */
+  --wl-info-soft: rgba(0, 168, 252, 0.15);
+  --wl-focus-ring: 0 0 0 3.5px rgba(88, 101, 242, 0.28), 0 2px 12px rgba(88, 101, 242, 0.25);
   --wl-teal: var(--wl-primary);
   --wl-teal-hover: var(--wl-primary-hover);
   --wl-teal-soft: var(--wl-primary-soft);
   --wl-teal-faint: var(--wl-primary-faint);
-  --wl-teal-ring: var(--wl-primary-ring);
   --wl-brass: var(--wl-accent);
   --wl-brass-soft: var(--wl-accent-soft);
   --clinical-primary: var(--wl-primary);
-  --clinical-inverse-surface: #FAFAFA;
-  --clinical-inverse-primary: #4F46E5;
   --bg-surface: var(--wl-surface);
   --bg-surface-soft: var(--wl-surface-soft);
   --border-color: var(--wl-border);

@@ -151,7 +151,7 @@ const sizeClass = computed(() => `field-control--${props.size}`)
 }
 
 .field-control:focus-within {
-  border-color: var(--wl-teal);
+  border-color: var(--wl-primary);
   box-shadow: var(--wl-focus-ring);
   transform: translateY(-0.5px);
   background: var(--wl-surface);
@@ -164,8 +164,8 @@ const sizeClass = computed(() => `field-control--${props.size}`)
 }
 
 .field-control--md {
-  min-height: 40px;
-  height: 40px;
+  min-height: 44px;
+  height: 44px;
   border-radius: 10px;
 }
 
@@ -227,7 +227,7 @@ const sizeClass = computed(() => `field-control--${props.size}`)
 }
 
 .field-control:focus-within .field-icon {
-  color: var(--wl-teal);
+  color: var(--wl-primary);
 }
 
 .field-icon--prefix {

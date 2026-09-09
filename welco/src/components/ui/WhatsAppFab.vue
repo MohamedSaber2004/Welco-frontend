@@ -41,7 +41,7 @@ const fabStyle = computed(() =>
 .wa-fab{
   position:fixed;bottom:24px;inset-inline-end:24px;z-index:200;
   display:inline-flex;align-items:center;gap:8px;
-  background:var(--wl-teal);color:#fff;
+  background:#25D366;color:#fff;
   padding:10px 14px 10px 10px;
   border-radius:999px;
   box-shadow:0 8px 22px rgba(0,0,0,.24),0 0 0 1px rgba(255,255,255,.06);
@@ -50,7 +50,7 @@ const fabStyle = computed(() =>
   /* ensure not hidden behind footer on home: stay above safe area */
   margin-bottom: env(safe-area-inset-bottom, 0);
 }
-.wa-fab:hover{transform:translateY(-2px);background:var(--wl-teal-hover);box-shadow:0 12px 28px rgba(0,0,0,.28)}
+.wa-fab:hover{transform:translateY(-2px);background:#20BA5A;box-shadow:0 12px 28px rgba(0,0,0,.28)}
 .wa-fab__icon{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);display:grid;place-items:center;flex-shrink:0}
 .wa-fab__label{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#fff}
 @media(max-width:768px){

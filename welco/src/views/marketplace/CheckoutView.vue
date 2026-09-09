@@ -6,6 +6,7 @@ import { useCart } from '../../composables/useCart'
 import { commerceService, salesService, companyService, authService, services } from '../../di/container'
 import ChainSteps from '../../components/ui/ChainSteps.vue'
 import BackButton from '../../components/ui/BackButton.vue'
+import AppImage from '../../components/ui/AppImage.vue'
 import { productMediaUrl } from '../../utils/file-url'
 import { toastService } from '../../infrastructure/feedback/toast.service'
 import { distinctCurrenciesFromAddresses } from '../../utils/country-currency-map'
@@ -167,14 +168,14 @@ async function convertToQuote() {
           <div class="line-items-list">
             <article v-for="it in items" :key="it.product.id" class="line-item">
               <div class="line-item__thumb" :style="{ background: it.product.imageGradient || 'var(--wl-surface-soft)' }">
-                <img
-                  v-if="productMediaUrl(it.product.imageName, it.product.imageGradient).url"
-                  :src="productMediaUrl(it.product.imageName, it.product.imageGradient).url"
+                <AppImage
+                  :src="it.product.imageName"
+                  placeholder-type="product"
+                  :placeholder-text="it.product.sku"
                   :alt="localized(it.product.nameEn, it.product.nameAr)"
+                  fit="contain"
                   class="line-item__thumb-img"
-                  loading="lazy"
                 />
-                <span v-else class="material-symbols-outlined text-[20px] text-muted">precision_manufacturing</span>
               </div>
 
               <div class="line-item__info">
@@ -294,7 +295,7 @@ async function convertToQuote() {
 }
 
 .breadcrumb a:hover {
-  color: var(--wl-teal);
+  color: var(--wl-primary);
 }
 
 .breadcrumb .sep {
@@ -316,7 +317,7 @@ async function convertToQuote() {
   align-items: center;
   gap: 0.45rem;
   font-size: 10px;
-  color: #4F46E5;
+  color: var(--wl-primary);
   font-weight: 700;
   letter-spacing: 0.08em;
   margin-bottom: 0.4rem;
@@ -425,20 +426,20 @@ async function convertToQuote() {
 }
 
 .curr-chip:hover {
-  border-color: var(--wl-teal);
-  color: var(--wl-teal);
+  border-color: var(--wl-primary);
+  color: var(--wl-primary);
 }
 .curr-chip--default {
   border-color: rgba(79, 70, 229, 0.2);
-  background: var(--wl-teal-soft);
+  background: var(--wl-primary-soft);
   font-weight: 800;
 }
 
 .curr-chip.active {
-  background: var(--wl-teal);
+  background: var(--wl-primary);
   color: #ffffff;
-  border-color: var(--wl-teal);
-  box-shadow: 0 2px 6px rgba(13, 148, 136, 0.3);
+  border-color: var(--wl-primary);
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
 }
 
 .curr-lock {
@@ -584,8 +585,8 @@ async function convertToQuote() {
   position: absolute;
   top: 0;
   inset-inline: 0;
-  height: 2.5px;
-  background: linear-gradient(90deg, #4F46E5, var(--wl-teal));
+  height: 2px;
+  background: var(--wl-laser-sweep);
 }
 
 .summary-head {
@@ -607,9 +608,9 @@ async function convertToQuote() {
 .summary-badge {
   font-size: 9.5px;
   font-weight: 700;
-  color: #059669;
-  background: rgba(16, 185, 129, 0.08);
-  border: 1px solid rgba(16, 185, 129, 0.25);
+  color: var(--wl-success);
+  background: var(--wl-success-soft);
+  border: 1px solid var(--wl-border);
   padding: 0.15rem 0.5rem;
   border-radius: 9999px;
 }
@@ -652,7 +653,7 @@ async function convertToQuote() {
 
 .total-curr {
   font-size: 0.95rem;
-  color: var(--wl-teal);
+  color: var(--wl-primary);
 }
 
 .summary-note-box {

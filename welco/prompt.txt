@@ -1,3 +1,171 @@
-the provider is company of distirbutor or organization user
+Act as a SENIOR UI/UX DESIGNER, SENIOR FRONTEND ARCHITECT, and PRODUCT DESIGN ENGINEER for the Welco project in `welco/`.
 
-The code currently has only 3 user types (Admin, WelcoStaff, OrganizationUser = company-linked buyer). You mention five business roles plus new Customer (buys, no company needed?) and Provider (lists own products?). List your 5 roles and confirm what Customer/Provider mean, e.g.: Admin, WelcoStaff, Distributor, Hospital/Clinic buyer, + Customer (individual buyer, no company) + Provider (seller company)?
+Your responsibility is to audit and implement a professional visual redesign of the ENTIRE application — public marketplace, auth, account dashboard, and admin console — as ONE cohesive enterprise design system. Preserve all business logic.
+
+Do NOT treat this as a simple styling task. Understand first, then implement systematically in code.
+
+==================================================
+0. PROJECT CONTEXT — READ THIS FIRST (source of truth)
+==================================================
+
+Stack (do not change):
+* Vue 3.5 + Vite 8 + vue-router 4 + TypeScript (`src/router/index.ts`, `src/main.ts`, `src/App.vue`)
+* Tailwind CSS 3.4 (`tailwind.config.js` maps colors to CSS vars — use Tailwind classes + vars, never hardcoded hex in templates)
+* Design tokens: `src/assets/tokens.css` is the SINGLE source of truth. Extend vars there; `src/assets/main.css` + `src/assets/base.css` hold shared patterns.
+* No component library. Reuse and extend `src/components/ui/*`. Do NOT install a new UI library.
+* Bilingual EN/AR with RTL: all strings via `t(key)` from `src/i18n`, use logical properties (`padding-inline-start`, `text-align: start`), test `[dir="rtl"]`.
+* Dark mode via `.dark` class on root using vars in `tokens.css`. Every new style MUST have a dark value. Never hardcode light-only colors.
+* Fonts already loaded in `tokens.css`: Display `Plus Jakarta Sans / Sora`, Body `Inter`, Arabic `Alexandria / IBM Plex Sans Arabic`, Data/Mono `JetBrains Mono`.
+
+Route inventory — you MUST audit and improve every one (see `src/router/index.ts`):
+* Public/landing (`isLandingPage`): `/` HomeView, `/oem` OemView, `/providers` ProvidersView, `/certifications` CertificationsView, `/about` AboutView, `/catalog/:slug` LandingPageView
+* Marketplace: `/marketplace` CatalogView, `/marketplace/product/:id` ProductDetailView, `/categories` CategoriesView, `/cart` CartView, `/checkout` CheckoutView, `/checkout/confirmation/:orderNumber` OrderConfirmationView, `/track-order` OrderTrackingView, `/wishlist` WishlistView
+* Auth (`guestOnly`, uses `AuthShell.vue`): `/auth/login`, `/auth/register`, `/auth/verify-email`, `/auth/forgot-password`, `/auth/verify-password-otp`, `/auth/reset-password`
+* Buyer account (`requiresAuth`): `/account` AccountDashboardView, `/account/orders` + `/:id`, `/account/rfqs` + `/:id`, `/account/quotes` + `/:id`, `/profile` ProfileView, `/addresses` AddressesView, `/help` HelpCenterView, `/help/my-tickets` MyTicketsView
+* Admin console (`requiresAuth + requiresAdmin`, wrapped in `AdminLayout.vue` rail): `/admin` AdminDashboardView, `/admin/sales` SalesAdminView, `/admin/orders` OrdersAdminView, `/admin/companies` CompaniesAdminView, `/admin/countries` CountriesAdminView, `/admin/cities` CitiesAdminView, `/admin/zones` ZonesAdminView, `/admin/users` UsersAdminView, `/admin/catalog` CatalogAdminView (tabs: products/categories), `/admin/certifications` CertificationsAdminView, `/admin/pages` PagesAdminView, `/admin/help` HelpAdminView, `/admin/tickets` TicketsAdminView, `/admin/audit-logs` AuditLogAdminView, `/locations` LocationsView
+* Layouts: `AppHeader.vue`, `AppFooter.vue`, `AppMobileNav.vue`, `AdminLayout.vue`, `AccountNav.vue`, `AuthShell.vue`
+* UI kit to reuse/extend (do not duplicate): `AppButton/BaseButton`, `AppInput/BaseInput`, `BaseCard`, `BaseModal`, `ConfirmDialog`, `ResultModal`, `StatusPill`, `StatCard`, `EmptyState`, `ErrorState`, `DataState`, `SkeletonLoader`, `LoadingBar`, `AppPagination/BasePagination`, `AppImage`, `QuantityStepper`, `PhoneInput`, `CurrencySelect`, `FileUpload`, `ChainSteps`, `BackButton`, `ToastContainer`, `WhatsAppFab`
+
+Phase 0 audit: read `tokens.css`, `tailwind.config.js`, `router/index.ts`, `AdminLayout.vue`, `AppHeader.vue`, one admin view (e.g. `AdminDashboardView.vue`), one marketplace view, one auth view, one account view, and the ui/* components above. Note duplications/inconsistencies before editing.
+
+==================================================
+1. WELCO VISUAL DIRECTION — "Surgical Precision Dashboard"
+==================================================
+
+Target feel: premium, clean, trustworthy B2B medical marketplace + enterprise console. Minimal decoration, maximum clarity. Usability over decoration. No generic AI look, no heavy gradients, no random colors, no oversized type, no excessive shadows/rounding.
+
+Color system — USE THESE EXACT TOKENS (extend `tokens.css`, never hardcode):
+* Light: primary Electric Indigo `--wl-primary #4F46E5` (hover `#4338CA`, active `#3730A3`, soft `#EEF2FF`, faint `#F5F3FF`); accent Precision Cobalt `--wl-accent #6366F1` (soft `#EEF2FF`); paper `#F8FAFC`, surface `#FFFFFF`, soft `#F1F5F9`, hover `#E2E8F0`; line `#E2E8F0`, strong `#CBD5E1`; ink-strong `#0F172A`, ink `#1E293B`, soft `#475569`, muted `#64748B`.
+* Semantic (light): success `#10B981`/`#ECFDF5`, warning `#F59E0B`/`#FFFBEB`, danger `#F43F5E`/`#FFF1F2`, info `#0EA5E9`/`#F0F9FF`.
+* Dark (Discord palette, already in tokens): bg `#1E1F22`, surface `#2B2D31`, card `#313338`, input `#383A40`, hover `#404249`, line `rgba(255,255,255,0.08)`; text `#F2F3F5`/`#DBDEE1`/`#B5BAC1`/muted `#949BA4`; primary blurple `#5865F2` (hover `#4752C4`, soft `rgba(88,101,242,0.16)`), accent `#949CF7`; success `#57F287`, warning `#FEE75C`, danger `#ED4245`, info `#00A8FC` (softs at 0.14 alpha).
+* Status colors are FIXED: active/success=emerald, pending/warning=amber, failed/closed/danger=rose, info Cobalt/sky. Same `StatusPill` mapping everywhere. Never invent a new status color per page.
+* Primary actions = Indigo solid only. Secondary = surface with border. Destructive = rose. Max 1 primary CTA per viewport/section.
+
+Typography (use vars, fluid where defined):
+* Display `var(--wl-font-display)`: display `clamp(2.75rem,5vw,3.75rem)` / H1 `clamp(2rem,3.6vw,2.5rem)` / H2 `clamp(1.5rem,2.6vw,2.05rem)` / H3 `1.28rem` / H4 `1.08rem`, tracking `-0.026em` display / `-0.012em` tight, weight 700-800 display, 600-700 H3/H4.
+* Body `var(--wl-font-body)`: `0.95rem`, line-height `1.62`; small `0.84rem`; caption/mono-label `0.72rem`, uppercase, `0.05-0.08em` tracking for labels/eyebrows/rail sections.
+* Numbers, IDs, order numbers, SKUs, money: `JetBrains Mono` with `tabular-nums`.
+* RTL: `[dir="rtl"]` auto-switches to Alexandria/IBM Plex Sans Arabic with line-height 1.68 — do not force Latin fonts.
+
+Shape / depth / motion:
+* Radii: cards `12-16px`, inputs/buttons `10px`, pills/badges `999px`. No fully-rounded cards, no oversized radii.
+* Shadows: `var(--wl-shadow-card)` for cards, `--shadow-sm/md` on hover only, `--wl-shadow-primary` for primary buttons. No heavy multi-layer shadows. Top hairline laser accent (`linear-gradient(90deg, transparent, primary, transparent)`, 1px) ONLY on interactive stat cards on hover — subtle, not everywhere.
+* Motion: `var(--wl-transition) 0.18s cubic-bezier(0.16,1,0.3,1)`; hover lift max `-2px`; focus ring `var(--wl-focus-ring)` (danger variant for destructive). Respect `prefers-reduced-motion`.
+* Spacing: 4px harmonic base; page `padding-top 1.75rem / bottom 3.5rem / gap 1.5rem`, card padding `1.5rem` (`1rem` sm, `2rem` lg), form gap `1.25rem`, field gap `0.45rem`, table cell `0.85rem 1.15rem`, modal `1.5rem`. Max content width `1280px` (admin shell `1560px`). Controls min-height `44px` touch target (`36px` sm, `52px` lg).
+
+==================================================
+2. DASHBOARD VISUAL SPEC (admin + account — highest priority)
+==================================================
+
+Every dashboard page MUST follow this page skeleton:
+1. Page header row: H1/H2 title + short muted subtitle + breadcrumb/context on the left; primary + secondary actions on the right (stack on mobile). Never a bare table without a header.
+2. KPI row: 2-4 `StatCard`s in CSS grid (`repeat(auto-fit,minmax(220px,1fr))`, 4→2→1 responsive). Each card: uppercase 11px muted label, 1.65rem display value (mono for numbers), trend pill (emerald/rose/neutral with ↑/↓/•), 12px muted hint, optional sparkline (88×32, real data only, indigo/emerald/rose stroke per `StatCard.vue` logic). Clickable cards lift -2px + show hairline accent.
+3. Main content grid: chart/activity (2fr) + side panel recent-items/quick-actions/alerts (1fr); collapse to 1 col <1024px.
+4. Charts: smooth area/line (existing SVG pattern in `AdminDashboardView`), real aggregated data only — never hardcoded demo data; empty chart shows `EmptyState` with CTA.
+5. Tables section below with toolbar (search + filters + sort + density consistent). See §4.
+
+Sidebar (`AdminLayout.vue` rail 240px → 64px collapsed, sticky):
+* Grouped sections with uppercase 10px toggles: Territory (countries/cities/zones) · Commerce (sales/orders/companies) · Catalog (catalog/certifications/pages) · System (users/help/tickets/audit-logs). Persist collapse in localStorage (existing key). Active link = indigo-soft bg + indigo text + 16% border + semibold. Icons 18px `material-symbols-outlined`. Mobile (<900px) = sticky horizontal pill bar, never a broken squeezed rail.
+
+Header (`AppHeader.vue` 56px, sticky, blur bg):
+* Logo left, search (min 170/max 230px, collapsible on mobile), wishlist/cart badges (mono count), theme toggle, lang toggle (EN/العربية), avatar with initials fallback + role label + dropdown. Seller authed → logo routes to `/admin`. Keep sweep decoration 1px only.
+
+Account dashboard (`AccountDashboardView` + `AccountNav`): same KPI + orders/RFQs/quotes summary cards, order timeline via `ChainSteps`, quick actions (track order, new RFQ, wishlist). Buyer must never see admin rail.
+
+==================================================
+3. TABLE / CRUD SPEC (all admin + account lists)
+==================================================
+
+Reuse one toolbar + table pattern everywhere (extend `main.css` `.row-actions`, `.status-dot-badge`, `.admin-modal-form`, `.admin-details` — do not fork per entity):
+* Toolbar: search input (44px, icon, clear button) + status filter chips/select + sort select + `BaseButton` primary "Add X". Results count in muted small text ("12 products").
+* Table: sticky header, `0.85rem 1.15rem` cells, header 11px uppercase muted, row hover surface-soft, zebra OFF, status via `StatusPill`/dot-badge, mono for IDs/dates/amounts, right-aligned numeric + row-actions column (`text-end`). Row actions = 32px bordered icon buttons (view/edit/activate/deactivate/delete) with tone hovers (indigo/emerald/amber/rose) + tooltips + aria-labels.
+* Behavior: server or client pagination via `AppPagination` (never both), sortable headers with aria-sort, loading = `SkeletonLoader` rows (never blank), empty = `EmptyState` with icon + reason + CTA ("No products yet — Add product"), error = `ErrorState` + Retry.
+* Mobile: transform to stacked cards (label:value rows via `.admin-details .detail-item`) — NEVER raw horizontal overflow. Test at 360px.
+* CRUD modals (`BaseModal` + `.admin-modal-form`): field grouping, visible labels + required asterisk, placeholders as hints not replacements, inline validation + `.form-error` summary, focus first field + focus trap + Esc, footer Cancel (ghost) + Save (primary, loading spinner, disabled while submitting). Delete/deactivate/cancel ALWAYS via `ConfirmDialog` stating what happens + item name + Cancel/Confirm (danger solid). No `window.confirm/alert`.
+* Detail views (order/RFQ/quote/ticket): header with status + actions, `.details-grid` 2-col meta cards, items table, totals, timeline, notes. Same layout for every entity.
+
+Entities to normalize: products, categories, orders, sales/RFQs/quotes, companies, users, countries/cities/zones, certifications/documents, pages/landing-pages, tickets/help articles, audit-logs.
+
+==================================================
+4. MARKETPLACE / PUBLIC / AUTH SPEC
+==================================================
+
+Marketplace (Catalog, ProductDetail, Categories, Cart, Checkout, Confirmation, Tracking, Wishlist):
+* Catalog: filter sidebar (collapses to drawer <1024px) + product grid `repeat(auto-fill,minmax(240px,1fr))`; product cards = `AppImage` 4:3 + category eyebrow + 2-line clamped title + rating + mono price + Add-to-quote stepper; skeleton grid while loading; empty search = EmptyState + "Clear filters".
+* ProductDetail: gallery left + info right (title, StatusPill stock, mono price, specs table, quantity + Add + wishlist), tabs (description/specs/certifications), related grid. No giant unstyled image.
+* Cart/Checkout: 2-col (items/form + sticky summary card with mono totals) → 1 col mobile; steps via `ChainSteps`; address + `PhoneInput` + `CurrencySelect` validated inline; submit shows LoadingBar + disabled; success → OrderConfirmation with big success icon + order number (mono, copyable) + timeline + CTAs.
+* Tracking/Wishlist: timeline states + EmptyState with CTA.
+
+Public landing (Home, OEM, Providers, Certifications, About, LandingPage, Locations):
+* One hero pattern: eyebrow badge + H1 display + muted lede + dual CTA + search where relevant; logo/stats strip (real counts from APIs, fallback constants only if API empty); section rhythm `var(--wl-section-gap)`; cards share `BaseCard` radius/shadow. No per-page custom hero colors.
+
+Auth (all 6 views in `AuthShell`): centered card (max 440px), logo, title + subtitle, 44px inputs with labels, password strength + show/hide, OTP inputs with auto-advance, error summary + field errors, submit loading, footer link to opposite auth route, language toggle visible. No full-page color splits.
+
+Profile/Addresses/Help/MyTickets: same page-header + card pattern; tickets use status pills + thread view + reply box; HelpCenter search + category cards + article list.
+
+==================================================
+5. STATES, FORMS, FEEDBACK, RESPONSIVE, A11Y — NON-NEGOTIABLE
+==================================================
+
+* States: every async view wires Loading (SkeletonLoader/LoadingBar) + Empty (EmptyState + CTA) + Error (ErrorState + Retry) + Success (toast via `toastService` + inline confirmation). Never blank screens, never silent failures.
+* NEVER fabricate data: no mock providers/products/rates/users. If an API returns nothing, show the EmptyState — never fallback sample records. Currency conversion with no rates shows original prices with the `rateUnavailable` badge.
+* Forms: label above input, 44px height, border `var(--wl-line)` → focus indigo + focus ring, error rose border + message with `aria-describedby`, required `*`, disabled 45% opacity, 2-col `.form-row` only for genuinely paired fields (city/zip), single column on mobile.
+* Toasts/modals/dropdowns/tabs/pagination/breadcrumbs/tooltips: reuse existing components; consistent radius/shadow/motion; toasts top-end, auto-dismiss, action link where useful.
+* Responsive: verify 1440 / 1280 / 1024 / 768 / 480 / 360 + RTL. Sidebar→pills, tables→cards, forms→1col, header→hamburger (`AppMobileNav`), grids collapse, touch targets ≥44px, no horizontal overflow (`overflow-x: clip` on shell), no clipped text, no overlapping.
+* A11y: contrast ≥4.5:1 body / 3:1 large, visible focus rings, keyboard-navigable nav/menus/modals/tables, semantic landmarks (header/main/nav/footer, h1 once), associated `<label>`, `aria-live` for toasts/announcer (router already announces titles — keep), logical tab order, `aria-expanded` on toggles, `role=dialog aria-modal` on modals. No a11y sacrifice for visuals.
+* Performance/architecture: reuse components + CSS vars; CSS over JS animation; lazy-route (already) + `AppImage` lazy + lazy charts; no new deps without real value; split >400-line views, delete duplicated button/input/card/table CSS into shared files; keep `preflight: false` + Tailwind config mapping intact.
+* Images: remote files may 404 — `AppImage` + broken-URL cache fail silently to placeholders. Never hotlink mock filenames as data.
+
+==================================================
+6. DO NOT BREAK
+==================================================
+
+* Do NOT change API contracts, endpoints, auth/role guards (`requiresAuth/requiresAdmin`, seller→admin redirect, pending-org guard), business rules, data models, or routes/redirects in `router/index.ts` unless required for the UX fix — then smallest safe change + verify.
+* Do NOT remove features. Preserve, restyle, improve discoverability. Remove only proven duplicates after usage search.
+* Do NOT hardcode colors/hex in `.vue` files — use vars/Tailwind tokens. Do NOT add a second design language per page. Do NOT use browser `alert/confirm`. Do NOT leave `console.error` noise.
+* Keep i18n: no hardcoded user-facing English/Arabic strings — add keys to locale files, verify both locales render + RTL mirrors correctly.
+
+==================================================
+7. IMPLEMENTATION PROCESS (follow in order, no shortcuts)
+==================================================
+
+PHASE 1 — Audit: map structure, routes, layouts, ui kit, tokens, duplications, UX issues. Do not edit yet.
+PHASE 2 — Tokens first: normalize `tokens.css` (light+dark+RTL+responsive vars), confirm `tailwind.config.js` coverage. No per-page hex after this.
+PHASE 3 — Shared kit: normalize Base/App Button+Input+Card+Modal+ConfirmDialog+StatusPill+StatCard+Empty/Error/Data/Skeleton/Pagination/AppImage in that order.
+PHASE 4 — Chrome: `AppHeader` + `AppMobileNav` + `AppFooter` + `AdminLayout` rail + `AccountNav` + `AuthShell`.
+PHASE 5 — Dashboards: `AdminDashboardView` (reference implementation) then `AccountDashboardView`, `SalesAdminView`.
+PHASE 6 — CRUD tables + modals + details: catalog → orders → companies/users → territory → certifications/pages → tickets/help → audit.
+PHASE 7 — Marketplace + public + auth + profile/addresses/support.
+PHASE 8 — States pass: ensure every async view has loading/empty/error/success.
+PHASE 9 — Responsive + RTL + dark + a11y pass at all breakpoints.
+PHASE 10 — Verify: `npm run type-check`, `npm run build`, fix errors; click every route in dev (`npm run dev`) in EN + AR, light + dark; fix regressions.
+
+==================================================
+8. SECOND PASS — STRICT REVIEWER (mandatory, implement fixes)
+==================================================
+
+Re-review everything as a hostile reviewer. Hunt for: inconsistent spacing/type/colors/buttons, weak hierarchy/CTAs, crowded dashboards, bad table/mobile UX, missing states, poor forms/modals, weak a11y, duplicated components, cross-page drift vs tokens. Fix every issue in code, rebuild, re-verify. Do not just list issues.
+
+==================================================
+9. FINAL QUALITY CHECK (all must be true before finishing)
+==================================================
+
+[ ] Every route in §0 audited + improved (public, marketplace, auth×6, account×7, admin×13, support)
+[ ] Tokens single-sourced in tokens.css; no hardcoded hex; dark + RTL verified
+[ ] Typography/spacing/radius/shadow/motion consistent via vars
+[ ] Header/rail/footer/mobile-nav/auth-shell consistent
+[ ] Dashboards follow §2 skeleton (header + KPI + grid + tables)
+[ ] All tables/CRUD follow §3 (toolbar, StatusPill, row-actions, pagination, card-mode mobile, ConfirmDialog)
+[ ] Marketplace/public/auth follow §4
+[ ] Loading/empty/error/success on every async view
+[ ] Responsive 1440→360, no overflow; touch ≥44px
+[ ] A11y: contrast, focus, keyboard, semantics, labels, live regions
+[ ] i18n EN+AR complete, no hardcoded strings
+[ ] No broken routes/guards; business logic preserved; no feature removed
+[ ] `npm run type-check` + `npm run build` pass; no major console errors
+
+==================================================
+FINAL INSTRUCTION
+==================================================
+
+Do not just describe improvements — ACTUALLY IMPLEMENT THEM IN THE CODEBASE like a senior engineer on a production project: inspect → plan → tokens → shared kit → chrome → dashboards → CRUD → marketplace/public/auth → states → responsive/RTL/dark/a11y → verify build → second reviewer pass → fix → final audit. The result must look and feel like one cohesive, professional visual dashboard + marketplace product in both languages and both themes.

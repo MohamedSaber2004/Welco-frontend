@@ -3,6 +3,28 @@ import { API_BASE_URL } from '../config/api.config'
 export const PLACEHOLDER = '/images/placeholder.svg'
 export const PLACEHOLDER_PNG = '/images/placeholder.png'
 
+/**
+ * Memory cache of backend file URLs that already failed (404/401/…).
+ * Once an <img> errors, every later AppImage with the same URL renders the
+ * local placeholder immediately instead of re-requesting a missing file and
+ * spamming the console on every navigation/remount.
+ */
+const brokenUrls = new Set<string>()
+const MAX_BROKEN_URLS = 500
+
+export function markBrokenUrl(url: string | null | undefined): void {
+  if (!url || typeof url !== 'string') return
+  if (brokenUrls.size >= MAX_BROKEN_URLS) {
+    const oldest = brokenUrls.values().next()
+    if (!oldest.done) brokenUrls.delete(oldest.value)
+  }
+  brokenUrls.add(url)
+}
+
+export function isKnownBrokenUrl(url: string | null | undefined): boolean {
+  return !!url && brokenUrls.has(url)
+}
+
 export function isStoredFileName(value: string | null | undefined): boolean {
   if (typeof value !== 'string') return false
   const trimmed = value.trim().replace(/^\/+/, '')
@@ -56,12 +78,28 @@ export function withImageFallback(img: HTMLImageElement): void {
   }
 }
 
+export function isNullOrPlaceholder(value: string | null | undefined): boolean {
+  if (!value || typeof value !== 'string') return true
+  const trimmed = value.trim()
+  return (
+    trimmed === '' ||
+    trimmed === 'null' ||
+    trimmed === 'undefined' ||
+    trimmed === PLACEHOLDER ||
+    trimmed === PLACEHOLDER_PNG ||
+    trimmed.endsWith(PLACEHOLDER) ||
+    trimmed.endsWith(PLACEHOLDER_PNG)
+  )
+}
+
 export function productMediaUrl(
   imageName: string | null | undefined,
   gradient: string | undefined,
-): { url: string; background: string } {
-  if (imageName && imageName.trim()) return { url: resolveFileUrl(imageName), background: gradient ?? '' }
-  return { url: PLACEHOLDER, background: gradient ?? 'linear-gradient(160deg,#122C3E,#0B1D2A)' }
+): { url: string; background: string; hasImage: boolean } {
+  if (imageName && imageName.trim() && !isNullOrPlaceholder(imageName)) {
+    return { url: resolveFileUrl(imageName), background: gradient ?? '', hasImage: true }
+  }
+  return { url: '', background: gradient ?? '', hasImage: false }
 }
 
 export interface ParsedVideo {

@@ -75,9 +75,7 @@ export const EXCHANGE_RATE_ROUTES = {
   convert: '/api/v1/exchange-rates/convert',
   history: (base: string, date: string) => `/api/v1/exchange-rates/history/${encodeURIComponent(base)}/${encodeURIComponent(date)}`,
   sync: '/api/v1/exchange-rates/sync',
-  syncEnqueue: '/api/v1/exchange-rates/sync/enqueue',
   syncLogs: '/api/v1/exchange-rates/sync/logs',
-  hangfireDashboard: (baseUrl?: string) => `${baseUrl || PRODUCT_API_BASE_URL}/hangfire`,
 } as const
 
 export const WISHLIST_ROUTES = {

@@ -106,7 +106,7 @@ const variantClass = computed(() => `confirm__icon--${opts.value?.variant ?? 'da
 .confirm-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(11, 29, 42, 0.52);
+  background: rgba(15, 23, 42, 0.6);
   backdrop-filter: blur(14px) saturate(1.15);
   -webkit-backdrop-filter: blur(14px) saturate(1.15);
   display: grid;
@@ -114,26 +114,30 @@ const variantClass = computed(() => `confirm__icon--${opts.value?.variant ?? 'da
   padding: 1rem;
   z-index: 10000;
 }
+:root.dark .confirm-backdrop,
+:root[data-theme='dark'] .confirm-backdrop {
+  background: rgba(0, 0, 0, 0.72);
+}
 .confirm-card {
   width: 100%;
   max-width: 460px;
   background: var(--wl-surface);
-  border: 1px solid var(--wl-line);
-  border-radius: var(--wl-radius-xl);
-  box-shadow: 0 24px 64px rgba(11, 29, 42, 0.22), 0 8px 24px rgba(11, 29, 42, 0.14);
+  border: 1px solid var(--wl-border);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 24px 64px rgba(15, 23, 42, 0.22), 0 8px 24px rgba(15, 23, 42, 0.14);
   position: relative;
   overflow: hidden;
   display: flex;
   flex-direction: column;
 }
 .confirm-accent {
-  height: 3px;
-  background: linear-gradient(90deg, var(--wl-teal), var(--wl-amber));
+  height: 2px;
+  background: var(--wl-laser-sweep);
   opacity: 0.95;
 }
-.confirm-card--danger .confirm-accent { background: linear-gradient(90deg, #A63A2E, #D98E00); }
-.confirm-card--warning .confirm-accent { background: linear-gradient(90deg, #9C5F26, #E8A317); }
-.confirm-card--primary .confirm-accent { background: linear-gradient(90deg, var(--wl-teal), #7FCFC6); }
+.confirm-card--danger .confirm-accent { background: var(--wl-danger); }
+.confirm-card--warning .confirm-accent { background: var(--wl-warning); }
+.confirm-card--primary .confirm-accent { background: var(--wl-primary); }
 
 .confirm-close {
   position: absolute;
@@ -144,14 +148,14 @@ const variantClass = computed(() => `confirm__icon--${opts.value?.variant ?? 'da
   display: grid;
   place-items: center;
   background: var(--wl-surface-soft);
-  border: 1px solid var(--wl-line);
-  border-radius: var(--wl-radius-full);
+  border: 1px solid var(--wl-border);
+  border-radius: var(--radius-full);
   color: var(--wl-muted);
   cursor: pointer;
   font-size: 12px;
   transition: all 0.18s var(--wl-ease-spring);
 }
-.confirm-close:hover { background: var(--wl-surface); color: var(--wl-ink-strong); border-color: var(--wl-line-strong); transform: rotate(90deg); }
+.confirm-close:hover { background: var(--wl-surface); color: var(--wl-ink-strong); border-color: var(--wl-border-strong); transform: rotate(90deg); }
 
 .confirm-body {
   display: flex;
@@ -162,17 +166,17 @@ const variantClass = computed(() => `confirm__icon--${opts.value?.variant ?? 'da
 .confirm-icon-wrap {
   width: 44px;
   height: 44px;
-  border-radius: var(--wl-radius);
+  border-radius: var(--radius-md);
   display: grid;
   place-items: center;
   flex-shrink: 0;
   border: 1px solid transparent;
 }
 .confirm-icon-wrap .material-symbols-outlined { font-size: 22px; }
-.confirm__icon--danger { background: var(--wl-danger-soft); color: var(--wl-danger); border-color: rgba(166,58,46,0.18); }
-.confirm__icon--warning { background: var(--wl-warning-soft); color: var(--wl-amber-strong); border-color: rgba(156,95,38,0.16); }
-.confirm__icon--primary { background: var(--wl-teal-soft); color: var(--wl-teal); border-color: rgba(14,113,105,0.14); }
-.confirm__icon--neutral { background: var(--wl-surface-soft); color: var(--wl-ink-soft); border-color: var(--wl-line); }
+.confirm__icon--danger { background: var(--wl-danger-soft); color: var(--wl-danger); border-color: rgba(var(--wl-danger-rgb), 0.2); }
+.confirm__icon--warning { background: var(--wl-warning-soft); color: var(--wl-warning); border-color: rgba(var(--wl-warning-rgb), 0.2); }
+.confirm__icon--primary { background: var(--wl-primary-soft); color: var(--wl-primary); border-color: rgba(var(--wl-primary-rgb), 0.2); }
+.confirm__icon--neutral { background: var(--wl-surface-soft); color: var(--wl-ink-soft); border-color: var(--wl-border); }
 
 .confirm-copy { flex: 1; min-width: 0; }
 .confirm-title {

@@ -393,13 +393,13 @@ watch(isOpen, (val) => {
 }
 
 .currency-trigger:hover:not(:disabled) {
-  border-color: var(--wl-teal);
+  border-color: var(--wl-primary);
   background: var(--wl-surface-soft);
 }
 
 .currency-trigger.is-open {
-  border-color: var(--wl-teal);
-  box-shadow: 0 0 0 3px rgba(14, 113, 105, 0.12);
+  border-color: var(--wl-primary);
+  box-shadow: 0 0 0 3px var(--wl-primary-ring);
 }
 
 .currency-trigger:disabled {
@@ -409,7 +409,7 @@ watch(isOpen, (val) => {
 }
 
 .currency-symbol-val {
-  color: var(--wl-teal);
+  color: var(--wl-primary);
   letter-spacing: -0.01em;
   font-size: 1rem;
   line-height: 1;
@@ -548,7 +548,7 @@ watch(isOpen, (val) => {
 }
 
 .currency-option.is-selected {
-  background: rgba(14, 113, 105, 0.08);
+  background: var(--wl-primary-soft);
 }
 
 .option-flag {
@@ -591,10 +591,10 @@ watch(isOpen, (val) => {
 .option-symbol-badge {
   flex-shrink: 0;
   padding: 0.15rem 0.45rem;
-  border-radius: var(--wl-radius-technical, 4px);
-  background: var(--wl-paper);
-  border: 1px solid var(--wl-line);
-  color: var(--wl-teal);
+  border-radius: var(--radius-xs);
+  background: var(--wl-surface);
+  border: 1px solid var(--wl-border);
+  color: var(--wl-primary);
   font-size: 0.78rem;
   font-weight: 700;
   text-align: center;
@@ -602,14 +602,14 @@ watch(isOpen, (val) => {
 }
 
 .is-selected .option-symbol-badge {
-  background: var(--wl-teal);
+  background: var(--wl-primary);
   color: #ffffff;
-  border-color: var(--wl-teal);
+  border-color: var(--wl-primary);
 }
 
 .selected-indicator {
   font-size: 0.9rem;
-  color: var(--wl-teal);
+  color: var(--wl-primary);
   font-weight: 700;
   margin-inline-start: 0.2rem;
 }

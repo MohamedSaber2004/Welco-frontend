@@ -23,6 +23,8 @@ export interface CompanyDto {
   status: CompanyStatus
   accountManagerId?: string | null
   isActive: boolean
+  isProvider?: boolean
+  imageName?: string | null
   createdAt: string
 }
 
@@ -34,6 +36,8 @@ export interface CreateCompanyPayload {
   tierLevel?: number
   status?: CompanyStatus
   accountManagerId?: string | null
+  isProvider?: boolean
+  imageName?: string | null
 }
 
 export interface UpdateCompanyPayload extends CreateCompanyPayload {

@@ -55,10 +55,10 @@ const pipelineStages = computed(() => {
   const total = all.length || 1
 
   return [
-    { label: t('account.pipeStatusPending'), count: pending, pct: Math.round((pending / total) * 100), color: '#F59E0B', icon: 'hourglass_top' },
-    { label: t('admin.pipeQuoted'), count: quoted, pct: Math.round((quoted / total) * 100), color: '#4F46E5', icon: 'description' },
-    { label: t('admin.pipeOrdered'), count: ordered, pct: Math.round((ordered / total) * 100), color: '#10B981', icon: 'verified' },
-    { label: `${t('admin.pipeArchived')} / ${t('admin.pipeOther')}`, count: cancelled, pct: Math.round((cancelled / total) * 100), color: '#94A3B8', icon: 'inventory' },
+    { label: t('account.pipeStatusPending'), count: pending, pct: Math.round((pending / total) * 100), color: 'var(--wl-warning)', icon: 'hourglass_top' },
+    { label: t('admin.pipeQuoted'), count: quoted, pct: Math.round((quoted / total) * 100), color: 'var(--wl-primary)', icon: 'description' },
+    { label: t('admin.pipeOrdered'), count: ordered, pct: Math.round((ordered / total) * 100), color: 'var(--wl-success)', icon: 'verified' },
+    { label: `${t('admin.pipeArchived')} / ${t('admin.pipeOther')}`, count: cancelled, pct: Math.round((cancelled / total) * 100), color: 'var(--wl-muted)', icon: 'inventory' },
   ]
 })
 
@@ -1404,7 +1404,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 
 /* Workflow Banner */
 .workflow-banner {
-  background: linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 100%);
+  background: linear-gradient(135deg, #2B2D31 0%, rgba(88, 101, 242, 0.14) 100%);
   border: 1px solid #DBEAFE;
   border-radius: 14px;
   padding: 1.15rem 1.35rem;

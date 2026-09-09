@@ -245,14 +245,15 @@ parseModelValue(props.modelValue)
               transform 0.15s ease,
               background-color 0.2s ease;
   overflow: hidden;
-  height: 40px;
+  height: 44px;
+  min-height: 44px;
 }
 .phone-field__control:hover:not(.is-disabled) {
   border-color: var(--wl-border-strong);
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
 }
 .phone-field__control:focus-within {
-  border-color: var(--wl-teal);
+  border-color: var(--wl-primary);
   box-shadow: var(--wl-focus-ring);
   transform: translateY(-0.5px);
   background: var(--wl-surface);
@@ -271,7 +272,7 @@ parseModelValue(props.modelValue)
   transition: background-color 0.18s ease;
 }
 .phone-field__control:focus-within .phone-code-select-wrap {
-  background: rgba(79, 70, 229, 0.04);
+  background: var(--wl-primary-soft);
 }
 .phone-code-select {
   appearance: none;
@@ -297,7 +298,7 @@ parseModelValue(props.modelValue)
   transition: transform 0.2s ease, color 0.18s ease;
 }
 .phone-field__control:focus-within .phone-code-arrow {
-  color: var(--wl-teal);
+  color: var(--wl-primary);
   transform: rotate(180deg);
 }
 .phone-field__divider { width: 1px; height: 55%; background: var(--wl-line); flex-shrink: 0; }

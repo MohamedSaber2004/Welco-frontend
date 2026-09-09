@@ -459,7 +459,7 @@ const closeDetails = () => {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #4F46E5;
+  background: var(--wl-primary);
 }
 
 .head-title {
@@ -474,7 +474,7 @@ const closeDetails = () => {
 
 .head-subtitle {
   font-size: 13.5px;
-  color: #64748B;
+  color: var(--wl-muted);
   margin: 0.25rem 0 0;
 }
 
@@ -507,7 +507,7 @@ const closeDetails = () => {
   top: 50%;
   transform: translateY(-50%);
   font-size: 18px;
-  color: #94A3B8;
+  color: var(--wl-muted);
   pointer-events: none;
 }
 
@@ -517,52 +517,52 @@ const closeDetails = () => {
   padding: 0 14px;
   padding-inline-start: 38px;
   background: var(--wl-surface);
-  border: 1.5px solid var(--wl-border);
-  border-radius: 10px;
+  border: 1px solid var(--wl-border);
+  border-radius: var(--wl-radius-sm);
   font-size: 13.5px;
   color: var(--wl-ink-strong);
   outline: none;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  box-shadow: var(--wl-shadow-card);
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .toolbar-search-input:focus {
-  border-color: #4F46E5;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+  border-color: var(--wl-primary);
+  box-shadow: 0 0 0 3px var(--wl-primary-ring);
 }
 
 .toolbar-select {
   height: 44px;
   padding: 0 14px;
   background: var(--wl-surface);
-  border: 1.5px solid var(--wl-border);
-  border-radius: 10px;
+  border: 1px solid var(--wl-border);
+  border-radius: var(--wl-radius-sm);
   font-size: 13px;
   font-weight: 600;
   color: var(--wl-ink-soft);
   outline: none;
   cursor: pointer;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  box-shadow: var(--wl-shadow-card);
 }
 
 .toolbar-select:focus {
-  border-color: #4F46E5;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+  border-color: var(--wl-primary);
+  box-shadow: 0 0 0 3px var(--wl-primary-ring);
 }
 
 .counter-text {
   font-size: 12px;
   font-weight: 700;
-  color: #64748B;
+  color: var(--wl-muted);
 }
 
 /* Executive Table */
 .table-card {
-  background: var(--wl-surface, #FFFFFF);
-  border: 1px solid var(--wl-border, #E2E8F0);
+  background: var(--wl-surface);
+  border: 1px solid var(--wl-border);
   border-radius: var(--wl-radius-card, 16px);
   overflow: hidden;
-  box-shadow: var(--wl-shadow-card, 0 1px 3px rgba(15, 23, 42, 0.05));
+  box-shadow: var(--wl-shadow-card);
 }
 
 .table-wrap {
@@ -610,7 +610,7 @@ const closeDetails = () => {
 
 .zone-icon {
   font-size: 20px;
-  color: #4F46E5;
+  color: var(--wl-primary);
 }
 
 .zone-name {

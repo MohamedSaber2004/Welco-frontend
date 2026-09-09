@@ -635,7 +635,7 @@ onMounted(load)
 }
 
 .table-card {
-  background: var(--wl-surface, #ffffff);
+  background: var(--wl-surface);
   border: 1px solid var(--wl-border, #e2e8f0);
   border-radius: var(--wl-radius-card, 16px);
   overflow: hidden;
@@ -814,7 +814,8 @@ onMounted(load)
 .field-input:focus,
 .field-textarea:focus {
   outline: none;
-  border-color: var(--wl-teal);
+  border-color: var(--wl-primary);
+  box-shadow: var(--wl-focus-ring);
 }
 
 .toggle-label {
@@ -828,9 +829,9 @@ onMounted(load)
 }
 
 .form-error {
-  background: rgba(239, 68, 68, 0.08);
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  color: #dc2626;
+  background: var(--wl-danger-soft);
+  border: 1px solid var(--wl-border);
+  color: var(--wl-danger);
   font-size: 0.82rem;
   padding: 0.6rem 0.85rem;
   border-radius: 8px;

@@ -7,6 +7,7 @@ import AppPagination from '../../components/ui/AppPagination.vue'
 import BaseModal from '../../components/ui/BaseModal.vue'
 import BaseButton from '../../components/ui/BaseButton.vue'
 import FileUpload from '../../components/ui/FileUpload.vue'
+import AppImage from '../../components/ui/AppImage.vue'
 import { ATTACHMENT_PLACE, MEDIA_TYPE } from '../../config/api.config'
 import { services } from '../../di/container'
 import { confirmService } from '../../infrastructure/feedback/confirm.service'
@@ -734,14 +735,14 @@ onMounted(async () => {
                         class="product-thumb"
                         :style="{ background: p.imageGradient || 'var(--wl-paper)' }"
                       >
-                        <img
-                          v-if="productMediaUrl(p.imageName, p.imageGradient).url"
-                          :src="productMediaUrl(p.imageName, p.imageGradient).url"
+                        <AppImage
+                          :src="p.imageName"
+                          placeholder-type="product"
+                          :placeholder-text="p.sku"
                           :alt="p.nameEn"
+                          fit="contain"
                           class="product-thumb__img"
-                          loading="lazy"
                         />
-                        <span v-else class="mono text-[10px]">{{ p.sku }}</span>
                       </div>
                       <div class="product-info">
                         <div class="product-name">{{ localized(p.nameEn, p.nameAr) }}</div>
@@ -879,14 +880,12 @@ onMounted(async () => {
                   <td>
                     <div class="category-cell">
                       <div class="category-icon-box">
-                        <img
-                          v-if="c.imageName"
-                          :src="resolveFileUrl(c.imageName, '')"
+                        <AppImage
+                          :src="c.imageName"
+                          placeholder-type="category"
                           :alt="c.nameEn"
                           class="category-thumb__img"
-                          loading="lazy"
                         />
-                        <span v-else class="material-symbols-outlined text-[20px]">folder</span>
                       </div>
                       <div class="category-info">
                         <strong>{{ localized(c.nameEn, c.nameAr) }}</strong>
@@ -1149,13 +1148,14 @@ onMounted(async () => {
         <div v-else-if="selectedProduct" class="product-details">
           <div class="details-hero">
             <div class="details-thumb">
-              <img
-                v-if="detailsImageUrl"
-                :src="detailsImageUrl"
+              <AppImage
+                :src="selectedProduct.imageName"
+                placeholder-type="product"
+                :placeholder-text="selectedProduct.sku"
                 :alt="selectedProduct.nameEn"
+                fit="contain"
                 class="details-thumb__img"
               />
-              <span v-else class="mono text-[10px]">{{ selectedProduct.sku }}</span>
             </div>
             <div class="details-hero__info">
               <strong class="details-name">{{ localized(selectedProduct.nameEn, selectedProduct.nameAr) }}</strong>
@@ -1618,8 +1618,8 @@ onMounted(async () => {
 }
 
 .category-chip {
-  background: rgba(14, 113, 105, 0.08);
-  color: var(--wl-teal);
+  background: var(--wl-primary-soft);
+  color: var(--wl-primary);
   padding: 0.2rem 0.55rem;
   border-radius: 999px;
   font-size: 0.76rem;
@@ -1639,13 +1639,13 @@ onMounted(async () => {
 }
 
 .stock-badge--in {
-  background: rgba(16, 185, 129, 0.12);
-  color: #059669;
+  background: var(--wl-success-soft);
+  color: var(--wl-success);
 }
 
 .stock-badge--out {
-  background: rgba(239, 68, 68, 0.12);
-  color: #dc2626;
+  background: var(--wl-danger-soft);
+  color: var(--wl-danger);
 }
 
 /* Category Table Cell */
@@ -1659,8 +1659,8 @@ onMounted(async () => {
   width: 38px;
   height: 38px;
   border-radius: var(--wl-radius-sm);
-  background: rgba(14, 113, 105, 0.08);
-  color: var(--wl-teal);
+  background: var(--wl-primary-soft);
+  color: var(--wl-primary);
   display: grid;
   place-items: center;
   flex-shrink: 0;
@@ -1698,8 +1698,8 @@ onMounted(async () => {
   width: 38px;
   height: 38px;
   border-radius: var(--wl-radius-sm);
-  background: rgba(14, 113, 105, 0.08);
-  color: var(--wl-teal);
+  background: var(--wl-primary-soft);
+  color: var(--wl-primary);
   display: grid;
   place-items: center;
   font-size: 0.82rem;
@@ -1735,23 +1735,23 @@ onMounted(async () => {
 }
 
 .action-btn--edit:hover {
-  color: var(--wl-teal);
-  border-color: var(--wl-teal);
+  color: var(--wl-primary);
+  border-color: var(--wl-primary);
 }
 
 .action-btn--delete:hover {
-  color: #dc2626;
-  border-color: #dc2626;
+  color: var(--wl-danger);
+  border-color: var(--wl-danger);
 }
 
 .action-btn--activate:hover {
-  color: #059669;
-  border-color: #059669;
+  color: var(--wl-success);
+  border-color: var(--wl-success);
 }
 
 .action-btn--deactivate:hover {
-  color: #d97706;
-  border-color: #d97706;
+  color: var(--wl-warning);
+  border-color: var(--wl-warning);
 }
 
 .action-btn:disabled {
@@ -1781,11 +1781,11 @@ onMounted(async () => {
 }
 
 .status-dot-badge--active {
-  background: #ecfdf5;
-  color: #059669;
+  background: var(--wl-success-faint);
+  color: var(--wl-success);
 }
 .status-dot-badge--active .dot {
-  background: #10b981;
+  background: var(--wl-success);
 }
 
 .status-dot-badge--inactive {
@@ -1797,9 +1797,9 @@ onMounted(async () => {
 }
 
 .form-error {
-  background: rgba(239, 68, 68, 0.08);
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  color: #dc2626;
+  background: var(--wl-danger-faint);
+  border: 1px solid var(--wl-danger-border);
+  color: var(--wl-danger);
   font-size: 0.82rem;
   padding: 0.6rem 0.85rem;
   border-radius: var(--wl-radius-sm);
@@ -1988,9 +1988,9 @@ onMounted(async () => {
 }
 
 .page-btn:hover:not(:disabled) {
-  background: var(--wl-teal);
+  background: var(--wl-primary);
   color: #fff;
-  border-color: var(--wl-teal);
+  border-color: var(--wl-primary);
 }
 
 .page-btn:disabled {
@@ -2050,7 +2050,8 @@ onMounted(async () => {
 .field-select:focus,
 .field-textarea:focus {
   outline: none;
-  border-color: var(--wl-teal);
+  border-color: var(--wl-primary);
+  box-shadow: var(--wl-focus-ring);
 }
 
 .price-input-group {
@@ -2137,7 +2138,7 @@ onMounted(async () => {
 }
 
 .attached-video-item:hover {
-  border-color: var(--wl-teal);
+  border-color: var(--wl-primary);
 }
 
 .attached-video-badge {
@@ -2225,9 +2226,9 @@ onMounted(async () => {
 }
 
 .video-tab-btn.is-active {
-  color: var(--wl-teal);
-  background: var(--wl-teal-soft);
-  border-color: rgba(14, 113, 105, 0.2);
+  color: var(--wl-primary);
+  background: var(--wl-primary-soft);
+  border-color: rgba(79, 70, 229, 0.2);
 }
 
 .add-video-body {
@@ -2250,8 +2251,8 @@ onMounted(async () => {
 }
 
 .video-drop-area:hover {
-  border-color: var(--wl-teal);
-  background: var(--wl-teal-faint);
+  border-color: var(--wl-primary);
+  background: var(--wl-surface-hover);
 }
 
 .video-uploading-box {
@@ -2275,7 +2276,7 @@ onMounted(async () => {
 
 .video-progress-fill {
   height: 100%;
-  background: var(--wl-teal);
+  background: var(--wl-primary);
   transition: width 0.15s ease;
 }
 
@@ -2284,8 +2285,8 @@ onMounted(async () => {
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 0.75rem;
-  background: var(--wl-teal-faint);
-  border: 1px solid var(--wl-teal);
+  background: var(--wl-primary-soft);
+  border: 1px solid var(--wl-primary);
   border-radius: var(--wl-radius-sm);
 }
 

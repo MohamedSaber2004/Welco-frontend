@@ -74,10 +74,10 @@ const procurementPipeline = computed(() => {
   const total = pendingRfqs + actionableQuotes + processingOrders + deliveredOrders || 1
 
   return [
-    { label: t('account.pipeRfq'), count: pendingRfqs, pct: Math.round((pendingRfqs / total) * 100), color: '#F59E0B', icon: 'request_quote', to: '/account/rfqs', status: t('account.pipeStatusPending') },
-    { label: t('account.pipeQuotes'), count: actionableQuotes, pct: Math.round((actionableQuotes / total) * 100), color: '#10B981', icon: 'description', to: '/account/quotes', status: t('account.pipeStatusAwaiting') },
-    { label: t('account.pipeProduction'), count: processingOrders, pct: Math.round((processingOrders / total) * 100), color: '#4F46E5', icon: 'precision_manufacturing', to: '/account/orders', status: t('account.pipeStatusManufacturing') },
-    { label: t('account.pipeDelivered'), count: deliveredOrders, pct: Math.round((deliveredOrders / total) * 100), color: '#64748B', icon: 'verified', to: '/account/orders', status: t('account.pipeStatusReceived') },
+    { label: t('account.pipeRfq'), count: pendingRfqs, pct: Math.round((pendingRfqs / total) * 100), color: 'var(--wl-warning)', icon: 'request_quote', to: '/account/rfqs', status: t('account.pipeStatusPending') },
+    { label: t('account.pipeQuotes'), count: actionableQuotes, pct: Math.round((actionableQuotes / total) * 100), color: 'var(--wl-success)', icon: 'description', to: '/account/quotes', status: t('account.pipeStatusAwaiting') },
+    { label: t('account.pipeProduction'), count: processingOrders, pct: Math.round((processingOrders / total) * 100), color: 'var(--wl-primary)', icon: 'precision_manufacturing', to: '/account/orders', status: t('account.pipeStatusManufacturing') },
+    { label: t('account.pipeDelivered'), count: deliveredOrders, pct: Math.round((deliveredOrders / total) * 100), color: 'var(--wl-muted)', icon: 'verified', to: '/account/orders', status: t('account.pipeStatusReceived') },
   ]
 })
 

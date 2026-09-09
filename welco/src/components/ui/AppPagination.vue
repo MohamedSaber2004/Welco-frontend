@@ -267,8 +267,8 @@ const goTo = (p: number | string) => {
 }
 
 .page-num-btn.is-active {
-  background: var(--wl-teal) !important;
-  border-color: var(--wl-teal) !important;
+  background: var(--wl-primary) !important;
+  border-color: var(--wl-primary) !important;
   color: #ffffff !important;
   font-weight: 700;
   box-shadow: 0 1px 3px rgba(79, 70, 229, 0.28), 0 1px 2px rgba(79, 70, 229, 0.16);

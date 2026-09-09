@@ -463,7 +463,7 @@ async function track() {
   align-items: center;
   gap: 1rem;
   padding: 0.6rem 0;
-  border-bottom: 1px solid #F8FAFC;
+  border-bottom: 1px solid var(--wl-border);
 }
 
 .line-item-name {

@@ -41,8 +41,11 @@ const clearFilters = () => {
 }
 
 onMounted(async () => {
-  await contentService.loadMyTickets()
-  loading.value = false
+  try {
+    await contentService.loadMyTickets()
+  } finally {
+    loading.value = false
+  }
 })
 
 async function create() {
@@ -412,7 +415,7 @@ async function closeTicket(id: string) {
 }
 
 .card {
-  background: var(--wl-surface, #FFFFFF);
+  background: var(--wl-surface);
   border: 1px solid var(--wl-border, #E2E8F0);
   border-radius: var(--wl-radius-card, 16px);
   padding: var(--wl-card-padding, 1.5rem);
@@ -555,7 +558,7 @@ async function closeTicket(id: string) {
 }
 
 .ticket-card {
-  background: var(--wl-surface, #FFFFFF);
+  background: var(--wl-surface);
   border: 1px solid var(--wl-border, #E2E8F0);
   border-radius: var(--wl-radius-card, 16px);
   padding: var(--wl-card-padding, 1.25rem 1.5rem);

@@ -5,12 +5,12 @@ import { t, setLocale, locale } from '../i18n'
 import SkeletonLoader from '../components/ui/SkeletonLoader.vue'
 import BackButton from '../components/ui/BackButton.vue'
 import PhoneInput from '../components/ui/PhoneInput.vue'
+import AppImage from '../components/ui/AppImage.vue'
 import { AppLanguage, UserType } from '../domain/models/user'
 import type { CompanyDto } from '../domain/models/company'
 import { CompanyType, CompanyStatus } from '../domain/models/company'
 import { resolveFileUrl, PLACEHOLDER } from '../utils/file-url'
 import { resolvePhoneDetails, type DetailedPhoneInfo } from '../utils/phone'
-import { theme, toggleTheme } from '../application/theme.service'
 
 const fullName = ref('')
 const phoneNumber = ref('')
@@ -113,25 +113,13 @@ const userTypeInfo = computed(() => {
       desc: locale.value === 'ar' ? 'فريق الدعم الفني والعمليات' : 'Welco Staff & Operational Specialist',
     }
   }
-  // 4-role model: OrganizationUser WITH a linked company is a
-  // Provider/Distributor (the company IS the provider); without one
-  // the user is a Customer (buyer, no company needed).
-  const hasCompany = !!(user.value?.companyId ?? myCompany.value?.id)
-  if (hasCompany) {
-    return {
-      type,
-      label: t('admin.roleProvider'),
-      icon: 'handshake',
-      pillClass: 'user-role-pill--org',
-      desc: locale.value === 'ar' ? 'مورّد / موزع معتمد — الشركة هي الجهة المورّدة' : 'Verified Provider / Distributor — your company is the supplying entity',
-    }
-  }
+  // OrganizationUser is a Provider/Distributor (the company IS the provider).
   return {
     type,
-    label: t('admin.roleCustomer'),
-    icon: 'shopping_bag',
+    label: t('admin.roleProvider'),
+    icon: 'handshake',
     pillClass: 'user-role-pill--org',
-    desc: locale.value === 'ar' ? 'عميل — مشترٍ مباشر بدون شركة' : 'Customer — direct buyer, no company needed',
+    desc: locale.value === 'ar' ? 'مورّد / موزع معتمد — الشركة هي الجهة المورّدة' : 'Verified Provider / Distributor — your company is the supplying entity',
   }
 })
 
@@ -280,11 +268,11 @@ const setLang = async (v: AppLanguage) => {
         <!-- Identity Card -->
         <div class="card id-card">
           <div class="avatar-holder">
-            <img
+            <AppImage
               :src="avatarUrl()"
+              placeholder-type="avatar"
               :alt="user?.fullName ?? 'Profile'"
               class="avatar-img"
-              @error="(e) => ((e.target as HTMLImageElement).src = PLACEHOLDER)"
             />
             <button
               type="button"
@@ -375,33 +363,19 @@ const setLang = async (v: AppLanguage) => {
           </div>
         </div>
 
-        <!-- Appearance / Theme Preference Card -->
+        <!-- Appearance Card (dark-only) -->
         <div class="card lang-card">
           <div class="card-mini-head">
             <span class="material-symbols-outlined text-[18px] text-indigo-600">dark_mode</span>
             <h3 class="card-mini-title">{{ locale === 'ar' ? 'سمة المظهر' : 'Appearance' }}</h3>
           </div>
-          <p class="card-mini-desc">{{ locale === 'ar' ? 'اختر بين المظهر الفاتح والمظهر الداكن' : 'Select your preferred visual mode' }}</p>
+          <p class="card-mini-desc">{{ locale === 'ar' ? 'الوضع الداكن الاحترافي مفعّل دائمًا' : 'Professional dark mode is always on' }}</p>
 
           <div class="lang-switch-box" dir="ltr">
-            <button
-              type="button"
-              class="lang-btn mono"
-              :class="{ 'is-active': theme === 'light' }"
-              @click="theme !== 'light' && toggleTheme()"
-            >
-              <span class="material-symbols-outlined text-[14px]">light_mode</span>
-              <span>{{ locale === 'ar' ? 'فاتح' : 'Light' }}</span>
-            </button>
-            <button
-              type="button"
-              class="lang-btn mono"
-              :class="{ 'is-active': theme === 'dark' }"
-              @click="theme !== 'dark' && toggleTheme()"
-            >
+            <span class="lang-btn mono is-active" aria-current="true">
               <span class="material-symbols-outlined text-[14px]">dark_mode</span>
               <span>{{ locale === 'ar' ? 'داكن' : 'Dark' }}</span>
-            </button>
+            </span>
           </div>
         </div>
 

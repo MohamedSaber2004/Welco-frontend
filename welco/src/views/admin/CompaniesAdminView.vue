@@ -1011,7 +1011,7 @@ watch([applicationSearch, statusFilter], () => {
 
 /* Executive Table */
 .table-card {
-  background: var(--wl-surface, #FFFFFF);
+  background: var(--wl-surface);
   border: 1px solid var(--wl-border, #E2E8F0);
   border-radius: var(--wl-radius-card, 16px);
   overflow: hidden;

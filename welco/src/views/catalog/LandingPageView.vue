@@ -8,6 +8,7 @@ import DataState from '../../components/ui/DataState.vue'
 import ErrorState from '../../components/ui/ErrorState.vue'
 import BaseButton from '../../components/ui/BaseButton.vue'
 import BackButton from '../../components/ui/BackButton.vue'
+import AppImage from '../../components/ui/AppImage.vue'
 import { useCart } from '../../composables/useCart'
 import { toastService } from '../../infrastructure/feedback/toast.service'
 import type { LandingPageDto } from '../../domain/models/content'
@@ -155,8 +156,14 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
           <div class="product-grid">
             <article v-for="p in products" :key="p.id" class="product-card" @click="router.push({ name: 'marketplace-product', params: { id: p.id } })">
               <div class="product-card__media" :style="{ background: productMediaUrl(p.imageName, p.imageGradient).background }">
-                <img v-if="productMediaUrl(p.imageName, p.imageGradient).url && productMediaUrl(p.imageName, p.imageGradient).url !== '/images/placeholder.svg'" :src="productMediaUrl(p.imageName, p.imageGradient).url" :alt="localized(p.nameEn, p.nameAr)" class="product-card__img" loading="lazy" @error="(e) => ((e.target as HTMLImageElement).style.display='none')" />
-                <span v-else class="sku-chip mono">{{ p.sku }}</span>
+                <AppImage
+                  :src="p.imageName"
+                  placeholder-type="product"
+                  :placeholder-text="p.sku"
+                  :alt="localized(p.nameEn, p.nameAr)"
+                  fit="contain"
+                  class="product-card__img"
+                />
               </div>
               <div class="product-card__body">
                 <div class="mono" style="font-size:10px;color:var(--wl-muted)">{{ localized(p.categoryNameEn || '', p.categoryNameAr || '') }}</div>
@@ -177,8 +184,13 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
         <div class="related-grid">
           <router-link v-for="c in categories" :key="c.id" :to="{ name: 'marketplace', query: { categoryId: c.id } }" class="cat-card">
             <div class="cat-media">
-              <img v-if="c.imageName" :src="resolveFileUrl(c.imageName)" :alt="localized(c.nameEn, c.nameAr)" class="cat-media__img" loading="lazy" />
-              <span v-else class="material-symbols-outlined cat-media__icon">category</span>
+              <AppImage
+                :src="c.imageName"
+                placeholder-type="category"
+                :placeholder-text="localized(c.nameEn, c.nameAr)"
+                :alt="localized(c.nameEn, c.nameAr)"
+                class="cat-media__img"
+              />
             </div>
             <div class="cat-body">
               <div class="cat-name" dir="auto">{{ localized(c.nameEn, c.nameAr) }}</div>
@@ -274,7 +286,7 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
   top: 0;
   inset-inline: 0;
   height: 2px;
-  background: linear-gradient(90deg, #6366F1, #10B981);
+  background: var(--wl-laser-sweep);
 }
 
 .lp-hero__glow {
@@ -283,7 +295,7 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
   inset-inline-end: -80px;
   width: 400px;
   height: 400px;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.09) 0%, transparent 70%);
+  background: radial-gradient(circle, var(--wl-primary-faint) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -307,13 +319,13 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #10B981;
-  box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+  background: var(--wl-success);
+  box-shadow: 0 0 8px var(--wl-success-border);
 }
 
 .lp-tag {
-  background: rgba(99, 102, 241, 0.1);
-  color: #4F46E5;
+  background: var(--wl-primary-soft);
+  color: var(--wl-primary);
   padding: 0.2rem 0.55rem;
   border-radius: 6px;
   font-weight: 700;
@@ -360,7 +372,7 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
 
 .cred-icon {
   font-size: 16px;
-  color: #10B981;
+  color: var(--wl-success);
 }
 
 .lp-spec-card {
@@ -368,7 +380,7 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
   border: 1px solid var(--wl-border);
   border-radius: 12px;
   padding: 1.5rem;
-  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+  box-shadow: var(--wl-shadow-card);
 }
 
 .spec-card__header {
@@ -384,7 +396,7 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.08em;
-  color: #4F46E5;
+  color: var(--wl-primary);
 }
 
 .spec-card__live {
@@ -392,14 +404,14 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
   align-items: center;
   gap: 0.35rem;
   font-size: 10px;
-  color: #10B981;
+  color: var(--wl-success);
   font-weight: 600;
 }
 
 .spec-dot {
   width: 5px;
   height: 5px;
-  background: #10B981;
+  background: var(--wl-success);
   border-radius: 50%;
 }
 
@@ -460,7 +472,7 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
   align-items: center;
   gap: 0.4rem;
   font-size: 10.5px;
-  color: #4F46E5;
+  color: var(--wl-primary);
   font-weight: 700;
   letter-spacing: 0.08em;
   margin-bottom: 0.35rem;
@@ -470,7 +482,7 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: #6366F1;
+  background: var(--wl-primary);
 }
 
 .section-title {
@@ -489,13 +501,13 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
   border: none;
   font-size: 12px;
   font-weight: 600;
-  color: #4F46E5;
+  color: var(--wl-primary);
   cursor: pointer;
   transition: color 0.15s;
 }
 
 .view-all-btn:hover {
-  color: #3730A3;
+  color: var(--wl-primary-hover);
 }
 
 .product-grid {
@@ -510,7 +522,7 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
   border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+  box-shadow: var(--wl-shadow-card);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   flex-direction: column;
@@ -518,8 +530,8 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
 
 .product-card:hover {
   transform: translateY(-3px);
-  border-color: rgba(99, 102, 241, 0.4);
-  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08);
+  border-color: var(--wl-primary);
+  box-shadow: var(--wl-shadow-card-hover);
 }
 
 .product-card__media {
@@ -547,8 +559,8 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
   bottom: 8px;
   inset-inline-start: 8px;
   font-size: 10px;
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: var(--wl-surface);
+  border: 1px solid var(--wl-border);
   padding: 0.15rem 0.45rem;
   border-radius: 4px;
   color: var(--wl-ink-strong);
@@ -612,8 +624,8 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
 }
 
 .add-quote-btn:hover {
-  background: #4F46E5;
-  border-color: #4F46E5;
+  background: var(--wl-primary);
+  border-color: var(--wl-primary);
   color: #fff;
 }
 
@@ -629,7 +641,7 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
   gap: 0.5rem;
   transition: all 0.2s ease;
 }
-.cat-card:hover { border-color: #6366F1; transform: translateY(-1px); }
+.cat-card:hover { border-color: var(--wl-primary); transform: translateY(-1px); }
 .cat-media { height: 100px; display: grid; place-items: center; background: var(--wl-surface-soft); border-radius: 8px; overflow: hidden; }
 .cat-media__img { max-width: 100%; max-height: 100%; object-fit: contain; padding: 0.5rem; }
 .cat-media__icon { font-size: 28px; color: var(--wl-muted); }
@@ -657,14 +669,14 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+  box-shadow: var(--wl-shadow-card);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .related-card:hover {
-  border-color: #6366F1;
+  border-color: var(--wl-primary);
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px -4px rgba(99, 102, 241, 0.12);
+  box-shadow: var(--wl-shadow-card-hover);
 }
 
 .related-card__header {
@@ -682,7 +694,7 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
 
 .related-arrow {
   font-size: 16px;
-  color: #4F46E5;
+  color: var(--wl-primary);
   transition: transform 0.18s;
 }
 
@@ -699,7 +711,7 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
 
 .related-link {
   font-size: 11px;
-  color: #4F46E5;
+  color: var(--wl-primary);
   font-weight: 600;
 }
 

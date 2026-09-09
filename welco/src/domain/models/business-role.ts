@@ -4,7 +4,6 @@ import { CompanyStatus, type CompanyDto } from './company'
 export enum BusinessRole {
   Admin = 'Admin',
   Provider = 'Provider',
-  Customer = 'Customer',
   WelcoStaff = 'WelcoStaff',
 }
 
@@ -39,35 +38,28 @@ export function isOrganizationUserContext(ctx: BusinessRoleContext): boolean {
   )
 }
 
-export function isCustomerTypeContext(ctx: BusinessRoleContext): boolean {
-  return roleList(ctx).includes('customer') || ctx.userType === UserType.Customer || ctx.userType === 4
+export function isCustomerTypeContext(_ctx: BusinessRoleContext): boolean {
+  return false
 }
 
 export function isProviderContext(ctx: BusinessRoleContext): boolean {
   if (isAdminContext(ctx) || isStaffContext(ctx)) return false
-  if (!isOrganizationUserContext(ctx)) return false
-  return !!(ctx.companyId ?? ctx.company?.id)
+  return isOrganizationUserContext(ctx)
 }
 
 export const isDistributorContext = isProviderContext
 
-export function isCustomerContext(ctx: BusinessRoleContext): boolean {
-  if (isAdminContext(ctx) || isStaffContext(ctx)) return false
-  if (isCustomerTypeContext(ctx)) return true
-  if (!isOrganizationUserContext(ctx)) return false
-  return !(ctx.companyId ?? ctx.company?.id)
+export function isCustomerContext(_ctx: BusinessRoleContext): boolean {
+  return false
 }
 
 export function resolveBusinessRole(ctx: BusinessRoleContext): BusinessRole {
   if (isAdminContext(ctx)) return BusinessRole.Admin
   if (isStaffContext(ctx)) return BusinessRole.WelcoStaff
-  if (isCustomerTypeContext(ctx)) return BusinessRole.Customer
-  if (isProviderContext(ctx)) return BusinessRole.Provider
-  if (isOrganizationUserContext(ctx)) return BusinessRole.Customer
-  return BusinessRole.Customer
+  return BusinessRole.Provider
 }
 
-export type BusinessRoleKey = 'roleAdmin' | 'roleWelcoStaff' | 'roleProvider' | 'roleCustomer'
+export type BusinessRoleKey = 'roleAdmin' | 'roleWelcoStaff' | 'roleProvider'
 
 export function businessRoleKey(role: BusinessRole): BusinessRoleKey {
   switch (role) {
@@ -76,10 +68,8 @@ export function businessRoleKey(role: BusinessRole): BusinessRoleKey {
     case BusinessRole.WelcoStaff:
       return 'roleWelcoStaff'
     case BusinessRole.Provider:
-      return 'roleProvider'
-    case BusinessRole.Customer:
     default:
-      return 'roleCustomer'
+      return 'roleProvider'
   }
 }
 

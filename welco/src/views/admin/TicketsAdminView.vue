@@ -59,9 +59,12 @@ async function closeTicket(id: string) {
 
 async function refresh() {
   loading.value = true
-  await contentService.loadTickets()
-  page.value = 1
-  loading.value = false
+  try {
+    await contentService.loadTickets()
+    page.value = 1
+  } finally {
+    loading.value = false
+  }
 }
 
 function onSearch() {

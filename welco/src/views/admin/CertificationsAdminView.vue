@@ -584,7 +584,7 @@ onMounted(async () => {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #4F46E5;
+  background: var(--wl-primary);
 }
 
 .head-title {
@@ -599,7 +599,7 @@ onMounted(async () => {
 
 .head-subtitle {
   font-size: 13.5px;
-  color: #64748B;
+  color: var(--wl-muted);
   margin: 0.25rem 0 0;
 }
 
@@ -625,7 +625,7 @@ onMounted(async () => {
   top: 50%;
   transform: translateY(-50%);
   font-size: 18px;
-  color: #94A3B8;
+  color: var(--wl-muted);
   pointer-events: none;
 }
 
@@ -635,27 +635,27 @@ onMounted(async () => {
   padding: 0 14px;
   padding-inline-start: 38px;
   background: var(--wl-surface);
-  border: 1.5px solid var(--wl-border);
-  border-radius: 10px;
+  border: 1px solid var(--wl-border);
+  border-radius: var(--wl-radius-sm);
   font-size: 13.5px;
   color: var(--wl-ink-strong);
   outline: none;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  box-shadow: var(--wl-shadow-card);
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .toolbar-search-input:focus {
-  border-color: #4F46E5;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+  border-color: var(--wl-primary);
+  box-shadow: 0 0 0 3px var(--wl-primary-ring);
 }
 
 /* Executive Table */
 .table-card {
-  background: var(--wl-surface, #FFFFFF);
-  border: 1px solid var(--wl-border, #E2E8F0);
+  background: var(--wl-surface);
+  border: 1px solid var(--wl-border);
   border-radius: var(--wl-radius-card, 16px);
   overflow: hidden;
-  box-shadow: var(--wl-shadow-card, 0 1px 3px rgba(15, 23, 42, 0.05));
+  box-shadow: var(--wl-shadow-card);
 }
 
 .table-wrap {
@@ -719,7 +719,7 @@ onMounted(async () => {
 
 .cert-issued-to {
   font-size: 11.5px;
-  color: #64748B;
+  color: var(--wl-muted);
 }
 
 .cert-badge {
@@ -739,7 +739,7 @@ onMounted(async () => {
 
 .validity-text {
   font-size: 11.5px;
-  color: #64748B;
+  color: var(--wl-muted);
 }
 
 .status-pill {
@@ -759,16 +759,16 @@ onMounted(async () => {
 }
 
 .status-pill--active {
-  background: #ECFDF5;
-  color: #059669;
+  background: var(--wl-success-faint);
+  color: var(--wl-success);
 }
-.status-pill--active .dot { background: #10B981; }
+.status-pill--active .dot { background: var(--wl-success); }
 
 .status-pill--expired {
-  background: #FEF3C7;
-  color: #92400E;
+  background: var(--wl-warning-faint);
+  color: var(--wl-warning);
 }
-.status-pill--expired .dot { background: #F59E0B; }
+.status-pill--expired .dot { background: var(--wl-warning); }
 
 .btn-view-doc {
   display: inline-flex;
@@ -786,7 +786,7 @@ onMounted(async () => {
 }
 
 .btn-view-doc:hover {
-  background: #4F46E5;
+  background: var(--wl-primary);
   color: #FFFFFF;
 }
 </style>

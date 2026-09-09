@@ -16,7 +16,6 @@ function extractFileName(raw: unknown): string {
         const parsed = JSON.parse(trimmed)
         return extractFileName(parsed)
       } catch {
-        // continue
       }
     }
     if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
@@ -25,7 +24,6 @@ function extractFileName(raw: unknown): string {
         const parts = url.pathname.split('/').filter(Boolean)
         return parts[parts.length - 1] || trimmed
       } catch {
-        // continue
       }
     }
     if (trimmed.startsWith('/files/')) return trimmed.slice(7)

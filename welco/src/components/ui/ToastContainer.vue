@@ -33,7 +33,7 @@ const toasts = toastService.toasts
 <style scoped>
 .toast-stack {
   position: fixed;
-  bottom: 1rem;
+  top: calc(var(--wl-header-height, 56px) + 1rem);
   inset-inline-end: 1rem;
   z-index: 9999;
   display: flex;
@@ -112,6 +112,6 @@ const toasts = toastService.toasts
 .toast-enter-from,
 .toast-leave-to {
   opacity: 0;
-  transform: translateY(8px);
+  transform: translateY(-8px);
 }
 </style>

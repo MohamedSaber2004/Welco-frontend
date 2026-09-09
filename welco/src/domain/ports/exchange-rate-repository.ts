@@ -6,6 +6,5 @@ export interface ExchangeRateRepository {
   convert(amount: number, from: string, to: string): Promise<ConversionResultDto>
   getHistory(base: string, date: string): Promise<ExchangeRateDto[]>
   sync(): Promise<{ success: boolean; ratesCount: number; baseCurrency: string }>
-  syncEnqueue(): Promise<{ isSuccess: boolean; data?: string; message?: string }>
   getSyncLogs(take?: number): Promise<ExchangeRateSyncLogDto[]>
 }

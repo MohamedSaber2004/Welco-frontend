@@ -45,9 +45,14 @@ withDefaults(
   transform: scale(0.985);
 }
 
-.btn:focus-visible {
+.btn--primary:focus-visible {
   outline: none;
   box-shadow: var(--wl-focus-ring);
+}
+
+.btn--danger:focus-visible {
+  outline: none;
+  box-shadow: var(--wl-focus-ring-danger);
 }
 
 .btn:disabled {
@@ -64,13 +69,13 @@ withDefaults(
   background: var(--wl-primary);
   color: #ffffff;
   border-color: var(--wl-primary);
-  box-shadow: 0 2px 8px -2px rgba(79, 70, 229, 0.3);
+  box-shadow: var(--wl-shadow-primary);
 }
 .btn--primary:hover:not(:disabled) {
   background: var(--wl-primary-hover);
   border-color: var(--wl-primary-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px -2px rgba(79, 70, 229, 0.4);
+  box-shadow: 0 4px 14px -2px rgba(79, 70, 229, 0.45);
 }
 
 .btn--secondary {
@@ -111,20 +116,22 @@ withDefaults(
 }
 
 .btn--danger {
-  background: #DC2626;
+  background: var(--wl-danger);
   color: #ffffff;
-  border-color: #DC2626;
+  border-color: var(--wl-danger);
+  box-shadow: 0 2px 8px rgba(244, 63, 94, 0.2);
 }
 
 .btn--danger:hover:not(:disabled) {
-  background: #B91C1C;
-  border-color: #B91C1C;
+  filter: brightness(0.92);
+  border-color: var(--wl-danger);
   transform: translateY(-1px);
 }
 
 /* Control heights conforming to VIP ergonomic floor */
 .btn--sm {
   height: 36px;
+  min-height: 36px;
   padding: 0 0.85rem;
   font-size: 0.82rem;
   border-radius: 8px;
@@ -132,13 +139,15 @@ withDefaults(
 
 .btn--md {
   height: 44px;
+  min-height: 44px;
   padding: 0 1.25rem;
   font-size: 0.88rem;
   border-radius: 10px;
 }
 
 .btn--lg {
-  height: 50px;
+  height: 52px;
+  min-height: 52px;
   padding: 0 1.65rem;
   font-size: 0.95rem;
   border-radius: 12px;

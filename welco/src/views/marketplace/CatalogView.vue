@@ -11,6 +11,7 @@ import SkeletonLoader from '../../components/ui/SkeletonLoader.vue'
 import { productMediaUrl, PLACEHOLDER } from '../../utils/file-url'
 import BackButton from '../../components/ui/BackButton.vue'
 import AppPagination from '../../components/ui/AppPagination.vue'
+import AppImage from '../../components/ui/AppImage.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -235,14 +236,14 @@ const hasMadeToOrder = computed(() => products.value.some((p) => p.stock === 0))
           <div class="products-grid">
             <article v-for="p in products" :key="p.id" class="card catalog-card" @click="router.push({ name: 'marketplace-product', params: { id: p.id } })">
               <div class="catalog-card__media" :style="{ background: productMediaUrl(p.imageName, p.imageGradient).background }">
-                <img
-                  v-if="productMediaUrl(p.imageName, p.imageGradient).url && productMediaUrl(p.imageName, p.imageGradient).url !== PLACEHOLDER"
-                  :src="productMediaUrl(p.imageName, p.imageGradient).url"
+                <AppImage
+                  :src="p.imageName"
+                  placeholder-type="product"
+                  :placeholder-text="p.sku"
                   :alt="localized(p.nameEn, p.nameAr)"
+                  fit="contain"
                   class="catalog-card__img"
-                  loading="lazy"
                 />
-                <div v-else class="catalog-card__sku-fallback mono"><span class="material-symbols-outlined">precision_manufacturing</span><span>{{ p.sku }}</span></div>
                 <div class="catalog-card__badges">
                   <span v-if="p.sku" class="sku-chip mono">{{ p.sku }}</span>
                   <span v-if="p.stock > 0" class="stock-pill stock-pill--in mono">{{ t('catalog.inStock') }}</span>
@@ -294,7 +295,7 @@ const hasMadeToOrder = computed(() => products.value.some((p) => p.stock === 0))
 }
 
 .breadcrumb a {
-  color: var(--wl-teal);
+  color: var(--wl-primary);
   text-decoration: none;
 }
 
@@ -370,15 +371,15 @@ const hasMadeToOrder = computed(() => products.value.some((p) => p.stock === 0))
 }
 
 .cat-pill:hover {
-  border-color: var(--wl-teal);
-  color: var(--wl-teal);
+  border-color: var(--wl-primary);
+  color: var(--wl-primary);
 }
 
 .cat-pill.is-active {
-  background: var(--wl-teal);
+  background: var(--wl-primary);
   color: #ffffff;
-  border-color: var(--wl-teal);
-  box-shadow: var(--wl-shadow-teal);
+  border-color: var(--wl-primary);
+  box-shadow: 0 4px 12px -2px rgba(79, 70, 229, 0.35);
 }
 
 .pill-badge {
@@ -436,8 +437,8 @@ const hasMadeToOrder = computed(() => products.value.some((p) => p.stock === 0))
 
 .search-input:focus {
   outline: none;
-  border-color: var(--wl-teal);
-  box-shadow: var(--wl-primary-ring);
+  border-color: var(--wl-primary);
+  box-shadow: var(--wl-focus-ring);
 }
 
 .clear-search-btn {
@@ -475,15 +476,15 @@ const hasMadeToOrder = computed(() => products.value.some((p) => p.stock === 0))
 }
 
 .mobile-filter-toggle.has-active {
-  border-color: var(--wl-teal);
-  color: var(--wl-teal);
+  border-color: var(--wl-primary);
+  color: var(--wl-primary);
 }
 
 .filter-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--wl-teal);
+  background: var(--wl-primary);
 }
 
 .sort-select-wrapper {
@@ -513,7 +514,7 @@ const hasMadeToOrder = computed(() => products.value.some((p) => p.stock === 0))
 
 .sort-select:focus {
   outline: none;
-  border-color: var(--wl-teal);
+  border-color: var(--wl-primary);
 }
 
 .catalog-grid-layout {
@@ -541,7 +542,7 @@ const hasMadeToOrder = computed(() => products.value.some((p) => p.stock === 0))
   position: absolute;
   top: 0; inset-inline: 0;
   height: 2px;
-  background: linear-gradient(90deg, var(--wl-teal), #6366F1);
+  background: var(--wl-laser-sweep);
   opacity: 0.85;
 }
 
@@ -581,7 +582,7 @@ const hasMadeToOrder = computed(() => products.value.some((p) => p.stock === 0))
 }
 
 .filter-checkbox {
-  accent-color: var(--wl-teal);
+  accent-color: var(--wl-primary);
   width: 17px;
   height: 17px;
   border-radius: 4px;
@@ -684,7 +685,7 @@ const hasMadeToOrder = computed(() => products.value.some((p) => p.stock === 0))
   position: absolute;
   top: 0; inset-inline: 0;
   height: 2px;
-  background: linear-gradient(90deg, var(--wl-teal), var(--wl-brass));
+  background: var(--wl-laser-sweep);
   opacity: 0;
   transition: opacity 0.22s var(--wl-ease-spring);
   pointer-events: none;
@@ -782,7 +783,7 @@ const hasMadeToOrder = computed(() => products.value.some((p) => p.stock === 0))
 
 .catalog-card__category {
   font-size: 0.68rem;
-  color: var(--wl-teal);
+  color: var(--wl-primary);
   font-weight: 700;
   text-transform: uppercase;
 }
@@ -859,7 +860,7 @@ const hasMadeToOrder = computed(() => products.value.some((p) => p.stock === 0))
 
 .currency-tag {
   font-size: 0.85rem;
-  color: var(--wl-teal);
+  color: var(--wl-primary);
 }
 
 .unit-tag {
@@ -869,7 +870,7 @@ const hasMadeToOrder = computed(() => products.value.some((p) => p.stock === 0))
 
 .rating-tag {
   font-size: 0.72rem;
-  color: var(--wl-amber-strong);
+  color: var(--wl-warning);
 }
 
 .catalog-card__actions {
@@ -907,16 +908,16 @@ const hasMadeToOrder = computed(() => products.value.some((p) => p.stock === 0))
 }
 
 .card-action-btn--quote {
-  background: var(--wl-teal);
-  border: 1px solid var(--wl-teal);
+  background: var(--wl-primary);
+  border: 1px solid var(--wl-primary);
   color: #ffffff;
-  box-shadow: 0 2px 6px rgba(13, 148, 136, 0.25);
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.25);
 }
 
 .card-action-btn--quote:hover:not(:disabled) {
-  background: var(--wl-teal-hover);
+  background: var(--wl-primary-hover);
   transform: translateY(-0.5px);
-  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.35);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
 }
 
 .card-action-btn--quote:disabled {
@@ -942,7 +943,7 @@ const hasMadeToOrder = computed(() => products.value.some((p) => p.stock === 0))
   z-index: 2;
 }
 .catalog-wishlist-btn .material-symbols-outlined { font-size: 18px; font-variation-settings: 'FILL' 0; }
-.catalog-wishlist-btn:hover { border-color: var(--wl-teal); color: var(--wl-teal); transform: scale(1.05); }
+.catalog-wishlist-btn:hover { border-color: var(--wl-primary); color: var(--wl-primary); transform: scale(1.05); }
 .catalog-wishlist-btn.is-saved { background: var(--wl-danger-soft); border-color: var(--wl-danger); color: var(--wl-danger); }
 .catalog-wishlist-btn.is-saved .material-symbols-outlined { font-variation-settings: 'FILL' 1; }
 
@@ -968,8 +969,8 @@ const hasMadeToOrder = computed(() => products.value.some((p) => p.stock === 0))
 }
 
 .catalog-page-btn:hover:not(:disabled) {
-  border-color: var(--wl-teal);
-  color: var(--wl-teal);
+  border-color: var(--wl-primary);
+  color: var(--wl-primary);
 }
 
 .catalog-page-btn:disabled {

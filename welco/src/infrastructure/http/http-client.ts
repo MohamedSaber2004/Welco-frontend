@@ -358,6 +358,10 @@ export class HttpClient {
       }
       xhr.onerror = () => reject(new Error('Network request failed'))
       xhr.onabort = () => reject(new Error('Request aborted'))
+      // Without this, a timed-out upload never settles: the promise hangs,
+      // the request tracker never decrements, and the global loading bar
+      // spins forever on every view.
+      xhr.ontimeout = () => reject(new Error('Request timed out — upload is slow'))
       xhr.timeout = 120_000
       xhr.send(form)
     })

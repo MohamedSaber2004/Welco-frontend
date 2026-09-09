@@ -258,21 +258,21 @@ async function submit() {
   align-items: center;
   gap: 0.45rem;
   font-size: 11px;
-  color: #64748B;
+  color: var(--wl-muted);
 }
 
 .crumb-bar a {
-  color: #64748B;
+  color: var(--wl-muted);
   text-decoration: none;
   transition: color 0.15s ease;
 }
 
 .crumb-bar a:hover {
-  color: #4F46E5;
+  color: var(--wl-primary);
 }
 
 .crumb-sep {
-  color: #CBD5E1;
+  color: var(--wl-border);
 }
 
 .crumb-active {
@@ -300,15 +300,15 @@ async function submit() {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #4F46E5;
+  background: var(--wl-primary);
 }
 
 .oem-hero {
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  border-radius: 20px;
+  border-radius: var(--wl-radius-xl, 20px);
   padding: 2.5rem;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  box-shadow: var(--wl-shadow-card);
 }
 
 .hero-grid {
@@ -336,7 +336,7 @@ async function submit() {
 
 .hero-desc {
   font-size: 15px;
-  color: #64748B;
+  color: var(--wl-muted);
   line-height: 1.6;
   margin: 0.5rem 0 0;
 }
@@ -347,20 +347,20 @@ async function submit() {
   gap: 0.45rem;
   font-size: 12px;
   font-weight: 700;
-  color: #059669;
+  color: var(--wl-success);
   margin-top: 0.75rem;
 }
 
 .hud-card {
-  background: #090D16;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--wl-surface-soft);
+  border: 1px solid var(--wl-border);
   border-radius: 16px;
   padding: 1.5rem;
-  color: #FFFFFF;
+  color: var(--wl-text);
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
-  box-shadow: 0 12px 36px -8px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--wl-shadow-card);
 }
 
 .hud-top {
@@ -375,9 +375,9 @@ async function submit() {
   gap: 0.4rem;
   font-size: 10px;
   font-weight: 700;
-  color: #818CF8;
-  background: rgba(79, 70, 229, 0.15);
-  border: 1px solid rgba(99, 102, 241, 0.3);
+  color: var(--wl-primary);
+  background: var(--wl-primary-faint);
+  border: 1px solid var(--wl-primary-ring);
   padding: 0.15rem 0.5rem;
   border-radius: 4px;
 }
@@ -386,12 +386,12 @@ async function submit() {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #818CF8;
+  background: var(--wl-primary);
 }
 
 .hud-est {
   font-size: 10.5px;
-  color: #94A3B8;
+  color: var(--wl-muted);
 }
 
 .hud-specs {
@@ -405,17 +405,17 @@ async function submit() {
   justify-content: space-between;
   align-items: center;
   font-size: 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid var(--wl-border);
   padding-bottom: 0.4rem;
 }
 
 .hud-key {
-  color: #64748B;
+  color: var(--wl-muted);
   font-weight: 700;
 }
 
 .hud-val {
-  color: #F1F5F9;
+  color: var(--wl-text);
 }
 
 .hud-meter {
@@ -426,14 +426,15 @@ async function submit() {
 
 .meter-track {
   height: 6px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--wl-surface);
   border-radius: 9999px;
   overflow: hidden;
+  border: 1px solid var(--wl-border);
 }
 
 .meter-fill {
   height: 100%;
-  background: linear-gradient(90deg, #4F46E5, #818CF8);
+  background: linear-gradient(90deg, var(--wl-primary), var(--wl-cobalt, #6366f1));
   border-radius: 9999px;
 }
 
@@ -441,7 +442,7 @@ async function submit() {
   display: flex;
   justify-content: space-between;
   font-size: 10.5px;
-  color: #94A3B8;
+  color: var(--wl-muted);
 }
 
 .oem-section {
@@ -460,7 +461,7 @@ async function submit() {
 
 .section-subtitle {
   font-size: 14px;
-  color: #64748B;
+  color: var(--wl-muted);
   margin: 0.25rem 0 0;
 }
 
@@ -478,14 +479,14 @@ async function submit() {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  box-shadow: var(--wl-shadow-card);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .service-card:hover {
-  border-color: #CBD5E1;
+  border-color: var(--wl-primary);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.08);
+  box-shadow: var(--wl-shadow-card-hover);
 }
 
 .service-card-top {
@@ -522,7 +523,7 @@ async function submit() {
 
 .service-desc {
   font-size: 13px;
-  color: #64748B;
+  color: var(--wl-muted);
   line-height: 1.55;
   margin: 0;
   flex: 1;
@@ -534,9 +535,9 @@ async function submit() {
   gap: 0.4rem;
   font-size: 11px;
   font-weight: 700;
-  color: #059669;
+  color: var(--wl-success);
   padding-top: 0.75rem;
-  border-top: 1px solid #F1F5F9;
+  border-top: 1px solid var(--wl-border);
 }
 
 .inquiry-grid {
@@ -561,7 +562,7 @@ async function submit() {
 
 .inquiry-desc {
   font-size: 14px;
-  color: #64748B;
+  color: var(--wl-muted);
   line-height: 1.6;
   margin: 0.25rem 0 1rem;
 }
@@ -583,7 +584,7 @@ async function submit() {
 
 .perk-icon {
   font-size: 20px;
-  color: #4F46E5;
+  color: var(--wl-primary);
   flex-shrink: 0;
 }
 
@@ -595,7 +596,7 @@ async function submit() {
 
 .perk-text {
   font-size: 12px;
-  color: #64748B;
+  color: var(--wl-muted);
   line-height: 1.45;
 }
 
@@ -604,7 +605,7 @@ async function submit() {
   border: 1px solid var(--wl-border);
   border-radius: 20px;
   padding: 2rem;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  box-shadow: var(--wl-shadow-card);
 }
 
 .form-stack {
@@ -622,7 +623,7 @@ async function submit() {
 .vip-field-label {
   font-size: 10.5px;
   font-weight: 700;
-  color: #475569;
+  color: var(--wl-muted);
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
@@ -630,11 +631,11 @@ async function submit() {
 .vip-48-input,
 .vip-select {
   width: 100%;
-  height: 48px;
+  height: 44px;
   padding: 0 14px;
   background: var(--wl-surface-soft);
-  border: 1.5px solid var(--wl-border);
-  border-radius: 10px;
+  border: 1px solid var(--wl-border);
+  border-radius: var(--wl-radius-sm);
   font-size: 14px;
   color: var(--wl-ink-strong);
   outline: none;
@@ -645,8 +646,8 @@ async function submit() {
   width: 100%;
   padding: 12px 14px;
   background: var(--wl-surface-soft);
-  border: 1.5px solid var(--wl-border);
-  border-radius: 10px;
+  border: 1px solid var(--wl-border);
+  border-radius: var(--wl-radius-sm);
   font-size: 13.5px;
   color: var(--wl-ink-strong);
   outline: none;
@@ -659,8 +660,8 @@ async function submit() {
 .vip-select:focus,
 .vip-textarea:focus {
   background: var(--wl-surface);
-  border-color: #4F46E5;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+  border-color: var(--wl-primary);
+  box-shadow: 0 0 0 3px var(--wl-primary-ring);
 }
 
 .fields-2col {
@@ -674,27 +675,27 @@ async function submit() {
   align-items: center;
   justify-content: center;
   gap: 0.45rem;
-  height: 48px;
-  background: #4F46E5;
+  height: 44px;
+  background: var(--wl-primary);
   color: #FFFFFF;
   border: none;
-  border-radius: 10px;
+  border-radius: var(--wl-radius-sm);
   font-size: 13.5px;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 4px 12px -2px rgba(79, 70, 229, 0.35);
+  box-shadow: 0 4px 12px -2px var(--wl-primary-ring);
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .btn-submit-inquiry:hover:not(:disabled) {
-  background: #4338CA;
+  background: var(--wl-primary-hover);
   transform: translateY(-1px);
 }
 
 .modal-error-banner {
-  background: #FFF1F2;
-  border: 1px solid #FECDD3;
-  color: #E11D48;
+  background: var(--wl-danger-faint);
+  border: 1px solid var(--wl-danger-border);
+  color: var(--wl-danger);
   padding: 0.65rem 0.85rem;
   border-radius: 8px;
   font-size: 12.5px;
@@ -712,9 +713,9 @@ async function submit() {
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  background: #ECFDF5;
-  border: 2px solid #A7F3D0;
-  color: #059669;
+  background: var(--wl-success-faint);
+  border: 2px solid var(--wl-success-border);
+  color: var(--wl-success);
   display: grid;
   place-items: center;
   margin-bottom: 1rem;
@@ -729,7 +730,7 @@ async function submit() {
 
 .success-desc {
   font-size: 13.5px;
-  color: #64748B;
+  color: var(--wl-muted);
   line-height: 1.6;
   margin: 0;
   max-width: 420px;

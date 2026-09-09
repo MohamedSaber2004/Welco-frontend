@@ -64,21 +64,23 @@ const tone = computed(() => TONE[props.status] ?? 'slate')
 }
 
 .status-pill--emerald {
-  color: #059669;
-  background: #ECFDF5;
-  border-color: rgba(16, 185, 129, 0.2);
+  color: var(--wl-success);
+  background: var(--wl-success-soft);
+  border-color: rgba(var(--wl-success-rgb), 0.25);
 }
+:root.dark .status-pill--emerald,
 :root[data-theme='dark'] .status-pill--emerald {
   color: #57F287;
-  background: rgba(87, 242, 135, 0.12);
+  background: rgba(87, 242, 135, 0.14);
   border-color: rgba(87, 242, 135, 0.25);
 }
 
 .status-pill--indigo {
-  color: #4F46E5;
-  background: #EEF2FF;
-  border-color: rgba(99, 102, 241, 0.2);
+  color: var(--wl-primary);
+  background: var(--wl-primary-soft);
+  border-color: rgba(var(--wl-primary-rgb), 0.25);
 }
+:root.dark .status-pill--indigo,
 :root[data-theme='dark'] .status-pill--indigo {
   color: #949CF7;
   background: rgba(88, 101, 242, 0.16);
@@ -86,23 +88,25 @@ const tone = computed(() => TONE[props.status] ?? 'slate')
 }
 
 .status-pill--amber {
-  color: #D97706;
-  background: #FFFBEB;
-  border-color: rgba(245, 158, 11, 0.22);
+  color: var(--wl-warning);
+  background: var(--wl-warning-soft);
+  border-color: rgba(var(--wl-warning-rgb), 0.25);
 }
+:root.dark .status-pill--amber,
 :root[data-theme='dark'] .status-pill--amber {
   color: #FEE75C;
-  background: rgba(254, 231, 92, 0.12);
+  background: rgba(254, 231, 92, 0.14);
   border-color: rgba(254, 231, 92, 0.3);
 }
 
 .status-pill--rose {
-  color: #E11D48;
-  background: #FFF1F2;
-  border-color: rgba(244, 63, 94, 0.2);
+  color: var(--wl-danger);
+  background: var(--wl-danger-soft);
+  border-color: rgba(var(--wl-danger-rgb), 0.25);
 }
+:root.dark .status-pill--rose,
 :root[data-theme='dark'] .status-pill--rose {
-  color: #F23F43;
+  color: #ED4245;
   background: rgba(237, 66, 69, 0.14);
   border-color: rgba(237, 66, 69, 0.3);
 }
@@ -112,6 +116,7 @@ const tone = computed(() => TONE[props.status] ?? 'slate')
   background: var(--wl-surface-soft);
   border-color: var(--wl-border);
 }
+:root.dark .status-pill--slate,
 :root[data-theme='dark'] .status-pill--slate {
   color: #B5BAC1;
   background: #383A40;

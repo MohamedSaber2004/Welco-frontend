@@ -3,54 +3,16 @@ import type { ConversionResultDto, ExchangeRateDto, ExchangeRateSyncLogDto } fro
 import type { ExchangeRateRepository } from '../domain/ports/exchange-rate-repository'
 
 
-const STATIC_USD_RATES: Record<string, number> = {
-  USD: 1,
-  EUR: 0.86,
-  GBP: 0.74,
-  AED: 3.6725,
-  SAR: 3.75,
-  PKR: 278,
-  INR: 94.5,
-  CNY: 6.71,
-  CAD: 1.38,
-  AUD: 1.39,
-  CHF: 0.81,
-  JPY: 156,
-  EGP: 49,
-  QAR: 3.64,
-  KWD: 0.31,
-  BHD: 0.376,
-  OMR: 0.385,
-  JOD: 0.71,
-  TRY: 48.4,
-}
-
-function staticRates(base: string): Map<string, number> {
-  const upper = base.toUpperCase().trim()
-  const map = new Map<string, number>()
-  if (upper === 'USD') {
-    for (const [code, rate] of Object.entries(STATIC_USD_RATES)) map.set(code, rate)
-    return map
-  }
-  const baseRate = STATIC_USD_RATES[upper]
-  if (!baseRate) return map
-  for (const [code, usdRate] of Object.entries(STATIC_USD_RATES)) {
-    if (code === upper) continue
-    map.set(code, usdRate / baseRate)
-  }
-  return map
-}
-
 export class ExchangeRateService {
   readonly latestRates = ref<Map<string, number>>(new Map())
   readonly lastUpdated = ref<string | null>(null)
-  /** 'live' | 'public' | 'static' | null — lets UI badge offline rates honestly. */
-  readonly lastUpdatedSource = ref<'live' | 'public' | 'static' | null>(null)
+  /** 'live' | 'public' | null — lets UI badge offline rates honestly. */
+  readonly lastUpdatedSource = ref<'live' | 'public' | null>(null)
   readonly loading = ref(false)
   readonly syncLogs = ref<ExchangeRateSyncLogDto[]>([])
   readonly syncing = ref(false)
   readonly loadingLogs = ref(false)
-  private cache = new Map<string, { rates: Map<string, number>; fetchedAt: number; source: 'live' | 'public' | 'static' }>()
+  private cache = new Map<string, { rates: Map<string, number>; fetchedAt: number; source: 'live' | 'public' }>()
   private readonly TTL_MS = 60 * 60 * 1000 // 60 min for live rates
   private readonly FALLBACK_TTL_MS = 10 * 60 * 1000 // 10 min negative-cache so we don't spam a broken backend
 
@@ -89,25 +51,23 @@ export class ExchangeRateService {
         this.cache.set(key, { rates: new Map(map), fetchedAt: Date.now(), source })
         return map
       }
-      // Backend + public providers both empty -> static table (still cached briefly)
-      const fallback = staticRates(base)
-      this.latestRates.value = fallback
-      this.lastUpdated.value = new Date().toISOString()
-      this.lastUpdatedSource.value = 'static'
-      this.cache.set(key, { rates: new Map(fallback), fetchedAt: Date.now(), source: 'static' })
-      return fallback
+      // Backend + public providers both empty -> no rates (callers show
+      // original prices with an "unavailable" badge instead of fake numbers)
+      this.latestRates.value = new Map()
+      this.lastUpdated.value = ''
+      this.lastUpdatedSource.value = null
+      return this.latestRates.value
     } catch {
-      // fallback to cached or static
+      // fallback to cached rates when available
       if (cached) {
         this.latestRates.value = new Map(cached.rates)
         this.lastUpdatedSource.value = cached.source
         return this.latestRates.value
       }
-      const fallback = staticRates(base)
-      this.latestRates.value = fallback
-      this.lastUpdatedSource.value = 'static'
-      this.cache.set(key, { rates: new Map(fallback), fetchedAt: Date.now(), source: 'static' })
-      return fallback
+      this.latestRates.value = new Map()
+      this.lastUpdated.value = ''
+      this.lastUpdatedSource.value = null
+      return this.latestRates.value
     } finally {
       this.loading.value = false
     }
@@ -177,19 +137,6 @@ export class ExchangeRateService {
       return logs
     } finally {
       this.loadingLogs.value = false
-    }
-  }
-
-  async enqueueHangfireSync(): Promise<{ isSuccess: boolean; data?: string; message?: string }> {
-    this.syncing.value = true
-    try {
-      const res = await this.repo.syncEnqueue()
-      this.cache.clear()
-      setTimeout(() => { void this.fetchSyncLogs() }, 1000)
-      setTimeout(() => { void this.fetchSyncLogs(); void this.loadLatest('USD') }, 3500)
-      return res
-    } finally {
-      this.syncing.value = false
     }
   }
 

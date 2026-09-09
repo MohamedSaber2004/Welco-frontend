@@ -41,13 +41,17 @@ const handleReset = async () => {
     return
   }
   loading.value = true
-  const res = await authService.resetPassword({
-    email: email.value.trim(),
-    token: token.value.trim(),
-    newPassword: newPassword.value,
-    confirmNewPassword: confirmNewPassword.value,
-  })
-  loading.value = false
+  let res: Awaited<ReturnType<typeof authService.resetPassword>>
+  try {
+    res = await authService.resetPassword({
+      email: email.value.trim(),
+      token: token.value.trim(),
+      newPassword: newPassword.value,
+      confirmNewPassword: confirmNewPassword.value,
+    })
+  } finally {
+    loading.value = false
+  }
   if (res.ok) {
     toastService.success(t('auth.passwordChanged'))
     await router.push({ name: 'login' })
@@ -209,21 +213,21 @@ const handleReset = async () => {
   display: flex;
   align-items: center;
   gap: 0.35rem;
-  color: #94A3B8;
+  color: var(--wl-muted);
   font-weight: 600;
 }
 
 .step-pill--done {
-  color: #059669;
+  color: var(--wl-success);
 }
 
 .step-pill--done .step-num {
-  background: #10B981;
+  background: var(--wl-success);
   color: #FFFFFF;
 }
 
 .step-pill--active {
-  color: #4F46E5;
+  color: var(--wl-primary);
   font-weight: 700;
 }
 
@@ -240,12 +244,12 @@ const handleReset = async () => {
 }
 
 .step-pill--active .step-num {
-  background: #4F46E5;
+  background: var(--wl-primary);
   color: #FFFFFF;
 }
 
 .step-sep {
-  color: #CBD5E1;
+  color: var(--wl-border);
   font-size: 12px;
 }
 
@@ -264,13 +268,13 @@ const handleReset = async () => {
 .form-label {
   font-size: 11px;
   font-weight: 700;
-  color: #475569;
+  color: var(--wl-ink-soft);
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 
 .req {
-  color: #EF4444;
+  color: var(--wl-danger);
 }
 
 .input-wrap {
@@ -293,18 +297,18 @@ const handleReset = async () => {
   top: 50%;
   transform: translateY(-50%);
   font-size: 19px;
-  color: #94A3B8;
+  color: var(--wl-muted);
   pointer-events: none;
   line-height: 1;
 }
 
 .vip-input {
   width: 100%;
-  height: 48px;
+  height: 44px;
   padding: 0 14px;
   background: var(--wl-surface);
   border: 1.5px solid var(--wl-border);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 14px;
   font-family: var(--wl-font-body, system-ui);
   color: var(--wl-ink-strong);
@@ -322,13 +326,13 @@ const handleReset = async () => {
 }
 
 .vip-input:focus {
-  border-color: #4F46E5;
-  box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.14);
+  border-color: var(--wl-primary);
+  box-shadow: var(--wl-focus-ring);
   transform: translateY(-0.5px);
 }
 
 .vip-input.is-invalid {
-  border-color: #EF4444;
+  border-color: var(--wl-danger);
 }
 
 .pwd-toggle-btn {
@@ -338,7 +342,7 @@ const handleReset = async () => {
   transform: translateY(-50%);
   background: none;
   border: none;
-  color: #94A3B8;
+  color: var(--wl-muted);
   cursor: pointer;
   display: grid;
   place-items: center;
@@ -348,7 +352,7 @@ const handleReset = async () => {
 }
 
 .pwd-toggle-btn:hover {
-  color: #4F46E5;
+  color: var(--wl-primary);
 }
 
 .strength-bar {
@@ -368,24 +372,24 @@ const handleReset = async () => {
   flex: 1;
   height: 4px;
   border-radius: 9999px;
-  background: #E2E8F0;
+  background: var(--wl-surface-hover);
   transition: background 0.2s ease;
 }
 
-.seg--weak { background: #EF4444; }
-.seg--fair { background: #F59E0B; }
-.seg--good { background: #10B981; }
-.seg--strong { background: #4F46E5; }
+.seg--weak { background: var(--wl-danger); }
+.seg--fair { background: var(--wl-warning); }
+.seg--good { background: var(--wl-success); }
+.seg--strong { background: var(--wl-primary); }
 
 .strength-label {
   font-size: 10px;
   font-weight: 700;
-  color: #64748B;
+  color: var(--wl-muted);
 }
 
 .field-error-text {
   font-size: 11px;
-  color: #EF4444;
+  color: var(--wl-danger);
   margin-top: 0.2rem;
 }
 
@@ -394,21 +398,21 @@ const handleReset = async () => {
   align-items: center;
   gap: 0.55rem;
   padding: 0.75rem 1rem;
-  background: #FFF1F2;
-  border: 1px solid #FECDD3;
+  background: var(--wl-danger-soft);
+  border: 1px solid var(--wl-border);
   border-radius: 10px;
-  color: #E11D48;
+  color: var(--wl-danger);
   font-size: 13px;
   font-weight: 500;
 }
 
 .vip-submit-btn {
-  height: 48px;
+  height: 44px;
   width: 100%;
-  background: #4F46E5;
+  background: var(--wl-primary);
   color: #FFFFFF;
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-family: var(--wl-font-body, system-ui);
   font-size: 14.5px;
   font-weight: 700;
@@ -422,7 +426,7 @@ const handleReset = async () => {
 }
 
 .vip-submit-btn:hover:not(:disabled) {
-  background: #4338CA;
+  background: var(--wl-primary-hover);
   transform: translateY(-1px);
   box-shadow: 0 6px 16px -2px rgba(79, 70, 229, 0.45);
 }

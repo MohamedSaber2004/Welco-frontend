@@ -12,6 +12,7 @@ import DataState from '../../components/ui/DataState.vue'
 import BackButton from '../../components/ui/BackButton.vue'
 import BaseModal from '../../components/ui/BaseModal.vue'
 import EmptyState from '../../components/ui/EmptyState.vue'
+import AppImage from '../../components/ui/AppImage.vue'
 import { productMediaUrl, resolveFileUrl, PLACEHOLDER, PLACEHOLDER_PNG, parseVideoSource } from '../../utils/file-url'
 
 const route = useRoute()
@@ -867,16 +868,14 @@ const resolvedDescription = computed(() => {
               class="rel-media"
               :style="{ background: productMediaUrl(p.imageName, p.imageGradient).background }"
             >
-              <img
-                v-if="productMediaUrl(p.imageName, p.imageGradient).url && productMediaUrl(p.imageName, p.imageGradient).url !== PLACEHOLDER"
-                :src="productMediaUrl(p.imageName, p.imageGradient).url"
+              <AppImage
+                :src="p.imageName"
+                placeholder-type="product"
+                :placeholder-text="p.sku"
                 :alt="localized(p.nameEn, p.nameAr)"
+                fit="contain"
                 class="rel-media__img"
-                loading="lazy"
               />
-              <div v-else class="rel-fallback mono">
-                <span class="material-symbols-outlined text-[24px]">precision_manufacturing</span>
-              </div>
               <span class="rel-sku mono">{{ p.sku }}</span>
             </div>
 

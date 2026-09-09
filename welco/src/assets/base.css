@@ -5,7 +5,7 @@ html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  color-scheme: light;
+  color-scheme: dark;
   scroll-padding-top: calc(var(--wl-header-height) + 1rem);
   overflow-x: clip;
 }

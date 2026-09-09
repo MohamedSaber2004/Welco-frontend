@@ -58,84 +58,130 @@
     }
   },
   "provider": {
-    "seekai": {
-      "name": "SeekAI",
+    "apinex": {
       "npm": "@ai-sdk/openai-compatible",
-      "env": [
-        "SEEKAI_API_KEY"
-      ],
+      "name": "APInex",
       "options": {
-        "baseURL": "https://seekai.cc/v1"
+        "baseURL": "https://api.apinex.bond/v1",
+        "apiKey": "sk-apx27cadc5942080710d98d6d8f95b1d7ca4c02ed25a47748e"
       },
       "models": {
-        "claude-opus-4-7": {
-          "name": "Claude Opus 4.7"
-        },
-        "claude-opus-4-8": {
-          "name": "Claude Opus 4.8"
-        },
-        "claude-opus-4-6": {
-          "name": "Claude Opus 4.6"
-        },
-        "claude-sonnet-4-6": {
-          "name": "Claude Sonnet 4.6"
-        },
-        "claude-sonnet-5": {
-          "name": "Claude Sonnet 5"
-        },
-        "gpt-5.6-sol": {
-          "name": "GPT-5.6 SOL"
-        },
-        "gpt-5.6-terra": {
-          "name": "GPT-5.6 Terra"
-        }
-      }
-    },
-    "agentrouter": {
-      "npm": "@ai-sdk/openai-compatible",
-      "name": "AgentRouter",
-      "env": [
-        "AGENTROUTER_API_KEY"
-      ],
-      "options": {
-        "baseURL": "https://agentrouter.org/v1",
-        "headers": {
-          "User-Agent": "claude-cli/1.0.108 (external, cli)",
-          "anthropic-version": "2023-06-01",
-          "X-Title": "Roo Code",
-          "HTTP-Referer": "https://github.com/RooVetGit/Roo-Cline"
-        }
-      },
-      "models": {
-        "deepseek-v4-flash": {
-          "name": "DeepSeek V4 Flash"
-        },
-        "glm-5.3": {
-          "name": "GLM 5.3"
-        },
-        "claude-opus-4-8": {
-          "name": "Claude Opus 4.8"
-        },
-        "claude-opus-5": {
+        "claude/opus-5": {
           "name": "Claude Opus 5"
         },
-        "gpt-5.6-sol": {
-          "name": "GPT 5.6 SOL"
+        "claude/sonnet-5": {
+          "name": "Claude Sonnet 5"
+        },
+        "free/deepseek-v4-flash-0731": {
+          "name": "Deepseek V4 Flash"
+        },
+        "deepseek/v4-flash": {
+          "name": "Deepseek V4 Flash"
+        },
+        "free/deepseek-v4-pro-0813": {
+          "name": "Deepseek V4 Pro"
+        },
+        "deepseek/v4-pro": {
+          "name": "Deepseek V4 Pro"
+        },
+        "glm/5.3": {
+          "name": "GLM 5.3"
+        },
+        "free/glm-5.3-flash": {
+          "name": "GLM-5.3 Flash"
+        },
+        "glm/5.3-flash": {
+          "name": "GLM-5.3 Flash"
+        },
+        "gemini/3.1-pro": {
+          "name": "Gemini 3.1 Pro"
+        },
+        "free/gemini-3.1-pro": {
+          "name": "Gemini 3.1 Pro"
+        },
+        "gemini/3.8-flash": {
+          "name": "Gemini 3.8 Flash"
         }
-      }
-    },
-    "naraya": {
-      "npm": "@ai-sdk/openai-compatible",
-      "name": "NaraRouter",
-      "env": [
-        "BYNARA_API_KEY"
-      ],
-      "options": {
-        "baseURL": "https://router.bynara.id/v1"
       },
-      "models": {
-        "agnes-2.0-flash": {
-          "name": "Agnes 2.0 Flash"
+      "seekai": {
+        "name": "SeekAI",
+        "npm": "@ai-sdk/openai-compatible",
+        "env": [
+          "SEEKAI_API_KEY"
+        ],
+        "options": {
+          "baseURL": "https://seekai.cc/v1"
+        },
+        "models": {
+          "claude-opus-4-7": {
+            "name": "Claude Opus 4.7"
+          },
+          "claude-opus-4-8": {
+            "name": "Claude Opus 4.8"
+          },
+          "claude-opus-4-6": {
+            "name": "Claude Opus 4.6"
+          },
+          "claude-sonnet-4-6": {
+            "name": "Claude Sonnet 4.6"
+          },
+          "claude-sonnet-5": {
+            "name": "Claude Sonnet 5"
+          },
+          "gpt-5.6-sol": {
+            "name": "GPT-5.6 SOL"
+          },
+          "gpt-5.6-terra": {
+            "name": "GPT-5.6 Terra"
+          }
+        }
+      },
+      "agentrouter": {
+        "npm": "@ai-sdk/openai-compatible",
+        "name": "AgentRouter",
+        "env": [
+          "AGENTROUTER_API_KEY"
+        ],
+        "options": {
+          "baseURL": "https://agentrouter.org/v1",
+          "headers": {
+            "User-Agent": "claude-cli/1.0.108 (external, cli)",
+            "anthropic-version": "2023-06-01",
+            "X-Title": "Roo Code",
+            "HTTP-Referer": "https://github.com/RooVetGit/Roo-Cline"
+          }
+        },
+        "models": {
+          "deepseek-v4-flash": {
+            "name": "DeepSeek V4 Flash"
+          },
+          "glm-5.3": {
+            "name": "GLM 5.3"
+          },
+          "claude-opus-4-8": {
+            "name": "Claude Opus 4.8"
+          },
+          "claude-opus-5": {
+            "name": "Claude Opus 5"
+          },
+          "gpt-5.6-sol": {
+            "name": "GPT 5.6 SOL"
+          }
+        }
+      },
+      "naraya": {
+        "npm": "@ai-sdk/openai-compatible",
+        "name": "NaraRouter",
+        "env": [
+          "BYNARA_API_KEY"
+        ],
+        "options": {
+          "baseURL": "https://router.bynara.id/v1"
+        },
+        "models": {
+          "agnes-2.0-flash": {
+            "name": "Agnes 2.0 Flash"
+          }
         }
       }
     }

@@ -154,14 +154,14 @@ const strokeColor = computed(() => {
   top: 0;
   inset-inline: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--wl-teal), transparent);
+  background: linear-gradient(90deg, transparent, var(--wl-primary), transparent);
   opacity: 0;
   transition: opacity 0.2s ease;
   pointer-events: none;
 }
 
 .stat-card.is-interactive:hover {
-  border-color: rgba(79, 70, 229, 0.25);
+  border-color: rgba(var(--wl-primary-rgb), 0.28);
   box-shadow: var(--shadow-md);
   transform: translateY(-2px);
 }
@@ -283,6 +283,6 @@ const strokeColor = computed(() => {
 /* Tone customizations */
 .stat-card--emerald .stat-card__value { color: var(--wl-success); }
 .stat-card--rose .stat-card__value { color: var(--wl-danger); }
-.stat-card--amber .stat-card__value { color: #D97706; }
+.stat-card--amber .stat-card__value { color: var(--wl-warning); }
 .stat-card--indigo .stat-card__value { color: var(--wl-ink-strong); }
 </style>

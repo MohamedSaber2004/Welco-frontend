@@ -356,8 +356,8 @@ const showDrop = computed(() => !hasMediaType.value || effectiveFileType.value =
   width: 38px;
   height: 38px;
   border-radius: 8px;
-  background: rgba(15, 118, 110, 0.1);
-  color: var(--wl-teal);
+  background: var(--wl-primary-faint);
+  color: var(--wl-primary);
   flex-shrink: 0;
 }
 .fup__file-icon-wrap--pdf {
@@ -383,7 +383,7 @@ const showDrop = computed(() => !hasMediaType.value || effectiveFileType.value =
   white-space: nowrap;
 }
 .fup__filename--link {
-  color: var(--wl-teal);
+  color: var(--wl-primary);
   text-decoration: none;
 }
 .fup__filename--link:hover {
@@ -400,14 +400,14 @@ const showDrop = computed(() => !hasMediaType.value || effectiveFileType.value =
   font-weight: 700;
   padding: 0.1rem 0.4rem;
   border-radius: 4px;
-  background: rgba(15, 118, 110, 0.08);
-  color: var(--wl-teal);
+  background: var(--wl-primary-soft);
+  color: var(--wl-primary);
   letter-spacing: 0.04em;
   white-space: nowrap;
 }
 .fup__type-tag--pdf {
-  background: rgba(225, 29, 72, 0.1);
-  color: #e11d48;
+  background: var(--wl-danger-soft);
+  color: var(--wl-danger);
 }
 .fup__url-preview {
   font-size: 0.68rem;
@@ -440,9 +440,9 @@ const showDrop = computed(() => !hasMediaType.value || effectiveFileType.value =
 }
 .fup__btn-open:hover,
 .fup__btn-inline-toggle:hover {
-  background: var(--wl-teal);
+  background: var(--wl-primary);
   color: #fff;
-  border-color: var(--wl-teal);
+  border-color: var(--wl-primary);
 }
 .fup__btn-open .material-symbols-outlined,
 .fup__btn-inline-toggle .material-symbols-outlined {
@@ -494,20 +494,20 @@ const showDrop = computed(() => !hasMediaType.value || effectiveFileType.value =
   padding: 1rem;
 }
 .fup__drop:hover:not(.fup__drop--busy) {
-  border-color: var(--wl-teal);
-  background: rgba(79, 70, 229, 0.04);
+  border-color: var(--wl-primary);
+  background: var(--wl-primary-soft);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px -2px rgba(79, 70, 229, 0.12);
 }
 .fup__drop:focus-visible {
-  outline: 2px solid var(--wl-teal);
+  outline: 2px solid var(--wl-primary);
   outline-offset: 2px;
   box-shadow: var(--wl-focus-ring);
 }
 .fup__drop--busy { cursor: wait; }
 .fup__icon {
   font-size: 28px;
-  color: var(--wl-teal);
+  color: var(--wl-primary);
   transition: transform 0.2s var(--wl-ease-spring);
 }
 .fup__drop:hover:not(.fup__drop--busy) .fup__icon {
@@ -516,7 +516,7 @@ const showDrop = computed(() => !hasMediaType.value || effectiveFileType.value =
 .fup__meta { font-size: 0.76rem; font-weight: 600; color: var(--wl-ink-strong); }
 .fup__hint-mono { font-size: 0.68rem; color: var(--wl-muted); }
 .fup__progress { width: 70%; height: 6px; background: var(--wl-line); border-radius: 999px; overflow: hidden; }
-.fup__bar { height: 100%; background: var(--wl-teal); transition: width 0.15s ease; }
+.fup__bar { height: 100%; background: var(--wl-primary); transition: width 0.15s ease; }
 
 .fup__error { font-size: 0.78rem; font-weight: 600; color: var(--wl-danger); margin: 0; }
 </style>

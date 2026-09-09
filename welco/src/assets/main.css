@@ -4,7 +4,7 @@
 @tailwind components;
 @tailwind utilities;
 
-#app { min-height: 100vh; display: flex; flex-direction: column; background: var(--wl-paper); overflow-x: clip; }
+#app { min-height: 100vh; display: flex; flex-direction: column; background: var(--wl-paper); background-image: var(--wl-app-glow); background-repeat: no-repeat; background-size: 100% 560px; overflow-x: clip; }
 main { flex: 1; min-width: 0; overflow-x: clip; }
 @media (max-width: 768px) {
   main {
@@ -71,23 +71,27 @@ table thead th.text-center {
 }
 
 .row-action-btn:hover {
-  color: #4f46e5;
-  border-color: #4f46e5;
+  color: var(--wl-primary);
+  border-color: var(--wl-primary);
+  background: var(--wl-primary-soft);
 }
 
 .row-action-btn--danger:hover {
-  color: #dc2626;
-  border-color: #dc2626;
+  color: var(--wl-danger);
+  border-color: var(--wl-danger);
+  background: var(--wl-danger-soft);
 }
 
 .row-action-btn--activate:hover {
-  color: #059669;
-  border-color: #059669;
+  color: var(--wl-success);
+  border-color: var(--wl-success);
+  background: var(--wl-success-soft);
 }
 
 .row-action-btn--deactivate:hover {
-  color: #d97706;
-  border-color: #d97706;
+  color: var(--wl-warning);
+  border-color: var(--wl-warning);
+  background: var(--wl-warning-soft);
 }
 
 .row-action-btn:disabled {
@@ -113,12 +117,12 @@ table thead th.text-center {
 }
 
 .status-dot-badge--active {
-  background: #ecfdf5;
-  color: #059669;
+  background: var(--wl-success-soft);
+  color: var(--wl-success);
 }
 
 .status-dot-badge--active .dot {
-  background: #10b981;
+  background: var(--wl-success);
 }
 
 .status-dot-badge--inactive {
@@ -174,7 +178,8 @@ table thead th.text-center {
 .admin-modal-form .field-textarea:focus,
 .admin-modal-form .field-select:focus {
   outline: none;
-  border-color: var(--wl-teal);
+  border-color: var(--wl-primary);
+  box-shadow: var(--wl-focus-ring);
 }
 
 .admin-modal-form .toggle-label {
@@ -188,9 +193,9 @@ table thead th.text-center {
 }
 
 .admin-modal-form .form-error {
-  background: rgba(239, 68, 68, 0.08);
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  color: #dc2626;
+  background: var(--wl-danger-soft);
+  border: 1px solid var(--wl-danger);
+  color: var(--wl-danger);
   font-size: 0.82rem;
   padding: 0.6rem 0.85rem;
   border-radius: 8px;

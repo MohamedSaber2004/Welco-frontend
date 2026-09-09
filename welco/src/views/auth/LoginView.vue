@@ -23,13 +23,16 @@ const handleLogin = async () => {
     return
   }
   loading.value = true
-  const res = await authService.login({ email: email.value.trim(), password: password.value })
-  loading.value = false
+  let res: Awaited<ReturnType<typeof authService.login>>
+  try {
+    res = await authService.login({ email: email.value.trim(), password: password.value })
+  } finally {
+    loading.value = false
+  }
   if (res.ok) {
-    // No-company OrganizationUser = either a Customer (buyer, allowed in) or
-    // a pending Organization signup awaiting admin approval (bounced out).
-    // The backend has no Customer role, so the pending-org marker (set at
-    // Organization registration) tells them apart.
+    await authService.loadProfile().catch(() => null)
+  }
+  if (res.ok) {
     if (authService.isOrganizationUser.value && !authService.user.value?.companyId) {
       if (isPendingOrg(authService.user.value?.email)) {
         await authService.logout().catch(() => {})
@@ -39,9 +42,8 @@ const handleLogin = async () => {
       }
     }
     const redirect = (route.query.redirect as string) || ''
-    if (redirect) await router.push(redirect)
-    else if (authService.isAdmin.value) await router.push({ name: 'admin-dashboard' })
-    else await router.push({ name: 'home' })
+    if (redirect && authService.canAccessPath(redirect)) await router.replace(redirect)
+    else await router.replace({ name: authService.getDashboardRouteName() })
   } else {
     error.value = res.error
     const lower = res.error.toLowerCase()
@@ -195,7 +197,7 @@ const handleLogin = async () => {
 
 .vip-input {
   width: 100%;
-  height: 48px;
+  height: 44px;
   padding: 0 14px;
   padding-inline-start: 42px;
   background: var(--wl-surface);
@@ -226,7 +228,7 @@ const handleLogin = async () => {
   transform: translateY(-50%);
   background: none;
   border: none;
-  color: #94A3B8;
+  color: var(--wl-muted);
   cursor: pointer;
   display: grid;
   place-items: center;
@@ -246,7 +248,7 @@ const handleLogin = async () => {
   gap: 0.55rem;
   padding: 0.75rem 1rem;
   background: var(--wl-danger-soft);
-  border: 1px solid rgba(244, 63, 94, 0.18);
+  border: 1px solid var(--wl-border);
   border-radius: var(--radius-md);
   color: var(--wl-danger);
   font-size: 13px;
@@ -254,7 +256,7 @@ const handleLogin = async () => {
 }
 
 .vip-submit-btn {
-  height: 48px;
+  height: 44px;
   width: 100%;
   background: var(--wl-primary);
   color: #FFFFFF;

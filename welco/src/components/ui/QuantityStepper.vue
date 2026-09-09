@@ -59,7 +59,7 @@ function step(delta: number) {
 
 .qty:focus-within,
 .qty:hover {
-  border-color: var(--wl-teal);
+  border-color: var(--wl-primary);
 }
 
 .qty__btn {
@@ -76,8 +76,8 @@ function step(delta: number) {
 }
 
 .qty__btn:hover:not(:disabled) {
-  background: rgba(13, 148, 136, 0.12);
-  color: var(--wl-teal);
+  background: var(--wl-primary-soft);
+  color: var(--wl-primary);
 }
 
 .qty__btn:active:not(:disabled) {

@@ -40,15 +40,19 @@ withDefaults(
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.55);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
   pointer-events: none;
+}
+:root.dark .card::after,
+:root[data-theme='dark'] .card::after {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 .card::before {
   content: '';
   position: absolute;
   inset-inline: 0;
   top: 0;
-  height: 2px;
+  height: 1px;
   background: var(--wl-laser-sweep);
   opacity: 0;
   transition: opacity 0.25s ease;
@@ -58,7 +62,7 @@ withDefaults(
 .card--hover:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
-  border-color: rgba(79,70,229,0.22);
+  border-color: rgba(var(--wl-primary-rgb), 0.28);
 }
 .card--pad-none .card__body { padding: 0; }
 .card--pad-sm .card__body { padding: var(--space-4); }
@@ -70,7 +74,7 @@ withDefaults(
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: linear-gradient(180deg, rgba(255,255,255,0.6), transparent);
+  background: var(--wl-surface-soft);
 }
 .card__footer {
   padding: var(--space-4) var(--space-6);

@@ -1,10 +1,42 @@
-<svg width="400" height="300" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
-  <rect width="400" height="300" rx="12" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1.5"/>
-  <g transform="translate(200,125)" text-anchor="middle">
-    <circle cx="0" cy="0" r="36" fill="white" stroke="#cbd5e1" stroke-width="1.5"/>
-    <path d="M -14 10 L -8 -6 L -2 2 L 4 -4 L 12 10 Z" fill="none" stroke="#94a3b8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-    <circle cx="6" cy="-8" r="3.5" fill="white" stroke="#94a3b8" stroke-width="1.4"/>
+<svg width="400" height="300" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#cbd5e1" opacity="0.35"/>
+    </pattern>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#f1f5f9"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="400" height="300" rx="12" fill="url(#bgGrad)"/>
+  <rect width="400" height="300" rx="12" fill="url(#grid)"/>
+  <rect x="0.75" y="0.75" width="398.5" height="298.5" rx="11.25" stroke="#e2e8f0" stroke-width="1.5"/>
+
+  <!-- Corner Caliper Crosshairs -->
+  <path d="M 16 26 V 16 H 26" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M 384 26 V 16 H 374" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M 16 274 V 284 H 26" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M 384 274 V 284 H 374" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/>
+
+  <!-- Centered "No Image" Housing -->
+  <g transform="translate(200, 115)">
+    <!-- Housing Circle -->
+    <circle cx="0" cy="0" r="38" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+
+    <!-- Universal Image Not Supported / Camera Crossed Symbol -->
+    <!-- Picture frame -->
+    <rect x="-17" y="-13" width="34" height="26" rx="4" fill="none" stroke="#94a3b8" stroke-width="2"/>
+    <!-- Mountain/Hills -->
+    <path d="M -11 9 L -3 -1 L 5 7 L 11 1" fill="none" stroke="#94a3b8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Sun -->
+    <circle cx="8" cy="-5" r="2.5" fill="#94a3b8"/>
+    <!-- Diagonal Strike Through (No Image) -->
+    <line x1="-22" y1="-18" x2="22" y2="18" stroke="#ef4444" stroke-width="2.2" stroke-linecap="round"/>
   </g>
-  <text x="200" y="185" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="600" fill="#64748b">No image</text>
-  <text x="200" y="205" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#94a3b8">Welco • placeholder</text>
+
+  <!-- Typography -->
+  <text x="200" y="186" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="12" font-weight="700" letter-spacing="1.5" fill="#334155">NO IMAGE</text>
+  <text x="200" y="206" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="500" fill="#64748b">لا توجد صورة</text>
 </svg>

@@ -99,15 +99,15 @@ const pillars = computed(() => [
 
             <div class="hero-badges mono">
               <div class="hero-badge">
-                <span class="material-symbols-outlined text-[16px] text-emerald-500">verified</span>
+                <span class="material-symbols-outlined text-[16px] text-[var(--wl-success)]">verified</span>
                 <span>{{ t('about.statCerts') }}</span>
               </div>
               <div class="hero-badge">
-                <span class="material-symbols-outlined text-[16px] text-indigo-500">history_edu</span>
+                <span class="material-symbols-outlined text-[16px] text-[var(--wl-primary)]">history_edu</span>
                 <span>{{ t('about.statYears') }}</span>
               </div>
               <div class="hero-badge">
-                <span class="material-symbols-outlined text-[16px] text-teal-500">public</span>
+                <span class="material-symbols-outlined text-[16px] text-[var(--wl-primary)]">public</span>
                 <span>{{ t('about.statGlobal') }}</span>
               </div>
             </div>

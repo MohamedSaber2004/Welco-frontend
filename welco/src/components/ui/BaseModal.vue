@@ -52,7 +52,7 @@ onUnmounted(() => {
     <Transition name="modal-fade">
       <div v-if="modelValue" class="modal-backdrop" @click.self="handleClose">
         <div class="modal-container" :style="{ maxWidth }" role="dialog" aria-modal="true">
-          <div class="modal-card card">
+          <div class="modal-card">
             <div v-if="title || $slots.header" class="modal-header">
               <slot name="header">
                 <h3 class="modal-title">{{ title }}</h3>
@@ -80,7 +80,7 @@ onUnmounted(() => {
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(11, 29, 42, 0.58);
+  background: rgba(15, 23, 42, 0.6);
   backdrop-filter: blur(12px) saturate(1.2);
   -webkit-backdrop-filter: blur(12px) saturate(1.2);
   display: flex;
@@ -88,6 +88,10 @@ onUnmounted(() => {
   justify-content: center;
   padding: var(--wl-gutter, var(--space-4));
   z-index: 999;
+}
+:root.dark .modal-backdrop,
+:root[data-theme='dark'] .modal-backdrop {
+  background: rgba(0, 0, 0, 0.72);
 }
 
 .modal-container {
@@ -101,7 +105,7 @@ onUnmounted(() => {
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
   border-radius: var(--radius-xl);
-  box-shadow: 0 24px 64px rgba(15,23,42,0.18), 0 8px 24px rgba(15,23,42,0.12);
+  box-shadow: 0 24px 64px rgba(15, 23, 42, 0.18), 0 8px 24px rgba(15, 23, 42, 0.12);
   display: flex;
   flex-direction: column;
   max-height: 90vh;
@@ -113,7 +117,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: linear-gradient(180deg, var(--wl-surface), var(--wl-surface-soft));
+  background: var(--wl-surface-soft);
 }
 
 .modal-title {

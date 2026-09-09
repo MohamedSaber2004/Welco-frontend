@@ -1,14 +1,20 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { t, locale } from '../../i18n'
 import { certificationService } from '../../di/container'
 import SkeletonLoader from '../../components/ui/SkeletonLoader.vue'
 import DataState from '../../components/ui/DataState.vue'
 import { resolveFileUrl, PLACEHOLDER } from '../../utils/file-url'
 import BackButton from '../../components/ui/BackButton.vue'
+import AppPagination from '../../components/ui/AppPagination.vue'
+import AppImage from '../../components/ui/AppImage.vue'
 
 const certs = certificationService.certifications
 const loading = ref(true)
+const searchQuery = ref('')
+const statusFilter = ref<'all' | 'verified' | 'pending'>('all')
+const page = ref(1)
+const pageSize = ref(6)
 
 onMounted(async () => {
   await certificationService.load()
@@ -28,6 +34,40 @@ function isPdfDoc(name: string | null | undefined): boolean {
   const hIdx = noQuery.indexOf('#')
   const clean = hIdx >= 0 ? noQuery.slice(0, hIdx) : noQuery
   return clean.endsWith('.pdf')
+}
+
+const filteredCerts = computed(() => {
+  let list = [...certs.value]
+  const q = searchQuery.value.trim().toLowerCase()
+  if (q) {
+    list = list.filter((c) =>
+      (c.title || '').toLowerCase().includes(q) ||
+      (c.certificateNumber || '').toLowerCase().includes(q) ||
+      (c.issuer || '').toLowerCase().includes(q) ||
+      (c.issuedTo || '').toLowerCase().includes(q)
+    )
+  }
+  if (statusFilter.value === 'verified') {
+    list = list.filter(isActive)
+  } else if (statusFilter.value === 'pending') {
+    list = list.filter((c) => !isActive(c))
+  }
+  return list
+})
+
+const totalCount = computed(() => filteredCerts.value.length)
+const totalPages = computed(() => Math.max(1, Math.ceil(totalCount.value / pageSize.value)))
+const paginatedCerts = computed(() => {
+  const start = (page.value - 1) * pageSize.value
+  return filteredCerts.value.slice(start, start + pageSize.value)
+})
+
+watch([searchQuery, statusFilter], () => {
+  page.value = 1
+})
+
+const goPage = (p: number) => {
+  page.value = p
 }
 </script>
 
@@ -87,26 +127,69 @@ function isPdfDoc(name: string | null | undefined): boolean {
         <span class="mono count-badge">{{ t('certifications.certsValid', { count: certs.length }) }}</span>
       </div>
 
+      <!-- Search & Filter Toolbar -->
+      <div class="cert-toolbar">
+        <div class="search-box">
+          <span class="material-symbols-outlined search-icon">search</span>
+          <input
+            v-model="searchQuery"
+            type="search"
+            :placeholder="t('common.searchPlaceholder')"
+            class="search-input"
+          />
+          <button v-if="searchQuery" class="clear-search-btn" type="button" @click="searchQuery = ''">
+            <span class="material-symbols-outlined text-[16px]">close</span>
+          </button>
+        </div>
+
+        <div class="filter-chips">
+          <button
+            type="button"
+            class="filter-chip mono"
+            :class="{ 'is-active': statusFilter === 'all' }"
+            @click="statusFilter = 'all'"
+          >
+            {{ t('common.all') }}
+          </button>
+          <button
+            type="button"
+            class="filter-chip mono"
+            :class="{ 'is-active': statusFilter === 'verified' }"
+            @click="statusFilter = 'verified'"
+          >
+            {{ t('common.verified') }}
+          </button>
+          <button
+            type="button"
+            class="filter-chip mono"
+            :class="{ 'is-active': statusFilter === 'pending' }"
+            @click="statusFilter = 'pending'"
+          >
+            {{ t('common.pending') }}
+          </button>
+        </div>
+      </div>
+
       <SkeletonLoader v-if="loading" type="category-grid" :count="4" />
       <DataState
         v-else
-        :empty="!certs.length"
+        :empty="!filteredCerts.length"
         :empty-title="t('certifications.certsTitle')"
         :empty-description="t('certifications.certsSubtitle')"
         skeleton-type="card"
         min-height="240px"
       >
         <div class="cert-grid">
-          <article v-for="c in certs" :key="c.id" class="cert-card">
+          <article v-for="c in paginatedCerts" :key="c.id" class="cert-card">
             <div class="card-head-row">
               <div class="seal-box" :class="{ 'seal-box--pdf': isPdfDoc(c.certificationImageName) }">
                 <span v-if="isPdfDoc(c.certificationImageName)" class="material-symbols-outlined seal-pdf-icon">picture_as_pdf</span>
-                <img
+                <AppImage
                   v-else
-                  :src="resolveFileUrl(c.certificationImageName)"
+                  :src="c.certificationImageName"
+                  placeholder-type="document"
                   :alt="c.title"
                   class="seal-img"
-                  @error="(e) => ((e.target as HTMLImageElement).src = PLACEHOLDER)"
                 />
               </div>
 
@@ -143,9 +226,19 @@ function isPdfDoc(name: string | null | undefined): boolean {
                 <dd class="mono">{{ new Date(c.expiryDate).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</dd>
               </div>
             </dl>
-
           </article>
         </div>
+
+        <!-- Pagination -->
+        <AppPagination
+          v-if="totalPages > 1"
+          :page="page"
+          :total-pages="totalPages"
+          :total-items="totalCount"
+          :page-size="pageSize"
+          class="mt-6"
+          @change="goPage"
+        />
       </DataState>
     </section>
   </div>
@@ -157,26 +250,118 @@ function isPdfDoc(name: string | null | undefined): boolean {
   gap: 2.5rem;
 }
 
+.cert-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.search-box {
+  position: relative;
+  flex: 1;
+  min-width: 240px;
+  max-width: 420px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--wl-muted);
+  font-size: 18px;
+  pointer-events: none;
+}
+
+[dir="rtl"] .search-icon {
+  left: auto;
+  right: 10px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.5rem 2rem;
+  border-radius: var(--wl-radius-sm);
+  border: 1px solid var(--wl-border);
+  background: var(--wl-surface);
+  color: var(--wl-text);
+  font-size: 0.8125rem;
+  outline: none;
+}
+
+.search-input:focus {
+  border-color: var(--wl-primary);
+}
+
+.clear-search-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--wl-muted);
+  cursor: pointer;
+  padding: 2px;
+}
+
+[dir="rtl"] .clear-search-btn {
+  right: auto;
+  left: 8px;
+}
+
+.filter-chips {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filter-chip {
+  padding: 0.4rem 0.85rem;
+  border-radius: 9999px;
+  border: 1px solid var(--wl-border);
+  background: var(--wl-surface);
+  color: var(--wl-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.filter-chip:hover {
+  border-color: var(--wl-primary);
+  color: var(--wl-text);
+}
+
+.filter-chip.is-active {
+  background: var(--wl-primary);
+  color: #ffffff;
+  border-color: var(--wl-primary);
+}
+
 .crumb-bar {
   display: flex;
   align-items: center;
   gap: 0.45rem;
   font-size: 11px;
-  color: #64748B;
+  color: var(--wl-muted);
 }
 
 .crumb-bar a {
-  color: #64748B;
+  color: var(--wl-muted);
   text-decoration: none;
   transition: color 0.15s ease;
 }
 
 .crumb-bar a:hover {
-  color: #4F46E5;
+  color: var(--wl-primary);
 }
 
 .crumb-sep {
-  color: #CBD5E1;
+  color: var(--wl-border);
 }
 
 .crumb-active {
@@ -204,7 +389,7 @@ function isPdfDoc(name: string | null | undefined): boolean {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #4F46E5;
+  background: var(--wl-primary);
 }
 
 .cert-hero {
@@ -212,7 +397,7 @@ function isPdfDoc(name: string | null | undefined): boolean {
   border: 1px solid var(--wl-border);
   border-radius: 20px;
   padding: 2.5rem;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  box-shadow: var(--wl-shadow-card);
 }
 
 .hero-top-row {
@@ -242,7 +427,7 @@ function isPdfDoc(name: string | null | undefined): boolean {
 
 .hero-desc {
   font-size: 15px;
-  color: #64748B;
+  color: var(--wl-muted);
   line-height: 1.6;
   margin: 0.35rem 0 0;
 }
@@ -257,8 +442,8 @@ function isPdfDoc(name: string | null | undefined): boolean {
 .standard-pill {
   font-size: 10.5px;
   font-weight: 700;
-  color: #0369A1;
-  background: #E0F2FE;
+  color: var(--wl-primary);
+  background: var(--wl-primary-faint);
   padding: 0.2rem 0.6rem;
   border-radius: 6px;
   letter-spacing: 0.04em;
@@ -290,14 +475,14 @@ function isPdfDoc(name: string | null | undefined): boolean {
 .telemetry-lbl {
   font-size: 9.5px;
   font-weight: 700;
-  color: #64748B;
+  color: var(--wl-muted);
   letter-spacing: 0.06em;
 }
 
 .telemetry-div {
   width: 1px;
   height: 36px;
-  background: #CBD5E1;
+  background: var(--wl-border);
 }
 
 .cert-section {
@@ -343,7 +528,7 @@ function isPdfDoc(name: string | null | undefined): boolean {
   border: 1px solid var(--wl-border);
   border-radius: 16px;
   padding: 1.5rem;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  box-shadow: var(--wl-shadow-card);
   display: flex;
   flex-direction: column;
   gap: 0.85rem;
@@ -351,8 +536,8 @@ function isPdfDoc(name: string | null | undefined): boolean {
 }
 
 .cert-card:hover {
-  border-color: #CBD5E1;
-  box-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.08);
+  border-color: var(--wl-primary);
+  box-shadow: var(--wl-shadow-card-hover);
 }
 
 .card-head-row {
@@ -374,13 +559,13 @@ function isPdfDoc(name: string | null | undefined): boolean {
 }
 
 .seal-box--pdf {
-  background: #FFF1F2;
-  border-color: #FECDD3;
+  background: var(--wl-danger-faint);
+  border-color: var(--wl-danger-border);
 }
 
 .seal-pdf-icon {
   font-size: 26px;
-  color: #E11D48;
+  color: var(--wl-danger);
 }
 
 .seal-img {
@@ -392,9 +577,8 @@ function isPdfDoc(name: string | null | undefined): boolean {
 .cert-card-actions {
   margin-top: auto;
   padding-top: 0.75rem;
-  border-top: 1px solid #F1F5F9;
+  border-top: 1px solid var(--wl-border);
 }
-
 
 .status-pill {
   display: inline-flex;
@@ -413,16 +597,16 @@ function isPdfDoc(name: string | null | undefined): boolean {
 }
 
 .status-pill--active {
-  background: #ECFDF5;
-  color: #059669;
+  background: var(--wl-success-faint);
+  color: var(--wl-success);
 }
-.status-pill--active .dot { background: #10B981; }
+.status-pill--active .dot { background: var(--wl-success); }
 
 .status-pill--expired {
-  background: #FEF3C7;
-  color: #92400E;
+  background: var(--wl-warning-faint);
+  color: var(--wl-warning);
 }
-.status-pill--expired .dot { background: #F59E0B; }
+.status-pill--expired .dot { background: var(--wl-warning); }
 
 .cert-title-text {
   font-size: 15px;
@@ -440,12 +624,12 @@ function isPdfDoc(name: string | null | undefined): boolean {
 
 .ref-label {
   font-size: 10px;
-  color: #64748B;
+  color: var(--wl-muted);
   font-weight: 700;
 }
 
 .ref-num {
-  color: #4F46E5;
+  color: var(--wl-primary);
 }
 
 .cert-meta-list {
@@ -454,7 +638,7 @@ function isPdfDoc(name: string | null | undefined): boolean {
   gap: 0.35rem;
   margin: 0;
   padding-top: 0.65rem;
-  border-top: 1px solid #F1F5F9;
+  border-top: 1px solid var(--wl-border);
   font-size: 12px;
 }
 
@@ -464,7 +648,7 @@ function isPdfDoc(name: string | null | undefined): boolean {
 }
 
 .meta-item dt {
-  color: #64748B;
+  color: var(--wl-muted);
   font-weight: 600;
 }
 

@@ -27,6 +27,7 @@ const isAuthed = computed(() => authService.isAuthenticated)
       <div class="footer__col">
         <h4>{{ t('footer.product') }}</h4>
         <router-link to="/marketplace" class="footer__link">{{ t('nav.marketplace') }}</router-link>
+        <router-link to="/providers" class="footer__link">{{ t('nav.providers') }}</router-link>
         <router-link to="/certifications" class="footer__link">{{ t('nav.certifications') }}</router-link>
         <router-link to="/oem" class="footer__link">{{ t('nav.oem') }}</router-link>
       </div>

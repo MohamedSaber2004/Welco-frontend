@@ -2,8 +2,6 @@ export enum UserType {
   Admin = 1,
   OrganizationUser = 2,
   WelcoStaff = 3,
-  /** Direct buyer — registers WITHOUT company, needs NO admin approval. */
-  Customer = 4,
 }
 
 export enum AppLanguage {
@@ -123,11 +121,9 @@ export const USER_TINTS = ['#0ea5e9', '#8b5cf6', '#ec4899', '#10b981', '#f59e0b'
 
 export const USER_TYPE_ROLE_KEY = (
   userType: UserType,
-): 'roleAdmin' | 'roleOrganizationUser' | 'roleWelcoStaff' | 'roleCustomer' =>
+): 'roleAdmin' | 'roleOrganizationUser' | 'roleWelcoStaff' =>
   userType === UserType.Admin
     ? 'roleAdmin'
     : userType === UserType.WelcoStaff
       ? 'roleWelcoStaff'
-      : userType === UserType.Customer
-        ? 'roleCustomer'
-        : 'roleOrganizationUser'
+      : 'roleOrganizationUser'

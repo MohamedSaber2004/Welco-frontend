@@ -20,14 +20,17 @@ const invoices = ref<{ invoiceNumber: string; status: string }[]>([])
 const localized = (en: string, ar: string) => (locale.value === 'ar' ? ar : en)
 
 onMounted(async () => {
-  const id = String(route.params.id)
-  const found = await commerceService.getOrder(id)
-  order.value = found
-  if (found) {
-    const invs = await commerceService.getInvoices(found.id)
-    invoices.value = invs.map((i) => ({ invoiceNumber: i.invoiceNumber, status: i.status }))
+  try {
+    const id = String(route.params.id)
+    const found = await commerceService.getOrder(id)
+    order.value = found
+    if (found) {
+      const invs = await commerceService.getInvoices(found.id)
+      invoices.value = invs.map((i) => ({ invoiceNumber: i.invoiceNumber, status: i.status }))
+    }
+  } finally {
+    loading.value = false
   }
-  loading.value = false
 })
 
 function statusIndex(o: OrderDto): number {

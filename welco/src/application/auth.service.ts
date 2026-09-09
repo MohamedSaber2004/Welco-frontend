@@ -22,7 +22,7 @@ import {
   resolveBusinessRole as resolveBusinessRoleFn,
   resolveBusinessRoleKey as resolveBusinessRoleKeyFn,
 } from '../domain/models/business-role'
-import { syncPendingOrgMarker } from '../utils/pending-org-marker'
+import { isPendingOrg, syncPendingOrgMarker } from '../utils/pending-org-marker'
 import router from '../router'
 
 export type AuthResult = { ok: true } | { ok: false; error: string }
@@ -256,24 +256,45 @@ export class AuthService {
     }
   }
 
-  /** Customer — the buyer (UserType.Customer, or legacy OrganizationUser with no linked company). */
-  readonly isCustomer = computed(() => {
-    const u = this.user.value
-    if (!u) return false
-    if (this.isAdmin.value || this.isWelcoStaff.value) return false
-    if (u.userType === 4) return true
-    if (!this.isOrganizationUser.value) return false
-    return !u.companyId
-  })
+  /** Seller = internal roles that live in /admin console. */
+  readonly isSeller = computed(() => this.isAdmin.value || this.isWelcoStaff.value)
 
-  /** Provider/Distributor — OrganizationUser WITH a linked provider company. */
+  /** Suitable landing dashboard per role. Single source of truth for post-login + guestOnly redirects. */
+  getDashboardRouteName(): string {
+    if (this.isSeller.value) return 'admin-dashboard'
+    if (this.isOrganizationUser.value) return 'account'
+    return 'home'
+  }
+
+  /**
+   * Validate a `?redirect=` target against the current role so login never
+   * pushes a buyer into /admin (or a seller into /account) just to bounce.
+   * Mirrors the guards in `src/router/index.ts`.
+   */
+  canAccessPath(path: string): boolean {
+    if (!path || !path.startsWith('/')) return false
+    const clean = path.split('?')[0]?.split('#')[0] ?? '/'
+    if (clean.startsWith('/admin')) return this.isSeller.value
+    if (clean.startsWith('/account') || clean === '/wishlist') return !this.isSeller.value && this.isAuthenticated
+    if (clean === '/cart' || clean === '/checkout') return !this.isSeller.value
+    return true
+  }
+
+  /** Pending org (no company + marker) has no dashboard yet — land on home. */
+  isPendingApproval(): boolean {
+    const u = this.user.value
+    return !!u && this.isOrganizationUser.value && !u.companyId && isPendingOrg(u.email)
+  }
+
+  /** Obsolete Customer role — always false in current architecture. */
+  readonly isCustomer = computed(() => false)
+
+  /** Provider/Distributor — OrganizationUser. */
   readonly isProvider = computed(() => {
     const u = this.user.value
     if (!u) return false
     if (this.isAdmin.value || this.isWelcoStaff.value) return false
-    if (u.userType === 4) return false
-    if (!this.isOrganizationUser.value) return false
-    return !!u.companyId
+    return this.isOrganizationUser.value
   })
 
   /** Whether the signed-in user already has a linked provider company. */

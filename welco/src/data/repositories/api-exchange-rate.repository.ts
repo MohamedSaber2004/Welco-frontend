@@ -89,7 +89,7 @@ async function fetchPublicRates(base: string): Promise<ExchangeRateDto[] | null>
     } finally {
       clearTimeout(t)
     }
-  } catch { /* give up -> caller uses static table */ }
+  } catch { /* give up -> caller shows original prices */ }
   return null
 }
 
@@ -236,16 +236,6 @@ export class ApiExchangeRateRepository implements ExchangeRateRepository {
       success: Boolean((unwrapped as Record<string, unknown>)?.success ?? (unwrapped as Record<string, unknown>)?.isSuccess ?? true),
       ratesCount: Number((unwrapped as Record<string, unknown>)?.ratesCount ?? 0),
       baseCurrency: String((unwrapped as Record<string, unknown>)?.baseCurrency ?? 'USD'),
-    }
-  }
-
-  async syncEnqueue(): Promise<{ isSuccess: boolean; data?: string; message?: string }> {
-    const raw = await this.http.post<unknown>(EXCHANGE_RATE_ROUTES.syncEnqueue, {})
-    const unwrapped = unwrap<Record<string, unknown>>(raw)
-    return {
-      isSuccess: Boolean((unwrapped as Record<string, unknown>)?.isSuccess ?? true),
-      data: String((unwrapped as Record<string, unknown>)?.data ?? ''),
-      message: String((unwrapped as Record<string, unknown>)?.message ?? 'Exchange rate sync job enqueued in Hangfire'),
     }
   }
 

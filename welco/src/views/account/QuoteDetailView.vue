@@ -22,10 +22,13 @@ const placingOrder = ref(false)
 const localized = (en: string, ar: string) => (locale.value === 'ar' ? ar : en)
 
 onMounted(async () => {
-  const id = String(route.params.id)
-  const found = await salesService.getQuote(id)
-  quote.value = found
-  loading.value = false
+  try {
+    const id = String(route.params.id)
+    const found = await salesService.getQuote(id)
+    quote.value = found
+  } finally {
+    loading.value = false
+  }
 })
 
 async function decide(approve: boolean) {
@@ -378,7 +381,7 @@ async function placeOrderFromQuote() {
 }
 
 .manifest-card {
-  background: var(--wl-surface, #FFFFFF);
+  background: var(--wl-surface);
   border: 1px solid var(--wl-border, #E2E8F0);
   border-radius: var(--wl-radius-card, 16px);
   padding: var(--wl-card-padding, 1.5rem);
@@ -431,7 +434,7 @@ async function placeOrderFromQuote() {
   align-items: center;
   gap: 1rem;
   padding: 0.6rem 0;
-  border-bottom: 1px solid #F8FAFC;
+  border-bottom: 1px solid var(--wl-border);
 }
 
 .item-primary {
@@ -469,7 +472,7 @@ async function placeOrderFromQuote() {
 }
 
 .card {
-  background: var(--wl-surface, #FFFFFF);
+  background: var(--wl-surface);
   border: 1px solid var(--wl-border, #E2E8F0);
   border-radius: var(--wl-radius-card, 16px);
   padding: var(--wl-card-padding, 1.25rem);

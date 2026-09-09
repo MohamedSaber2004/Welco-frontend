@@ -220,21 +220,21 @@ onMounted(() => {
   align-items: center;
   gap: 0.45rem;
   font-size: 11px;
-  color: #64748B;
+  color: var(--wl-muted);
 }
 
 .crumb-bar a {
-  color: #64748B;
+  color: var(--wl-muted);
   text-decoration: none;
   transition: color 0.15s ease;
 }
 
 .crumb-bar a:hover {
-  color: #4F46E5;
+  color: var(--wl-primary);
 }
 
 .crumb-sep {
-  color: #CBD5E1;
+  color: var(--wl-border);
 }
 
 .crumb-active {
@@ -269,7 +269,7 @@ onMounted(() => {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #4F46E5;
+  background: var(--wl-primary);
 }
 
 .header-title {
@@ -284,7 +284,7 @@ onMounted(() => {
 
 .header-subtitle {
   font-size: 13.5px;
-  color: #64748B;
+  color: var(--wl-muted);
   margin: 0.25rem 0 0;
 }
 
@@ -294,21 +294,21 @@ onMounted(() => {
   gap: 0.45rem;
   height: 44px;
   padding: 0 1.25rem;
-  background: #4F46E5;
+  background: var(--wl-primary);
   color: #FFFFFF;
   border: none;
-  border-radius: 10px;
+  border-radius: var(--wl-radius-sm);
   font-size: 13.5px;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 4px 12px -2px rgba(79, 70, 229, 0.35);
+  box-shadow: 0 4px 12px -2px var(--wl-primary-ring);
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .btn-create-rfq:hover {
-  background: #4338CA;
+  background: var(--wl-primary-hover);
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px -2px rgba(79, 70, 229, 0.45);
+  box-shadow: 0 6px 16px -2px var(--wl-primary-ring);
 }
 
 /* Table Card */
@@ -317,7 +317,7 @@ onMounted(() => {
   border: 1px solid var(--wl-border);
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  box-shadow: var(--wl-shadow-card);
 }
 
 .table-wrap {
@@ -354,7 +354,7 @@ onMounted(() => {
 }
 
 .exec-row:hover .row-link {
-  color: #4F46E5;
+  color: var(--wl-primary);
   transform: translateX(2px);
 }
 
@@ -389,7 +389,7 @@ onMounted(() => {
   gap: 0.3rem;
   font-size: 11.5px;
   font-weight: 700;
-  color: #94A3B8;
+  color: var(--wl-muted);
   transition: all 0.15s ease;
 }
 
@@ -419,16 +419,16 @@ onMounted(() => {
   position: absolute;
   inset-inline-start: 0.75rem;
   font-size: 18px;
-  color: #94A3B8;
+  color: var(--wl-muted);
   pointer-events: none;
 }
 
 .search-input {
   width: 100%;
-  height: 38px;
+  height: 44px;
   padding: 0 2.2rem 0 2.5rem;
   border: 1px solid var(--wl-border);
-  border-radius: 10px;
+  border-radius: var(--wl-radius-sm);
   font-size: 12.5px;
   color: var(--wl-ink-strong);
   background: var(--wl-surface-soft);
@@ -437,8 +437,8 @@ onMounted(() => {
 }
 
 .search-input:focus {
-  border-color: #6366F1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+  border-color: var(--wl-primary);
+  box-shadow: 0 0 0 3px var(--wl-primary-ring);
   background: var(--wl-surface);
 }
 
@@ -448,20 +448,20 @@ onMounted(() => {
   background: none;
   border: none;
   cursor: pointer;
-  color: #94A3B8;
+  color: var(--wl-muted);
   display: flex;
   align-items: center;
   padding: 0.2rem;
   border-radius: 4px;
 }
 
-.clear-btn:hover { color: #4F46E5; }
+.clear-btn:hover { color: var(--wl-primary); }
 
 .filter-select {
-  height: 38px;
+  height: 44px;
   padding: 0 0.85rem;
   border: 1px solid var(--wl-border);
-  border-radius: 10px;
+  border-radius: var(--wl-radius-sm);
   font-size: 12.5px;
   color: var(--wl-ink-soft);
   background: var(--wl-surface-soft);
@@ -470,25 +470,25 @@ onMounted(() => {
   transition: border-color 0.15s;
 }
 
-.filter-select:focus { border-color: #6366F1; }
+.filter-select:focus { border-color: var(--wl-primary); }
 
 .clear-filters-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  height: 38px;
+  height: 44px;
   padding: 0 0.85rem;
-  border: 1px solid #FCA5A5;
-  border-radius: 10px;
+  border: 1px solid var(--wl-danger-border);
+  border-radius: var(--wl-radius-sm);
   font-size: 12px;
   font-weight: 700;
-  color: #DC2626;
-  background: #FEF2F2;
+  color: var(--wl-danger);
+  background: var(--wl-danger-faint);
   cursor: pointer;
   transition: all 0.15s;
 }
 
-.clear-filters-btn:hover { background: #FEE2E2; }
+.clear-filters-btn:hover { background: var(--wl-danger-soft); }
 
 /* ── Product Names Cell ── */
 .product-names-cell {

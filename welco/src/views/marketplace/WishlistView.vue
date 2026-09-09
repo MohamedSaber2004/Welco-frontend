@@ -10,6 +10,7 @@ import { productMediaUrl } from '../../utils/file-url'
 import SkeletonLoader from '../../components/ui/SkeletonLoader.vue'
 import EmptyState from '../../components/ui/EmptyState.vue'
 import BackButton from '../../components/ui/BackButton.vue'
+import AppImage from '../../components/ui/AppImage.vue'
 
 const router = useRouter()
 const { add } = useCart()
@@ -127,15 +128,15 @@ const goDetail = (id: string) => {
     <!-- Saved instruments -->
     <div v-else class="product-grid">
       <article v-for="p in items" :key="p.id" class="product-card" @click="goDetail(p.id)">
-        <div class="product-media" :style="{ background: p.imageGradient || '#F8FAFC' }">
-          <img
-            v-if="productMediaUrl(p.imageName, p.imageGradient).url"
-            :src="productMediaUrl(p.imageName, p.imageGradient).url"
+        <div class="product-media" :style="{ background: p.imageGradient || '#2B2D31' }">
+          <AppImage
+            :src="p.imageName"
+            placeholder-type="product"
+            :placeholder-text="p.sku"
             :alt="localized(p.nameEn, p.nameAr)"
+            fit="contain"
             class="product-img"
-            loading="lazy"
           />
-          <span v-else class="material-symbols-outlined text-[40px] text-slate-300">precision_manufacturing</span>
           <span v-if="p.sku" class="sku-tag mono">{{ p.sku }}</span>
           <button
             type="button"

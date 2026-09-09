@@ -1,17 +1,19 @@
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { authService, services, contentRepository } from '../di/container'
+import { authService, services, contentRepository, companyRepository } from '../di/container'
 import { t, locale } from '../i18n'
 import type { CategoryDto, ProductDto } from '../domain/models/marketplace'
 import type { CountryDto } from '../domain/models/location'
 import type { CertificationDto } from '../domain/models/certification'
-import type { LandingPageDto, TradeShowEventDto } from '../domain/models/content'
+import type { LandingPageDto } from '../domain/models/content'
+import type { CompanyDto } from '../domain/models/company'
 import { useCart } from '../composables/useCart'
 import { toastService } from '../infrastructure/feedback/toast.service'
 import DataState from '../components/ui/DataState.vue'
 import BaseModal from '../components/ui/BaseModal.vue'
 import BaseButton from '../components/ui/BaseButton.vue'
+import AppImage from '../components/ui/AppImage.vue'
 import { productMediaUrl, resolveFileUrl } from '../utils/file-url'
 
 const router = useRouter()
@@ -28,8 +30,8 @@ const cats = ref<CategoryDto[]>([])
 const countries = ref<CountryDto[]>([])
 const certifications = ref<CertificationDto[]>([])
 const landingPages = ref<LandingPageDto[]>([])
-const tradeShows = ref<TradeShowEventDto[]>([])
 const aboutPage = ref<LandingPageDto | null>(null)
+const providers = ref<CompanyDto[]>([])
 const loading = ref(true)
 
 const FOUNDING_YEAR = 1994
@@ -51,11 +53,22 @@ onMounted(async () => {
           aboutPage.value = p && p.isActive !== false ? p : null
         })
         .catch(() => null),
+      companyRepository
+        .getCompanies({ pageNumber: 1, pageSize: 8 })
+        .then((p) => {
+          if (p?.data?.length) {
+            providers.value = p.data.filter((c) => c.isActive !== false).slice(0, 8)
+          } else {
+            providers.value = []
+          }
+        })
+        .catch(() => {
+          providers.value = []
+        }),
     ])
     if (svc.categories.value.length) cats.value = svc.categories.value.slice(0, 8)
     if (svc.featured.value.length) featured.value = svc.featured.value.slice(0, 3)
     certifications.value = services.certificationService.certifications.value
-    tradeShows.value = services.contentService.tradeShows.value
   } finally {
     loading.value = false
   }
@@ -81,15 +94,7 @@ const whyItems = computed(() => {
   items.push({ b: 'OEM / ODM', label: t('home.whyOem'), badge: 'DIRECT', tone: 'amber' })
   return items
 })
-const trustedCountriesLabel = computed(() => countries.value.length > 0 ? t('home.trustedIn', { count: countries.value.length } as never) : t('home.trustedGlobal'))
-const tradeShowStatus = (show: TradeShowEventDto): string => {
-  if (show.isUpcoming) {
-    const month = new Date(show.startDate).toLocaleString(locale.value === 'ar' ? 'ar-EG' : 'en-US', { month: 'short' }).toUpperCase()
-    return t('home.upcoming', { month } as never)
-  }
-  return t('home.pastEvent')
-}
-const localized = (en: string, ar: string) => locale.value === 'ar' ? ar : en
+const localized = (en?: string | null, ar?: string | null) => locale.value === 'ar' ? (ar || en || '') : (en || ar || '')
 const handleAdd = (id: string) => {
   const p = (featured.value.find(x => x.id === id) ?? services.marketplaceService.products.value.find((x) => x.id === id))
   if (!p) return
@@ -186,6 +191,58 @@ const navigateToOemFromModal = () => {
         </div>
       </div>
     </header>
+
+    <!-- Our Providers Section -->
+    <section class="section section--providers" aria-labelledby="providers-heading">
+      <div class="section__inner">
+        <div class="section-head">
+          <div>
+            <div class="mono section__eyebrow">{{ t('home.ourProvidersEyebrow') }}</div>
+            <h2 id="providers-heading" class="section-title">{{ t('home.ourProviders') }}</h2>
+          </div>
+          <router-link to="/providers" class="btn btn-ghost btn-sm view-all-btn">
+            <span>{{ t('common.viewAll') }}</span>
+            <span class="icon--directional">→</span>
+          </router-link>
+        </div>
+        <p class="section-desc">{{ t('home.ourProvidersSubtitle') }}</p>
+
+        <DataState :loading="loading && !providers.length" :empty="!providers.length && !loading" skeleton-type="catalog-grid" :skeleton-count="4" min-height="160px">
+          <div class="providers-strip-grid">
+            <router-link
+              v-for="p in providers"
+              :key="p.id"
+              :to="{ name: 'marketplace', query: { search: p.name } }"
+              class="provider-tile"
+            >
+              <div class="provider-tile__logo">
+                <AppImage
+                  :src="p.imageName"
+                  placeholder-type="company"
+                  :placeholder-text="p.name"
+                  :alt="p.name"
+                  fit="contain"
+                  height="70px"
+                />
+              </div>
+              <div class="provider-tile__info">
+                <div class="provider-tile__top">
+                  <span class="provider-tile__badge mono">
+                    <span class="material-symbols-outlined text-[12px]">verified</span>
+                    {{ t('home.verifiedSupplier') }}
+                  </span>
+                </div>
+                <h3 class="provider-tile__name" dir="auto">{{ p.name }}</h3>
+                <div v-if="p.countryNameEn || p.countryNameAr" class="provider-tile__country mono">
+                  <span class="material-symbols-outlined text-[13px] text-teal-600">public</span>
+                  <span>{{ localized(p.countryNameEn, p.countryNameAr) }}</span>
+                </div>
+              </div>
+            </router-link>
+          </div>
+        </DataState>
+      </div>
+    </section>
     <section class="section" aria-labelledby="metrics-heading">
       <div class="section__inner">
         <h2 id="metrics-heading" class="visually-hidden">{{ t('home.metricsHeading') }}</h2>
@@ -208,13 +265,22 @@ const navigateToOemFromModal = () => {
             <div class="mono section__eyebrow">{{ t('home.browseClinicalSpecialty') }}</div>
             <h2 id="cat-heading" class="section-title">{{ t('marketplace.categoriesTitle') }}</h2>
           </div>
+          <router-link to="/categories" class="btn btn-ghost btn-sm view-all-btn">
+            <span>{{ t('common.viewAll') }}</span>
+            <span class="icon--directional">→</span>
+          </router-link>
         </div>
         <DataState :loading="loading && !cats.length" :empty="!cats.length && !loading" skeleton-type="category-grid" :skeleton-count="8" min-height="160px">
           <div class="cat-grid">
             <router-link v-for="c in cats" :key="c.id" :to="{ name: 'marketplace', query: { categoryId: c.id } }" class="cat-card">
               <div class="cat-media">
-                <img v-if="c.imageName" :src="resolveFileUrl(c.imageName)" :alt="localized(c.nameEn, c.nameAr)" class="cat-media__img" loading="lazy" />
-                <span v-else class="material-symbols-outlined cat-media__icon">category</span>
+                <AppImage
+                  :src="c.imageName"
+                  placeholder-type="category"
+                  :placeholder-text="localized(c.nameEn, c.nameAr)"
+                  :alt="localized(c.nameEn, c.nameAr)"
+                  class="cat-media__img"
+                />
               </div>
               <div class="cat-body">
                 <div class="cat-name" dir="auto">{{ localized(c.nameEn, c.nameAr) }}</div>
@@ -233,8 +299,8 @@ const navigateToOemFromModal = () => {
             <div class="mono section__eyebrow">{{ t('home.clinicalHighlights') }}</div>
             <h2 id="featured-heading" class="section-title">{{ t('marketplace.featuredSubtitle') }}</h2>
           </div>
-          <router-link to="/marketplace" class="btn btn-ghost btn-sm">
-            <span>{{ t('home.browseComplete') }}</span>
+          <router-link to="/marketplace" class="btn btn-ghost btn-sm view-all-btn">
+            <span>{{ t('common.viewAll') }}</span>
             <span class="icon--directional">→</span>
           </router-link>
         </div>
@@ -247,14 +313,14 @@ const navigateToOemFromModal = () => {
               @click="router.push({ name: 'marketplace-product', params: { id: p.id } })"
             >
               <div class="product-card__media" :style="{ background: productMediaUrl(p.imageName, p.imageGradient).background }">
-                <img
-                  v-if="productMediaUrl(p.imageName, p.imageGradient).url"
-                  :src="productMediaUrl(p.imageName, p.imageGradient).url"
+                <AppImage
+                  :src="p.imageName"
+                  placeholder-type="product"
+                  :placeholder-text="p.sku"
                   :alt="localized(p.nameEn, p.nameAr)"
+                  fit="contain"
                   class="product-card__img"
-                  loading="lazy"
                 />
-                <span v-else class="mono product-card__sku">{{ p.sku }}</span>
                 <span v-if="p.isNew" class="mono product-card__badge">{{ t('home.newBadge') }}</span>
                 <span v-if="p.stock > 0" class="mono product-card__stock product-card__stock--in">{{ t('catalog.inStock') }}</span>
                 <span v-else class="mono product-card__stock product-card__stock--out">{{ t('catalog.madeToOrder') }}</span>
@@ -275,6 +341,46 @@ const navigateToOemFromModal = () => {
             </article>
           </div>
         </DataState>
+      </div>
+    </section>
+
+    <!-- Audited Quality Standards Section -->
+    <section v-if="certifications.length" class="section section--soft" aria-labelledby="home-certs-heading">
+      <div class="section__inner">
+        <div class="section-head">
+          <div>
+            <div class="mono section__eyebrow">{{ t('certifications.eyebrow') }}</div>
+            <h2 id="home-certs-heading" class="section-title">{{ t('certifications.certsTitle') }}</h2>
+          </div>
+          <router-link to="/certifications" class="btn btn-ghost btn-sm view-all-btn">
+            <span>{{ t('common.viewAll') }}</span>
+            <span class="icon--directional">→</span>
+          </router-link>
+        </div>
+        <div class="home-certs-grid">
+          <article
+            v-for="c in certifications.slice(0, 3)"
+            :key="c.id"
+            class="home-cert-card"
+            @click="router.push('/certifications')"
+          >
+            <div class="home-cert-card__media">
+              <AppImage
+                :src="c.certificationImageName"
+                placeholder-type="document"
+                :placeholder-text="c.certificateNumber || c.title"
+                :alt="c.title"
+                aspect-ratio="16/10"
+                fit="contain"
+              />
+            </div>
+            <div class="home-cert-card__body">
+              <div class="home-cert-card__badge mono">{{ c.certificateNumber || 'ISO / CE' }}</div>
+              <h3 class="home-cert-card__title">{{ c.title }}</h3>
+              <div class="home-cert-card__meta mono">{{ c.issuer }}</div>
+            </div>
+          </article>
+        </div>
       </div>
     </section>
     <section class="section section--soft" aria-labelledby="about-heading">
@@ -300,26 +406,6 @@ const navigateToOemFromModal = () => {
         <div class="about-media">
           <img src="/logo.jpeg" alt="Welco" class="about-media__img" loading="lazy" />
           <div class="mono about-media__badge">{{ yearsOfExperience }} · EST. 1994</div>
-        </div>
-      </div>
-    </section>
-    <section class="trust" aria-labelledby="trust-heading">
-      <div class="trust__inner">
-        <div>
-          <div class="mono trust__eyebrow">{{ t('home.exportTitle') }}</div>
-          <h2 id="trust-heading">{{ trustedCountriesLabel }}</h2>
-          <p>{{ t('home.exportSubtitle') }}</p>
-        </div>
-        <div>
-          <div class="mono trust__eyebrow">{{ t('home.tradeShowsEyebrow') }}</div>
-          <h3>{{ t('home.meetWelco') }}</h3>
-          <template v-if="tradeShows.length">
-            <div v-for="e in tradeShows.slice(0, 3)" :key="e.id" class="trust__row">
-              <span>{{ e.name }}<template v-if="e.location"> — {{ e.location }}</template></span>
-              <span class="mono trust__status">{{ tradeShowStatus(e) }}</span>
-            </div>
-          </template>
-          <p v-else class="mono" style="color:#94A3B8; margin-top:0.7rem">{{ t('home.noTradeShows') }}</p>
         </div>
       </div>
     </section>
@@ -546,7 +632,7 @@ const navigateToOemFromModal = () => {
 
 .hero h1 em {
   font-style: normal;
-  color: var(--wl-teal);
+  color: var(--wl-primary);
 }
 
 .hero p {
@@ -576,7 +662,7 @@ const navigateToOemFromModal = () => {
 }
 
 .hero__search-bar:focus-within {
-  border-color: var(--wl-teal);
+  border-color: var(--wl-primary);
   box-shadow: var(--wl-focus-ring);
   transform: translateY(-0.5px);
 }
@@ -611,7 +697,7 @@ const navigateToOemFromModal = () => {
 }
 
 .hero__search-btn {
-  background: var(--wl-teal);
+  background: var(--wl-primary);
   color: #fff;
   border: none;
   padding: 0 1.25rem;
@@ -620,12 +706,12 @@ const navigateToOemFromModal = () => {
   font-weight: 700;
   font-size: 13px;
   cursor: pointer;
-  box-shadow: 0 2px 8px -2px rgba(13, 148, 136, 0.35);
+  box-shadow: 0 2px 8px -2px rgba(79, 70, 229, 0.35);
   transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
 }
 
 .hero__search-btn:hover {
-  background: #0f766e;
+  background: var(--wl-primary-hover);
   transform: translateY(-0.5px);
 }
 
@@ -673,8 +759,8 @@ const navigateToOemFromModal = () => {
   position: absolute;
   top: 0;
   inset-inline: 0;
-  height: 2.5px;
-  background: linear-gradient(90deg, #4F46E5, var(--wl-teal), #10B981);
+  height: 2px;
+  background: var(--wl-laser-sweep);
 }
 
 .hud-top {
@@ -689,19 +775,19 @@ const navigateToOemFromModal = () => {
   align-items: center;
   gap: 0.4rem;
   font-weight: 700;
-  color: #4F46E5;
+  color: var(--wl-primary);
 }
 
 .hud-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #10B981;
+  background: var(--wl-success);
 }
 
 .hud-live {
   font-weight: 700;
-  color: var(--wl-teal);
+  color: var(--wl-primary);
 }
 
 .hud-center {
@@ -787,6 +873,204 @@ const navigateToOemFromModal = () => {
   flex-wrap: wrap;
 }
 
+.view-all-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.95rem;
+  border-radius: var(--wl-radius-md, 8px);
+  border: 1px solid var(--wl-border);
+  background: var(--wl-surface);
+  color: var(--wl-primary);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.view-all-btn:hover {
+  background: var(--wl-surface-soft);
+  border-color: var(--wl-primary);
+  transform: translateX(2px);
+}
+
+[dir="rtl"] .view-all-btn:hover {
+  transform: translateX(-2px);
+}
+
+/* Our Providers Section */
+.section--providers {
+  background: var(--wl-surface-soft, #383A40);
+  border-bottom: 1px solid var(--wl-border, #e2e8f0);
+  padding: 3rem 0;
+}
+
+.section-desc {
+  font-size: 0.95rem;
+  color: var(--wl-muted, #64748b);
+  margin: -0.5rem 0 1.75rem;
+  max-width: 680px;
+}
+
+.providers-strip-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+}
+
+.provider-tile {
+  background: var(--wl-surface, #2B2D31);
+  border: 1px solid var(--wl-border, #e2e8f0);
+  border-radius: var(--wl-radius-lg, 12px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.provider-tile:hover {
+  transform: translateY(-3px);
+  border-color: var(--wl-primary, #0d9488);
+  box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.08);
+}
+
+.provider-tile__logo {
+  height: 110px;
+  background: linear-gradient(180deg, var(--wl-surface-soft, #383A40) 0%, var(--wl-surface, #2B2D31) 100%);
+  border-bottom: 1px solid var(--wl-border, #f1f5f9);
+  padding: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.provider-tile__info {
+  padding: 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 0.4rem;
+}
+
+.provider-tile__top {
+  display: flex;
+  align-items: center;
+}
+
+.provider-tile__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #047857;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  padding: 0.15rem 0.45rem;
+  border-radius: 9999px;
+  letter-spacing: 0.02em;
+}
+
+.provider-tile__name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--wl-text, #0f172a);
+  margin: 0;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.provider-tile__country {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  color: var(--wl-muted, #64748b);
+  margin-top: auto;
+  padding-top: 0.25rem;
+}
+
+@media (max-width: 1024px) {
+  .providers-strip-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .providers-strip-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Home Certs Grid */
+.home-certs-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+
+.home-cert-card {
+  background: var(--wl-surface);
+  border: 1px solid var(--wl-border);
+  border-radius: var(--wl-radius-xl, 14px);
+  overflow: hidden;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.home-cert-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--wl-primary);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+}
+
+.home-cert-card__media {
+  height: 160px;
+  background: var(--wl-surface-soft);
+  overflow: hidden;
+}
+
+.home-cert-card__body {
+  padding: 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex: 1;
+}
+
+.home-cert-card__badge {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--wl-primary);
+  letter-spacing: 0.05em;
+}
+
+.home-cert-card__title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--wl-text);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.home-cert-card__issuer {
+  font-size: 0.8125rem;
+  color: var(--wl-muted);
+  margin-top: auto;
+}
+
+@media (max-width: 768px) {
+  .home-certs-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .section__eyebrow {
   font-size: 10.5px;
   color: #4F46E5;
@@ -863,11 +1147,11 @@ const navigateToOemFromModal = () => {
 .badge--emerald { background: rgba(16,185,129,0.08); color: #059669; }
 .bar--emerald { background: #10B981; }
 
-.badge--teal { background: rgba(13,148,136,0.08); color: var(--wl-teal); }
-.bar--teal { background: var(--wl-teal); }
+.badge--teal { background: var(--wl-primary-soft); color: var(--wl-primary); }
+.bar--teal { background: var(--wl-primary); }
 
-.badge--amber { background: rgba(245,158,11,0.08); color: #D97706; }
-.bar--amber { background: #F59E0B; }
+.badge--amber { background: var(--wl-warning-soft); color: var(--wl-warning); }
+.bar--amber { background: var(--wl-warning); }
 
 /* Categories Grid */
 .cat-grid {
@@ -936,7 +1220,7 @@ const navigateToOemFromModal = () => {
 
 .cat-count {
   font-size: 10.5px;
-  color: var(--wl-teal);
+  color: var(--wl-primary);
   font-weight: 600;
   margin-top: 0.2rem;
 }
@@ -990,7 +1274,7 @@ const navigateToOemFromModal = () => {
   inset-inline-end: 10px;
   font-size: 9.5px;
   font-weight: 800;
-  background: var(--wl-teal);
+  background: var(--wl-primary);
   color: #fff;
   padding: 0.15rem 0.5rem;
   border-radius: 9999px;
@@ -1060,68 +1344,6 @@ const navigateToOemFromModal = () => {
   padding-top: 0.85rem;
 }
 
-/* Trust Section */
-.trust {
-  background: var(--wl-obsidian);
-  color: #fff;
-  padding: 3.5rem var(--wl-gutter);
-}
-
-.trust__inner {
-  max-width: var(--wl-max-width);
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 3rem;
-}
-
-.trust__eyebrow {
-  font-size: 10px;
-  color: #818CF8;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  margin-bottom: 0.4rem;
-}
-
-.trust h2 {
-  font-family: var(--wl-font-display);
-  font-size: 1.75rem;
-  font-weight: 800;
-  margin: 0 0 0.65rem;
-  line-height: 1.15;
-}
-
-.trust p {
-  color: #94A3B8;
-  font-size: 14px;
-  line-height: 1.6;
-}
-
-.trust h3 {
-  font-family: var(--wl-font-display);
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin: 0 0 1rem;
-}
-
-.trust__row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.65rem 0;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-  font-size: 13px;
-}
-
-.trust__status {
-  font-size: 10px;
-  color: var(--wl-teal);
-  background: rgba(13,148,136,0.15);
-  padding: 0.15rem 0.5rem;
-  border-radius: 9999px;
-}
-
-
 @media (max-width: 1024px) {
   .hero__inner {
     padding: 2.75rem var(--wl-gutter) 2.25rem;
@@ -1154,10 +1376,6 @@ const navigateToOemFromModal = () => {
   .product-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
-  }
-  .trust__inner {
-    grid-template-columns: 1fr;
-    gap: 2rem;
   }
 }
 
@@ -1227,12 +1445,6 @@ const navigateToOemFromModal = () => {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-  .trust {
-    padding: 2.25rem var(--wl-gutter);
-  }
-  .trust h2 {
-    font-size: 1.4rem;
-  }
 }
 
 @media (max-width: 440px) {
@@ -1288,7 +1500,7 @@ const navigateToOemFromModal = () => {
 .modal-sel,
 .modal-txt {
   width: 100%;
-  background: var(--wl-surface-soft, #F8FAFC);
+  background: var(--wl-surface-soft, #383A40);
   border: 1.5px solid var(--wl-border, #E2E8F0);
   border-radius: 9px;
   color: var(--wl-ink-strong, #0F172A);
@@ -1303,8 +1515,8 @@ const navigateToOemFromModal = () => {
 .modal-sel:focus,
 .modal-txt:focus {
   background: var(--wl-surface);
-  border-color: var(--wl-teal, #0D9488);
-  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+  border-color: var(--wl-primary);
+  box-shadow: var(--wl-focus-ring);
 }
 
 .modal-txt {
@@ -1316,8 +1528,8 @@ const navigateToOemFromModal = () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(13, 148, 136, 0.06);
-  border: 1px dashed rgba(13, 148, 136, 0.3);
+  background: var(--wl-primary-soft);
+  border: 1px dashed rgba(79, 70, 229, 0.3);
   border-radius: 8px;
   padding: 0.6rem 0.85rem;
   font-size: 11.5px;
@@ -1327,7 +1539,7 @@ const navigateToOemFromModal = () => {
 }
 
 .oem-callout-link {
-  color: var(--wl-teal, #0D9488);
+  color: var(--wl-primary);
   font-weight: 700;
   text-decoration: underline;
   cursor: pointer;
@@ -1354,20 +1566,20 @@ const navigateToOemFromModal = () => {
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: rgba(16, 185, 129, 0.12);
+  background: var(--wl-success-soft);
   margin-bottom: 1rem;
 }
 
 .success-head {
   font-size: 1.25rem;
   font-weight: 800;
-  color: var(--wl-ink-strong, #0F172A);
+  color: var(--wl-ink-strong);
   margin: 0 0 0.5rem;
 }
 
 .success-body {
   font-size: 13.5px;
-  color: var(--wl-ink-muted, #64748B);
+  color: var(--wl-ink-soft);
   line-height: 1.55;
   max-width: 440px;
   margin: 0 auto 1.25rem;
@@ -1377,8 +1589,8 @@ const navigateToOemFromModal = () => {
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
-  background: var(--wl-surface-soft, #F1F5F9);
-  border: 1px solid var(--wl-border, #CBD5E1);
+  background: var(--wl-surface-soft);
+  border: 1px solid var(--wl-border);
   border-radius: 8px;
   padding: 0.5rem 1rem;
   margin-bottom: 1.5rem;
@@ -1386,13 +1598,13 @@ const navigateToOemFromModal = () => {
 
 .ref-label {
   font-size: 11.5px;
-  color: var(--wl-muted, #64748B);
+  color: var(--wl-muted);
 }
 
 .ref-code {
   font-size: 14px;
   font-weight: 800;
-  color: var(--wl-teal, #0D9488);
+  color: var(--wl-primary);
   letter-spacing: 0.05em;
 }
 
@@ -1407,7 +1619,7 @@ const navigateToOemFromModal = () => {
 .btn-link-oem {
   background: transparent;
   border: none;
-  color: var(--wl-teal, #0D9488);
+  color: var(--wl-primary);
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;

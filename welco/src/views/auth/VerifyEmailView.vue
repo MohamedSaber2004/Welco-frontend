@@ -71,12 +71,7 @@ const handleVerify = async () => {
     try {
       const raw = sessionStorage.getItem('welco-pending-register')
       if (raw) {
-        const parsed = JSON.parse(raw) as { companyName?: unknown; userType?: unknown }
-        const sentCustomerType =
-          parsed.userType === UserType.Customer || (parsed.userType as number) === 4
-        const sentCompany =
-          typeof parsed.companyName === 'string' && parsed.companyName.trim().length > 0
-        registeredAsOrg = !sentCustomerType && sentCompany
+        registeredAsOrg = true
       }
       sessionStorage.removeItem('welco-pending-email')
       sessionStorage.removeItem('welco-pending-register')
@@ -221,15 +216,15 @@ const handleResend = async () => {
   display: flex;
   align-items: flex-start;
   gap: 0.85rem;
-  background: #F0FDF4;
-  border: 1px solid #BBF7D0;
+  background: var(--wl-success-soft);
+  border: 1px solid var(--wl-border);
   border-radius: 12px;
   padding: 1rem 1.15rem;
 }
 
 .notice-icon {
   font-size: 24px;
-  color: #10B981;
+  color: var(--wl-success);
   flex-shrink: 0;
   margin-top: 1px;
 }
@@ -238,13 +233,13 @@ const handleResend = async () => {
   display: block;
   font-size: 13.5px;
   font-weight: 700;
-  color: #166534;
+  color: var(--wl-ink-strong);
   margin-bottom: 0.2rem;
 }
 
 .notice-sub {
   font-size: 12.5px;
-  color: #15803D;
+  color: var(--wl-ink-soft);
   margin: 0;
   line-height: 1.45;
 }
@@ -255,7 +250,7 @@ const handleResend = async () => {
   background: var(--wl-surface);
   padding: 1px 5px;
   border-radius: 4px;
-  border: 1px solid #DCFCE7;
+  border: 1px solid var(--wl-border);
 }
 
 .auth-form-body {
@@ -273,7 +268,7 @@ const handleResend = async () => {
 .form-label {
   font-size: 11px;
   font-weight: 700;
-  color: #475569;
+  color: var(--wl-ink-soft);
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
@@ -286,11 +281,11 @@ const handleResend = async () => {
 
 .vip-input {
   width: 100%;
-  height: 48px;
+  height: 44px;
   padding: 0 14px;
   background: var(--wl-surface);
   border: 1.5px solid var(--wl-border);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 14px;
   font-family: var(--wl-font-body, system-ui);
   color: var(--wl-ink-strong);
@@ -300,8 +295,8 @@ const handleResend = async () => {
 }
 
 .vip-input:focus {
-  border-color: #4F46E5;
-  box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.14);
+  border-color: var(--wl-primary);
+  box-shadow: var(--wl-focus-ring);
   transform: translateY(-0.5px);
 }
 
@@ -317,21 +312,21 @@ const handleResend = async () => {
   align-items: center;
   gap: 0.55rem;
   padding: 0.75rem 1rem;
-  background: #FFF1F2;
-  border: 1px solid #FECDD3;
+  background: var(--wl-danger-soft);
+  border: 1px solid var(--wl-border);
   border-radius: 10px;
-  color: #E11D48;
+  color: var(--wl-danger);
   font-size: 13px;
   font-weight: 500;
 }
 
 .vip-submit-btn {
-  height: 48px;
+  height: 44px;
   width: 100%;
-  background: #4F46E5;
+  background: var(--wl-primary);
   color: #FFFFFF;
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-family: var(--wl-font-body, system-ui);
   font-size: 14.5px;
   font-weight: 700;
@@ -345,7 +340,7 @@ const handleResend = async () => {
 }
 
 .vip-submit-btn:hover:not(:disabled) {
-  background: #4338CA;
+  background: var(--wl-primary-hover);
   transform: translateY(-1px);
   box-shadow: 0 6px 16px -2px rgba(79, 70, 229, 0.45);
 }
@@ -367,7 +362,7 @@ const handleResend = async () => {
 .resend-btn {
   background: none;
   border: none;
-  color: #4F46E5;
+  color: var(--wl-primary);
   font-size: 12.5px;
   font-weight: 600;
   cursor: pointer;
@@ -380,7 +375,7 @@ const handleResend = async () => {
 }
 
 .resend-btn:disabled {
-  color: #94A3B8;
+  color: var(--wl-muted);
   cursor: not-allowed;
   text-decoration: none;
 }
@@ -392,7 +387,7 @@ const handleResend = async () => {
 }
 
 .switch-link {
-  color: #4F46E5;
+  color: var(--wl-primary);
   font-weight: 600;
   font-size: 12.5px;
   text-decoration: none;

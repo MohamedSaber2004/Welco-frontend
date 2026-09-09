@@ -15,10 +15,13 @@ const order = ref<OrderDto | null>(null)
 const loading = ref(true)
 
 onMounted(async () => {
-  const number = String(route.params.orderNumber ?? '')
-  const found = await commerceService.trackOrder(number)
-  order.value = found
-  loading.value = false
+  try {
+    const number = String(route.params.orderNumber ?? '')
+    const found = await commerceService.trackOrder(number)
+    order.value = found
+  } finally {
+    loading.value = false
+  }
 })
 </script>
 
@@ -303,7 +306,7 @@ onMounted(async () => {
   align-items: center;
   gap: 1rem;
   padding: 0.5rem 0;
-  border-bottom: 1px solid #F8FAFC;
+  border-bottom: 1px solid var(--wl-border);
 }
 
 .item-name {

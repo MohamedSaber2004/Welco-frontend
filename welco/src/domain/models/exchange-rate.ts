@@ -43,12 +43,3 @@ export interface ExchangeRateSyncLogDto {
   createdAt?: string
 }
 
-export interface HangfireJobInfo {
-  id: string
-  name: string
-  cron: string
-  queue: string
-  lastExecution?: string | null
-  nextExecution?: string | null
-  status: 'Active' | 'Running' | 'Failed' | 'Idle'
-}

@@ -3,8 +3,7 @@ import { computed, ref, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { authService } from '../../di/container'
 import { t, locale, setLocale } from '../../i18n'
-import { theme, toggleTheme } from '../../application/theme.service'
-import { resolveFileUrl, PLACEHOLDER } from '../../utils/file-url'
+import { resolveFileUrl, PLACEHOLDER, markBrokenUrl, isKnownBrokenUrl } from '../../utils/file-url'
 import { AppLanguage } from '../../domain/models/user'
 import { useCart } from '../../composables/useCart'
 import { wishlistService } from '../../di/container'
@@ -18,6 +17,7 @@ const toggleLang = async () => {
   const next = locale.value === 'ar' ? 'en' : 'ar'
   setLocale(next)
   userMenuOpen.value = false
+  mobileOpen.value = false
   if (authService.user.value && authService.user.value.fullName) {
     try {
       await authService.updateProfile({
@@ -39,7 +39,8 @@ const avatarSrc = computed(() => {
   const name = user.value?.profilePictureName
   if (!name) return ''
   const url = resolveFileUrl(name, '')
-  return url === PLACEHOLDER || url === '/images/placeholder.svg' ? '' : url
+  if (!url || url === PLACEHOLDER || url === '/images/placeholder.svg' || isKnownBrokenUrl(url)) return ''
+  return url
 })
 const avatarInitials = computed(() => {
   const n = user.value?.fullName?.trim() ?? user.value?.email ?? '?'
@@ -104,6 +105,7 @@ watch(isAuthed, (v) => {
         <template v-else>
           <router-link to="/" class="menu__link">{{ t('nav.home') }}</router-link>
           <router-link to="/marketplace" class="menu__link">{{ t('nav.marketplace') }}</router-link>
+          <router-link to="/providers" class="menu__link">{{ t('nav.providers') }}</router-link>
           <router-link to="/about" class="menu__link">{{ t('nav.about') }}</router-link>
           <router-link to="/certifications" class="menu__link">{{ t('nav.certifications') }}</router-link>
           <router-link to="/help" class="menu__link">{{ t('nav.help') }}</router-link>
@@ -127,15 +129,15 @@ watch(isAuthed, (v) => {
           <span v-if="cartCount > 0" class="icon-btn__badge">{{ cartCount > 9 ? '9+' : cartCount }}</span>
         </router-link>
 
-        <button v-if="isAuthed" class="icon-btn" :aria-label="t('nav.toggleTheme')" @click="toggleTheme">
-          <span class="material-symbols-outlined" style="font-size:16px">{{ theme === 'light' ? 'dark_mode' : 'light_mode' }}</span>
+        <button class="icon-btn lang-btn" :aria-label="locale === 'ar' ? 'English' : 'العربية'" :title="locale === 'ar' ? 'Switch to English' : 'التحويل إلى العربية'" @click="toggleLang">
+          <span class="lang-btn__text mono">{{ locale === 'ar' ? 'EN' : 'عربي' }}</span>
         </button>
 
         <template v-if="isAuthed">
           <div class="header__user-wrap">
             <button class="header__user" type="button" @click.stop="userMenuOpen = !userMenuOpen" :aria-expanded="userMenuOpen">
               <span class="header__avatar" :style="{ background: user?.tint || '#4F46E5' }">
-                <img v-if="hasAvatar" :src="avatarSrc" :alt="user?.fullName ?? ''" class="header__avatar-img" @error="avatarFailed = true" />
+                <img v-if="hasAvatar" :src="avatarSrc" :alt="user?.fullName ?? ''" class="header__avatar-img" @error="avatarFailed = true; markBrokenUrl(avatarSrc)" />
                 <span v-else class="header__avatar-fallback">{{ avatarInitials }}</span>
               </span>
               <span class="header__user-text">
@@ -210,12 +212,19 @@ watch(isAuthed, (v) => {
         <template v-else>
           <router-link to="/" class="header__drawer-link" @click="closeMobile">{{ t('nav.home') }}</router-link>
           <router-link to="/marketplace" class="header__drawer-link" @click="closeMobile">{{ t('nav.marketplace') }}</router-link>
+          <router-link to="/providers" class="header__drawer-link" @click="closeMobile">{{ t('nav.providers') }}</router-link>
           <router-link to="/about" class="header__drawer-link" @click="closeMobile">{{ t('nav.about') }}</router-link>
           <router-link to="/certifications" class="header__drawer-link" @click="closeMobile">{{ t('nav.certifications') }}</router-link>
           <router-link to="/help" class="header__drawer-link" @click="closeMobile">{{ t('nav.help') }}</router-link>
           <router-link v-if="!isAuthed" to="/auth/login" class="header__drawer-link" @click="closeMobile">{{ t('nav.login') }}</router-link>
           <router-link v-if="!isAuthed" to="/auth/register" class="header__drawer-link" @click="closeMobile">{{ t('nav.register') }}</router-link>
         </template>
+        <div class="header__drawer-footer">
+          <button type="button" class="header__drawer-btn" @click="toggleLang">
+            <span class="material-symbols-outlined text-[18px]">language</span>
+            <span>{{ locale === 'ar' ? 'English' : 'العربية' }}</span>
+          </button>
+        </div>
       </nav>
     </Transition>
   </header>
@@ -237,7 +246,7 @@ watch(isAuthed, (v) => {
   position: absolute;
   bottom: 0;
   inset-inline: 0;
-  height: 2px;
+  height: 1px;
   background: var(--wl-laser-sweep);
   opacity: 0.35;
   transition: opacity 0.3s ease;
@@ -298,8 +307,8 @@ watch(isAuthed, (v) => {
   padding: 0 0.6rem 0 0.7rem;
   height: 38px;
   max-height: 38px;
-  min-width: 220px;
-  max-width: 320px;
+  min-width: var(--wl-header-search-min, 170px);
+  max-width: var(--wl-header-search-max, 230px);
   flex-shrink: 1;
   transition: border-color 0.12s, box-shadow 0.12s;
   overflow: hidden;
@@ -356,6 +365,15 @@ watch(isAuthed, (v) => {
 .icon-btn:hover { border-color: var(--wl-primary); color: var(--wl-primary); background: var(--wl-primary-soft); }
 .icon-btn:focus-visible { outline: none; box-shadow: var(--wl-focus-ring); border-color: var(--wl-primary); }
 .icon-btn:active { transform: scale(0.94); }
+.lang-btn {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.lang-btn__text {
+  display: inline-block;
+  line-height: 1;
+}
 .icon-btn__badge {
   position: absolute;
   top: -6px;
@@ -365,6 +383,8 @@ watch(isAuthed, (v) => {
   padding: 0 4px;
   background: var(--wl-danger);
   color: #fff;
+  font-family: var(--wl-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 10px;
   font-weight: 700;
   display: grid;
@@ -525,6 +545,34 @@ watch(isAuthed, (v) => {
     min-height: 44px;
   }
   .header__drawer-link:hover, .header__drawer-link.router-link-active { background: var(--wl-surface-soft); color: var(--wl-ink-strong); }
+  .header__drawer-footer {
+    display: flex;
+    gap: 0.5rem;
+    padding-top: 0.8rem;
+    margin-top: 0.5rem;
+    border-top: 1px solid var(--wl-border);
+  }
+  .header__drawer-btn {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.65rem 0.75rem;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--wl-surface-soft);
+    border: 1px solid var(--wl-border);
+    color: var(--wl-ink-strong);
+    transition: all 0.12s ease;
+    min-height: 42px;
+  }
+  .header__drawer-btn:hover {
+    border-color: var(--wl-primary);
+    color: var(--wl-primary);
+  }
 }
 @media (max-width: 768px) {
   .header__auth-desktop { display: none; }

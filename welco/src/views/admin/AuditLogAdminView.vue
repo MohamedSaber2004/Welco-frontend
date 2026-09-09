@@ -337,7 +337,7 @@ watch([() => filters.value.entity, () => filters.value.action, () => filters.val
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #4F46E5;
+  background: var(--wl-primary);
 }
 
 .head-title {
@@ -352,7 +352,7 @@ watch([() => filters.value.entity, () => filters.value.action, () => filters.val
 
 .head-subtitle {
   font-size: 13.5px;
-  color: #64748B;
+  color: var(--wl-muted);
   margin: 0.25rem 0 0;
 }
 
@@ -365,7 +365,7 @@ watch([() => filters.value.entity, () => filters.value.action, () => filters.val
   display: flex;
   gap: 1rem;
   align-items: flex-end;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  box-shadow: var(--wl-shadow-card);
   flex-wrap: wrap;
 }
 
@@ -384,7 +384,7 @@ watch([() => filters.value.entity, () => filters.value.action, () => filters.val
 .filter-label {
   font-size: 10.5px;
   font-weight: 700;
-  color: #64748B;
+  color: var(--wl-muted);
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
@@ -393,8 +393,8 @@ watch([() => filters.value.entity, () => filters.value.action, () => filters.val
   height: 44px;
   padding: 0 12px;
   background: var(--wl-surface-soft);
-  border: 1.5px solid var(--wl-border);
-  border-radius: 10px;
+  border: 1px solid var(--wl-border);
+  border-radius: var(--wl-radius-sm);
   font-size: 13.5px;
   color: var(--wl-ink-strong);
   outline: none;
@@ -403,8 +403,8 @@ watch([() => filters.value.entity, () => filters.value.action, () => filters.val
 
 .filter-input:focus {
   background: var(--wl-surface);
-  border-color: #4F46E5;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+  border-color: var(--wl-primary);
+  box-shadow: 0 0 0 3px var(--wl-primary-ring);
 }
 
 .filter-select {
@@ -421,7 +421,7 @@ watch([() => filters.value.entity, () => filters.value.action, () => filters.val
   position: absolute;
   inset-inline-start: 12px;
   font-size: 18px;
-  color: #94A3B8;
+  color: var(--wl-muted);
   pointer-events: none;
 }
 
@@ -436,7 +436,7 @@ watch([() => filters.value.entity, () => filters.value.action, () => filters.val
   border: 1px solid var(--wl-border);
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  box-shadow: var(--wl-shadow-card);
 }
 
 .table-wrap {
@@ -496,10 +496,10 @@ watch([() => filters.value.entity, () => filters.value.action, () => filters.val
 }
 
 .action-badge--indigo { background: var(--wl-primary-soft); color: var(--wl-primary); }
-.action-badge--teal { background: #CCFBF1; color: #0F766E; }
-.action-badge--emerald { background: #D1FAE5; color: #065F46; }
-.action-badge--amber { background: #FEF3C7; color: #92400E; }
-.action-badge--rose { background: #FFE4E6; color: #9F1239; }
+.action-badge--teal { background: var(--wl-primary-faint); color: var(--wl-primary); }
+.action-badge--emerald { background: var(--wl-success-faint); color: var(--wl-success); }
+.action-badge--amber { background: var(--wl-warning-faint); color: var(--wl-warning); }
+.action-badge--rose { background: var(--wl-danger-faint); color: var(--wl-danger); }
 .action-badge--slate { background: var(--wl-surface-soft); color: var(--wl-ink-soft); }
 
 .actor-cell {
@@ -528,7 +528,7 @@ watch([() => filters.value.entity, () => filters.value.action, () => filters.val
 
 .actor-ip {
   font-size: 10.5px;
-  color: #94A3B8;
+  color: var(--wl-muted);
 }
 
 .role-badge {
@@ -542,27 +542,27 @@ watch([() => filters.value.entity, () => filters.value.action, () => filters.val
 }
 
 .role-badge--admin {
-  background: rgba(99, 102, 241, 0.12);
-  color: #4F46E5;
-  border: 1px solid rgba(99, 102, 241, 0.25);
+  background: var(--wl-primary-soft);
+  color: var(--wl-primary);
+  border: 1px solid var(--wl-primary-ring);
 }
 
 .role-badge--staff {
-  background: rgba(16, 185, 129, 0.12);
-  color: #059669;
-  border: 1px solid rgba(16, 185, 129, 0.25);
+  background: var(--wl-success-faint);
+  color: var(--wl-success);
+  border: 1px solid var(--wl-success-border);
 }
 
 .role-badge--org {
-  background: rgba(245, 158, 11, 0.12);
-  color: #D97706;
-  border: 1px solid rgba(245, 158, 11, 0.25);
+  background: var(--wl-warning-faint);
+  color: var(--wl-warning);
+  border: 1px solid var(--wl-warning-border);
 }
 
 .role-badge--system {
-  background: rgba(100, 116, 139, 0.12);
-  color: #475569;
-  border: 1px solid rgba(100, 116, 139, 0.25);
+  background: var(--wl-surface-soft);
+  color: var(--wl-muted);
+  border: 1px solid var(--wl-border);
 }
 
 .role-badge--default {
@@ -600,7 +600,7 @@ watch([() => filters.value.entity, () => filters.value.action, () => filters.val
 
 .detail-k {
   font-size: 10px;
-  color: #64748B;
+  color: var(--wl-muted);
 }
 
 .detail-v {
@@ -617,12 +617,13 @@ watch([() => filters.value.entity, () => filters.value.action, () => filters.val
 .detail-code-label {
   font-size: 10.5px;
   font-weight: 700;
-  color: #64748B;
+  color: var(--wl-muted);
 }
 
 .detail-pre {
-  background: #0F172A;
-  color: #F8FAFC;
+  background: var(--wl-surface-card);
+  color: var(--wl-text);
+  border: 1px solid var(--wl-border);
   padding: 1rem;
   border-radius: 10px;
   font-size: 11.5px;

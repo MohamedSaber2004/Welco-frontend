@@ -251,7 +251,7 @@ async function closeTicket(id: string) {
   position: absolute;
   inset-inline-start: 0.75rem;
   font-size: 18px;
-  color: #94A3B8;
+  color: var(--wl-muted-soft);
   pointer-events: none;
 }
 
@@ -269,8 +269,8 @@ async function closeTicket(id: string) {
 }
 
 .search-input:focus {
-  border-color: #6366F1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+  border-color: #69a9ff;
+  box-shadow: 0 0 0 3px rgba(105, 169, 255, 0.12);
   background: var(--wl-surface);
 }
 
@@ -280,14 +280,14 @@ async function closeTicket(id: string) {
   background: none;
   border: none;
   cursor: pointer;
-  color: #94A3B8;
+  color: var(--wl-muted-soft);
   display: flex;
   align-items: center;
   padding: 0.2rem;
   border-radius: 4px;
 }
 
-.clear-btn:hover { color: #4F46E5; }
+.clear-btn:hover { color: var(--wl-primary); }
 
 .filter-select {
   height: 38px;
@@ -302,7 +302,7 @@ async function closeTicket(id: string) {
   transition: border-color 0.15s;
 }
 
-.filter-select:focus { border-color: #6366F1; }
+.filter-select:focus { border-color: #69a9ff; }
 
 .clear-filters-btn {
   display: inline-flex;
@@ -315,33 +315,33 @@ async function closeTicket(id: string) {
   font-size: 12px;
   font-weight: 700;
   color: #DC2626;
-  background: #FEF2F2;
+  background: var(--wl-danger-soft);
   cursor: pointer;
   transition: all 0.15s;
 }
 
-.clear-filters-btn:hover { background: #FEE2E2; }
+.clear-filters-btn:hover { background: rgba(242, 109, 109, 0.22); }
 
 .crumb-bar {
   display: flex;
   align-items: center;
   gap: 0.45rem;
   font-size: 11px;
-  color: #64748B;
+  color: var(--wl-muted);
 }
 
 .crumb-bar a {
-  color: #64748B;
+  color: var(--wl-muted);
   text-decoration: none;
   transition: color 0.15s ease;
 }
 
 .crumb-bar a:hover {
-  color: #4F46E5;
+  color: var(--wl-primary);
 }
 
 .crumb-sep {
-  color: #CBD5E1;
+  color: var(--wl-muted-soft);
 }
 
 .crumb-active {
@@ -377,7 +377,7 @@ async function closeTicket(id: string) {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #4F46E5;
+  background: var(--wl-primary);
 }
 
 .head-title {
@@ -392,7 +392,7 @@ async function closeTicket(id: string) {
 
 .head-subtitle {
   font-size: 13.5px;
-  color: #64748B;
+  color: var(--wl-muted);
   margin: 0.25rem 0 0;
 }
 
@@ -419,7 +419,7 @@ async function closeTicket(id: string) {
   border: 1px solid var(--wl-border, #E2E8F0);
   border-radius: var(--wl-radius-card, 16px);
   padding: var(--wl-card-padding, 1.5rem);
-  box-shadow: var(--wl-shadow-card, 0 1px 3px rgba(15, 23, 42, 0.05));
+  box-shadow: var(--wl-shadow-card, 0 1px 3px rgba(0, 10, 25, 0.05));
 }
 
 /* Form Card */
@@ -434,7 +434,7 @@ async function closeTicket(id: string) {
   align-items: center;
   gap: 0.5rem;
   padding-bottom: 0.75rem;
-  border-bottom: 1px solid #F1F5F9;
+  border-bottom: 1px solid var(--wl-border);
 }
 
 .form-title {
@@ -459,7 +459,7 @@ async function closeTicket(id: string) {
 .vip-field-label {
   font-size: 11px;
   font-weight: 700;
-  color: #475569;
+  color: var(--wl-ink-soft);
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -494,8 +494,8 @@ async function closeTicket(id: string) {
 .vip-48-input:focus,
 .vip-textarea:focus {
   background: var(--wl-surface);
-  border-color: #4F46E5;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+  border-color: var(--wl-primary);
+  box-shadow: 0 0 0 3px rgba(105, 169, 255, 0.12);
 }
 
 .btn-send-ticket {
@@ -504,19 +504,19 @@ async function closeTicket(id: string) {
   justify-content: center;
   gap: 0.45rem;
   height: 48px;
-  background: #4F46E5;
-  color: #FFFFFF;
+  background: var(--wl-primary);
+  color: var(--wl-on-primary);
   border: none;
   border-radius: 10px;
   font-size: 13.5px;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 4px 12px -2px rgba(79, 70, 229, 0.35);
+  box-shadow: 0 4px 12px -2px rgba(105, 169, 255, 0.35);
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .btn-send-ticket:hover:not(:disabled) {
-  background: #4338CA;
+  background: var(--wl-primary-hover);
   transform: translateY(-1px);
 }
 
@@ -547,7 +547,7 @@ async function closeTicket(id: string) {
 
 .history-count {
   font-size: 11px;
-  color: #64748B;
+  color: var(--wl-muted);
   font-weight: 700;
 }
 
@@ -562,7 +562,7 @@ async function closeTicket(id: string) {
   border: 1px solid var(--wl-border, #E2E8F0);
   border-radius: var(--wl-radius-card, 16px);
   padding: var(--wl-card-padding, 1.25rem 1.5rem);
-  box-shadow: var(--wl-shadow-card, 0 1px 3px rgba(15, 23, 42, 0.05));
+  box-shadow: var(--wl-shadow-card, 0 1px 3px rgba(0, 10, 25, 0.05));
   display: flex;
   flex-direction: column;
   gap: 0.85rem;
@@ -570,8 +570,8 @@ async function closeTicket(id: string) {
 }
 
 .ticket-card:hover {
-  border-color: var(--wl-border-hover, #CBD5E1);
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+  border-color: var(--wl-border-strong);
+  box-shadow: 0 4px 12px rgba(0, 10, 25, 0.06);
 }
 
 .ticket-card-top {
@@ -597,7 +597,7 @@ async function closeTicket(id: string) {
 
 .ticket-date {
   font-size: 11px;
-  color: #94A3B8;
+  color: var(--wl-muted-soft);
 }
 
 .ticket-status-actions {
@@ -624,13 +624,13 @@ async function closeTicket(id: string) {
 
 .status-pill--open {
   background: #FEF3C7;
-  color: #92400E;
+  color: var(--wl-warning);
 }
 .status-pill--open .dot { background: #F59E0B; }
 
 .status-pill--answered {
-  background: #ECFDF5;
-  color: #059669;
+  background: var(--wl-success-soft);
+  color: var(--wl-success);
 }
 .status-pill--answered .dot { background: #10B981; }
 
@@ -638,12 +638,12 @@ async function closeTicket(id: string) {
   background: var(--wl-surface-soft);
   color: var(--wl-muted);
 }
-.status-pill--closed .dot { background: #94A3B8; }
+.status-pill--closed .dot { background: var(--wl-muted-soft); }
 
 .btn-close-ticket {
-  border: 1px solid #FECDD3;
+  border: 1px solid rgba(237, 66, 69, 0.35);
   background: var(--wl-surface);
-  color: #E11D48;
+  color: var(--wl-danger);
   padding: 0.25rem 0.6rem;
   border-radius: 6px;
   font-size: 11px;
@@ -653,7 +653,7 @@ async function closeTicket(id: string) {
 }
 
 .btn-close-ticket:hover {
-  background: #FFF1F2;
+  background: var(--wl-danger-soft);
 }
 
 .ticket-body-text {
@@ -677,7 +677,7 @@ async function closeTicket(id: string) {
   gap: 0.4rem;
   font-size: 11px;
   font-weight: 800;
-  color: #4F46E5;
+  color: var(--wl-primary);
   margin-bottom: 0.35rem;
 }
 
@@ -695,3 +695,4 @@ async function closeTicket(id: string) {
   }
 }
 </style>
+

@@ -102,7 +102,7 @@ onMounted(async () => {
 
           <div class="items-stack">
             <article v-for="it in rfq.items" :key="it.id" class="rfq-item-card">
-              <div class="thumb-box" :style="{ background: it.imageGradient || '#2B2D31' }">
+              <div class="thumb-box" :style="{ background: it.imageGradient || '#071A38' }">
                 <img
                   v-if="it.imageName"
                   :src="resolveFileUrl(it.imageName)"
@@ -193,21 +193,21 @@ onMounted(async () => {
   align-items: center;
   gap: 0.45rem;
   font-size: 11px;
-  color: #64748B;
+  color: var(--wl-muted);
 }
 
 .crumb-bar a {
-  color: #64748B;
+  color: var(--wl-muted);
   text-decoration: none;
   transition: color 0.15s ease;
 }
 
 .crumb-bar a:hover {
-  color: #4F46E5;
+  color: var(--wl-primary);
 }
 
 .crumb-sep {
-  color: #CBD5E1;
+  color: var(--wl-muted-soft);
 }
 
 .crumb-active {
@@ -250,7 +250,7 @@ onMounted(async () => {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #4F46E5;
+  background: var(--wl-primary);
 }
 
 .rfq-heading {
@@ -267,7 +267,7 @@ onMounted(async () => {
   align-items: center;
   gap: 0.5rem;
   font-size: 11.5px;
-  color: #64748B;
+  color: var(--wl-muted);
   margin: 0.35rem 0 0;
 }
 
@@ -277,7 +277,7 @@ onMounted(async () => {
   border: 1px solid var(--wl-border, #E2E8F0);
   border-radius: var(--wl-radius-card, 16px);
   padding: var(--wl-card-padding, 1.25rem 1.5rem);
-  box-shadow: var(--wl-shadow-card, 0 1px 3px rgba(15, 23, 42, 0.05));
+  box-shadow: var(--wl-shadow-card, 0 1px 3px rgba(0, 10, 25, 0.05));
 }
 
 /* Detail 2-Column Grid */
@@ -293,7 +293,7 @@ onMounted(async () => {
   border: 1px solid var(--wl-border, #E2E8F0);
   border-radius: var(--wl-radius-card, 16px);
   padding: var(--wl-card-padding, 1.5rem);
-  box-shadow: var(--wl-shadow-card, 0 1px 3px rgba(15, 23, 42, 0.05));
+  box-shadow: var(--wl-shadow-card, 0 1px 3px rgba(0, 10, 25, 0.05));
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -304,7 +304,7 @@ onMounted(async () => {
   justify-content: space-between;
   align-items: center;
   padding-bottom: 0.75rem;
-  border-bottom: 1px solid var(--wl-border-subtle, #F1F5F9);
+  border-bottom: 1px solid var(--wl-border);
 }
 
 .manifest-title-group {
@@ -354,7 +354,7 @@ onMounted(async () => {
   display: grid;
   place-items: center;
   flex-shrink: 0;
-  border: 1px solid #E2E8F0;
+  border: 1px solid var(--wl-border);
 }
 
 .thumb-img {
@@ -379,7 +379,7 @@ onMounted(async () => {
 
 .rfq-item-qty {
   font-size: 11.5px;
-  color: #64748B;
+  color: var(--wl-muted);
 }
 
 .rfq-item-notes {
@@ -400,7 +400,7 @@ onMounted(async () => {
   font-size: 12px;
   color: var(--wl-ink-soft);
   background: var(--wl-primary-soft);
-  border: 1px solid #C7D2FE;
+  border: 1px solid rgba(148, 156, 247, 0.35);
   padding: 0.75rem 1rem;
   border-radius: 10px;
 }
@@ -417,13 +417,13 @@ onMounted(async () => {
   border: 1px solid var(--wl-border, #E2E8F0);
   border-radius: var(--wl-radius-card, 16px);
   padding: var(--wl-card-padding, 1.25rem);
-  box-shadow: var(--wl-shadow-card, 0 1px 3px rgba(15, 23, 42, 0.05));
+  box-shadow: var(--wl-shadow-card, 0 1px 3px rgba(0, 10, 25, 0.05));
 }
 
 .side-title {
   font-size: 11px;
   font-weight: 800;
-  color: var(--wl-primary, #4F46E5);
+  color: var(--wl-primary, #69a9ff);
   letter-spacing: 0.05em;
   text-transform: uppercase;
   margin: 0;
@@ -438,7 +438,7 @@ onMounted(async () => {
 
 .amount-label {
   font-size: 11px;
-  color: #64748B;
+  color: var(--wl-muted);
   font-weight: 700;
 }
 
@@ -456,7 +456,7 @@ onMounted(async () => {
 
 .linked-desc {
   font-size: 12px;
-  color: #64748B;
+  color: var(--wl-muted);
   margin: 0.5rem 0 1rem;
   line-height: 1.45;
 }
@@ -468,19 +468,19 @@ onMounted(async () => {
   gap: 0.45rem;
   height: 44px;
   width: 100%;
-  background: #4F46E5;
-  color: #FFFFFF;
+  background: var(--wl-primary);
+  color: var(--wl-on-primary);
   border: none;
   border-radius: 10px;
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 4px 12px -2px rgba(79, 70, 229, 0.35);
+  box-shadow: 0 4px 12px -2px rgba(105, 169, 255, 0.35);
   transition: all 0.18s ease;
 }
 
 .btn-view-quote:hover {
-  background: #4338CA;
+  background: var(--wl-primary-hover);
 }
 
 .side-actions-stack {
@@ -506,7 +506,7 @@ onMounted(async () => {
 }
 
 .btn-back-rfqs:hover {
-  border-color: #4F46E5;
+  border-color: var(--wl-primary);
   color: var(--wl-primary);
   background: var(--wl-primary-soft);
 }
@@ -528,8 +528,8 @@ onMounted(async () => {
 }
 
 .btn-create-rfq:hover {
-  background: #4F46E5;
-  color: #FFFFFF;
+  background: var(--wl-primary);
+  color: var(--wl-on-primary);
 }
 
 @media (max-width: 900px) {
@@ -538,3 +538,4 @@ onMounted(async () => {
   }
 }
 </style>
+

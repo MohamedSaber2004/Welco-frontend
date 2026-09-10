@@ -424,6 +424,9 @@ const detailsLoading = ref(false)
 const openProductDetails = async (p: ProductDto) => {
   selectedProduct.value = p
   selectedVideos.value = p.videos ?? []
+  videoDraftUrl.value = ''
+  videoDraftTitle.value = ''
+  videosError.value = ''
   showDetailsModal.value = true
   detailsLoading.value = true
   try {
@@ -442,6 +445,9 @@ const closeDetailsModal = () => {
   showDetailsModal.value = false
   selectedProduct.value = null
   selectedVideos.value = []
+  videoDraftUrl.value = ''
+  videoDraftTitle.value = ''
+  videosError.value = ''
 }
 
 const detailsImageUrl = computed(() => {
@@ -455,6 +461,61 @@ const detailVideoItems = computed(() =>
 )
 
 const videoEmbed = (url: string) => parseVideoSource(url)
+
+// --- Product videos manager (bulk sync, mirrors the public PDP videos tab) ---
+const videoDraftUrl = ref('')
+const videoDraftTitle = ref('')
+const videosSaving = ref(false)
+const videosError = ref('')
+
+const persistVideos = async (next: ProductMediaDto[]) => {
+  const product = selectedProduct.value
+  if (!product) return
+  videosSaving.value = true
+  videosError.value = ''
+  try {
+    const payload = next.map((v, i) => ({
+      productId: product.id,
+      type: 2,
+      url: v.url.trim(),
+      title: v.title?.trim() || undefined,
+      sortOrder: i + 1,
+    }))
+    const saved = await services.marketplaceService.updateProductVideos(product.id, payload)
+    selectedVideos.value = Array.isArray(saved) ? saved : []
+    toastService.success(t('common.savedSuccessfully'))
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('welco:product-videos-updated', { detail: { productId: product.id } }))
+    }
+  } catch (e) {
+    videosError.value = e instanceof Error ? e.message : t('common.error')
+  } finally {
+    videosSaving.value = false
+  }
+}
+
+const addVideo = () => {
+  const url = videoDraftUrl.value.trim()
+  if (!url || !selectedProduct.value) return
+  const next = [
+    ...selectedVideos.value,
+    {
+      productId: selectedProduct.value.id,
+      type: 2,
+      url,
+      title: videoDraftTitle.value.trim() || undefined,
+      sortOrder: selectedVideos.value.length + 1,
+    } as ProductMediaDto,
+  ]
+  videoDraftUrl.value = ''
+  videoDraftTitle.value = ''
+  void persistVideos(next)
+}
+
+const removeVideo = (index: number) => {
+  const next = selectedVideos.value.filter((_, i) => i !== index)
+  void persistVideos(next)
+}
 
 // ----------------------------------------------------
 // 4. CATEGORY ACTIONS: add / details / edit / delete
@@ -1224,9 +1285,9 @@ onMounted(async () => {
           <div v-if="detailsLoading" class="details-loading">
             {{ t('common.loading') }}
           </div>
-          <div v-else-if="detailVideoItems.length" class="details-videos">
+          <div v-else class="details-videos">
             <span class="detail-k mono">{{ t('admin.productVideos') }} ({{ detailVideoItems.length }})</span>
-            <div v-for="v in detailVideoItems" :key="v.id || v.url" class="details-video-item">
+            <div v-for="(v, vi) in detailVideoItems" :key="v.id || v.url" class="details-video-item">
               <div class="details-video-title mono">{{ v.title || v.url }}</div>
               <div v-if="videoEmbed(v.url).type !== 'html5'" class="details-video-frame">
                 <iframe
@@ -1244,7 +1305,52 @@ onMounted(async () => {
                 :src="videoEmbed(v.url).src"
                 class="details-video-native"
               />
+              <div class="details-video-row-actions">
+                <BaseButton
+                  variant="ghost"
+                  size="sm"
+                  :loading="videosSaving"
+                  @click="removeVideo(selectedVideos.indexOf(v))"
+                >
+                  <span class="material-symbols-outlined text-[16px]">delete</span>
+                  <span>{{ t('admin.removeVideo') }}</span>
+                </BaseButton>
+              </div>
             </div>
+            <div v-if="!detailVideoItems.length" class="details-videos-empty mono">
+              {{ t('admin.noVideos') }}
+            </div>
+            <div class="details-video-add">
+              <input
+                v-model="videoDraftUrl"
+                type="url"
+                inputmode="url"
+                dir="ltr"
+                class="field-input mono"
+                :placeholder="t('admin.videoUrl')"
+                :disabled="videosSaving"
+                @keydown.enter.prevent="addVideo"
+              />
+              <input
+                v-model="videoDraftTitle"
+                type="text"
+                class="field-input"
+                :placeholder="t('admin.videoTitle')"
+                :disabled="videosSaving"
+                @keydown.enter.prevent="addVideo"
+              />
+              <BaseButton
+                variant="secondary"
+                size="sm"
+                :loading="videosSaving"
+                :disabled="!videoDraftUrl.trim()"
+                @click="addVideo"
+              >
+                <span class="material-symbols-outlined text-[16px]">add</span>
+                <span>{{ t('admin.addVideo') }}</span>
+              </BaseButton>
+            </div>
+            <p v-if="videosError" class="form-error" role="alert">{{ videosError }}</p>
           </div>
 
           <div class="modal-foot">
@@ -1959,6 +2065,39 @@ onMounted(async () => {
   border-radius: var(--wl-radius-sm);
 }
 
+.details-video-row-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.details-videos-empty {
+  font-size: 0.78rem;
+  color: var(--wl-muted);
+  padding: 0.5rem 0.1rem;
+}
+
+.details-video-add {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
+  background: var(--wl-surface-soft);
+  border: 1px dashed var(--wl-border-strong);
+  border-radius: var(--wl-radius-sm);
+  padding: 0.65rem;
+  margin-top: 0.25rem;
+}
+
+.details-video-add .field-input {
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .details-video-add {
+    grid-template-columns: 1.4fr 1fr auto;
+    align-items: center;
+  }
+}
+
 /* Table Pagination */
 .table-pagination {
   display: flex;
@@ -1989,7 +2128,7 @@ onMounted(async () => {
 
 .page-btn:hover:not(:disabled) {
   background: var(--wl-primary);
-  color: #fff;
+  color: var(--wl-on-primary);
   border-color: var(--wl-primary);
 }
 
@@ -2228,7 +2367,7 @@ onMounted(async () => {
 .video-tab-btn.is-active {
   color: var(--wl-primary);
   background: var(--wl-primary-soft);
-  border-color: rgba(79, 70, 229, 0.2);
+  border-color: rgba(105, 169, 255, 0.2);
 }
 
 .add-video-body {
@@ -2324,3 +2463,4 @@ onMounted(async () => {
   padding: 0.25rem 0.5rem;
 }
 </style>
+

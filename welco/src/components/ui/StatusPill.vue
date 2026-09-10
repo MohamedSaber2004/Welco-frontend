@@ -68,58 +68,33 @@ const tone = computed(() => TONE[props.status] ?? 'slate')
   background: var(--wl-success-soft);
   border-color: rgba(var(--wl-success-rgb), 0.25);
 }
-:root.dark .status-pill--emerald,
-:root[data-theme='dark'] .status-pill--emerald {
-  color: #57F287;
-  background: rgba(87, 242, 135, 0.14);
-  border-color: rgba(87, 242, 135, 0.25);
-}
+
 
 .status-pill--indigo {
   color: var(--wl-primary);
   background: var(--wl-primary-soft);
   border-color: rgba(var(--wl-primary-rgb), 0.25);
 }
-:root.dark .status-pill--indigo,
-:root[data-theme='dark'] .status-pill--indigo {
-  color: #949CF7;
-  background: rgba(88, 101, 242, 0.16);
-  border-color: rgba(88, 101, 242, 0.3);
-}
+
 
 .status-pill--amber {
   color: var(--wl-warning);
   background: var(--wl-warning-soft);
   border-color: rgba(var(--wl-warning-rgb), 0.25);
 }
-:root.dark .status-pill--amber,
-:root[data-theme='dark'] .status-pill--amber {
-  color: #FEE75C;
-  background: rgba(254, 231, 92, 0.14);
-  border-color: rgba(254, 231, 92, 0.3);
-}
+
 
 .status-pill--rose {
   color: var(--wl-danger);
   background: var(--wl-danger-soft);
   border-color: rgba(var(--wl-danger-rgb), 0.25);
 }
-:root.dark .status-pill--rose,
-:root[data-theme='dark'] .status-pill--rose {
-  color: #ED4245;
-  background: rgba(237, 66, 69, 0.14);
-  border-color: rgba(237, 66, 69, 0.3);
-}
+
 
 .status-pill--slate {
   color: var(--wl-ink-soft);
   background: var(--wl-surface-soft);
   border-color: var(--wl-border);
 }
-:root.dark .status-pill--slate,
-:root[data-theme='dark'] .status-pill--slate {
-  color: #B5BAC1;
-  background: #383A40;
-  border-color: rgba(255, 255, 255, 0.08);
-}
+
 </style>

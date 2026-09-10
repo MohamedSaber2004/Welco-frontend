@@ -113,14 +113,9 @@ export class HttpClient {
     const { headers: extraHeaders, showFeedback, onUploadProgress } = options
     const mutation = isMutation(method)
     const wantsFeedback = showFeedback ?? mutation
-    // For absolute URLs compare on pathname so gateway/product hosts share routing rules
     const routingPath = isAbsoluteUrl(path) ? (() => { try { return new URL(path).pathname } catch { return path } })() : path
     const silentPath = NO_FEEDBACK_PATHS.some((candidate) => routingPath.startsWith(candidate))
 
-    // Expired access token → force logout before sending; the user must
-    // sign in again. There is intentionally no silent refresh, so the
-    // request below goes out anonymous (GET resolves to a safe empty
-    // result, mutations surface the 401 as an error).
     if (this.tokenStore.hasAccessToken() && this.tokenStore.isAccessTokenExpired()) {
       this.tokenStore.clear()
       this.authBridge.onSessionExpired()

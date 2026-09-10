@@ -53,7 +53,7 @@ function step(delta: number) {
   border: 1.5px solid var(--wl-border);
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+  box-shadow: 0 1px 2px rgba(0, 10, 25, 0.05);
   transition: border-color 0.18s var(--wl-ease-spring), box-shadow 0.18s var(--wl-ease-spring);
 }
 

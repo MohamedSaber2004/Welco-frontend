@@ -73,7 +73,7 @@ const filteredArticles = computed(() => {
   })
 })
 
-const COLOR_PALETTE = ['#4F46E5', '#0D9488', '#F43F5E', '#10B981', '#6366F1', '#D97706', '#0284C7', '#8B5CF6']
+const COLOR_PALETTE = ['#69a9ff', '#0D9488', '#F43F5E', '#10B981', '#69a9ff', '#D97706', '#0284C7', '#69a9ff']
 
 const visibleFaqs = computed(() => {
   const list = Array.isArray(faqs.value) ? faqs.value : []
@@ -288,7 +288,7 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
               <svg class="schematic-svg" viewBox="0 0 320 190" fill="none">
                 <defs>
                   <linearGradient id="laserGrad" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stop-color="#4F46E5" />
+                    <stop offset="0%" stop-color="#69a9ff" />
                     <stop offset="100%" stop-color="#0D9488" />
                   </linearGradient>
                 </defs>
@@ -967,9 +967,9 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
 }
 
 .quick-tag-btn:hover {
-  background: rgba(79, 70, 229, 0.08);
-  border-color: rgba(79, 70, 229, 0.3);
-  color: #4F46E5;
+  background: rgba(105, 169, 255, 0.08);
+  border-color: rgba(105, 169, 255, 0.3);
+  color: var(--wl-primary);
   transform: translateY(-0.5px);
 }
 
@@ -1012,7 +1012,7 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
 .telemetry-sla {
   font-size: 11px;
   font-weight: 700;
-  color: #059669;
+  color: var(--wl-success);
   background: rgba(16, 185, 129, 0.1);
   padding: 0.18rem 0.55rem;
   border-radius: 9999px;
@@ -1039,7 +1039,7 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
   fill: var(--wl-surface);
   stroke: var(--wl-primary);
   stroke-width: 2;
-  box-shadow: 0 0 10px rgba(79, 70, 229, 0.4);
+  box-shadow: 0 0 10px rgba(105, 169, 255, 0.4);
 }
 
 .node-center-inner {
@@ -1082,7 +1082,7 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
 }
 
 .sat-node--teal .sat-circle { stroke: var(--wl-primary); }
-.sat-node--indigo .sat-circle { stroke: #6366F1; }
+.sat-node--indigo .sat-circle { stroke: #69a9ff; }
 .sat-node--amber .sat-circle { stroke: #F59E0B; }
 .sat-node--emerald .sat-circle { stroke: #10B981; }
 
@@ -1156,7 +1156,7 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
 
 .help-card:hover {
   transform: translateY(-3px);
-  border-color: rgba(79, 70, 229, 0.3);
+  border-color: rgba(105, 169, 255, 0.3);
   box-shadow: var(--shadow-md);
 }
 
@@ -1311,8 +1311,8 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
 .pill--active {
   background: var(--wl-primary) !important;
   border-color: var(--wl-primary) !important;
-  color: #ffffff !important;
-  box-shadow: 0 2px 8px -2px rgba(79, 70, 229, 0.4);
+  color: var(--wl-ink-strong) !important;
+  box-shadow: 0 2px 8px -2px rgba(105, 169, 255, 0.4);
 }
 
 .pill-img {
@@ -1331,7 +1331,7 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
 
 .pill--active .pill__count {
   background: rgba(255, 255, 255, 0.25);
-  color: #ffffff;
+  color: var(--wl-on-primary);
 }
 
 /* Article Grid */
@@ -1642,7 +1642,7 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
   padding: 0.6rem 1.15rem;
   border-radius: 9999px;
   background: var(--wl-primary-soft);
-  border: 1px solid rgba(79, 70, 229, 0.22);
+  border: 1px solid rgba(105, 169, 255, 0.22);
   color: var(--wl-primary);
   font-size: 0.84rem;
   font-weight: 700;
@@ -1652,7 +1652,7 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
 
 .my-tickets-badge-link:hover {
   background: var(--wl-primary);
-  color: #fff;
+  color: var(--wl-on-primary);
   transform: translateY(-1px);
 }
 
@@ -1661,7 +1661,7 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
   border-radius: 9999px;
   font-size: 0.72rem;
   background: var(--wl-primary);
-  color: #fff;
+  color: var(--wl-on-primary);
   font-weight: 800;
   transition: all 0.2s ease;
 }
@@ -1758,8 +1758,8 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
 }
 
 .channel-icon--phone {
-  background: rgba(99, 102, 241, 0.12);
-  color: #6366F1;
+  background: rgba(105, 169, 255, 0.12);
+  color: var(--wl-accent);
 }
 
 .channel-info {
@@ -1889,7 +1889,7 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
   font-size: 0.92rem;
   background: var(--wl-surface);
   color: var(--wl-ink-strong);
-  font-family: inherit;
+  font-family: var(--wl-font-body);
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
   min-height: 48px;
@@ -1944,7 +1944,7 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
   width: 18px;
   height: 18px;
   border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: #fff;
+  border-top-color: var(--wl-on-primary);
   border-radius: 50%;
   animation: ticket-spin 0.8s linear infinite;
 }
@@ -2025,8 +2025,8 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
   width: 52px;
   height: 52px;
   border-radius: 14px;
-  background: rgba(79, 70, 229, 0.08);
-  color: #4F46E5;
+  background: rgba(105, 169, 255, 0.08);
+  color: var(--wl-primary);
   display: grid;
   place-items: center;
   font-size: 26px;
@@ -2120,3 +2120,4 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
   }
 }
 </style>
+

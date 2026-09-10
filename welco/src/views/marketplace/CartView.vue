@@ -70,19 +70,22 @@ onMounted(async () => {
   try { await refreshConversions() } catch { }
   try {
     await services.locationService.loadCountries().catch(() => {})
-    await companyService.loadMyCompany().catch(() => {})
-    const cid = companyService.myCompany.value?.id
-    if (cid) {
-      await companyService.loadCompanyAddresses(cid).catch(() => {})
-      const addrs = companyService.companyAddresses.value as unknown as { countryId: string }[]
-      const countries = locationService.countries.value as unknown as { id: string; code?: string | null; nameEn?: string | null; nameAr?: string | null }[]
-      const distinct = distinctCurrenciesFromAddresses(addrs, countries)
-      addressCurrencies.value = distinct
-      if (distinct.length > 0) {
-        const current = targetCurrency.value.toUpperCase()
-        if (!distinct.includes(current)) {
-          const preferred = distinct[0] as string
-          if (preferred) setTargetCurrency(preferred)
+    // /companies/my requires auth — skip for guests to avoid a 401.
+    if (authService.isAuthenticated) {
+      await companyService.loadMyCompany().catch(() => {})
+      const cid = companyService.myCompany.value?.id
+      if (cid) {
+        await companyService.loadCompanyAddresses(cid).catch(() => {})
+        const addrs = companyService.companyAddresses.value as unknown as { countryId: string }[]
+        const countries = locationService.countries.value as unknown as { id: string; code?: string | null; nameEn?: string | null; nameAr?: string | null }[]
+        const distinct = distinctCurrenciesFromAddresses(addrs, countries)
+        addressCurrencies.value = distinct
+        if (distinct.length > 0) {
+          const current = targetCurrency.value.toUpperCase()
+          if (!distinct.includes(current)) {
+            const preferred = distinct[0] as string
+            if (preferred) setTargetCurrency(preferred)
+          }
         }
       }
     }
@@ -738,7 +741,7 @@ const submitRfq = async () => {
 }
 
 .text-danger {
-  color: #DC2626 !important;
+  color: var(--wl-danger) !important;
 }
 
 /* Layout */
@@ -763,7 +766,7 @@ const submitRfq = async () => {
   border: 1px solid var(--wl-border);
   border-radius: var(--wl-radius-card, 16px);
   padding: 1.25rem 1.5rem;
-  box-shadow: var(--wl-shadow-card, 0 1px 3px rgba(15, 23, 42, 0.05));
+  box-shadow: var(--wl-shadow-card, 0 1px 3px rgba(0, 10, 25, 0.05));
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -792,9 +795,9 @@ const submitRfq = async () => {
   gap: 0.4rem;
   font-size: 10px;
   font-weight: 700;
-  color: #047857;
-  background: #ECFDF5;
-  border: 1px solid #A7F3D0;
+  color: var(--wl-success);
+  background: var(--wl-success-soft);
+  border: 1px solid rgba(87, 242, 135, 0.35);
   padding: 0.18rem 0.55rem;
   border-radius: 9999px;
   letter-spacing: 0.04em;
@@ -815,7 +818,7 @@ const submitRfq = async () => {
   gap: 0.3rem;
   font-size: 10.5px;
   font-weight: 700;
-  color: var(--wl-primary, #4F46E5);
+  color: var(--wl-primary, #69a9ff);
   background: var(--wl-primary-soft);
   border: 1px solid rgba(var(--wl-primary-rgb), 0.3);
   padding: 0.18rem 0.55rem;
@@ -831,7 +834,7 @@ const submitRfq = async () => {
 .active-flag {
   font-size: 32px;
   line-height: 1;
-  filter: drop-shadow(0 1px 2px rgba(15, 23, 42, 0.1));
+  filter: drop-shadow(0 1px 2px rgba(0, 10, 25, 0.1));
 }
 
 .active-titles {
@@ -857,7 +860,7 @@ const submitRfq = async () => {
 .active-symbol-badge {
   font-size: 12px;
   font-weight: 800;
-  color: var(--wl-primary, #4F46E5);
+  color: var(--wl-primary, #69a9ff);
   background: var(--wl-primary-soft);
   border: 1px solid rgba(var(--wl-primary-rgb), 0.3);
   padding: 0.1rem 0.45rem;
@@ -926,7 +929,7 @@ const submitRfq = async () => {
 }
 
 .btn-refresh-rates:hover:not(:disabled) {
-  color: var(--wl-primary, #4F46E5);
+  color: var(--wl-primary, #69a9ff);
   background: var(--wl-primary-soft);
 }
 
@@ -966,29 +969,29 @@ const submitRfq = async () => {
   color: var(--wl-ink-strong, #0F172A);
   cursor: pointer;
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  box-shadow: var(--shadow-xs);
 }
 
 .curr-pill:hover {
-  border-color: var(--wl-primary, #4F46E5);
-  color: var(--wl-primary, #4F46E5);
+  border-color: var(--wl-primary, #69a9ff);
+  color: var(--wl-primary, #69a9ff);
   transform: translateY(-1px);
 }
 
 .curr-pill.is-active {
-  background: var(--wl-primary, #4F46E5);
-  border-color: var(--wl-primary, #4F46E5);
-  color: #FFFFFF;
-  box-shadow: 0 3px 10px rgba(79, 70, 229, 0.3);
+  background: var(--wl-primary, #69a9ff);
+  border-color: var(--wl-primary, #69a9ff);
+  color: var(--wl-on-primary);
+  box-shadow: 0 3px 10px rgba(105, 169, 255, 0.3);
 }
 
 .curr-pill.is-active .pill-sym {
   background: rgba(255, 255, 255, 0.22);
-  color: #FFFFFF;
+  color: var(--wl-on-primary);
 }
 
 .curr-pill.is-active .check-icon {
-  color: #FFFFFF;
+  color: var(--wl-on-primary);
 }
 
 .pill-flag {
@@ -1020,8 +1023,8 @@ const submitRfq = async () => {
 .curr-pill--more:hover,
 .curr-pill--more.is-open {
   border-style: solid;
-  border-color: var(--wl-primary, #4F46E5);
-  color: var(--wl-primary, #4F46E5);
+  border-color: var(--wl-primary, #69a9ff);
+  color: var(--wl-primary, #69a9ff);
   background: var(--wl-primary-soft);
 }
 
@@ -1047,7 +1050,7 @@ const submitRfq = async () => {
   background: var(--wl-surface);
   border: 1px solid var(--wl-border, #E2E8F0);
   border-radius: 12px;
-  box-shadow: 0 14px 36px -4px rgba(15, 23, 42, 0.15), 0 4px 12px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 14px 36px -4px rgba(0, 10, 25, 0.15), 0 4px 12px rgba(0, 10, 25, 0.08);
   padding: 0.75rem;
   display: flex;
   flex-direction: column;
@@ -1092,8 +1095,8 @@ const submitRfq = async () => {
 
 .popover-search-input:focus {
   background: var(--wl-surface);
-  border-color: var(--wl-primary, #4F46E5);
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  border-color: var(--wl-primary, #69a9ff);
+  box-shadow: 0 0 0 3px rgba(105, 169, 255, 0.1);
 }
 
 .clear-search-btn {
@@ -1121,7 +1124,7 @@ const submitRfq = async () => {
   width: 5px;
 }
 .popover-items-list::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
+  background: var(--wl-surface-hover);
   border-radius: 4px;
 }
 
@@ -1180,7 +1183,7 @@ const submitRfq = async () => {
 .p-addr-badge {
   font-size: 9.5px;
   font-weight: 700;
-  color: var(--wl-primary, #4F46E5);
+  color: var(--wl-primary, #69a9ff);
 }
 
 .p-line-2 {
@@ -1203,7 +1206,7 @@ const submitRfq = async () => {
 .p-sym-badge {
   font-size: 11px;
   font-weight: 700;
-  color: var(--wl-primary, #4F46E5);
+  color: var(--wl-primary, #69a9ff);
   background: var(--wl-primary-soft);
   padding: 0.15rem 0.35rem;
   border-radius: 5px;
@@ -1440,7 +1443,7 @@ const submitRfq = async () => {
 .line-remove-btn:hover {
   background: rgba(220, 38, 38, 0.08);
   border-color: rgba(220, 38, 38, 0.3);
-  color: #DC2626;
+  color: var(--wl-danger);
 }
 
 /* Summary Column */
@@ -1619,3 +1622,4 @@ const submitRfq = async () => {
   }
 }
 </style>
+

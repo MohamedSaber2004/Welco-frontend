@@ -1054,7 +1054,7 @@ const resolvedDescription = computed(() => {
 
 .pdp-new-pill {
   background: var(--wl-primary);
-  color: #ffffff;
+  color: var(--wl-on-primary);
   padding: 0.2rem 0.55rem;
   border-radius: 999px;
   font-size: 0.68rem;
@@ -1064,7 +1064,7 @@ const resolvedDescription = computed(() => {
 
 .pdp-featured-pill {
   background: var(--wl-warning);
-  color: #ffffff;
+  color: var(--wl-on-primary);
   padding: 0.2rem 0.55rem;
   border-radius: 999px;
   font-size: 0.68rem;
@@ -1073,7 +1073,7 @@ const resolvedDescription = computed(() => {
 
 .pdp-ce-pill {
   background: rgba(16, 185, 129, 0.14);
-  color: #059669;
+  color: var(--wl-success);
   border: 1px solid rgba(16, 185, 129, 0.25);
   padding: 0.2rem 0.55rem;
   border-radius: 999px;
@@ -1158,10 +1158,10 @@ const resolvedDescription = computed(() => {
   align-items: center;
   gap: 0.35rem;
   padding: 0.45rem 0.85rem;
-  background: rgba(15, 23, 42, 0.75);
+  background: rgba(0, 10, 25, 0.75);
   backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #ffffff;
+  color: var(--wl-ink-strong);
   border-radius: 999px;
   font-size: 0.72rem;
   font-weight: 600;
@@ -1196,7 +1196,7 @@ const resolvedDescription = computed(() => {
   font-size: 1.35rem;
   font-weight: 800;
   letter-spacing: 0.08em;
-  color: #ffffff;
+  color: var(--wl-ink-strong);
 }
 
 .pdp-schematic-caliper {
@@ -1402,17 +1402,17 @@ const resolvedDescription = computed(() => {
 
 .stock-badge--in {
   background: #059669;
-  color: #fff;
+  color: var(--wl-on-primary);
 }
 
 .stock-badge--low {
   background: #D97706;
-  color: #fff;
+  color: var(--wl-on-primary);
 }
 
 .stock-badge--out {
   background: #DC2626;
-  color: #fff;
+  color: var(--wl-on-primary);
 }
 
 .live-dot {
@@ -1544,7 +1544,7 @@ const resolvedDescription = computed(() => {
   justify-content: center;
   gap: 0.55rem;
   background: var(--wl-primary);
-  color: #ffffff;
+  color: var(--wl-on-primary);
   border: none;
   border-radius: 12px;
   font-weight: 700;
@@ -1552,14 +1552,14 @@ const resolvedDescription = computed(() => {
   padding: 0 1.25rem;
   cursor: pointer;
   transition: all 0.18s var(--wl-ease-spring);
-  box-shadow: 0 4px 14px -2px rgba(79, 70, 229, 0.35);
+  box-shadow: 0 4px 14px -2px rgba(105, 169, 255, 0.35);
   white-space: nowrap;
 }
 
 .btn-primary-cta:hover:not(:disabled) {
   background: var(--wl-primary-hover);
   transform: translateY(-1px);
-  box-shadow: 0 6px 18px -2px rgba(79, 70, 229, 0.45);
+  box-shadow: 0 6px 18px -2px rgba(105, 169, 255, 0.45);
 }
 
 .btn-primary-cta:active:not(:disabled) {
@@ -1629,11 +1629,11 @@ const resolvedDescription = computed(() => {
 }
 
 .tert-link--wa {
-  color: #059669;
+  color: var(--wl-success);
 }
 .tert-link--wa:hover {
-  color: #047857;
-  border-color: #059669;
+  color: var(--wl-success);
+  border-color: var(--wl-success);
   background: rgba(16, 185, 129, 0.1);
 }
 
@@ -1796,7 +1796,7 @@ const resolvedDescription = computed(() => {
 }
 
 .video-thumb {
-  background: #0f172a;
+  background: var(--wl-surface-hover);
   aspect-ratio: 16/9;
   display: grid;
   place-items: center;
@@ -1825,7 +1825,7 @@ const resolvedDescription = computed(() => {
 }
 
 .video-card:hover .video-thumb__overlay {
-  background: radial-gradient(circle, rgba(79, 70, 229, 0.3) 0%, rgba(0, 0, 0, 0.7) 100%);
+  background: radial-gradient(circle, rgba(105, 169, 255, 0.3) 0%, rgba(0, 0, 0, 0.7) 100%);
 }
 
 .video-play {
@@ -1835,7 +1835,7 @@ const resolvedDescription = computed(() => {
   background: rgba(255, 255, 255, 0.25);
   backdrop-filter: blur(6px);
   border: 1.5px solid rgba(255, 255, 255, 0.7);
-  color: #ffffff;
+  color: var(--wl-ink-strong);
   display: grid;
   place-items: center;
   transition: all 0.18s var(--wl-ease-spring);
@@ -1938,7 +1938,7 @@ const resolvedDescription = computed(() => {
   border-radius: var(--radius-sm);
   color: var(--wl-ink-strong);
   outline: none;
-  font-family: inherit;
+  font-family: var(--wl-font-body);
   transition: border-color 0.16s ease;
 }
 
@@ -1963,14 +1963,14 @@ const resolvedDescription = computed(() => {
   justify-content: center;
   gap: 0.5rem;
   background: var(--wl-primary);
-  color: #ffffff;
+  color: var(--wl-on-primary);
   border: none;
   border-radius: var(--radius-sm);
   font-size: 0.88rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.18s ease;
-  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
+  box-shadow: 0 2px 8px rgba(105, 169, 255, 0.3);
 }
 
 .btn-inquiry-submit:hover:not(:disabled) {
@@ -2295,3 +2295,4 @@ const resolvedDescription = computed(() => {
   border-bottom-color: var(--wl-primary);
 }
 </style>
+

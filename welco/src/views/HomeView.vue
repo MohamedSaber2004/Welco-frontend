@@ -532,9 +532,9 @@ const navigateToOemFromModal = () => {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(700px 350px at 70% 20%, rgba(79,70,229,0.06), transparent 60%),
-              linear-gradient(rgba(15,23,42,0.02) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(15,23,42,0.02) 1px, transparent 1px);
+  background: radial-gradient(700px 350px at 70% 20%, rgba(105, 169, 255, 0.06), transparent 60%),
+              linear-gradient(rgba(0, 10, 25, 0.02) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(0, 10, 25, 0.02) 1px, transparent 1px);
   background-size: auto, 24px 24px, 24px 24px;
   pointer-events: none;
 }
@@ -575,7 +575,7 @@ const navigateToOemFromModal = () => {
 
 .hero__eyebrow {
   font-size: 10.5px;
-  color: #4F46E5;
+  color: var(--wl-primary);
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -632,7 +632,11 @@ const navigateToOemFromModal = () => {
 
 .hero h1 em {
   font-style: normal;
-  color: var(--wl-primary);
+  background: var(--wl-gradient-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 10px rgba(233, 168, 37, 0.28)) drop-shadow(0 1px 0 rgba(6, 19, 40, 0.9));
 }
 
 .hero p {
@@ -698,7 +702,7 @@ const navigateToOemFromModal = () => {
 
 .hero__search-btn {
   background: var(--wl-primary);
-  color: #fff;
+  color: var(--wl-on-primary);
   border: none;
   padding: 0 1.25rem;
   height: 38px;
@@ -706,7 +710,7 @@ const navigateToOemFromModal = () => {
   font-weight: 700;
   font-size: 13px;
   cursor: pointer;
-  box-shadow: 0 2px 8px -2px rgba(79, 70, 229, 0.35);
+  box-shadow: 0 2px 8px -2px rgba(105, 169, 255, 0.35);
   transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
 }
 
@@ -900,7 +904,7 @@ const navigateToOemFromModal = () => {
 
 /* Our Providers Section */
 .section--providers {
-  background: var(--wl-surface-soft, #383A40);
+  background: var(--wl-surface-soft, #0B274F);
   border-bottom: 1px solid var(--wl-border, #e2e8f0);
   padding: 3rem 0;
 }
@@ -919,7 +923,7 @@ const navigateToOemFromModal = () => {
 }
 
 .provider-tile {
-  background: var(--wl-surface, #2B2D31);
+  background: var(--wl-surface, #071A38);
   border: 1px solid var(--wl-border, #e2e8f0);
   border-radius: var(--wl-radius-lg, 12px);
   overflow: hidden;
@@ -937,8 +941,8 @@ const navigateToOemFromModal = () => {
 
 .provider-tile__logo {
   height: 110px;
-  background: linear-gradient(180deg, var(--wl-surface-soft, #383A40) 0%, var(--wl-surface, #2B2D31) 100%);
-  border-bottom: 1px solid var(--wl-border, #f1f5f9);
+  background: linear-gradient(180deg, var(--wl-surface-soft, #0B274F) 0%, var(--wl-surface, #071A38) 100%);
+  border-bottom: 1px solid var(--wl-border);
   padding: 0.85rem;
   display: flex;
   align-items: center;
@@ -964,9 +968,9 @@ const navigateToOemFromModal = () => {
   gap: 0.25rem;
   font-size: 0.65rem;
   font-weight: 700;
-  color: #047857;
-  background: #ecfdf5;
-  border: 1px solid #a7f3d0;
+  color: var(--wl-success);
+  background: var(--wl-success-soft);
+  border: 1px solid rgba(87, 242, 135, 0.35);
   padding: 0.15rem 0.45rem;
   border-radius: 9999px;
   letter-spacing: 0.02em;
@@ -975,7 +979,7 @@ const navigateToOemFromModal = () => {
 .provider-tile__name {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--wl-text, #0f172a);
+  color: var(--wl-ink-strong);
   margin: 0;
   line-height: 1.35;
   display: -webkit-box;
@@ -1027,7 +1031,7 @@ const navigateToOemFromModal = () => {
 .home-cert-card:hover {
   transform: translateY(-3px);
   border-color: var(--wl-primary);
-  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+  box-shadow: 0 8px 20px rgba(0, 10, 25, 0.06);
 }
 
 .home-cert-card__media {
@@ -1073,11 +1077,12 @@ const navigateToOemFromModal = () => {
 
 .section__eyebrow {
   font-size: 10.5px;
-  color: #4F46E5;
+  color: var(--wl-gold);
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   margin-bottom: 0.25rem;
+  text-shadow: var(--wl-gold-text-shadow);
 }
 
 .section-title {
@@ -1085,7 +1090,8 @@ const navigateToOemFromModal = () => {
   font-size: 1.6rem;
   font-weight: 800;
   letter-spacing: -0.02em;
-  color: var(--wl-ink-strong);
+  color: var(--wl-gold-text);
+  text-shadow: var(--wl-gold-text-shadow);
   margin: 0;
 }
 
@@ -1141,10 +1147,10 @@ const navigateToOemFromModal = () => {
   width: 100%;
 }
 
-.badge--indigo { background: rgba(79,70,229,0.08); color: #4F46E5; }
-.bar--indigo { background: #4F46E5; }
+.badge--indigo { background: var(--wl-primary-soft); color: var(--wl-primary); }
+.bar--indigo { background: var(--wl-primary); }
 
-.badge--emerald { background: rgba(16,185,129,0.08); color: #059669; }
+.badge--emerald { background: var(--wl-success-soft); color: var(--wl-success); }
 .bar--emerald { background: #10B981; }
 
 .badge--teal { background: var(--wl-primary-soft); color: var(--wl-primary); }
@@ -1175,7 +1181,7 @@ const navigateToOemFromModal = () => {
 
 .cat-card:hover {
   transform: translateY(-2px);
-  border-color: rgba(79, 70, 229, 0.3);
+  border-color: rgba(105, 169, 255, 0.3);
   box-shadow: var(--shadow-sm);
 }
 
@@ -1244,7 +1250,7 @@ const navigateToOemFromModal = () => {
 
 .product-card:hover {
   transform: translateY(-2px);
-  border-color: rgba(79, 70, 229, 0.3);
+  border-color: rgba(105, 169, 255, 0.3);
   box-shadow: var(--shadow-md);
 }
 
@@ -1275,7 +1281,7 @@ const navigateToOemFromModal = () => {
   font-size: 9.5px;
   font-weight: 800;
   background: var(--wl-primary);
-  color: #fff;
+  color: var(--wl-on-primary);
   padding: 0.15rem 0.5rem;
   border-radius: 9999px;
 }
@@ -1288,11 +1294,11 @@ const navigateToOemFromModal = () => {
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #fff;
+  color: var(--wl-on-primary);
   padding: 0.2rem 0.6rem;
   border-radius: 9999px;
   border: 1px solid rgba(255, 255, 255, 0.65);
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.25);
+  box-shadow: 0 2px 8px rgba(0, 10, 25, 0.25);
 }
 
 .product-card__stock--in {
@@ -1331,7 +1337,7 @@ const navigateToOemFromModal = () => {
 
 .product-card__meta {
   font-size: 11px;
-  color: #059669;
+  color: var(--wl-success);
   font-weight: 600;
   margin: 0.2rem 0 0.85rem;
 }
@@ -1468,7 +1474,7 @@ const navigateToOemFromModal = () => {
 /* Institutional Quote Modal Styles */
 .quote-modal-desc {
   font-size: 13.5px;
-  color: var(--wl-ink-muted, #64748B);
+  color: var(--wl-muted);
   line-height: 1.5;
   margin: 0 0 1.25rem;
 }
@@ -1492,7 +1498,7 @@ const navigateToOemFromModal = () => {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: var(--wl-ink-muted, #475569);
+  color: var(--wl-ink-soft);
   text-align: start;
 }
 
@@ -1500,7 +1506,7 @@ const navigateToOemFromModal = () => {
 .modal-sel,
 .modal-txt {
   width: 100%;
-  background: var(--wl-surface-soft, #383A40);
+  background: var(--wl-surface-soft, #0B274F);
   border: 1.5px solid var(--wl-border, #E2E8F0);
   border-radius: 9px;
   color: var(--wl-ink-strong, #0F172A);
@@ -1529,7 +1535,7 @@ const navigateToOemFromModal = () => {
   align-items: center;
   justify-content: space-between;
   background: var(--wl-primary-soft);
-  border: 1px dashed rgba(79, 70, 229, 0.3);
+  border: 1px dashed rgba(105, 169, 255, 0.3);
   border-radius: 8px;
   padding: 0.6rem 0.85rem;
   font-size: 11.5px;
@@ -1684,7 +1690,7 @@ const navigateToOemFromModal = () => {
   inset-inline-start: 1rem;
   bottom: 1rem;
   background: rgba(11, 29, 42, 0.85);
-  color: #fff;
+  color: var(--wl-ink-strong);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.06em;

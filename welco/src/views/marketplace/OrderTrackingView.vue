@@ -172,21 +172,21 @@ async function track() {
   align-items: center;
   gap: 0.45rem;
   font-size: 11px;
-  color: #64748B;
+  color: var(--wl-muted);
 }
 
 .crumb-bar a {
-  color: #64748B;
+  color: var(--wl-muted);
   text-decoration: none;
   transition: color 0.15s ease;
 }
 
 .crumb-bar a:hover {
-  color: #4F46E5;
+  color: var(--wl-primary);
 }
 
 .crumb-sep {
-  color: #CBD5E1;
+  color: var(--wl-muted-soft);
 }
 
 .crumb-active {
@@ -220,7 +220,7 @@ async function track() {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #4F46E5;
+  background: var(--wl-primary);
 }
 
 .head-title {
@@ -235,7 +235,7 @@ async function track() {
 
 .head-subtitle {
   font-size: 13.5px;
-  color: #64748B;
+  color: var(--wl-muted);
   margin: 0.25rem 0 0;
 }
 
@@ -245,7 +245,7 @@ async function track() {
   border: 1px solid var(--wl-border);
   border-radius: 16px;
   padding: 1.25rem;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  box-shadow: var(--shadow-xs);
 }
 
 .track-form {
@@ -267,7 +267,7 @@ async function track() {
   top: 50%;
   transform: translateY(-50%);
   font-size: 20px;
-  color: #94A3B8;
+  color: var(--wl-muted-soft);
   pointer-events: none;
 }
 
@@ -287,8 +287,8 @@ async function track() {
 
 .vip-track-input:focus {
   background: var(--wl-surface);
-  border-color: #4F46E5;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+  border-color: var(--wl-primary);
+  box-shadow: 0 0 0 3px rgba(105, 169, 255, 0.12);
 }
 
 .btn-track-submit {
@@ -297,19 +297,19 @@ async function track() {
   gap: 0.4rem;
   height: 48px;
   padding: 0 1.5rem;
-  background: #4F46E5;
-  color: #FFFFFF;
+  background: var(--wl-primary);
+  color: var(--wl-on-primary);
   border: none;
   border-radius: 10px;
   font-size: 13.5px;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 4px 12px -2px rgba(79, 70, 229, 0.35);
+  box-shadow: 0 4px 12px -2px rgba(105, 169, 255, 0.35);
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .btn-track-submit:hover:not(:disabled) {
-  background: #4338CA;
+  background: var(--wl-primary-hover);
   transform: translateY(-1px);
 }
 
@@ -334,15 +334,15 @@ async function track() {
   border-radius: 16px;
   padding: 3.5rem 1.5rem;
   text-align: center;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  box-shadow: var(--shadow-xs);
 }
 
 .not-found-circle {
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  background: #FFF1F2;
-  color: #E11D48;
+  background: var(--wl-danger-soft);
+  color: var(--wl-danger);
   display: grid;
   place-items: center;
   margin: 0 auto 1rem;
@@ -357,7 +357,7 @@ async function track() {
 
 .not-found-desc {
   font-size: 13.5px;
-  color: #64748B;
+  color: var(--wl-muted);
   margin: 0;
 }
 
@@ -373,7 +373,7 @@ async function track() {
   border: 1px solid var(--wl-border);
   border-radius: 16px;
   padding: 1.5rem;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  box-shadow: var(--shadow-xs);
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -389,7 +389,7 @@ async function track() {
 .ref-label {
   font-size: 10px;
   font-weight: 700;
-  color: #64748B;
+  color: var(--wl-muted);
   letter-spacing: 0.06em;
 }
 
@@ -402,7 +402,7 @@ async function track() {
 
 .order-date-text {
   font-size: 11.5px;
-  color: #94A3B8;
+  color: var(--wl-muted-soft);
 }
 
 .stepper-zone {
@@ -414,13 +414,13 @@ async function track() {
   justify-content: space-between;
   align-items: center;
   padding-top: 1rem;
-  border-top: 1px solid #F1F5F9;
+  border-top: 1px solid var(--wl-border);
 }
 
 .foot-label {
   font-size: 11px;
   font-weight: 700;
-  color: #64748B;
+  color: var(--wl-muted);
   text-transform: uppercase;
 }
 
@@ -435,7 +435,7 @@ async function track() {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  border-bottom: 1px solid #F1F5F9;
+  border-bottom: 1px solid var(--wl-border);
   padding-bottom: 0.75rem;
 }
 
@@ -448,7 +448,7 @@ async function track() {
 
 .items-count {
   font-size: 11px;
-  color: #64748B;
+  color: var(--wl-muted);
 }
 
 .line-items-stack {
@@ -477,13 +477,13 @@ async function track() {
   align-items: center;
   gap: 1rem;
   font-size: 12px;
-  color: #64748B;
+  color: var(--wl-muted);
 }
 
 .view-link-btn {
   background: transparent;
   border: none;
-  color: #4F46E5;
+  color: var(--wl-primary);
   font-weight: 700;
   cursor: pointer;
   padding: 0;
@@ -517,7 +517,7 @@ async function track() {
 }
 
 .btn-action-ghost:hover {
-  border-color: #4F46E5;
+  border-color: var(--wl-primary);
   color: var(--wl-primary);
   background: var(--wl-primary-soft);
 }
@@ -578,3 +578,4 @@ async function track() {
   }
 }
 </style>
+

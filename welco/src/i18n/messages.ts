@@ -17,6 +17,7 @@ export type Messages = {
     delete: string
     edit: string
     add: string
+    reset: string
     searchPlaceholder: string
     noData: string
     next: string
@@ -331,6 +332,8 @@ export type Messages = {
     registerStep2Title: string
     registerStep2Subtitle: string
     errCompanyRequired: string
+    companyType: string
+    errCompanyTypeRequired: string
     errCountryRequired: string
     errVolumeRequired: string
     errWebsiteInvalid: string
@@ -412,7 +415,6 @@ export type Messages = {
     companyEmail: string
     companyType: string
     companyCountry: string
-    companyTier: string
     companyStatus: string
     companyAddresses: string
     companyCreated: string
@@ -544,16 +546,16 @@ export type Messages = {
     issueQuote: string
     manageSales: string
     companyType: string
-    tierLevel: string
     openRfqs: string
     distributorApps: string
+    oemInquiries: string
+    oemInquiryDeleted: string
     pendingAppsCount: string
     approveApplication: string
     rejectApplication: string
     approveSuccess: string
     approvedSuccessfully: string
     rejectSuccess: string
-    selectTier: string
     noApplications: string
     emptyApplicationsDesc: string
     applicant: string
@@ -605,6 +607,7 @@ export type Messages = {
     uploadVideo: string
     orVideoUrl: string
     noVideos: string
+    removeVideo: string
     videoUploaded: string
     videoReadyToAttach: string
     videoSyncFailed: string
@@ -907,7 +910,7 @@ export type Messages = {
     editCompany: string
     companyName: string
     companyEmail: string
-    companyTier: string
+    companyImage: string
     companyDetails: string
     deleteCompanyConfirm: string
     companyCreated: string
@@ -1156,7 +1159,6 @@ export type Messages = {
     isoDossier: string
     verifiedBuyer: string
     verifiedPartner: string
-    tierLevel: string
     pipelineEyebrow: string
     pipelineTitle: string
     activeLifecycle: string
@@ -1621,10 +1623,8 @@ export type Messages = {
     providerCount: string
     noProvidersFound: string
     viewProducts: string
-    tier: string
     hospital: string
     distributor: string
     clinic: string
-    importer: string
   }
 }

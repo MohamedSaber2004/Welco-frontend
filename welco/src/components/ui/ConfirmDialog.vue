@@ -106,7 +106,7 @@ const variantClass = computed(() => `confirm__icon--${opts.value?.variant ?? 'da
 .confirm-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.6);
+  background: rgba(0, 10, 25, 0.6);
   backdrop-filter: blur(14px) saturate(1.15);
   -webkit-backdrop-filter: blur(14px) saturate(1.15);
   display: grid;
@@ -124,7 +124,7 @@ const variantClass = computed(() => `confirm__icon--${opts.value?.variant ?? 'da
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
   border-radius: var(--radius-xl);
-  box-shadow: 0 24px 64px rgba(15, 23, 42, 0.22), 0 8px 24px rgba(15, 23, 42, 0.14);
+  box-shadow: var(--shadow-xl);
   position: relative;
   overflow: hidden;
   display: flex;

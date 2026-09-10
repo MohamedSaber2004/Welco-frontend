@@ -1,7 +1,6 @@
 import type { PaginatedResult } from '../models/location'
 import type {
   CreateOrderPayload,
-  InvoiceDto,
   OrderDto,
 } from '../models/commerce'
 
@@ -18,5 +17,4 @@ export interface CommerceRepository {
   createOrder(payload: CreateOrderPayload): Promise<OrderDto>
   trackOrder(orderNumber: string): Promise<OrderDto>
   updateOrderStatus(id: string, status: string): Promise<string>
-  getInvoices(orderId: string): Promise<InvoiceDto[]>
 }

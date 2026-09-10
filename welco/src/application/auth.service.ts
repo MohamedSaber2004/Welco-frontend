@@ -380,6 +380,11 @@ export class AuthService {
       this.session.user = user
       this.tokenStore.saveSession(this.session)
     }
+    // Skip replacement when nothing changed: every replacement notifies all
+    // `user` watchers app-wide, and any watcher that writes back (e.g. theme
+    // persistence) would otherwise ping-pong into an infinite request loop.
+    const prev = this.user.value
+    if (prev && JSON.stringify(prev) === JSON.stringify(user)) return
     this.user.value = user
   }
 

@@ -480,10 +480,11 @@ onMounted(loadDashboard)
   align-items: center;
   gap: 0.5rem;
   font-size: 11px;
-  color: #4F46E5;
+  color: var(--wl-gold);
   font-weight: 700;
   letter-spacing: 0.08em;
   margin-bottom: 0.5rem;
+  text-shadow: var(--wl-gold-text-shadow);
 }
 
 .live-dot {
@@ -498,9 +499,13 @@ onMounted(loadDashboard)
   font-size: clamp(1.8rem, 3.2vw, 2.5rem);
   font-weight: 800;
   letter-spacing: -0.03em;
-  color: var(--wl-ink-strong);
   line-height: 1.1;
   margin: 0 0 0.5rem;
+  background: var(--wl-gradient-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 10px rgba(233, 168, 37, 0.28)) drop-shadow(0 1px 0 rgba(6, 19, 40, 0.9));
 }
 
 .org-desc {
@@ -523,7 +528,7 @@ onMounted(loadDashboard)
   border: 1px solid var(--wl-border);
   border-radius: 12px;
   padding: 1.15rem 1.4rem;
-  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+  box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
   gap: 0.85rem;
@@ -648,10 +653,11 @@ onMounted(loadDashboard)
       align-items: center;
       gap: 0.45rem;
       font-size: 10.5px;
-      color: #4F46E5;
+      color: var(--wl-gold);
       font-weight: 700;
       letter-spacing: 0.08em;
       margin-bottom: 0.25rem;
+      text-shadow: var(--wl-gold-text-shadow);
     }
 
     .pipeline-title {
@@ -659,7 +665,8 @@ onMounted(loadDashboard)
       font-size: 1.15rem;
       font-weight: 700;
       letter-spacing: -0.015em;
-      color: var(--wl-ink-strong);
+      color: var(--wl-gold-text);
+      text-shadow: var(--wl-gold-text-shadow);
       margin: 0;
     }
 
@@ -784,7 +791,7 @@ onMounted(loadDashboard)
       border: 1px solid var(--wl-border);
       border-radius: 14px;
       padding: 1.4rem;
-      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+      box-shadow: var(--shadow-xs);
       display: flex;
       flex-direction: column;
     }
@@ -804,14 +811,16 @@ onMounted(loadDashboard)
       font-size: 10px;
       font-weight: 700;
       letter-spacing: 0.08em;
-      color: #6366F1;
+      color: var(--wl-gold);
       margin-bottom: 0.2rem;
+      text-shadow: var(--wl-gold-text-shadow);
     }
 
     .card-title {
       font-size: 15px;
       font-weight: 700;
-      color: var(--wl-ink-strong);
+      color: var(--wl-gold-text);
+      text-shadow: var(--wl-gold-text-shadow);
       margin: 0;
     }
 
@@ -883,7 +892,7 @@ onMounted(loadDashboard)
       .quote-item:hover {
         background: var(--wl-surface);
         border-color: rgba(99, 102, 241, 0.4);
-        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+        box-shadow: var(--shadow-sm);
         transform: translateY(-1px);
       }
 
@@ -933,7 +942,7 @@ onMounted(loadDashboard)
       border: 1px solid var(--wl-border);
       border-radius: 14px;
       padding: 1.5rem 1.75rem;
-      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+      box-shadow: var(--shadow-xs);
     }
 
     .bento-head {

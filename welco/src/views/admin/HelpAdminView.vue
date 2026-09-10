@@ -11,7 +11,7 @@ import { toastService } from '../../infrastructure/feedback/toast.service'
 import { resolveFileUrl, isStoredFileName, PLACEHOLDER } from '../../utils/file-url'
 import type { FaqItemDto, HelpArticleDto, HelpCategoryDto } from '../../domain/models/content'
 
-const activeTab = ref<'categories' | 'articles' | 'faqs'>('categories')
+const activeTab = ref<'categories' | 'articles' | 'faqs' | 'contact'>('categories')
 const loading = ref(true)
 const pageSize = 10
 const categoryPage = ref(1)
@@ -80,8 +80,48 @@ const paginatedFaqs = computed(() => {
 })
 const faqTotalPages = computed(() => Math.max(1, Math.ceil(filteredFaqs.value.length / pageSize)))
 
+const contactForm = ref({ supportEmail: '', phoneNumber: '', whatsAppNumber: '', workingHours: '' })
+const contactLoading = ref(false)
+const contactError = ref('')
+const contactDirty = ref(false)
+
+const fillContactForm = () => {
+  const c = contentService.supportContact.value
+  contactForm.value = {
+    supportEmail: c.supportEmail ?? '',
+    phoneNumber: c.phoneNumber ?? '',
+    whatsAppNumber: c.whatsAppNumber ?? '',
+    workingHours: c.workingHours ?? '',
+  }
+  contactDirty.value = false
+}
+
+const saveContact = async () => {
+  contactError.value = ''
+  if (!contactForm.value.supportEmail.trim()) {
+    contactError.value = t('admin.supportEmailLabel')
+    return
+  }
+  contactLoading.value = true
+  try {
+    await contentService.updateSupportContact({
+      supportEmail: contactForm.value.supportEmail.trim(),
+      phoneNumber: contactForm.value.phoneNumber.trim(),
+      whatsAppNumber: contactForm.value.whatsAppNumber.trim(),
+      workingHours: contactForm.value.workingHours.trim() || undefined,
+    })
+    contactDirty.value = false
+    toastService.success(t('admin.supportChannelsSaveSuccess'))
+  } catch (e) {
+    contactError.value = e instanceof Error ? e.message : t('common.error')
+  } finally {
+    contactLoading.value = false
+  }
+}
+
 onMounted(async () => {
   await contentService.loadSupport()
+  fillContactForm()
   loading.value = false
 })
 
@@ -495,6 +535,16 @@ const closeFaqDetails = () => {
           <span>{{ t('help.faq') }}</span>
           <span class="tab-chip">{{ faqs.length }}</span>
         </button>
+
+        <button
+          type="button"
+          class="tab-btn mono"
+          :class="{ 'is-active': activeTab === 'contact' }"
+          @click="activeTab = 'contact'"
+        >
+          <span class="material-symbols-outlined text-[18px]">support_agent</span>
+          <span>{{ t('admin.supportChannels') }}</span>
+        </button>
       </div>
 
       <div v-if="loading" class="empty-tray-card mono">{{ t('common.loading') }}</div>
@@ -849,6 +899,79 @@ const closeFaqDetails = () => {
             />
           </div>
         </section>
+
+        <!-- TAB 4: SUPPORT CONTACT CHANNELS (public footer / help center data) -->
+        <section v-if="activeTab === 'contact'" class="tab-content-stack">
+          <div class="card contact-card">
+            <div class="contact-card__head">
+              <span class="material-symbols-outlined text-[20px]">support_agent</span>
+              <div>
+                <h2 class="contact-card__title">{{ t('admin.supportChannels') }}</h2>
+                <p class="contact-card__sub">{{ t('admin.supportChannelsSub') }}</p>
+              </div>
+            </div>
+            <form class="admin-modal-form" @submit.prevent="saveContact">
+              <div class="form-row two-cols">
+                <div class="form-field">
+                  <label class="field-label" for="contact-email">{{ t('admin.supportEmailLabel') }} *</label>
+                  <input
+                    id="contact-email"
+                    v-model="contactForm.supportEmail"
+                    type="email"
+                    dir="ltr"
+                    class="field-input mono"
+                    required
+                    @input="contactDirty = true"
+                  />
+                </div>
+                <div class="form-field">
+                  <label class="field-label" for="contact-phone">{{ t('admin.callUsPhoneLabel') }}</label>
+                  <input
+                    id="contact-phone"
+                    v-model="contactForm.phoneNumber"
+                    type="tel"
+                    dir="ltr"
+                    class="field-input mono"
+                    @input="contactDirty = true"
+                  />
+                </div>
+              </div>
+              <div class="form-row two-cols">
+                <div class="form-field">
+                  <label class="field-label" for="contact-whatsapp">{{ t('admin.whatsAppPhoneLabel') }}</label>
+                  <input
+                    id="contact-whatsapp"
+                    v-model="contactForm.whatsAppNumber"
+                    type="tel"
+                    dir="ltr"
+                    class="field-input mono"
+                    @input="contactDirty = true"
+                  />
+                </div>
+                <div class="form-field">
+                  <label class="field-label" for="contact-hours">{{ t('admin.workingHoursLabel') }}</label>
+                  <input
+                    id="contact-hours"
+                    v-model="contactForm.workingHours"
+                    type="text"
+                    class="field-input"
+                    :placeholder="t('admin.workingHoursPlaceholder')"
+                    @input="contactDirty = true"
+                  />
+                </div>
+              </div>
+              <p v-if="contactError" class="form-error" role="alert">{{ contactError }}</p>
+              <div class="modal-foot">
+                <BaseButton variant="secondary" type="button" @click="fillContactForm">
+                  {{ t('common.reset') }}
+                </BaseButton>
+                <BaseButton variant="primary" type="submit" :loading="contactLoading" :disabled="!contactDirty">
+                  {{ t('common.save') }}
+                </BaseButton>
+              </div>
+            </form>
+          </div>
+        </section>
       </template>
 
       <!-- Category Add / Edit Modal -->
@@ -1099,7 +1222,7 @@ const closeFaqDetails = () => {
   position: absolute;
   inset-inline-start: 0.75rem;
   font-size: 18px;
-  color: #94A3B8;
+  color: var(--wl-muted-soft);
   pointer-events: none;
 }
 
@@ -1117,8 +1240,8 @@ const closeFaqDetails = () => {
 }
 
 .search-input:focus {
-  border-color: #6366F1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+  border-color: #69a9ff;
+  box-shadow: 0 0 0 3px rgba(105, 169, 255, 0.12);
   background: var(--wl-surface);
 }
 
@@ -1128,14 +1251,14 @@ const closeFaqDetails = () => {
   background: none;
   border: none;
   cursor: pointer;
-  color: #94A3B8;
+  color: var(--wl-muted-soft);
   display: flex;
   align-items: center;
   padding: 0.2rem;
   border-radius: 4px;
 }
 
-.clear-btn:hover { color: #4F46E5; }
+.clear-btn:hover { color: var(--wl-primary); }
 
 .clear-filters-btn {
   display: inline-flex;
@@ -1147,13 +1270,13 @@ const closeFaqDetails = () => {
   border-radius: 10px;
   font-size: 12px;
   font-weight: 700;
-  color: #DC2626;
-  background: #FEF2F2;
+  color: var(--wl-danger);
+  background: var(--wl-danger-soft);
   cursor: pointer;
   transition: all 0.15s;
 }
 
-.clear-filters-btn:hover { background: #FEE2E2; }
+.clear-filters-btn:hover { background: rgba(242, 109, 109, 0.22); }
 
 .admin-head {
   display: flex;
@@ -1182,7 +1305,7 @@ const closeFaqDetails = () => {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #4F46E5;
+  background: var(--wl-primary);
 }
 
 .head-title {
@@ -1197,7 +1320,7 @@ const closeFaqDetails = () => {
 
 .head-subtitle {
   font-size: 13.5px;
-  color: #64748B;
+  color: var(--wl-muted);
   margin: 0.25rem 0 0;
 }
 
@@ -1229,8 +1352,8 @@ const closeFaqDetails = () => {
 }
 
 .tab-btn.is-active {
-  color: var(--wl-primary, #4F46E5);
-  border-bottom-color: var(--wl-primary, #4F46E5);
+  color: var(--wl-primary, #69a9ff);
+  border-bottom-color: var(--wl-primary, #69a9ff);
 }
 
 .tab-chip {
@@ -1264,7 +1387,7 @@ const closeFaqDetails = () => {
   border: 1px solid var(--wl-border, #E2E8F0);
   border-radius: var(--wl-radius-card, 16px);
   overflow: hidden;
-  box-shadow: var(--wl-shadow-card, 0 1px 3px rgba(15, 23, 42, 0.05));
+  box-shadow: var(--wl-shadow-card, 0 1px 3px rgba(0, 10, 25, 0.05));
 }
 
 .table-wrap {
@@ -1351,7 +1474,41 @@ const closeFaqDetails = () => {
 
 .slug-badge {
   font-size: 11px;
-  color: #64748B;
+  color: var(--wl-muted);
+}
+
+/* Support contact channels card */
+.contact-card {
+  background: var(--wl-surface);
+  border: 1px solid var(--wl-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--wl-shadow-card);
+  padding: var(--wl-card-padding);
+  max-width: 860px;
+}
+
+.contact-card__head {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  color: var(--wl-primary);
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--wl-border);
+}
+
+.contact-card__title {
+  font-family: var(--wl-font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--wl-ink-strong);
+  margin: 0;
+}
+
+.contact-card__sub {
+  font-size: 0.82rem;
+  color: var(--wl-muted);
+  margin: 0.2rem 0 0;
 }
 
 /* FAQ Cards Stack */
@@ -1387,9 +1544,10 @@ const closeFaqDetails = () => {
 
 .faq-a-text {
   font-size: 13px;
-  color: #475569;
+  color: var(--wl-ink-soft);
   line-height: 1.5;
   margin: 0;
   white-space: pre-line;
 }
 </style>
+

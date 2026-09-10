@@ -2,7 +2,6 @@ export enum CompanyType {
   Hospital = 1,
   Distributor = 2,
   Clinic = 3,
-  Importer = 4,
 }
 
 export enum CompanyStatus {
@@ -19,7 +18,6 @@ export interface CompanyDto {
   countryId?: string
   countryNameEn?: string | null
   countryNameAr?: string | null
-  tierLevel: number
   status: CompanyStatus
   accountManagerId?: string | null
   isActive: boolean
@@ -33,7 +31,6 @@ export interface CreateCompanyPayload {
   email?: string | null
   type: CompanyType
   countryId: string
-  tierLevel?: number
   status?: CompanyStatus
   accountManagerId?: string | null
   isProvider?: boolean
@@ -59,6 +56,7 @@ export interface DistributorApplicationPayload {
 
 export interface DistributorApplicationDto extends DistributorApplicationPayload {
   id: string
+  type: CompanyType
   status: CompanyStatus | string
   countryNameEn?: string | null
   contactEmail?: string
@@ -87,7 +85,6 @@ export const COMPANY_TYPE_LABEL: Record<CompanyType, string> = {
   [CompanyType.Hospital]: 'Hospital',
   [CompanyType.Distributor]: 'Distributor',
   [CompanyType.Clinic]: 'Clinic',
-  [CompanyType.Importer]: 'Importer',
 }
 
 export const COMPANY_STATUS_LABEL: Record<CompanyStatus, string> = {

@@ -15,7 +15,6 @@ const toggleLang = () => {
 <template>
   <div class="auth-wrap">
     <div class="auth-card" :class="{ 'auth-card--wide': wide }">
-      <!-- Top Utility Header: Brand link + Theme & Lang toggle -->
       <header class="auth-card__top">
         <router-link to="/" class="auth-brand-link" :aria-label="t('nav.home')">
           <img src="/logo.jpeg" alt="Welco" class="auth-logo-img" width="108" height="26" loading="eager" />
@@ -35,19 +34,16 @@ const toggleLang = () => {
         </div>
       </header>
 
-      <!-- Main Header -->
       <div class="auth-card__head">
         <div class="auth-chip mono">{{ t('auth.shellBadge') }}</div>
         <h1 class="auth-title">{{ title }}</h1>
         <p class="auth-subtitle">{{ subtitle }}</p>
       </div>
 
-      <!-- Body / Form Slot -->
       <main class="auth-card__body">
         <slot />
       </main>
 
-      <!-- Security / Brand Footer -->
       <footer class="auth-card__foot mono">
         <span class="material-symbols-outlined text-[14px] text-emerald-500">lock</span>
         <span>{{ t('auth.shellFormFoot') }}</span>
@@ -75,7 +71,7 @@ const toggleLang = () => {
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
   border-radius: var(--radius-xl);
-  box-shadow: 0 16px 36px -8px rgba(15, 23, 42, 0.08), 0 6px 14px -4px rgba(15, 23, 42, 0.04);
+  box-shadow: 0 16px 36px -8px rgba(0, 10, 25, 0.08), 0 6px 14px -4px rgba(0, 10, 25, 0.04);
   position: relative;
   overflow: hidden;
   padding: 1.75rem 1.85rem 1.5rem;

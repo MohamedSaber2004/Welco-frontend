@@ -41,7 +41,7 @@ const fabStyle = computed(() =>
 .wa-fab{
   position:fixed;bottom:24px;inset-inline-end:24px;z-index:200;
   display:inline-flex;align-items:center;gap:8px;
-  background:#25D366;color:#fff;
+  background:#25D366;color:#061328;
   padding:10px 14px 10px 10px;
   border-radius:999px;
   box-shadow:0 8px 22px rgba(0,0,0,.24),0 0 0 1px rgba(255,255,255,.06);

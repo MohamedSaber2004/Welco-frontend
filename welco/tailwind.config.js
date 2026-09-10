@@ -7,6 +7,11 @@ export default {
     extend: {
       colors: {
         primary: 'rgb(var(--wl-primary-rgb) / <alpha-value>)',
+        gold: 'rgb(var(--wl-gold-rgb) / <alpha-value>)',
+        'gold-soft': 'var(--wl-gold-soft)',
+        'gold-faint': 'var(--wl-gold-faint)',
+        admin: 'rgb(var(--wl-gold-rgb) / <alpha-value>)',
+        'admin-soft': 'var(--wl-gold-soft)',
         'primary-container': 'var(--wl-primary-soft)',
         'on-primary': 'var(--wl-on-primary)',
         'primary-fixed': 'var(--wl-primary-soft)',
@@ -55,7 +60,7 @@ export default {
         sm: '0 1px 2px rgba(15,23,42,0.04)',
         DEFAULT: '0 1px 3px rgba(15,23,42,0.04), 0 4px 12px rgba(15,23,42,0.03)',
         md: '0 4px 6px -1px rgba(15,23,42,0.05), 0 2px 4px -2px rgba(15,23,42,0.05)',
-        glow: '0 0 0 3.5px rgba(79, 70, 229, 0.14), 0 2px 8px -2px rgba(79, 70, 229, 0.18)',
+        glow: '0 0 0 3.5px rgba(105, 169, 255, 0.2), 0 2px 8px -2px rgba(105, 169, 255, 0.25)',
         'glow-danger': '0 0 0 3.5px rgba(244, 63, 94, 0.16)',
       },
     },

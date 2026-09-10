@@ -264,21 +264,23 @@ const isOrganizationUser = computed(() => authService.isOrganizationUser.value)
   gap: 0.45rem;
   font-size: 10px;
   font-weight: 700;
-  color: var(--wl-primary);
-  background: var(--wl-primary-soft);
-  border: 1px solid rgba(var(--wl-primary-rgb), 0.3);
+  color: var(--wl-gold);
+  background: var(--wl-gold-soft);
+  border: 1px solid rgba(255, 209, 102, 0.35);
   padding: 0.2rem 0.6rem;
   border-radius: 9999px;
   letter-spacing: 0.06em;
   width: fit-content;
   margin-bottom: 0.4rem;
+  text-shadow: var(--wl-gold-text-shadow);
 }
 
 .pulse-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--wl-primary);
+  background: var(--wl-gold);
+  box-shadow: var(--wl-gold-glow-soft);
 }
 
 .head-title {
@@ -286,9 +288,13 @@ const isOrganizationUser = computed(() => authService.isOrganizationUser.value)
   font-size: 1.68rem;
   font-weight: 800;
   letter-spacing: -0.025em;
-  color: var(--wl-ink-strong);
   margin: 0;
   line-height: 1.1;
+  background: var(--wl-gradient-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 10px rgba(233, 168, 37, 0.28)) drop-shadow(0 1px 0 rgba(6, 19, 40, 0.9));
 }
 
 .head-subtitle {
@@ -471,7 +477,7 @@ const isOrganizationUser = computed(() => authService.isOrganizationUser.value)
 .territory-item.is-selected {
   background: var(--wl-primary);
   border-color: var(--wl-primary);
-  color: #FFFFFF;
+  color: var(--wl-on-primary);
   box-shadow: 0 4px 12px -2px var(--wl-primary-ring);
 }
 
@@ -487,7 +493,7 @@ const isOrganizationUser = computed(() => authService.isOrganizationUser.value)
 
 .territory-item.is-selected .code-tag {
   background: rgba(255, 255, 255, 0.2);
-  color: #FFFFFF;
+  color: var(--wl-on-primary);
 }
 
 .item-name {
@@ -510,7 +516,7 @@ const isOrganizationUser = computed(() => authService.isOrganizationUser.value)
 }
 
 .territory-item.is-selected .nav-arrow {
-  color: #FFFFFF;
+  color: var(--wl-on-primary);
 }
 
 .zone-item-static {

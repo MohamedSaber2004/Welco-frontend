@@ -141,7 +141,7 @@ const isAuthed = computed(() => authService.isAuthenticated)
   font-weight: 700;
   color: var(--wl-primary);
   background: var(--wl-primary-soft);
-  border: 1px solid rgba(79, 70, 229, 0.2);
+  border: 1px solid rgba(105, 169, 255, 0.2);
   padding: 0.2rem 0.5rem;
   border-radius: var(--radius-xs);
 }
@@ -151,7 +151,8 @@ const isAuthed = computed(() => authService.isAuthenticated)
   font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--wl-ink-strong);
+  color: var(--wl-gold-text);
+  text-shadow: var(--wl-gold-text-shadow);
   margin-bottom: 0.95rem;
   font-weight: 700;
 }

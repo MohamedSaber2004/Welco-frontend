@@ -136,8 +136,8 @@ const totalSevenMonthOps = computed(() => {
 const territoryData = computed(() => {
   const max = Math.max(liveCounts.value.countries, liveCounts.value.cities, liveCounts.value.zones, 1)
   return [
-    { label: t('admin.countries'), value: liveCounts.value.countries, pct: Math.round((liveCounts.value.countries / max) * 100), color: '#4F46E5', icon: 'public', desc: t('admin.sovereignRoot') },
-    { label: t('admin.cities'), value: liveCounts.value.cities, pct: Math.round((liveCounts.value.cities / max) * 100), color: '#6366F1', icon: 'location_city', desc: t('admin.regionalHubs') },
+    { label: t('admin.countries'), value: liveCounts.value.countries, pct: Math.round((liveCounts.value.countries / max) * 100), color: '#69a9ff', icon: 'public', desc: t('admin.sovereignRoot') },
+    { label: t('admin.cities'), value: liveCounts.value.cities, pct: Math.round((liveCounts.value.cities / max) * 100), color: '#8abcff', icon: 'location_city', desc: t('admin.regionalHubs') },
     { label: t('admin.zones'), value: liveCounts.value.zones, pct: Math.round((liveCounts.value.zones / max) * 100), color: '#10B981', icon: 'my_location', desc: t('admin.deliveryAnchors') },
   ]
 })
@@ -156,8 +156,8 @@ const activeDonutSegment = ref<{ label: string; value: number; pct: number; colo
 
 const platformData = computed(() => {
   const items = [
-    { label: t('admin.products'), value: stats.value.products, color: '#4F46E5', to: '/admin/catalog?tab=products' },
-    { label: t('admin.categoriesTitle'), value: stats.value.categories, color: '#6366F1', to: '/admin/catalog?tab=categories' },
+    { label: t('admin.products'), value: stats.value.products, color: '#69a9ff', to: '/admin/catalog?tab=products' },
+    { label: t('admin.categoriesTitle'), value: stats.value.categories, color: '#8abcff', to: '/admin/catalog?tab=categories' },
     { label: t('admin.users'), value: stats.value.users, color: '#10B981', to: '/admin/users' },
     { label: t('admin.distributorApps'), value: stats.value.pendingApps, color: '#F59E0B', to: '/admin/companies' },
   ]
@@ -668,13 +668,13 @@ onUnmounted(_removeListeners)
             <svg class="curve-chart-svg" viewBox="0 0 540 180" preserveAspectRatio="none">
               <defs>
                 <linearGradient id="curveGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#4F46E5" stop-opacity="0.32" />
-                  <stop offset="60%" stop-color="#6366F1" stop-opacity="0.10" />
-                  <stop offset="100%" stop-color="#6366F1" stop-opacity="0.0" />
+                  <stop offset="0%" stop-color="#69a9ff" stop-opacity="0.32" />
+                  <stop offset="60%" stop-color="#8abcff" stop-opacity="0.10" />
+                  <stop offset="100%" stop-color="#8abcff" stop-opacity="0.0" />
                 </linearGradient>
                 <linearGradient id="laserStrokeGrad" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0%" stop-color="#4F46E5" />
-                  <stop offset="50%" stop-color="#6366F1" />
+                  <stop offset="0%" stop-color="#69a9ff" />
+                  <stop offset="50%" stop-color="#8abcff" />
                   <stop offset="100%" stop-color="#818CF8" />
                 </linearGradient>
               </defs>
@@ -687,7 +687,7 @@ onUnmounted(_removeListeners)
 
               <!-- Ambient Glow & Laser Curve -->
               <path :d="smoothChart.area" fill="url(#curveGrad)" />
-              <path :d="smoothChart.line" fill="none" stroke="rgba(99, 102, 241, 0.25)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" class="chart-glow-path" />
+              <path :d="smoothChart.line" fill="none" stroke="rgba(105, 169, 255, 0.25)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" class="chart-glow-path" />
               <path :d="smoothChart.line" fill="none" stroke="url(#laserStrokeGrad)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" />
 
               <!-- Interactive Laser Caliper Vertical Guide -->
@@ -915,7 +915,7 @@ onUnmounted(_removeListeners)
       <!-- Staff Quick Actions -->
       <div v-if="isStaffOnly" class="quick-actions-grid">
         <button type="button" class="quick-btn" @click="$router.push('/admin/sales')">
-          <span class="material-symbols-outlined quick-btn__icon" style="color:#D97706">receipt_long</span>
+          <span class="material-symbols-outlined quick-btn__icon" style="color:var(--wl-warning)">receipt_long</span>
           <div class="quick-btn__text">
             <strong>{{ t('admin.issueQuotation') }}</strong>
             <span>{{ t('admin.salesRfqQueue') }}</span>
@@ -923,7 +923,7 @@ onUnmounted(_removeListeners)
         </button>
 
         <button type="button" class="quick-btn" @click="$router.push('/admin/orders')">
-          <span class="material-symbols-outlined quick-btn__icon" style="color:#4F46E5">local_shipping</span>
+          <span class="material-symbols-outlined quick-btn__icon" style="color:var(--wl-primary)">local_shipping</span>
           <div class="quick-btn__text">
             <strong>{{ t('admin.orderFulfillment') }}</strong>
             <span>{{ t('admin.orderFulfillmentSub') }}</span>
@@ -931,7 +931,7 @@ onUnmounted(_removeListeners)
         </button>
 
         <button type="button" class="quick-btn" @click="$router.push('/admin/catalog?tab=products')">
-          <span class="material-symbols-outlined quick-btn__icon" style="color:#059669">inventory_2</span>
+          <span class="material-symbols-outlined quick-btn__icon" style="color:var(--wl-success)">inventory_2</span>
           <div class="quick-btn__text">
             <strong>{{ t('admin.catalogProducts') }}</strong>
             <span>{{ t('admin.catalogProductsSub') }}</span>
@@ -939,7 +939,7 @@ onUnmounted(_removeListeners)
         </button>
 
         <button type="button" class="quick-btn" @click="$router.push('/admin/tickets')">
-          <span class="material-symbols-outlined quick-btn__icon" style="color:#6366F1">support_agent</span>
+          <span class="material-symbols-outlined quick-btn__icon" style="color:var(--wl-accent)">support_agent</span>
           <div class="quick-btn__text">
             <strong>{{ t('admin.supportTickets') }}</strong>
             <span>{{ t('admin.supportTicketsSub') }}</span>
@@ -947,7 +947,7 @@ onUnmounted(_removeListeners)
         </button>
 
         <button type="button" class="quick-btn" @click="$router.push('/marketplace')">
-          <span class="material-symbols-outlined quick-btn__icon" style="color:#64748B">storefront</span>
+          <span class="material-symbols-outlined quick-btn__icon" style="color:var(--wl-muted)">storefront</span>
           <div class="quick-btn__text">
             <strong>{{ t('admin.storefront') }}</strong>
             <span>{{ t('admin.storefrontSub') }}</span>
@@ -1083,11 +1083,12 @@ onUnmounted(_removeListeners)
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--wl-primary);
+  color: var(--wl-gold);
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
   margin-bottom: 0.25rem;
+  text-shadow: var(--wl-gold-text-shadow);
 }
 
 .dash-title {
@@ -1096,8 +1097,12 @@ onUnmounted(_removeListeners)
   font-weight: 700;
   letter-spacing: -0.025em;
   line-height: 1.05;
-  color: var(--wl-ink-strong);
   margin: 0;
+  background: var(--wl-gradient-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 10px rgba(233, 168, 37, 0.28)) drop-shadow(0 1px 0 rgba(6, 19, 40, 0.9));
 }
 
 .dash-head__desc {
@@ -1203,12 +1208,13 @@ onUnmounted(_removeListeners)
   font-size: 10.5px;
   font-weight: 700;
   letter-spacing: 0.08em;
-  color: #4F46E5;
+  color: var(--wl-gold);
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
   margin-bottom: 0.35rem;
   text-transform: uppercase;
+  text-shadow: var(--wl-gold-text-shadow);
 }
 
 .chart-title {
@@ -1216,7 +1222,8 @@ onUnmounted(_removeListeners)
   font-size: 1.05rem;
   font-weight: 700;
   letter-spacing: -0.015em;
-  color: var(--wl-ink-strong);
+  color: var(--wl-gold-text);
+  text-shadow: var(--wl-gold-text-shadow);
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -1286,7 +1293,7 @@ onUnmounted(_removeListeners)
 }
 
 .chart-gridline {
-  stroke: rgba(15, 23, 42, 0.06);
+  stroke: rgba(0, 10, 25, 0.06);
   stroke-width: 1;
   stroke-dasharray: 4 4;
 }
@@ -1340,10 +1347,10 @@ onUnmounted(_removeListeners)
 
 .chart-point {
   fill: #ffffff;
-  stroke: #4F46E5;
+  stroke: #69a9ff;
   stroke-width: 2.5;
   transition: all 0.2s var(--wl-ease-spring);
-  filter: drop-shadow(0 0 4px rgba(79, 70, 229, 0.4));
+  filter: drop-shadow(0 0 4px rgba(105, 169, 255, 0.4));
 }
 
 .chart-point-hit {
@@ -1353,7 +1360,7 @@ onUnmounted(_removeListeners)
 
 .chart-point-group:hover .chart-point {
   r: 6.5;
-  stroke: #4F46E5;
+  stroke: #69a9ff;
   stroke-width: 3.5;
 }
 
@@ -1361,15 +1368,15 @@ onUnmounted(_removeListeners)
 .chart-tooltip {
   position: absolute;
   transform: translate(-50%, -125%);
-  background: rgba(15, 23, 42, 0.92);
+  background: rgba(0, 10, 25, 0.92);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  color: #ffffff;
+  color: var(--wl-ink-strong);
   padding: 0.55rem 0.85rem;
   border-radius: 10px;
   font-size: 12px;
   pointer-events: none;
-  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.35);
+  box-shadow: 0 10px 25px -5px rgba(0, 10, 25, 0.35);
   border: 1px solid rgba(255, 255, 255, 0.16);
   white-space: nowrap;
   z-index: 20;
@@ -1384,7 +1391,7 @@ onUnmounted(_removeListeners)
   align-items: center;
   gap: 0.75rem;
   font-size: 9.5px;
-  color: #94A3B8;
+  color: var(--wl-muted-soft);
   letter-spacing: 0.06em;
 }
 
@@ -1396,7 +1403,7 @@ onUnmounted(_removeListeners)
 .tooltip-val {
   font-weight: 700;
   font-size: 12.5px;
-  color: #ffffff;
+  color: var(--wl-ink-strong);
 }
 
 /* Territory Lineage Architecture */
@@ -1471,7 +1478,7 @@ onUnmounted(_removeListeners)
   height: 100%;
   border-radius: 9999px;
   transition: width 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 0 8px rgba(79, 70, 229, 0.25);
+  box-shadow: 0 0 8px rgba(105, 169, 255, 0.25);
 }
 
 .chart-foot {
@@ -1525,7 +1532,7 @@ onUnmounted(_removeListeners)
 .donut-segment:hover,
 .donut-segment.is-active {
   stroke-width: 18;
-  filter: drop-shadow(0 0 6px rgba(79, 70, 229, 0.35));
+  filter: drop-shadow(0 0 6px rgba(105, 169, 255, 0.35));
 }
 
 .donut-center-hud {
@@ -1559,7 +1566,7 @@ onUnmounted(_removeListeners)
 .donut-hud__sub {
   font-size: 8.5px;
   font-weight: 600;
-  color: #4F46E5;
+  color: var(--wl-primary);
   letter-spacing: 0.06em;
 }
 
@@ -1686,7 +1693,7 @@ onUnmounted(_removeListeners)
 
 .quick-btn:hover {
   background: var(--wl-surface-soft);
-  border-color: rgba(79, 70, 229, 0.25);
+  border-color: rgba(105, 169, 255, 0.25);
   transform: translateY(-1px);
   box-shadow: var(--shadow-sm);
 }
@@ -1738,7 +1745,7 @@ onUnmounted(_removeListeners)
 }
 
 .staff-queue-card:hover {
-  border-color: rgba(79, 70, 229, 0.25);
+  border-color: rgba(105, 169, 255, 0.25);
   box-shadow: var(--shadow-md);
 }
 
@@ -1770,17 +1777,17 @@ onUnmounted(_removeListeners)
 
 .queue-icon--amber {
   background: rgba(245, 158, 11, 0.12);
-  color: #D97706;
+  color: var(--wl-warning);
 }
 
 .queue-icon--indigo {
-  background: rgba(79, 70, 229, 0.12);
-  color: #4F46E5;
+  background: rgba(105, 169, 255, 0.12);
+  color: var(--wl-primary);
 }
 
 .queue-icon--emerald {
   background: rgba(16, 185, 129, 0.12);
-  color: #059669;
+  color: var(--wl-success);
 }
 
 .queue-title {
@@ -1818,20 +1825,20 @@ onUnmounted(_removeListeners)
   border-radius: 4px;
   font-weight: 600;
   background: rgba(245, 158, 11, 0.12);
-  color: #D97706;
+  color: var(--wl-warning);
   border: 1px solid rgba(245, 158, 11, 0.25);
 }
 
 .priority-chip--order {
-  background: rgba(79, 70, 229, 0.1);
-  color: #4F46E5;
-  border-color: rgba(79, 70, 229, 0.2);
+  background: rgba(105, 169, 255, 0.1);
+  color: var(--wl-primary);
+  border-color: rgba(105, 169, 255, 0.2);
 }
 
 .dash-link {
   font-size: 11px;
   font-weight: 600;
-  color: #4F46E5;
+  color: var(--wl-primary);
   text-decoration: none;
 }
 
@@ -1869,7 +1876,7 @@ onUnmounted(_removeListeners)
 
 .dash-mini-item:hover {
   background: var(--wl-surface);
-  border-color: rgba(79, 70, 229, 0.4);
+  border-color: rgba(105, 169, 255, 0.4);
   transform: translateY(-1px);
 }
 
@@ -1993,26 +2000,26 @@ onUnmounted(_removeListeners)
 }
 
 .role-badge--admin {
-  background: rgba(99, 102, 241, 0.12);
-  color: #4F46E5;
-  border: 1px solid rgba(99, 102, 241, 0.25);
+  background: rgba(105, 169, 255, 0.12);
+  color: var(--wl-primary);
+  border: 1px solid rgba(105, 169, 255, 0.25);
 }
 
 .role-badge--staff {
   background: rgba(16, 185, 129, 0.12);
-  color: #059669;
+  color: var(--wl-success);
   border: 1px solid rgba(16, 185, 129, 0.25);
 }
 
 .role-badge--org {
   background: rgba(245, 158, 11, 0.12);
-  color: #D97706;
+  color: var(--wl-warning);
   border: 1px solid rgba(245, 158, 11, 0.25);
 }
 
 .role-badge--system {
   background: rgba(100, 116, 139, 0.12);
-  color: #475569;
+  color: var(--wl-ink-soft);
   border: 1px solid rgba(100, 116, 139, 0.25);
 }
 
@@ -2040,19 +2047,19 @@ onUnmounted(_removeListeners)
 
 .badge--slate {
   background: rgba(100, 116, 139, 0.12);
-  color: #475569;
+  color: var(--wl-ink-soft);
   border: 1px solid rgba(100, 116, 139, 0.25);
 }
 
 .badge--red {
   background: rgba(239, 68, 68, 0.12);
-  color: #DC2626;
+  color: var(--wl-danger);
   border: 1px solid rgba(239, 68, 68, 0.25);
 }
 
 .badge--amber {
   background: rgba(245, 158, 11, 0.12);
-  color: #D97706;
+  color: var(--wl-warning);
   border: 1px solid rgba(245, 158, 11, 0.25);
 }
 
@@ -2228,9 +2235,9 @@ onUnmounted(_removeListeners)
 }
 
 .modal-error-banner {
-  background: #FFF1F2;
-  border: 1px solid #FECDD3;
-  color: #E11D48;
+  background: var(--wl-danger-soft);
+  border: 1px solid rgba(237, 66, 69, 0.35);
+  color: var(--wl-danger);
   padding: 0.65rem 0.85rem;
   border-radius: 8px;
   font-size: 12.5px;
@@ -2242,3 +2249,4 @@ onUnmounted(_removeListeners)
   gap: 0.75rem;
 }
 </style>
+

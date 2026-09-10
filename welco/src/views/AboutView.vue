@@ -377,31 +377,36 @@ const pillars = computed(() => [
   gap: 0.45rem;
   font-size: 10.5px;
   font-weight: 700;
-  color: var(--wl-primary);
-  background: var(--wl-primary-soft);
-  border: 1px solid rgba(var(--wl-primary-rgb), 0.25);
+  color: var(--wl-gold);
+  background: var(--wl-gold-soft);
+  border: 1px solid rgba(255, 209, 102, 0.35);
   padding: 0.25rem 0.65rem;
   border-radius: 9999px;
   letter-spacing: 0.06em;
   width: fit-content;
+  text-shadow: var(--wl-gold-text-shadow);
 }
 
 .pulse-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--wl-primary);
-  box-shadow: 0 0 0 3px rgba(var(--wl-primary-rgb), 0.2);
+  background: var(--wl-gold);
+  box-shadow: var(--wl-gold-glow-soft);
 }
 
 .hero-title {
   font-family: var(--wl-font-display);
   font-size: clamp(1.85rem, 3.2vw, 2.45rem);
   font-weight: 800;
-  color: var(--wl-ink-strong);
   letter-spacing: -0.028em;
   line-height: 1.12;
   margin: 0;
+  background: var(--wl-gradient-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 10px rgba(233, 168, 37, 0.28)) drop-shadow(0 1px 0 rgba(6, 19, 40, 0.9));
 }
 
 .hero-desc {
@@ -574,9 +579,10 @@ const pillars = computed(() => [
   font-family: var(--wl-font-display);
   font-size: 1.55rem;
   font-weight: 800;
-  color: var(--wl-ink-strong);
   letter-spacing: -0.02em;
   margin: 0;
+  color: var(--wl-gold-text);
+  text-shadow: var(--wl-gold-text-shadow);
 }
 
 /* Pillars Grid */
@@ -756,16 +762,21 @@ const pillars = computed(() => [
   font-size: 10.5px;
   font-weight: 700;
   letter-spacing: 0.06em;
-  color: var(--wl-primary);
+  color: var(--wl-gold);
+  text-shadow: var(--wl-gold-text-shadow);
 }
 
 .cta-title {
   font-family: var(--wl-font-display);
   font-size: 1.45rem;
   font-weight: 800;
-  color: var(--wl-ink-strong);
   margin: 0;
   line-height: 1.25;
+  background: var(--wl-gradient-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 10px rgba(233, 168, 37, 0.28)) drop-shadow(0 1px 0 rgba(6, 19, 40, 0.9));
 }
 
 .cta-desc {

@@ -1,7 +1,6 @@
 import { ref } from 'vue'
 import type {
   CreateOrderPayload,
-  InvoiceDto,
   OrderDto,
 } from '../domain/models/commerce'
 import type { CommerceRepository } from '../domain/ports/commerce-repository'
@@ -67,14 +66,6 @@ export class CommerceService {
       return { ok: true, order }
     } catch (err) {
       return { ok: false, error: err instanceof Error ? err.message : t('common.error') }
-    }
-  }
-
-  async getInvoices(orderId: string): Promise<InvoiceDto[]> {
-    try {
-      return await this.repo.getInvoices(orderId)
-    } catch {
-      return []
     }
   }
 

@@ -245,9 +245,20 @@ function getRfqForQuote(q: QuoteDto): RfqDto | undefined {
   return rfqs.value.find((r) => r.id === q.rfqId || (q.rfqNumber && r.rfqNumber === q.rfqNumber))
 }
 
-function viewQuoteDetail(q: QuoteDto) {
+const quoteDetailsLoading = ref(false)
+
+async function viewQuoteDetail(q: QuoteDto) {
   selectedQuote.value = q
   showQuoteDetailModal.value = true
+  // List payloads omit line items — fetch the full quote so the items
+  // table fills in (same pattern as the orders details modal).
+  quoteDetailsLoading.value = true
+  try {
+    const fresh = await salesService.getQuote(q.id)
+    if (fresh && selectedQuote.value?.id === q.id) selectedQuote.value = fresh
+  } finally {
+    quoteDetailsLoading.value = false
+  }
 }
 
 function viewLinkedQuoteForRfq(rfqId: string) {
@@ -273,7 +284,8 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
       : await salesService.declineQuote(quoteId)
     if (res.ok) {
       if (selectedQuote.value && selectedQuote.value.id === quoteId) {
-        selectedQuote.value = quotes.value.find((q) => q.id === quoteId) || null
+        const fresh = await salesService.getQuote(quoteId)
+        if (fresh) selectedQuote.value = fresh
       }
     }
   } finally {
@@ -756,6 +768,9 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
                 </tr>
               </thead>
               <tbody>
+                <tr v-if="quoteDetailsLoading && !selectedQuote.items.length">
+                  <td colspan="4" class="text-center mono">{{ t('common.loading') }}…</td>
+                </tr>
                 <tr v-for="it in selectedQuote.items" :key="it.id">
                   <td class="product-title-cell">{{ locale === 'ar' ? (it.productNameAr || it.productNameEn) : it.productNameEn }}</td>
                   <td class="text-end mono">{{ it.quantity }}</td>
@@ -899,7 +914,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
   position: absolute;
   inset-inline-start: 0.75rem;
   font-size: 18px;
-  color: #94A3B8;
+  color: var(--wl-muted-soft);
   pointer-events: none;
 }
 
@@ -917,8 +932,8 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 }
 
 .search-input:focus {
-  border-color: #6366F1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+  border-color: #69a9ff;
+  box-shadow: 0 0 0 3px rgba(105, 169, 255, 0.12);
   background: var(--wl-surface);
 }
 
@@ -928,14 +943,14 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
   background: none;
   border: none;
   cursor: pointer;
-  color: #94A3B8;
+  color: var(--wl-muted-soft);
   display: flex;
   align-items: center;
   padding: 0.2rem;
   border-radius: 4px;
 }
 
-.clear-btn:hover { color: #4F46E5; }
+.clear-btn:hover { color: var(--wl-primary); }
 
 .filter-select {
   height: 38px;
@@ -950,7 +965,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
   transition: border-color 0.15s;
 }
 
-.filter-select:focus { border-color: #6366F1; }
+.filter-select:focus { border-color: #69a9ff; }
 
 .clear-filters-btn {
   display: inline-flex;
@@ -962,13 +977,13 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
   border-radius: 10px;
   font-size: 12px;
   font-weight: 700;
-  color: #DC2626;
-  background: #FEF2F2;
+  color: var(--wl-danger);
+  background: var(--wl-danger-soft);
   cursor: pointer;
   transition: all 0.15s;
 }
 
-.clear-filters-btn:hover { background: #FEE2E2; }
+.clear-filters-btn:hover { background: rgba(242, 109, 109, 0.22); }
 
 /* ── Product Names Cell ── */
 .product-names-cell {
@@ -1040,7 +1055,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #4F46E5;
+  background: var(--wl-primary);
 }
 
 .head-title {
@@ -1055,7 +1070,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 
 .head-subtitle {
   font-size: 13.5px;
-  color: #64748B;
+  color: var(--wl-muted);
   margin: 0.25rem 0 0;
 }
 
@@ -1075,7 +1090,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
   border: 1px solid var(--wl-border);
   border-radius: 16px;
   padding: 1.25rem 1.5rem;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  box-shadow: var(--shadow-xs);
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -1093,7 +1108,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
   gap: 0.35rem;
   font-size: 10.5px;
   font-weight: 700;
-  color: #4F46E5;
+  color: var(--wl-primary);
   letter-spacing: 0.05em;
 }
 
@@ -1107,7 +1122,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 .pipeline-counter {
   font-size: 11px;
   font-weight: 700;
-  color: #64748B;
+  color: var(--wl-muted);
 }
 
 .pipeline-grid {
@@ -1139,7 +1154,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 .step-label {
   font-size: 11px;
   font-weight: 700;
-  color: #475569;
+  color: var(--wl-ink-soft);
 }
 
 .step-value-row {
@@ -1157,12 +1172,12 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 .step-pct {
   font-size: 11px;
   font-weight: 700;
-  color: #64748B;
+  color: var(--wl-muted);
 }
 
 .step-track {
   height: 6px;
-  background: #E2E8F0;
+  background: var(--wl-surface-hover);
   border-radius: 9999px;
   overflow: hidden;
 }
@@ -1179,7 +1194,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
   border: 1px solid var(--wl-border);
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  box-shadow: var(--shadow-xs);
 }
 
 .table-wrap {
@@ -1248,8 +1263,8 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  background: #4F46E5;
-  color: #FFFFFF;
+  background: var(--wl-primary);
+  color: var(--wl-on-primary);
   border: none;
   border-radius: 8px;
   padding: 0.35rem 0.75rem;
@@ -1260,7 +1275,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 }
 
 .btn-issue-quote:hover {
-  background: #4338CA;
+  background: var(--wl-primary-hover);
 }
 
 .text-end {
@@ -1298,7 +1313,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 
 .modal-pricing-table td {
   padding: 0.6rem 0.85rem;
-  border-bottom: 1px solid #F1F5F9;
+  border-bottom: 1px solid var(--wl-border);
   vertical-align: middle;
 }
 
@@ -1321,7 +1336,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 }
 
 .pricing-input:focus {
-  border-color: #4F46E5;
+  border-color: var(--wl-primary);
 }
 
 .subtotal-num {
@@ -1348,7 +1363,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 .validity-label {
   font-size: 10.5px;
   font-weight: 700;
-  color: #64748B;
+  color: var(--wl-muted);
   text-transform: uppercase;
 }
 
@@ -1364,7 +1379,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 }
 
 .validity-date-input:focus {
-  border-color: #4F46E5;
+  border-color: var(--wl-primary);
 }
 
 .total-quote-box {
@@ -1376,20 +1391,20 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 .total-label {
   font-size: 10.5px;
   font-weight: 700;
-  color: #64748B;
+  color: var(--wl-muted);
   text-transform: uppercase;
 }
 
 .total-value {
   font-size: 1.45rem;
   font-weight: 800;
-  color: #4F46E5;
+  color: var(--wl-primary);
 }
 
 .modal-error-banner {
-  background: #FFF1F2;
-  border: 1px solid #FECDD3;
-  color: #E11D48;
+  background: var(--wl-danger-soft);
+  border: 1px solid rgba(237, 66, 69, 0.35);
+  color: var(--wl-danger);
   padding: 0.65rem 0.85rem;
   border-radius: 8px;
   font-size: 12.5px;
@@ -1404,8 +1419,8 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 
 /* Workflow Banner */
 .workflow-banner {
-  background: linear-gradient(135deg, #2B2D31 0%, rgba(88, 101, 242, 0.14) 100%);
-  border: 1px solid #DBEAFE;
+  background: linear-gradient(135deg, #071A38 0%, rgba(105, 169, 255, 0.14) 100%);
+  border: 1px solid rgba(151, 190, 255, 0.35);
   border-radius: 14px;
   padding: 1.15rem 1.35rem;
   display: flex;
@@ -1441,7 +1456,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 
 .workflow-banner__desc {
   font-size: 12px;
-  color: #64748B;
+  color: var(--wl-muted);
   margin: 0.2rem 0 0;
   line-height: 1.45;
 }
@@ -1461,20 +1476,20 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
   border: 1px solid var(--wl-border);
   border-radius: 10px;
   padding: 0.45rem 0.75rem;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  box-shadow: var(--shadow-xs);
 }
 
 .workflow-chip.is-highlight {
-  background: #F0FDF4;
-  border-color: #86EFAC;
+  background: linear-gradient(180deg, rgba(62, 215, 180, 0.16), rgba(62, 215, 180, 0.07));
+  border-color: rgba(62, 215, 180, 0.45);
 }
 
 .chip-num {
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: #4F46E5;
-  color: #FFFFFF;
+  background: var(--wl-primary);
+  color: var(--wl-on-primary);
   font-size: 10.5px;
   font-weight: 800;
   display: flex;
@@ -1483,7 +1498,8 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 }
 
 .workflow-chip.is-highlight .chip-num {
-  background: #16A34A;
+  background: var(--wl-success);
+  color: var(--wl-on-primary);
 }
 
 .chip-text {
@@ -1499,12 +1515,12 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 
 .chip-sub {
   font-size: 10px;
-  color: #64748B;
+  color: var(--wl-muted);
 }
 
 .workflow-arrow {
   font-size: 15px;
-  color: #94A3B8;
+  color: var(--wl-muted-soft);
   font-weight: 700;
 }
 
@@ -1513,7 +1529,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  border-bottom: 1.5px solid #E2E8F0;
+  border-bottom: 1.5px solid var(--wl-border);
   padding-bottom: 0.5rem;
 }
 
@@ -1527,7 +1543,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
   border: 1px solid transparent;
   font-size: 12.5px;
   font-weight: 700;
-  color: #64748B;
+  color: var(--wl-muted);
   cursor: pointer;
   transition: all 0.15s ease;
 }
@@ -1552,13 +1568,13 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
   font-weight: 800;
   padding: 0.15rem 0.45rem;
   border-radius: 9999px;
-  background: #E2E8F0;
-  color: #475569;
+  background: var(--wl-surface-hover);
+  color: var(--wl-ink-soft);
 }
 
 .tab-count-pill--purple {
-  background: #E0E7FF;
-  color: #4338CA;
+  background: var(--wl-primary-soft);
+  color: var(--wl-primary);
 }
 
 /* Actions Group */
@@ -1575,7 +1591,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
   gap: 0.35rem;
   background: var(--wl-surface-soft);
   color: var(--wl-ink-soft);
-  border: 1px solid #CBD5E1;
+  border: 1px solid var(--wl-border-strong);
   border-radius: 7px;
   padding: 0.35rem 0.65rem;
   font-size: 11.5px;
@@ -1605,7 +1621,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 
 .btn-reprice:hover {
   background: var(--wl-surface-soft);
-  color: #4F46E5;
+  color: var(--wl-primary);
   border-color: rgba(var(--wl-primary-rgb), 0.3);
 }
 
@@ -1615,17 +1631,17 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
   justify-content: center;
   width: 30px;
   height: 30px;
-  background: #F0FDF4;
-  color: #16A34A;
-  border: 1px solid #BBF7D0;
+  background: var(--wl-success-soft);
+  color: var(--wl-success);
+  border: 1px solid rgba(62, 215, 180, 0.4);
   border-radius: 7px;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .btn-quick-approve:hover {
-  background: #DCFCE7;
-  color: #15803D;
+  background: rgba(62, 215, 180, 0.22);
+  color: var(--wl-success);
 }
 
 .btn-quick-decline {
@@ -1634,17 +1650,17 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
   justify-content: center;
   width: 30px;
   height: 30px;
-  background: #FFF1F2;
-  color: #E11D48;
-  border: 1px solid #FECDD3;
+  background: var(--wl-danger-soft);
+  color: var(--wl-danger);
+  border: 1px solid rgba(237, 66, 69, 0.35);
   border-radius: 7px;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .btn-quick-decline:hover {
-  background: #FFE4E6;
-  color: #BE123C;
+  background: rgba(242, 109, 109, 0.22);
+  color: var(--wl-danger);
 }
 
 /* Quote Detail Modal Body */
@@ -1664,21 +1680,21 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 }
 
 .quote-workflow-alert.is-awaiting {
-  background: #FFFBEB;
-  border-color: #FDE68A;
-  color: #B45309;
+  background: var(--wl-warning-soft);
+  border-color: rgba(254, 231, 92, 0.35);
+  color: var(--wl-warning);
 }
 
 .quote-workflow-alert.is-approved {
-  background: #F0FDF4;
-  border-color: #BBF7D0;
-  color: #15803D;
+  background: var(--wl-success-soft);
+  border-color: rgba(62, 215, 180, 0.4);
+  color: var(--wl-success);
 }
 
 .quote-workflow-alert.is-declined {
-  background: #FFF1F2;
-  border-color: #FECDD3;
-  color: #BE123C;
+  background: var(--wl-danger-soft);
+  border-color: rgba(237, 66, 69, 0.35);
+  color: var(--wl-danger);
 }
 
 .quote-workflow-alert.is-expired {
@@ -1727,7 +1743,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 .summary-label {
   font-size: 10px;
   font-weight: 700;
-  color: #64748B;
+  color: var(--wl-muted);
   text-transform: uppercase;
 }
 
@@ -1752,6 +1768,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
   gap: 0.65rem;
   margin-top: 0.5rem;
   padding-top: 0.85rem;
-  border-top: 1px solid #F1F5F9;
+  border-top: 1px solid var(--wl-border);
 }
 </style>
+

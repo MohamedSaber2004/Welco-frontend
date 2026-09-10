@@ -188,7 +188,7 @@ const handleResend = async () => {
 
 .step-pill--done .step-num {
   background: var(--wl-success);
-  color: #FFFFFF;
+  color: var(--wl-on-primary);
 }
 
 .step-pill--active {
@@ -210,7 +210,7 @@ const handleResend = async () => {
 
 .step-pill--active .step-num {
   background: var(--wl-primary);
-  color: #FFFFFF;
+  color: var(--wl-on-primary);
 }
 
 .step-sep {
@@ -254,7 +254,7 @@ const handleResend = async () => {
   font-size: 14px;
   font-family: var(--wl-font-body, system-ui);
   color: var(--wl-ink-strong);
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  box-shadow: var(--shadow-xs);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   outline: none;
 }
@@ -289,7 +289,7 @@ const handleResend = async () => {
   height: 44px;
   width: 100%;
   background: var(--wl-primary);
-  color: #FFFFFF;
+  color: var(--wl-on-primary);
   border: none;
   border-radius: var(--radius-md);
   font-family: var(--wl-font-body, system-ui);
@@ -300,14 +300,14 @@ const handleResend = async () => {
   justify-content: center;
   gap: 0.55rem;
   cursor: pointer;
-  box-shadow: 0 4px 12px -2px rgba(79, 70, 229, 0.35);
+  box-shadow: 0 4px 12px -2px rgba(105, 169, 255, 0.35);
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .vip-submit-btn:hover:not(:disabled) {
   background: var(--wl-primary-hover);
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px -2px rgba(79, 70, 229, 0.45);
+  box-shadow: 0 6px 16px -2px rgba(105, 169, 255, 0.45);
 }
 
 .vip-submit-btn:active:not(:disabled) {
@@ -345,3 +345,4 @@ const handleResend = async () => {
   text-decoration: none;
 }
 </style>
+

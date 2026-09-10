@@ -436,7 +436,7 @@ watch(isOpen, (val) => {
   background: var(--wl-surface);
   border: 1px solid var(--wl-line-strong, #cbd5e1);
   border-radius: var(--wl-radius-md, 10px);
-  box-shadow: 0 10px 28px -4px rgba(15, 23, 42, 0.18), 0 4px 12px -2px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 10px 28px -4px rgba(0, 10, 25, 0.18), 0 4px 12px -2px rgba(0, 10, 25, 0.08);
   z-index: 10000;
   overflow: hidden;
   display: flex;
@@ -603,7 +603,7 @@ watch(isOpen, (val) => {
 
 .is-selected .option-symbol-badge {
   background: var(--wl-primary);
-  color: #ffffff;
+  color: var(--wl-on-primary);
   border-color: var(--wl-primary);
 }
 

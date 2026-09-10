@@ -787,6 +787,6 @@ onMounted(async () => {
 
 .btn-view-doc:hover {
   background: var(--wl-primary);
-  color: #FFFFFF;
+  color: var(--wl-on-primary);
 }
 </style>

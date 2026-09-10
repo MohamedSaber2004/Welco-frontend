@@ -304,23 +304,28 @@ const navigateToCategory = (catId: string) => {
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--wl-primary);
+  color: var(--wl-gold);
+  text-shadow: var(--wl-gold-text-shadow);
 }
 
 .pulse-dot {
   width: 6px;
   height: 6px;
   border-radius: 9999px;
-  background: var(--wl-primary);
-  box-shadow: 0 0 0 3px var(--wl-primary-ring);
+  background: var(--wl-gold);
+  box-shadow: var(--wl-gold-glow-soft);
 }
 
 .hero-title {
   font-size: 1.75rem;
   font-weight: 800;
-  color: var(--wl-text);
   letter-spacing: -0.02em;
   margin: 0;
+  background: var(--wl-gradient-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 10px rgba(233, 168, 37, 0.28)) drop-shadow(0 1px 0 rgba(6, 19, 40, 0.9));
 }
 
 .hero-desc {
@@ -456,7 +461,7 @@ const navigateToCategory = (catId: string) => {
 
 .filter-pill.is-active {
   background: var(--wl-primary);
-  color: #ffffff;
+  color: var(--wl-ink-strong);
   border-color: var(--wl-primary);
 }
 
@@ -539,9 +544,9 @@ const navigateToCategory = (catId: string) => {
   top: 10px;
   right: 10px;
   padding: 3px 8px;
-  background: var(--wl-overlay-tint, rgba(15, 23, 42, 0.75));
+  background: var(--wl-overlay-tint, rgba(0, 10, 25, 0.75));
   backdrop-filter: blur(4px);
-  color: #ffffff;
+  color: var(--wl-ink-strong);
   font-size: 10.5px;
   font-weight: 700;
   border-radius: 4px;
@@ -648,3 +653,4 @@ const navigateToCategory = (catId: string) => {
   }
 }
 </style>
+

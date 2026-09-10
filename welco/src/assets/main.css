@@ -4,7 +4,7 @@
 @tailwind components;
 @tailwind utilities;
 
-#app { min-height: 100vh; display: flex; flex-direction: column; background: var(--wl-paper); background-image: var(--wl-app-glow); background-repeat: no-repeat; background-size: 100% 560px; overflow-x: clip; }
+#app { min-height: 100vh; display: flex; flex-direction: column; background-color: var(--wl-paper); background-image: var(--wl-gradient-app, var(--wl-app-glow)); background-repeat: no-repeat; background-attachment: fixed; background-size: cover; overflow-x: clip; }
 main { flex: 1; min-width: 0; overflow-x: clip; }
 @media (max-width: 768px) {
   main {
@@ -62,7 +62,8 @@ table thead th.text-center {
   height: 32px;
   border-radius: 8px;
   border: 1px solid var(--wl-border);
-  background: var(--wl-surface);
+  background-color: var(--wl-surface);
+  background-image: var(--wl-gradient-secondary);
   color: var(--wl-muted);
   display: inline-grid;
   place-items: center;
@@ -255,3 +256,504 @@ table thead th.text-center {
   justify-content: flex-end;
   gap: 0.75rem;
 }
+
+/* ── Corrupted-font repair: legacy Tailwind slate/indigo/emerald text on navy ──
+ * These utilities were designed for light backgrounds and render near-invisible
+ * (or muddy grey) on the navy-classic dark theme. Remap them to theme tokens so
+ * every view — profile, admin tables, account — regains readable visualization.
+ * Placed AFTER @tailwind utilities so it wins over generated classes. */
+.text-slate-900,
+.text-slate-800,
+.text-slate-700 {
+  color: var(--wl-ink-strong) !important;
+}
+.text-slate-600 {
+  color: var(--wl-ink-soft) !important;
+}
+.text-slate-500,
+.text-slate-400 {
+  color: var(--wl-muted) !important;
+}
+.text-indigo-600,
+.text-indigo-500 {
+  color: var(--wl-primary) !important;
+}
+.text-emerald-700,
+.text-emerald-600,
+.text-emerald-500 {
+  color: var(--wl-success) !important;
+}
+.text-amber-600,
+.text-amber-500,
+.text-yellow-600,
+.text-yellow-500 {
+  color: var(--wl-gold) !important;
+}
+
+/* ── Gold / yellow-degree visualization utilities (admin identity) ── */
+.wl-text-gold {
+  color: var(--wl-gold) !important;
+}
+.wl-text-gold-gradient {
+  background: var(--wl-gradient-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent !important;
+}
+.wl-bg-gold-soft {
+  background: var(--wl-gold-soft) !important;
+  border: 1px solid rgba(255, 209, 102, 0.32) !important;
+}
+.wl-admin-glow {
+  box-shadow: var(--wl-gold-ring), 0 6px 22px rgba(233, 168, 37, 0.22) !important;
+}
+.wl-eyebrow-gold {
+  color: var(--wl-gold) !important;
+  background: var(--wl-gold-soft) !important;
+  border: 1px solid rgba(255, 209, 102, 0.32) !important;
+}
+
+/* ── Yellow-degree font color + shadow for landing pages & dashboards ──
+ * Display headings use the gold gradient clipped to text (with a navy
+ * drop-shadow for legibility); eyebrows/chips use solid gold on gold-soft.
+ * Body copy is intentionally untouched for readability. */
+.wl-gold-title {
+  background: var(--wl-gradient-gold) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+  filter: drop-shadow(0 2px 10px rgba(233, 168, 37, 0.28)) drop-shadow(0 1px 0 rgba(6, 19, 40, 0.9)) !important;
+}
+.wl-gold-text {
+  color: var(--wl-gold-text) !important;
+  text-shadow: var(--wl-gold-text-shadow) !important;
+}
+.wl-gold-eyebrow {
+  color: var(--wl-gold) !important;
+  background: var(--wl-gold-soft) !important;
+  border: 1px solid rgba(255, 209, 102, 0.35) !important;
+  box-shadow: var(--wl-gold-glow-soft) !important;
+  text-shadow: 0 1px 0 rgba(6, 19, 40, 0.9) !important;
+}
+.wl-gold-metric {
+  color: var(--wl-gold-text) !important;
+  text-shadow: var(--wl-gold-text-shadow) !important;
+  font-variant-numeric: tabular-nums !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+ * SITE-WIDE UNIFICATION — same fonts / same shadows / same colors
+ * Single enforcement layer AFTER Tailwind so every view + UI component
+ * renders identical typography, elevation, and palette degrees.
+ * ── Fonts: display → headings, body → controls, mono → data ──
+ * ── Shadows: navy-diffusion scale only (no light-theme greys) ──
+ * ── Colors: primary blue #69a9ff · gold #FFD166 · semantic tokens ──
+ * ═══════════════════════════════════════════════════════════════════ */
+
+/* Same fonts everywhere */
+button,
+input,
+select,
+textarea,
+.btn,
+.field__input,
+.field__select,
+.toolbar-search-input,
+.vip-48-input,
+.vip-input,
+.vip-select {
+  font-family: var(--wl-font-body) !important;
+}
+h1, h2, h3, h4, h5, h6,
+.font-display,
+.modal-title,
+.head-title,
+.form-card-title,
+.page-head__info h1,
+.admin-head h1 {
+  font-family: var(--wl-font-display) !important;
+  color: var(--wl-ink-strong) !important;
+}
+code, kbd, samp,
+.mono, .font-mono,
+.badge, .pill, .eyebrow, .eyebrow-rule,
+.panel__title, .breadcrumb,
+.role-pill, .status-dot-badge, .status-pill,
+.counter-text, .crumb-bar {
+  font-family: var(--wl-font-mono) !important;
+}
+
+/* Same shadows everywhere — cards / panels / modals / toolbars */
+.card,
+.panel,
+.table-card,
+.toolbar,
+.toolbar-card,
+.account-specs-bar,
+.company-headline,
+.admin-details .detail-item {
+  box-shadow: var(--wl-shadow-card) !important;
+}
+.modal-card,
+.confirm__card,
+.result-modal__card {
+  box-shadow: var(--shadow-xl) !important;
+  background-image: var(--wl-gradient-modal, var(--wl-gradient-card)) !important;
+}
+.btn:not(:disabled):hover,
+.btn-primary:hover:not(:disabled),
+.btn-vip-save:hover:not(:disabled),
+.row-action-btn:hover,
+.page-btn:not(:disabled):hover,
+.pill:hover {
+  box-shadow: var(--wl-shadow-hover) !important;
+}
+.btn-primary,
+.btn--primary,
+.btn-vip-save,
+.btn-place-order,
+.btn-approve {
+  box-shadow: var(--wl-shadow-primary) !important;
+}
+
+/* Same colors everywhere — legacy indigo/violet/grey degrees → tokens */
+.bg-indigo-600, .bg-indigo-500 { background-color: var(--wl-primary) !important; }
+.border-indigo-600, .border-indigo-500 { border-color: var(--wl-primary) !important; }
+.text-rose-600, .text-rose-500 { color: var(--wl-danger) !important; }
+.bg-rose-600, .bg-rose-500 { background-color: var(--wl-danger) !important; }
+.text-white, .text-gray-100, .text-zinc-100 { color: var(--wl-ink-strong) !important; }
+.text-gray-500, .text-gray-400, .text-zinc-400, .text-zinc-500 { color: var(--wl-muted) !important; }
+
+/* ═══════════════════════════════════════════════════════════════════
+ * YELLOW / GOLD DEGREES — shared across ALL pages, dashboards & UI
+ * Every primary display heading inherits the gold gradient + navy
+ * drop-shadow so titles glow consistently on navy panels site-wide.
+ * Stat values, metric numbers, and hero copy also get gold degrees.
+ * ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Shared font enforcement (broader surface coverage) ── */
+/* Display / heading font → every structural heading variant */
+.page-title,
+.section-title,
+.section-heading,
+.hero-title,
+.hero-heading,
+.dash-title,
+.dash-heading,
+.widget-title,
+.widget-heading,
+.card-title,
+.card-heading,
+.modal-heading,
+.modal-title,
+.drawer-title,
+.drawer-heading,
+.panel-title,
+.sidebar-heading,
+.sidebar-title,
+.rail-logo,
+.nav-brand,
+.brand-name,
+.stat-label,
+.stat-card__label,
+.metric-label,
+.chart-title,
+.tab-label,
+.section-label,
+.form-section-title,
+.detail-heading,
+.profile-name,
+.company-name,
+.product-name,
+.catalog-name,
+.item-name,
+.order-title {
+  font-family: var(--wl-font-display) !important;
+}
+
+/* Body font → every control and interactive element */
+.label,
+.form-label,
+.field-label,
+.input-label,
+.select-label,
+.toggle-label,
+.checkbox-label,
+.radio-label,
+.tag,
+.chip,
+.nav-link,
+.menu-item,
+.menu__link,
+.nav-item,
+.sidebar-link,
+.rail-link,
+.mobile-nav-link,
+.footer-link,
+.dropdown-item,
+.list-item,
+.table-cell,
+.td-text,
+.detail-value,
+.detail-v,
+.summary-value,
+.price,
+.amount,
+.quantity,
+.step-label,
+.crumb,
+.crumb-item {
+  font-family: var(--wl-font-body) !important;
+}
+
+/* Mono font → all data, code, stats, ids, pills */
+.sku,
+.sku-code,
+.order-id,
+.ref-code,
+.product-id,
+.user-id,
+.tracking-number,
+.date-value,
+.time-value,
+.stat-value,
+.stat-card__value,
+.metric-value,
+.counter,
+.counter-value,
+.kpi-value,
+.kpi-number,
+.chart-value,
+.table-num,
+.table-id,
+.invoice-number,
+.serial-number,
+.role-badge,
+.version-tag,
+.build-tag {
+  font-family: var(--wl-font-mono) !important;
+  font-variant-numeric: tabular-nums !important;
+}
+
+/* ── Gold / yellow degrees — ALL page & dashboard headings ──
+ * Primary headings (h1) on every view get the gold gradient + depth shadow.
+ * h2 and .section-title get the solid gold text color with navy shadow.
+ * This excludes body copy, labels, and navigation (readability first). */
+
+/* h1 — gold gradient clipped to text + deep-navy drop shadow */
+.page-shell > h1,
+.page-shell .page-head__info > h1,
+.page-shell .page-head > h1,
+.page-shell .admin-head > h1,
+.hero-title,
+.hero-heading,
+.landing-title,
+.home-title,
+.section-hero h1,
+.hero-section h1,
+.hero-block h1,
+.dash-hero h1,
+.dash-hero-title {
+  background: var(--wl-gradient-gold) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+  filter:
+    drop-shadow(0 2px 12px rgba(233, 168, 37, 0.28))
+    drop-shadow(0 1px 0 rgba(6, 19, 40, 0.9)) !important;
+}
+
+/* h2 — solid gold text + text-shadow depth */
+.page-shell h2,
+.page-shell .section-title,
+.page-shell .section-heading,
+.dash-section-title,
+.widget-heading,
+.dashboard-section-title {
+  color: var(--wl-gold-text) !important;
+  text-shadow: var(--wl-gold-text-shadow) !important;
+}
+
+/* Stat / metric values site-wide (dashboards, account, admin) */
+.stat-card__value,
+.stat-value,
+.kpi-value,
+.kpi-number,
+.metric-value,
+.counter-value,
+.dash-stat-value,
+.dash-metric-value,
+.account-stat-value,
+.admin-stat-value {
+  color: var(--wl-gold-text) !important;
+  text-shadow: var(--wl-gold-text-shadow) !important;
+  font-family: var(--wl-font-mono) !important;
+  font-variant-numeric: tabular-nums !important;
+}
+
+/* Gold eyebrow / section labels — chips, admin badges, run-of-site labels */
+.wl-eyebrow,
+.eyebrow-gold,
+.section-eyebrow,
+.page-eyebrow,
+.dash-eyebrow,
+.admin-eyebrow,
+.gold-label,
+.gold-eyebrow {
+  color: var(--wl-gold) !important;
+  background: var(--wl-gold-soft) !important;
+  border: 1px solid rgba(255, 209, 102, 0.32) !important;
+  text-shadow: 0 1px 0 rgba(6, 19, 40, 0.9) !important;
+  font-family: var(--wl-font-mono) !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+}
+
+/* ── Navy-diffusion shadows — ALL structural elements ──
+ * Comprehensive override that replaces any remaining light-theme
+ * rgba(15,23,42) or rgba(0,0,0,0.1) box-shadows with the navy scale.
+ * Uses cascade specificity (no !important where unnecessary) so that
+ * hover/focus states from the element block above still win. */
+
+/* Navigation & layout shells */
+.app-header,
+.header,
+.site-header,
+.nav-bar,
+.top-bar,
+.app-footer,
+.footer,
+.site-footer,
+.mobile-nav,
+.app-mobile-nav,
+.bottom-nav,
+.rail,
+.sidebar,
+.side-rail,
+.drawer,
+.nav-drawer,
+.admin-rail,
+.admin-sidebar {
+  box-shadow: var(--wl-shadow-card) !important;
+}
+
+/* Dropdowns, popups, overlays */
+.dropdown,
+.dropdown-menu,
+.dropdown-panel,
+.popup,
+.popover,
+.tooltip,
+.flyout,
+.select-dropdown,
+.currency-dropdown,
+.search-dropdown,
+.suggestion-list,
+.autocomplete-panel {
+  box-shadow: var(--shadow-lg) !important;
+}
+
+/* Floating action buttons */
+.fab,
+.whatsapp-fab,
+.floating-btn,
+.action-fab {
+  box-shadow: var(--wl-shadow-primary) !important;
+}
+
+/* Images with elevation */
+.product-img,
+.catalog-img,
+.cert-img,
+.avatar,
+.avatar-img,
+.logo-img,
+.thumbnail {
+  box-shadow: var(--shadow-sm) !important;
+}
+
+/* Account nav & section cards */
+.account-nav,
+.account-card,
+.account-specs-bar,
+.profile-card,
+.profile-section,
+.user-card,
+.company-card,
+.address-card,
+.order-card,
+.order-detail-card,
+.ticket-card,
+.help-card,
+.loc-card,
+.territory-col {
+  box-shadow: var(--wl-shadow-card) !important;
+}
+
+/* Dashboard widgets & stat cards */
+.stat-card,
+.dash-card,
+.metric-card,
+.kpi-card,
+.widget-card,
+.chart-card,
+.analytics-card,
+.summary-card,
+.activity-card,
+.feed-card,
+.recent-orders-card,
+.revenue-card,
+.overview-card {
+  box-shadow: var(--wl-shadow-card) !important;
+}
+
+/* Admin view cards & panels */
+.admin-card,
+.admin-panel,
+.admin-section,
+.admin-block,
+.management-card,
+.crud-card,
+.detail-card,
+.form-card,
+.filter-panel,
+.search-panel,
+.audit-card,
+.log-card,
+.zone-card,
+.city-card,
+.country-card,
+.company-headline {
+  box-shadow: var(--wl-shadow-card) !important;
+}
+
+/* Toast / notification banners */
+.toast,
+.toast-item,
+.notification,
+.alert-banner,
+.snack-bar,
+.flash-message {
+  box-shadow: var(--shadow-lg) !important;
+}
+
+/* Input adornment wrappers */
+.input-wrapper,
+.input-group,
+.field-wrapper,
+.phone-input-wrapper,
+.search-input-wrapper,
+.currency-select-wrapper {
+  box-shadow: var(--shadow-xs) !important;
+}
+
+/* Skeleton / loading states */
+.skeleton,
+.shimmer-box,
+.skeleton-card,
+.skeleton-row,
+.skeleton-text,
+.loading-card {
+  box-shadow: none !important;
+}
+

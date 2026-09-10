@@ -1,15 +1,16 @@
-/* Welco — Surgical Precision Design System · DARK ONLY
- * Deep charcoal foundation · Blurple #5865F2 · Periwinkle #949CF7
+/* Welco — Classic Control-Panel Design System · NAVY CLASSIC ONLY
+ * SmarterASP-classic degrees: deep navy #061328 · panel #071A38 · table-head #0B274F
+ * Link blue #69a9ff · action accent #d8e8ff (navy ink) · mint #3ed7b4 · amber #f8c15d
+ * Compact classic density: 12px base · 36px header controls · 32px toolbar controls
  * Plus Jakarta Sans & Sora Display · Inter Body · Alexandria & IBM Plex Sans Arabic · JetBrains Mono Data
- * Signature: Laser scalpel sweep, luminous micro-focus rings, 44px ergonomic controls
- * NOTE: white/light mode has been removed — :root IS the dark theme.
+ * NOTE: light mode has been removed — :root IS the navy classic theme.
  */
 @import url('https://fonts.googleapis.com/css2?family=Alexandria:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Sora:wght@500;600;700;800&display=swap');
 
 :root {
   color-scheme: dark;
 
-  /* ── Typography — Surgical Precision & High-Density Clinical Clarity ── */
+  /* ── Typography ── */
   --wl-font-display: 'Plus Jakarta Sans', 'Sora', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --wl-font-body: 'Inter', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --wl-font-mono: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, monospace;
@@ -26,18 +27,19 @@
   --wl-leading-body: 1.62;
 
   /* ── RGB channels for Tailwind opacity ── */
-  --wl-primary-rgb: 88, 101, 242;
-  --wl-accent-rgb: 148, 156, 247;
-  --wl-danger-rgb: 237, 66, 69;
-  --wl-success-rgb: 87, 242, 135;
-  --wl-warning-rgb: 254, 231, 92;
-  --wl-info-rgb: 0, 168, 252;
-  --wl-paper-rgb: 30, 31, 34;
-  --wl-surface-rgb: 43, 45, 49;
-  --wl-ink-rgb: 219, 222, 225;
-  --wl-ink-strong-rgb: 242, 243, 245;
-  --wl-ink-soft-rgb: 181, 186, 193;
-  --wl-muted-rgb: 148, 155, 164;
+  --wl-primary-rgb: 105, 169, 255;
+  --wl-accent-rgb: 216, 232, 255;
+  --wl-gold-rgb: 255, 209, 102;
+  --wl-danger-rgb: 242, 109, 109;
+  --wl-success-rgb: 62, 215, 180;
+  --wl-warning-rgb: 248, 193, 93;
+  --wl-info-rgb: 105, 169, 255;
+  --wl-paper-rgb: 6, 19, 40;
+  --wl-surface-rgb: 7, 26, 56;
+  --wl-ink-rgb: 216, 232, 255;
+  --wl-ink-strong-rgb: 244, 248, 255;
+  --wl-ink-soft-rgb: 191, 207, 232;
+  --wl-muted-rgb: 147, 165, 189;
 
   /* ── Zinc Neutrals (kept for scrollbars / legacy refs) ── */
   --zinc-50: #FAFAFA;
@@ -52,67 +54,95 @@
   --zinc-900: #18181B;
   --zinc-950: #09090B;
 
-  /* ── Primary — Blurple ── */
-  --wl-primary: #5865F2;
-  --wl-primary-hover: #4752C4;
-  --wl-primary-active: #3C45A5;
-  --wl-primary-soft: rgba(88, 101, 242, 0.18);
-  --wl-primary-faint: rgba(88, 101, 242, 0.09);
-  --wl-primary-ring: 0 0 0 4px rgba(88, 101, 242, 0.28);
-  --wl-primary-shadow: 0 4px 22px rgba(88, 101, 242, 0.35), 0 2px 8px rgba(0, 0, 0, 0.4);
-  --wl-primary-glow: 0 0 0 3.5px rgba(88, 101, 242, 0.24), 0 2px 12px rgba(88, 101, 242, 0.3);
-  --wl-on-primary: #FFFFFF;
+  /* ── Primary — panel blue (links, highlights, rings) ── */
+  --wl-primary: #69a9ff;
+  --wl-primary-hover: #8abcff;
+  --wl-primary-active: #4f95f5;
+  --wl-primary-soft: rgba(105, 169, 255, 0.14);
+  --wl-primary-faint: rgba(105, 169, 255, 0.07);
+  --wl-primary-ring: 0 0 0 4px rgba(105, 169, 255, 0.2);
+  --wl-primary-shadow: 0 4px 18px rgba(4, 12, 28, 0.55), 0 2px 8px rgba(105, 169, 255, 0.18);
+  --wl-primary-glow: 0 0 0 3.5px rgba(105, 169, 255, 0.2), 0 2px 10px rgba(105, 169, 255, 0.22);
+  --wl-on-primary: #061328;
 
-  /* ── Accent — Periwinkle ── */
-  --wl-accent: #949CF7;
-  --wl-accent-hover: #A8B3FA;
-  --wl-accent-soft: rgba(148, 156, 247, 0.15);
-  --wl-accent-faint: rgba(148, 156, 247, 0.08);
-  --wl-accent-ring: 0 0 0 4px rgba(148, 156, 247, 0.2);
+  /* ── Accent — action tint (light action surfaces, navy ink) ── */
+  --wl-accent: #d8e8ff;
+  --wl-accent-hover: #eaf3ff;
+  --wl-accent-soft: rgba(216, 232, 255, 0.12);
+  --wl-accent-faint: rgba(216, 232, 255, 0.06);
+  --wl-accent-ring: 0 0 0 4px rgba(216, 232, 255, 0.16);
+  --wl-on-accent: #061328;
 
-  /* ── Semantic (dark-tuned, high contrast on charcoal) ── */
-  --wl-success: #57F287;
-  --wl-success-soft: rgba(87, 242, 135, 0.15);
-  --wl-success-ring: 0 0 0 4px rgba(87, 242, 135, 0.18);
-  --wl-warning: #FEE75C;
-  --wl-warning-soft: rgba(254, 231, 92, 0.15);
-  --wl-danger: #ED4245;
-  --wl-danger-soft: rgba(237, 66, 69, 0.15);
-  --wl-danger-ring: 0 0 0 4px rgba(237, 66, 69, 0.18);
-  --wl-info: #00A8FC;
-  --wl-info-soft: rgba(0, 168, 252, 0.15);
+  /* ── Semantic (classic panel degrees) ── */
+  --wl-success: #3ed7b4;
+  --wl-success-soft: rgba(62, 215, 180, 0.13);
+  --wl-success-ring: 0 0 0 4px rgba(62, 215, 180, 0.16);
+  --wl-warning: #f8c15d;
+  --wl-warning-soft: rgba(248, 193, 93, 0.13);
+  --wl-danger: #f26d6d;
+  --wl-danger-soft: rgba(242, 109, 109, 0.13);
+  --wl-danger-ring: 0 0 0 4px rgba(242, 109, 109, 0.16);
+  --wl-info: #69a9ff;
+  --wl-info-soft: rgba(105, 169, 255, 0.14);
 
-  /* ── Ink & Line (font colors — all tuned for dark readability) ── */
-  --wl-ink-strong: #F2F3F5;
-  --wl-ink: #DBDEE1;
-  --wl-ink-soft: #B5BAC1;
-  --wl-muted: #949BA4;
-  --wl-muted-soft: #7E8590;
-  --wl-line: rgba(255, 255, 255, 0.09);
-  --wl-line-strong: rgba(255, 255, 255, 0.18);
+  /* ── Gold / Yellow degrees — admin identity & high-visibility accents ──
+   * 300 #FFE29A (highlight text) · 400 #FFD166 (primary gold) ·
+   * 500 #F8C15D (amber depth) · 600 #E9A825 (outline / deep shade) */
+  --wl-gold-300: #FFE29A;
+  --wl-gold-400: #FFD166;
+  --wl-gold-500: #F8C15D;
+  --wl-gold-600: #E9A825;
+  --wl-gold: #FFD166;
+  --wl-gold-hover: #FFE29A;
+  --wl-gold-active: #E9A825;
+  --wl-gold-soft: rgba(255, 209, 102, 0.14);
+  --wl-gold-faint: rgba(255, 209, 102, 0.07);
+  --wl-gold-ring: 0 0 0 4px rgba(255, 209, 102, 0.18);
+  --wl-on-gold: #061328;
+  --wl-admin: var(--wl-gold);
+  --wl-admin-soft: var(--wl-gold-soft);
+  --wl-admin-ring: var(--wl-gold-ring);
+  /* ── Gold font-color + shadow degrees (landing + dashboards) ──
+   * Yellow-degree text must always pair with a deep-navy shadow so it stays
+   * legible and glowing on navy panels. */
+  --wl-gold-text: #FFD66B;
+  --wl-gold-text-shadow: 0 1px 0 rgba(6, 19, 40, 0.9), 0 2px 14px rgba(233, 168, 37, 0.35);
+  --wl-gold-title-shadow: 0 1px 0 rgba(6, 19, 40, 0.9), 0 4px 26px rgba(233, 168, 37, 0.28), 0 2px 8px rgba(0, 0, 0, 0.45);
+  --wl-gold-glow-soft: 0 0 0 3px rgba(255, 209, 102, 0.14), 0 4px 18px rgba(233, 168, 37, 0.22);
 
-  /* ── Surfaces (layered charcoal depth) ── */
-  --wl-paper: #1E1F22;
-  --wl-surface: #2B2D31;
-  --wl-card: #313338;
-  --wl-surface-soft: #383A40;
-  --wl-surface-hover: #404249;
-  --wl-surface-muted: #1E1F22;
-  --wl-border: rgba(255, 255, 255, 0.09);
-  --wl-border-strong: rgba(255, 255, 255, 0.18);
-  --wl-header-bg: rgba(30, 31, 34, 0.86);
-  --wl-header-border: rgba(255, 255, 255, 0.07);
-  --wl-app-glow: radial-gradient(1200px 500px at 50% -10%, rgba(88, 101, 242, 0.12), transparent 60%);
+  /* ── Ink & Line ── */
+  --wl-ink-strong: #f4f8ff;
+  --wl-ink: #d8e8ff;
+  --wl-ink-soft: #bfcfe8;
+  --wl-muted: #93a5bd;
+  --wl-muted-soft: #7c8da0;
+  --wl-line: rgba(116, 169, 255, 0.24);
+  --wl-line-strong: rgba(151, 190, 255, 0.42);
+
+  /* ── Surfaces (classic navy panels) ── */
+  --wl-paper: #061328;
+  --wl-surface: #071a38;
+  --wl-card: #0a2248;
+  --wl-surface-soft: #0b274f;
+  --wl-surface-hover: rgba(84, 151, 255, 0.16);
+  --wl-surface-muted: #061328;
+  --wl-row-alt: #0a2248;
+  --wl-field: rgba(8, 28, 58, 0.98);
+  --wl-border: rgba(116, 169, 255, 0.24);
+  --wl-border-strong: rgba(151, 190, 255, 0.42);
+  --wl-header-bg: rgba(6, 19, 40, 0.9);
+  --wl-header-border: rgba(116, 169, 255, 0.18);
+  --wl-app-glow: radial-gradient(circle at 50% 0%, rgba(114, 177, 255, 0.24), transparent 34%);
 
   /* ── Text Colors ── */
-  --wl-text-primary: #F2F3F5;
-  --wl-text-secondary: #B5BAC1;
-  --wl-text-muted: #949BA4;
+  --wl-text-primary: #f4f8ff;
+  --wl-text-secondary: #d8e8ff;
+  --wl-text-muted: #93a5bd;
 
   /* ── Background Colors ── */
-  --wl-bg-app: #1E1F22;
-  --wl-bg-surface: #2B2D31;
-  --wl-bg-surface-soft: #383A40;
+  --wl-bg-app: #061328;
+  --wl-bg-surface: #071a38;
+  --wl-bg-surface-soft: #0b274f;
 
   /* ── Spacing Scale (4px harmonic base) ── */
   --space-0: 0px;
@@ -129,23 +159,31 @@
   --space-20: 80px;
   --space-24: 96px;
 
-  /* ── Radii ── */
-  --radius-xs: 6px;
-  --radius-sm: 10px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
-  --radius-2xl: 24px;
+  /* ── Radii (classic compact) ── */
+  --radius-xs: 3px;
+  --radius-sm: 5px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
   --radius-full: 999px;
 
-  /* ── Shadows (deep ambient diffusion for dark depth) ── */
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.45);
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.55);
-  --shadow-xl: 0 24px 48px rgba(0, 0, 0, 0.6);
-  --wl-shadow-card: 0 0 0 1px rgba(0, 0, 0, 0.32), 0 2px 10px rgba(0, 0, 0, 0.45), 0 14px 32px -8px rgba(0, 0, 0, 0.55);
-  --wl-shadow-primary: 0 4px 22px rgba(88, 101, 242, 0.4);
+  /* ── Shadows (deep navy diffusion) — SINGLE source of truth site-wide ──
+   * All components/views must use these; no light-theme rgba(15,23,42) shadows. */
+  --shadow-xs: 0 1px 2px rgba(0, 8, 20, 0.5);
+  --shadow-sm: 0 1px 3px rgba(0, 8, 20, 0.5);
+  --shadow-md: 0 6px 18px rgba(0, 10, 25, 0.55);
+  --shadow-lg: 0 14px 40px rgba(0, 12, 28, 0.6);
+  --shadow-xl: 0 23px 81px rgba(0, 15, 38, 0.66);
+  --wl-shadow-card: 0 0 0 1px rgba(116, 169, 255, 0.1), 0 10px 30px rgba(0, 10, 25, 0.5);
+  --wl-shadow-primary: 0 4px 18px rgba(4, 12, 28, 0.55), 0 2px 8px rgba(105, 169, 255, 0.2);
+  /* Unified aliases — every shadow reference resolves to the same scale */
+  --wl-shadow: var(--wl-shadow-card);
+  --wl-shadow-sm: var(--shadow-sm);
+  --wl-shadow-md: var(--shadow-md);
+  --wl-shadow-lg: var(--shadow-lg);
+  --wl-shadow-modal: var(--shadow-xl);
+  --wl-shadow-hover: 0 4px 16px -2px rgba(0, 10, 25, 0.5), 0 10px 24px -4px rgba(105, 169, 255, 0.12);
 
   /* ── Layout & Semantic Spacing Tokens ── */
   --wl-max-width: 1280px;
@@ -169,24 +207,33 @@
   --wl-card-padding-lg: 2rem;
   --wl-form-gap: 1.25rem;
   --wl-field-gap: 0.45rem;
-  --wl-table-cell-padding-y: 0.85rem;
-  --wl-table-cell-padding-x: 1.15rem;
+  --wl-table-cell-padding-y: 8px;
+  --wl-table-cell-padding-x: 9px;
   --wl-table-cell-padding: var(--wl-table-cell-padding-y) var(--wl-table-cell-padding-x);
   --wl-modal-padding: 1.5rem;
   --wl-modal-padding-sm: 1rem;
 
-  /* ── Control Sizing ── */
-  --wl-control-sm: 36px;
-  --wl-control-md: 44px;
-  --wl-control-lg: 52px;
+  /* ── Control Sizing (classic compact: 36px header, 32px toolbar) ── */
+  --wl-control-sm: 32px;
+  --wl-control-md: 36px;
+  --wl-control-lg: 44px;
+  --wl-table-action-size: 27px;
 
   /* ── Motion ── */
   --wl-transition: 0.18s cubic-bezier(0.16, 1, 0.3, 1);
   --wl-ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
-  --wl-focus-ring: 0 0 0 3.5px rgba(88, 101, 242, 0.28), 0 2px 12px rgba(88, 101, 242, 0.25);
-  --wl-focus-ring-danger: 0 0 0 3.5px rgba(237, 66, 69, 0.22);
+  --wl-focus-ring: 0 0 0 3.5px rgba(105, 169, 255, 0.22), 0 2px 10px rgba(105, 169, 255, 0.2);
+  --wl-focus-ring-danger: 0 0 0 3.5px rgba(242, 109, 109, 0.2);
 
-  /* ── Backward-compatible aliases (consolidate to --wl-primary / --wl-accent) ── */
+  /* ── Backward-compatible aliases — SAME color everywhere ──
+   * Legacy indigo/violet hexes resolve to the navy-classic primary so every
+   * component renders the identical blue degree. */
+  --wl-indigo: var(--wl-primary);
+  --wl-indigo-hover: var(--wl-primary-hover);
+  --wl-indigo-soft: var(--wl-primary-soft);
+  --wl-indigo-rgb: var(--wl-primary-rgb);
+  --wl-violet: var(--wl-primary);
+  --wl-violet-soft: var(--wl-primary-soft);
   --wl-teal: var(--wl-primary);
   --wl-teal-hover: var(--wl-primary-hover);
   --wl-teal-soft: var(--wl-primary-soft);
@@ -200,8 +247,8 @@
   --wl-brass-soft: var(--wl-accent-soft);
   --clinical-primary: var(--wl-primary);
   --clinical-primary-container: var(--wl-primary-soft);
-  --clinical-inverse-surface: #FAFAFA;
-  --clinical-inverse-primary: #4F46E5;
+  --clinical-inverse-surface: #f4f8ff;
+  --clinical-inverse-primary: #1B75BB;
   --wl-medical-blue-soft: var(--wl-primary-soft);
   --wl-medical-blue-faint: var(--wl-primary-faint);
   --wl-steril-amber-soft: var(--wl-accent-soft);
@@ -215,62 +262,124 @@
   --wl-radius-lg: var(--radius-lg);
   --wl-radius-xl: var(--radius-xl);
 
-  /* ── Laser Sweep Gradient ── */
-  --wl-laser-sweep: linear-gradient(90deg, transparent, #5865F2, #949CF7, transparent);
+  /* ── Header accent sweep ── */
+  --wl-laser-sweep: linear-gradient(90deg, transparent, #69a9ff, #d8e8ff, transparent);
+
+  /* ── Background gradients (high-contrast eye-friendly blends) ── */
+  --wl-gradient-app:
+    radial-gradient(900px 420px at 12% -4%, rgba(62, 215, 180, 0.1), transparent 60%),
+    radial-gradient(1000px 480px at 88% -6%, rgba(139, 124, 255, 0.14), transparent 62%),
+    radial-gradient(760px 340px at 50% 110%, rgba(105, 169, 255, 0.08), transparent 60%),
+    linear-gradient(180deg, #0a2148 0%, #071a38 34%, #061328 100%);
+  --wl-gradient-card: linear-gradient(135deg, #0e2f63 0%, #0a2350 42%, #081d3d 100%);
+  --wl-gradient-panel: linear-gradient(135deg, #0c2a55 0%, #0a2248 55%, #071a38 100%);
+  --wl-gradient-rail: linear-gradient(180deg, #0d2c5c 0%, #0a2148 45%, #061328 100%);
+  --wl-gradient-table-head: linear-gradient(90deg, #10407f 0%, #0e2e5e 45%, #0c4a4a 100%);
+  --wl-gradient-primary: linear-gradient(135deg, #8abcff 0%, #69a9ff 45%, #3ed7b4 100%);
+  --wl-gradient-gold: linear-gradient(135deg, #FFE29A 0%, #FFD166 45%, #E9A825 100%);
+  --wl-gradient-gold-soft: linear-gradient(135deg, rgba(255, 226, 154, 0.18) 0%, rgba(255, 209, 102, 0.12) 50%, rgba(233, 168, 37, 0.1) 100%);
+  --wl-gradient-secondary: linear-gradient(135deg, #12365f 0%, #0e2c58 50%, #0a2248 100%);
+  --wl-gradient-toolbar: linear-gradient(90deg, rgba(105, 169, 255, 0.16) 0%, rgba(62, 215, 180, 0.1) 50%, rgba(139, 124, 255, 0.14) 100%);
+  --wl-gradient-chip: linear-gradient(90deg, rgba(105, 169, 255, 0.22), rgba(62, 215, 180, 0.18));
+  --wl-gradient-modal: linear-gradient(160deg, #0d2c5c 0%, #081d3d 100%);
+  --wl-gradient-hero: radial-gradient(720px 320px at 18% 0%, rgba(105, 169, 255, 0.2), transparent 60%), radial-gradient(560px 280px at 85% 10%, rgba(62, 215, 180, 0.12), transparent 60%), linear-gradient(180deg, #0a2350 0%, #061328 100%);
+  --wl-app-glow:
+    radial-gradient(900px 420px at 12% -4%, rgba(62, 215, 180, 0.1), transparent 60%),
+    radial-gradient(1000px 480px at 88% -6%, rgba(139, 124, 255, 0.14), transparent 62%),
+    radial-gradient(circle at 50% 0%, rgba(114, 177, 255, 0.24), transparent 34%);
 }
 
-/* ── Dark-only compat: .dark / [data-theme] selectors resolve identically ──
- * White mode removed — these blocks intentionally mirror :root so any
- * legacy `dark` class handling keeps rendering the same rich dark theme. */
+/* ── Navy-classic compat: .dark / [data-theme] selectors resolve identically ──
+ * Light mode removed — these blocks intentionally mirror :root. */
 :root.dark, :root[data-theme='dark'], :root[data-theme='light'] {
   color-scheme: dark;
-  --wl-paper: #1E1F22;
-  --wl-surface: #2B2D31;
-  --wl-card: #313338;
-  --wl-surface-soft: #383A40;
-  --wl-surface-hover: #404249;
-  --wl-surface-muted: #1E1F22;
-  --wl-border: rgba(255, 255, 255, 0.09);
-  --wl-border-strong: rgba(255, 255, 255, 0.18);
-  --wl-line: rgba(255, 255, 255, 0.09);
-  --wl-line-strong: rgba(255, 255, 255, 0.18);
-  --wl-header-bg: rgba(30, 31, 34, 0.86);
-  --wl-header-border: rgba(255, 255, 255, 0.07);
-  --wl-ink-strong: #F2F3F5;
-  --wl-ink: #DBDEE1;
-  --wl-ink-soft: #B5BAC1;
-  --wl-muted: #949BA4;
-  --wl-muted-soft: #7E8590;
-  --wl-text-primary: #F2F3F5;
-  --wl-text-secondary: #B5BAC1;
-  --wl-text-muted: #949BA4;
-  --wl-bg-app: #1E1F22;
-  --wl-bg-surface: #2B2D31;
-  --wl-bg-surface-soft: #383A40;
-  --wl-primary: #5865F2;
-  --wl-primary-hover: #4752C4;
-  --wl-primary-active: #3C45A5;
-  --wl-primary-soft: rgba(88, 101, 242, 0.18);
-  --wl-primary-faint: rgba(88, 101, 242, 0.09);
-  --wl-accent: #949CF7;
-  --wl-accent-hover: #A8B3FA;
-  --wl-accent-soft: rgba(148, 156, 247, 0.15);
-  --wl-accent-faint: rgba(148, 156, 247, 0.08);
-  --wl-success: #57F287;
-  --wl-success-soft: rgba(87, 242, 135, 0.15);
-  --wl-warning: #FEE75C;
-  --wl-warning-soft: rgba(254, 231, 92, 0.15);
-  --wl-danger: #ED4245;
-  --wl-danger-soft: rgba(237, 66, 69, 0.15);
-  --wl-info: #00A8FC;
-  --wl-info-soft: rgba(0, 168, 252, 0.15);
-  --wl-focus-ring: 0 0 0 3.5px rgba(88, 101, 242, 0.28), 0 2px 12px rgba(88, 101, 242, 0.25);
+  --wl-paper: #061328;
+  --wl-surface: #071a38;
+  --wl-card: #0a2248;
+  --wl-surface-soft: #0b274f;
+  --wl-surface-hover: rgba(84, 151, 255, 0.16);
+  --wl-surface-muted: #061328;
+  --wl-row-alt: #0a2248;
+  --wl-field: rgba(8, 28, 58, 0.98);
+  --wl-border: rgba(116, 169, 255, 0.24);
+  --wl-border-strong: rgba(151, 190, 255, 0.42);
+  --wl-line: rgba(116, 169, 255, 0.24);
+  --wl-line-strong: rgba(151, 190, 255, 0.42);
+  --wl-header-bg: rgba(6, 19, 40, 0.9);
+  --wl-header-border: rgba(116, 169, 255, 0.18);
+  --wl-ink-strong: #f4f8ff;
+  --wl-ink: #d8e8ff;
+  --wl-ink-soft: #bfcfe8;
+  --wl-muted: #93a5bd;
+  --wl-muted-soft: #7c8da0;
+  --wl-text-primary: #f4f8ff;
+  --wl-text-secondary: #d8e8ff;
+  --wl-text-muted: #93a5bd;
+  --wl-gold-rgb: 255, 209, 102;
+  --wl-gold-300: #FFE29A;
+  --wl-gold-400: #FFD166;
+  --wl-gold-500: #F8C15D;
+  --wl-gold-600: #E9A825;
+  --wl-gold: #FFD166;
+  --wl-gold-hover: #FFE29A;
+  --wl-gold-active: #E9A825;
+  --wl-gold-soft: rgba(255, 209, 102, 0.14);
+  --wl-gold-faint: rgba(255, 209, 102, 0.07);
+  --wl-gold-ring: 0 0 0 4px rgba(255, 209, 102, 0.18);
+  --wl-on-gold: #061328;
+  --wl-admin: var(--wl-gold);
+  --wl-admin-soft: var(--wl-gold-soft);
+  --wl-admin-ring: var(--wl-gold-ring);
+  --wl-gold-text: #FFD66B;
+  --wl-gold-text-shadow: 0 1px 0 rgba(6, 19, 40, 0.9), 0 2px 14px rgba(233, 168, 37, 0.35);
+  --wl-gold-title-shadow: 0 1px 0 rgba(6, 19, 40, 0.9), 0 4px 26px rgba(233, 168, 37, 0.28), 0 2px 8px rgba(0, 0, 0, 0.45);
+  --wl-gold-glow-soft: 0 0 0 3px rgba(255, 209, 102, 0.14), 0 4px 18px rgba(233, 168, 37, 0.22);
+  --wl-bg-app: #061328;
+  --wl-bg-surface: #071a38;
+  --wl-bg-surface-soft: #0b274f;
+  --wl-primary: #69a9ff;
+  --wl-primary-hover: #8abcff;
+  --wl-primary-active: #4f95f5;
+  --wl-primary-soft: rgba(105, 169, 255, 0.14);
+  --wl-primary-faint: rgba(105, 169, 255, 0.07);
+  --wl-on-primary: #061328;
+  --wl-accent: #d8e8ff;
+  --wl-accent-hover: #eaf3ff;
+  --wl-accent-soft: rgba(216, 232, 255, 0.12);
+  --wl-accent-faint: rgba(216, 232, 255, 0.06);
+  --wl-on-accent: #061328;
+  --wl-success: #3ed7b4;
+  --wl-success-soft: rgba(62, 215, 180, 0.13);
+  --wl-warning: #f8c15d;
+  --wl-warning-soft: rgba(248, 193, 93, 0.13);
+  --wl-danger: #f26d6d;
+  --wl-danger-soft: rgba(242, 109, 109, 0.13);
+  --wl-info: #69a9ff;
+  --wl-info-soft: rgba(105, 169, 255, 0.14);
+  --wl-focus-ring: 0 0 0 3.5px rgba(105, 169, 255, 0.22), 0 2px 10px rgba(105, 169, 255, 0.2);
   --wl-teal: var(--wl-primary);
   --wl-teal-hover: var(--wl-primary-hover);
   --wl-teal-soft: var(--wl-primary-soft);
   --wl-teal-faint: var(--wl-primary-faint);
   --wl-brass: var(--wl-accent);
   --wl-brass-soft: var(--wl-accent-soft);
+  --wl-gradient-card: linear-gradient(135deg, #0e2f63 0%, #0a2350 42%, #081d3d 100%);
+  --wl-gradient-panel: linear-gradient(135deg, #0c2a55 0%, #0a2248 55%, #071a38 100%);
+  --wl-gradient-rail: linear-gradient(180deg, #0d2c5c 0%, #0a2148 45%, #061328 100%);
+  --wl-gradient-table-head: linear-gradient(90deg, #10407f 0%, #0e2e5e 45%, #0c4a4a 100%);
+  --wl-gradient-primary: linear-gradient(135deg, #8abcff 0%, #69a9ff 45%, #3ed7b4 100%);
+  --wl-gradient-gold: linear-gradient(135deg, #FFE29A 0%, #FFD166 45%, #E9A825 100%);
+  --wl-gradient-gold-soft: linear-gradient(135deg, rgba(255, 226, 154, 0.18) 0%, rgba(255, 209, 102, 0.12) 50%, rgba(233, 168, 37, 0.1) 100%);
+  --wl-gradient-secondary: linear-gradient(135deg, #12365f 0%, #0e2c58 50%, #0a2248 100%);
+  --wl-gradient-toolbar: linear-gradient(90deg, rgba(105, 169, 255, 0.16) 0%, rgba(62, 215, 180, 0.1) 50%, rgba(139, 124, 255, 0.14) 100%);
+  --wl-gradient-chip: linear-gradient(90deg, rgba(105, 169, 255, 0.22), rgba(62, 215, 180, 0.18));
+  --wl-gradient-modal: linear-gradient(160deg, #0d2c5c 0%, #081d3d 100%);
+  --wl-gradient-app:
+    radial-gradient(900px 420px at 12% -4%, rgba(62, 215, 180, 0.1), transparent 60%),
+    radial-gradient(1000px 480px at 88% -6%, rgba(139, 124, 255, 0.14), transparent 62%),
+    radial-gradient(760px 340px at 50% 110%, rgba(105, 169, 255, 0.08), transparent 60%),
+    linear-gradient(180deg, #0a2148 0%, #071a38 34%, #061328 100%);
+  --wl-gradient-hero: radial-gradient(720px 320px at 18% 0%, rgba(105, 169, 255, 0.2), transparent 60%), radial-gradient(560px 280px at 85% 10%, rgba(62, 215, 180, 0.12), transparent 60%), linear-gradient(180deg, #0a2350 0%, #061328 100%);
   --clinical-primary: var(--wl-primary);
   --bg-surface: var(--wl-surface);
   --bg-surface-soft: var(--wl-surface-soft);

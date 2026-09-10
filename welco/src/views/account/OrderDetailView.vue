@@ -15,7 +15,6 @@ const route = useRoute()
 const router = useRouter()
 const order = ref<OrderDto | null>(null)
 const loading = ref(true)
-const invoices = ref<{ invoiceNumber: string; status: string }[]>([])
 
 const localized = (en: string, ar: string) => (locale.value === 'ar' ? ar : en)
 
@@ -24,10 +23,6 @@ onMounted(async () => {
     const id = String(route.params.id)
     const found = await commerceService.getOrder(id)
     order.value = found
-    if (found) {
-      const invs = await commerceService.getInvoices(found.id)
-      invoices.value = invs.map((i) => ({ invoiceNumber: i.invoiceNumber, status: i.status }))
-    }
   } finally {
     loading.value = false
   }
@@ -129,21 +124,8 @@ function statusIndex(o: OrderDto): number {
           </div>
         </main>
 
-        <!-- Sidebar: Invoices & Navigation -->
+        <!-- Sidebar: Navigation -->
         <aside class="side-panel">
-          <!-- Invoices Card -->
-          <section v-if="invoices.length" class="card invoice-card">
-            <h2 class="side-title mono">{{ t('commerce.invoice') }}</h2>
-            <div class="invoice-rows">
-              <div v-for="inv in invoices" :key="inv.invoiceNumber" class="inv-row">
-                <div class="inv-info">
-                  <span class="mono inv-num">{{ inv.invoiceNumber }}</span>
-                  <StatusPill :status="inv.status" />
-                </div>
-              </div>
-            </div>
-          </section>
-
           <!-- Action Stack -->
           <div class="side-actions-stack">
             <button
@@ -216,7 +198,7 @@ function statusIndex(o: OrderDto): number {
   font-weight: 700;
   color: var(--wl-primary);
   background: var(--wl-primary-soft);
-  border: 1px solid rgba(79, 70, 229, 0.2);
+  border: 1px solid rgba(105, 169, 255, 0.2);
   padding: 0.2rem 0.6rem;
   border-radius: var(--radius-full);
   letter-spacing: 0.06em;
@@ -272,7 +254,7 @@ function statusIndex(o: OrderDto): number {
 
 .btn-act--primary {
   background: var(--wl-primary);
-  color: #FFFFFF;
+  color: var(--wl-on-primary);
 }
 
 .btn-act--primary:hover {
@@ -425,35 +407,6 @@ function statusIndex(o: OrderDto): number {
   margin: 0 0 0.75rem;
 }
 
-.invoice-rows {
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
-}
-
-.inv-row {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  padding: 0.65rem;
-  background: var(--wl-surface-soft);
-  border: 1px solid var(--wl-border);
-  border-radius: var(--radius-sm);
-}
-
-.inv-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.inv-num {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--wl-ink-strong);
-}
-
-
 .side-actions-stack {
   display: flex;
   flex-direction: column;
@@ -488,3 +441,4 @@ function statusIndex(o: OrderDto): number {
   }
 }
 </style>
+

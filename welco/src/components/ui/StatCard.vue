@@ -71,10 +71,10 @@ const sparkPath = computed(() => {
 })
 
 const strokeColor = computed(() => {
-  if (props.tone === 'emerald' || (props.trend && isPositive.value)) return '#10B981'
-  if (props.tone === 'rose' || (props.trend && isNegative.value)) return '#F43F5E'
-  if (props.tone === 'amber') return '#F59E0B'
-  return '#6366F1'
+  if (props.tone === 'emerald' || (props.trend && isPositive.value)) return '#3ed7b4'
+  if (props.tone === 'rose' || (props.trend && isNegative.value)) return '#f26d6d'
+  if (props.tone === 'amber') return '#f8c15d'
+  return '#69a9ff'
 })
 </script>
 
@@ -136,7 +136,7 @@ const strokeColor = computed(() => {
   justify-content: space-between;
   gap: 0.75rem;
   padding: 1.15rem 1.25rem;
-  background: var(--wl-surface);
+  background: var(--wl-gradient-card, var(--wl-surface));
   border: 1px solid var(--wl-border);
   border-radius: 12px;
   box-shadow: var(--wl-shadow-card);
@@ -280,9 +280,20 @@ const strokeColor = computed(() => {
   overflow: visible;
 }
 
-/* Tone customizations */
+/* Tone customizations — yellow-degree value with shadow for dashboard metrics */
 .stat-card--emerald .stat-card__value { color: var(--wl-success); }
 .stat-card--rose .stat-card__value { color: var(--wl-danger); }
-.stat-card--amber .stat-card__value { color: var(--wl-warning); }
+.stat-card--amber .stat-card__value {
+  color: var(--wl-gold-text);
+  text-shadow: var(--wl-gold-text-shadow);
+}
+.stat-card--gold .stat-card__value {
+  color: var(--wl-gold-text);
+  text-shadow: var(--wl-gold-text-shadow);
+}
+.stat-card--gold {
+  border-color: rgba(255, 209, 102, 0.35) !important;
+  box-shadow: var(--wl-gold-glow-soft), var(--wl-shadow-card) !important;
+}
 .stat-card--indigo .stat-card__value { color: var(--wl-ink-strong); }
 </style>

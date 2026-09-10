@@ -11,7 +11,8 @@ import type {
   CreateCompanyAddressPayload,
   UpdateCompanyAddressPayload,
 } from '../domain/models/address'
-import type { CompanyRepository, DistributorApplicationQuery } from '../domain/ports/company-repository'
+import type {
+  CompanyRepository, DistributorApplicationQuery, OemInquiryDto } from '../domain/ports/company-repository'
 import { toastService } from '../infrastructure/feedback/toast.service'
 import { t } from '../i18n'
 
@@ -20,6 +21,8 @@ export type CompanyResult = { ok: true } | { ok: false; error: string }
 export class CompanyService {
   readonly myCompany = ref<CompanyDto | null>(null)
   readonly oemServices = ref<OemService[]>([])
+  readonly oemInquiries = ref<OemInquiryDto[]>([])
+  readonly oemInquiriesLoading = ref(false)
   readonly distributorApplications = ref<DistributorApplicationDto[]>([])
   readonly applicationsTotal = ref(0)
   readonly pendingCount = ref(0)
@@ -93,9 +96,9 @@ export class CompanyService {
     }
   }
 
-  async approveDistributorApplication(id: string, tierLevel = 1, accountManagerId?: string | null): Promise<CompanyResult> {
+  async approveDistributorApplication(id: string, accountManagerId?: string | null): Promise<CompanyResult> {
     try {
-      const updated = await this.repo.approveDistributorApplication(id, { tierLevel, accountManagerId })
+      const updated = await this.repo.approveDistributorApplication(id, { accountManagerId })
       const idx = this.distributorApplications.value.findIndex((a) => a.id === id)
       if (idx !== -1) {
         this.distributorApplications.value[idx] = updated
@@ -127,6 +130,29 @@ export class CompanyService {
     try {
       await this.repo.submitOemInquiry(payload)
       toastService.success(t('oem.inquirySubmitted'))
+      return { ok: true }
+    } catch (err) {
+      return { ok: false, error: err instanceof Error ? err.message : t('common.error') }
+    }
+  }
+
+  async loadOemInquiries(): Promise<void> {
+    this.oemInquiriesLoading.value = true
+    try {
+      const res = await this.repo.getOemInquiries({ pageNumber: 1, pageSize: 50 })
+      this.oemInquiries.value = res?.data ?? []
+    } catch {
+      this.oemInquiries.value = []
+    } finally {
+      this.oemInquiriesLoading.value = false
+    }
+  }
+
+  async deleteOemInquiry(id: string): Promise<CompanyResult> {
+    try {
+      await this.repo.deleteOemInquiry(id)
+      this.oemInquiries.value = this.oemInquiries.value.filter((q) => q.id !== id)
+      toastService.success(t('admin.oemInquiryDeleted'))
       return { ok: true }
     } catch (err) {
       return { ok: false, error: err instanceof Error ? err.message : t('common.error') }

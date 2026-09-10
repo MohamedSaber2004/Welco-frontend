@@ -67,7 +67,7 @@ withDefaults(
 
 .btn--primary {
   background: var(--wl-primary);
-  color: #ffffff;
+  color: var(--wl-on-primary);
   border-color: var(--wl-primary);
   box-shadow: var(--wl-shadow-primary);
 }
@@ -75,7 +75,7 @@ withDefaults(
   background: var(--wl-primary-hover);
   border-color: var(--wl-primary-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 14px -2px rgba(79, 70, 229, 0.45);
+  box-shadow: 0 4px 14px -2px rgba(105, 169, 255, 0.45);
 }
 
 .btn--secondary {
@@ -117,9 +117,9 @@ withDefaults(
 
 .btn--danger {
   background: var(--wl-danger);
-  color: #ffffff;
+  color: var(--wl-on-primary);
   border-color: var(--wl-danger);
-  box-shadow: 0 2px 8px rgba(244, 63, 94, 0.2);
+  box-shadow: 0 2px 8px rgba(242, 109, 109, 0.25);
 }
 
 .btn--danger:hover:not(:disabled) {

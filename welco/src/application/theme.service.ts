@@ -5,11 +5,11 @@ import { ThemeMode } from '../domain/models/user'
 export type Theme = 'dark'
 
 /**
- * Theme rules (DARK ONLY — white mode removed):
- * - The entire site renders the rich charcoal dark theme for everyone.
+ * Theme rules (NAVY CLASSIC ONLY — light mode removed):
+ * - The entire site renders the classic navy control-panel theme for everyone.
  * - `theme` is kept as a ref for backward-compat with existing imports.
- * - `toggleTheme` is a no-op that always re-applies dark (so legacy
- *   call sites don't break if missed during cleanup).
+ * - `toggleTheme` is a no-op that always re-applies the classic theme (so
+ *   legacy call sites don't break if missed during cleanup).
  * - Stored `welco-theme` values are normalized to dark on boot.
  * - Authenticated users persist `User.ThemeMode.Dark` to the backend.
  */
@@ -22,7 +22,7 @@ const applyTheme = () => {
   document.documentElement.classList.add('dark')
   document.documentElement.style.colorScheme = 'dark'
   const meta = document.querySelector('meta[name="theme-color"]:not([media])') as HTMLMetaElement | null
-  if (meta) meta.content = '#1E1F22'
+  if (meta) meta.content = '#061328'
 }
 
 export const theme = ref<Theme>('dark')
@@ -32,18 +32,27 @@ try {
   if (typeof localStorage !== 'undefined') localStorage.setItem(STORAGE_KEY, 'dark')
 } catch { /* ignore */ }
 
-/** Push Dark mode to the backend profile (fire-and-forget; local wins on failure). */
+/**
+ * Push Dark mode to the backend profile (fire-and-forget; local wins on failure).
+ * Guarded + once-per-session: skips when the server already reports Dark.
+ * Without this, the user watcher below re-fires on every updateProfile
+ * response (which replaces the user object), causing an infinite
+ * PUT /auth/profile storm that keeps the global loading bar spinning.
+ */
+let persistAttempted = false
 const persistModeToBackend = () => {
-  if (!authService.isAuthenticated) return
+  if (!authService.isAuthenticated || persistAttempted) return
   const user = authService.user.value
-  if (user) user.themeMode = ThemeMode.Dark
+  if (!user || user.themeMode === ThemeMode.Dark) return
+  persistAttempted = true
+  user.themeMode = ThemeMode.Dark
   void authService.updateProfile({ themeMode: ThemeMode.Dark }, { silent: true }).catch(() => {})
 }
 
 /**
- * Keep the theme forced to dark across auth changes (call once at boot):
- * - guest -> dark
- * - login/restored session -> dark (+ persist Dark to backend)
+ * Keep the theme forced to navy classic across auth changes (call once at boot):
+ * - guest -> classic
+ * - login/restored session -> classic (+ persist Dark to backend)
  */
 export const applyAuthGatedTheme = () => {
   const sync = () => {
@@ -54,13 +63,14 @@ export const applyAuthGatedTheme = () => {
     } catch { /* ignore */ }
   }
   sync()
-  watch(() => authService.user.value, () => {
+  watch(() => authService.user.value, (user) => {
     sync()
-    persistModeToBackend()
+    if (!user) persistAttempted = false
+    else persistModeToBackend()
   })
 }
 
-/** Legacy no-op — white mode removed. Always stays dark. */
+/** Legacy no-op — light mode removed. Always stays navy classic. */
 export const toggleTheme = () => {
   theme.value = 'dark'
   applyTheme()

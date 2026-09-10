@@ -377,9 +377,9 @@ const hasMadeToOrder = computed(() => products.value.some((p) => p.stock === 0))
 
 .cat-pill.is-active {
   background: var(--wl-primary);
-  color: #ffffff;
+  color: var(--wl-on-primary);
   border-color: var(--wl-primary);
-  box-shadow: 0 4px 12px -2px rgba(79, 70, 229, 0.35);
+  box-shadow: 0 4px 12px -2px rgba(105, 169, 255, 0.35);
 }
 
 .pill-badge {
@@ -393,7 +393,7 @@ const hasMadeToOrder = computed(() => products.value.some((p) => p.stock === 0))
 
 .cat-pill.is-active .pill-badge {
   background: rgba(255, 255, 255, 0.2);
-  color: #ffffff;
+  color: var(--wl-ink-strong);
   border-color: transparent;
 }
 
@@ -756,9 +756,9 @@ const hasMadeToOrder = computed(() => products.value.some((p) => p.stock === 0))
   font-weight: 800;
   letter-spacing: 0.03em;
   text-transform: uppercase;
-  color: #fff;
+  color: var(--wl-on-primary);
   border: 1px solid rgba(255, 255, 255, 0.65);
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.25);
+  box-shadow: 0 2px 8px rgba(0, 10, 25, 0.25);
 }
 
 .stock-pill--in {
@@ -910,14 +910,14 @@ const hasMadeToOrder = computed(() => products.value.some((p) => p.stock === 0))
 .card-action-btn--quote {
   background: var(--wl-primary);
   border: 1px solid var(--wl-primary);
-  color: #ffffff;
-  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.25);
+  color: var(--wl-ink-strong);
+  box-shadow: 0 2px 6px rgba(105, 169, 255, 0.25);
 }
 
 .card-action-btn--quote:hover:not(:disabled) {
   background: var(--wl-primary-hover);
   transform: translateY(-0.5px);
-  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
+  box-shadow: 0 4px 12px rgba(105, 169, 255, 0.35);
 }
 
 .card-action-btn--quote:disabled {
@@ -1052,3 +1052,4 @@ const hasMadeToOrder = computed(() => products.value.some((p) => p.stock === 0))
   }
 }
 </style>
+

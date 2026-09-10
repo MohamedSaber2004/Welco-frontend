@@ -275,7 +275,7 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
   background: linear-gradient(135deg, var(--wl-surface) 0%, var(--wl-surface-soft) 100%);
   border: 1px solid var(--wl-border);
   padding: 2.75rem 2.5rem;
-  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+  box-shadow: 0 4px 20px -2px rgba(0, 10, 25, 0.05);
   overflow: hidden;
   margin-bottom: 2rem;
 }
@@ -324,13 +324,15 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
 }
 
 .lp-tag {
-  background: var(--wl-primary-soft);
-  color: var(--wl-primary);
+  background: var(--wl-gold-soft);
+  color: var(--wl-gold);
   padding: 0.2rem 0.55rem;
   border-radius: 6px;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+  border: 1px solid rgba(255, 209, 102, 0.35);
+  text-shadow: 0 1px 0 rgba(6, 19, 40, 0.9);
 }
 
 .lp-url {
@@ -342,9 +344,13 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
   font-size: clamp(2rem, 4vw, 3.1rem);
   font-weight: 800;
   line-height: 1.05;
-  color: var(--wl-ink-strong);
   letter-spacing: -0.03em;
   margin-bottom: 1rem;
+  background: var(--wl-gradient-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 10px rgba(233, 168, 37, 0.28)) drop-shadow(0 1px 0 rgba(6, 19, 40, 0.9));
 }
 
 .lp-body {
@@ -472,24 +478,27 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
   align-items: center;
   gap: 0.4rem;
   font-size: 10.5px;
-  color: var(--wl-primary);
+  color: var(--wl-gold);
   font-weight: 700;
   letter-spacing: 0.08em;
   margin-bottom: 0.35rem;
+  text-shadow: var(--wl-gold-text-shadow);
 }
 
 .eyebrow-dot {
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: var(--wl-primary);
+  background: var(--wl-gold);
+  box-shadow: var(--wl-gold-glow-soft);
 }
 
 .section-title {
   font-size: 1.5rem;
   font-weight: 800;
   letter-spacing: -0.02em;
-  color: var(--wl-ink-strong);
+  color: var(--wl-gold-text);
+  text-shadow: var(--wl-gold-text-shadow);
   margin: 0;
 }
 
@@ -626,7 +635,7 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
 .add-quote-btn:hover {
   background: var(--wl-primary);
   border-color: var(--wl-primary);
-  color: #fff;
+  color: var(--wl-ink-strong);
 }
 
 /* Category fallback */
@@ -791,3 +800,4 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
   }
 }
 </style>
+

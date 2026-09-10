@@ -37,7 +37,6 @@ const companyTypeName = (type?: CompanyType | number) => {
   if (type === CompanyType.Distributor || type === 2) return locale.value === 'ar' ? 'موزع معتمد' : 'Authorized Distributor'
   if (type === CompanyType.Hospital || type === 1) return locale.value === 'ar' ? 'مستشفى / مركز طبي' : 'Hospital / Medical Center'
   if (type === CompanyType.Clinic || type === 3) return locale.value === 'ar' ? 'عيادة تخصصية' : 'Specialized Clinic'
-  if (type === CompanyType.Importer || type === 4) return locale.value === 'ar' ? 'مستورد أجهزة طبية' : 'Medical Importer'
   return locale.value === 'ar' ? 'منشأة مؤسسية' : 'Enterprise Entity'
 }
 
@@ -248,12 +247,12 @@ const setLang = async (v: AppLanguage) => {
     </div>
 
     <!-- Executive Header -->
-    <header class="profile-head">
-      <div class="head-chip mono">
+    <header class="profile-head" :class="{ 'is-admin-head': isAdminOrStaff }">
+      <div class="head-chip mono" :class="{ 'head-chip--gold': isAdminOrStaff }">
         <span class="pulse-dot"></span>
         <span>{{ t('profile.headerEyebrow') }}</span>
       </div>
-      <h1 class="head-title">{{ t('profile.title') }}</h1>
+      <h1 class="head-title" :class="{ 'head-title--gold': isAdminOrStaff }">{{ t('profile.title') }}</h1>
       <p class="head-subtitle">{{ t('profile.subtitle') }}</p>
     </header>
 
@@ -266,7 +265,7 @@ const setLang = async (v: AppLanguage) => {
       <!-- Left Column: Identity Card, Language, Addresses Link -->
       <aside class="profile-sidebar">
         <!-- Identity Card -->
-        <div class="card id-card">
+        <div class="card id-card" :class="{ 'id-card--admin': userTypeInfo.pillClass === 'user-role-pill--admin', 'id-card--staff': userTypeInfo.pillClass === 'user-role-pill--staff' }">
           <div class="avatar-holder">
             <AppImage
               :src="avatarUrl()"
@@ -295,7 +294,15 @@ const setLang = async (v: AppLanguage) => {
             @change="onPicturePicked"
           />
 
-          <h2 class="user-display-name">{{ user?.fullName }}</h2>
+          <h2
+            class="user-display-name"
+            :class="{
+              'is-admin': userTypeInfo.pillClass === 'user-role-pill--admin',
+              'is-staff': userTypeInfo.pillClass === 'user-role-pill--staff',
+            }"
+          >
+            {{ user?.fullName }}
+          </h2>
           <span class="user-email-text mono">{{ user?.email }}</span>
 
           <!-- User Role / Type Pill (All User Types) -->
@@ -404,12 +411,20 @@ const setLang = async (v: AppLanguage) => {
       <!-- Right Column: Personal Information & Password Change -->
       <main class="profile-main-stack">
         <!-- Executive Identity & Phone Code Overview for All User Types -->
-        <div class="account-specs-bar card">
+        <div class="account-specs-bar card" :class="{ 'account-specs-bar--admin': isAdminOrStaff }">
           <div class="specs-bar-cell">
             <span class="specs-bar-lbl mono">{{ t('profile.userType') }}</span>
             <div class="specs-bar-val">
-              <span class="material-symbols-outlined text-[18px] text-indigo-600">{{ userTypeInfo.icon }}</span>
-              <strong class="font-bold text-slate-900">{{ userTypeInfo.label }}</strong>
+              <span
+                class="material-symbols-outlined text-[18px]"
+                :class="userTypeInfo.pillClass === 'user-role-pill--admin' ? 'wl-text-gold' : 'text-indigo-600'"
+                >{{ userTypeInfo.icon }}</span
+              >
+              <strong
+                class="font-bold"
+                :class="userTypeInfo.pillClass === 'user-role-pill--admin' ? 'specs-admin-name' : 'text-slate-900'"
+                >{{ userTypeInfo.label }}</strong
+              >
             </div>
           </div>
 
@@ -418,7 +433,11 @@ const setLang = async (v: AppLanguage) => {
             <div class="specs-bar-val">
               <template v-if="userPhoneDetails">
                 <span class="flag-icon text-[18px]">{{ userPhoneDetails.flag }}</span>
-                <strong class="text-indigo-600 font-extrabold text-base">{{ userPhoneDetails.dialCode }}</strong>
+                <strong
+                  class="font-extrabold text-base"
+                  :class="isAdminOrStaff ? 'specs-admin-name' : 'text-indigo-600'"
+                  >{{ userPhoneDetails.dialCode }}</strong
+                >
                 <span class="text-xs text-slate-500 font-mono">({{ userPhoneDetails.iso }})</span>
               </template>
               <span v-else class="text-slate-400">—</span>
@@ -732,7 +751,7 @@ const setLang = async (v: AppLanguage) => {
   font-weight: 700;
   color: var(--wl-primary);
   background: var(--wl-primary-soft);
-  border: 1px solid rgba(79, 70, 229, 0.2);
+  border: 1px solid rgba(105, 169, 255, 0.2);
   padding: 0.2rem 0.6rem;
   border-radius: var(--radius-full);
   letter-spacing: 0.06em;
@@ -747,6 +766,17 @@ const setLang = async (v: AppLanguage) => {
   background: var(--wl-primary);
 }
 
+.head-chip--gold {
+  color: var(--wl-gold);
+  background: var(--wl-gold-soft);
+  border-color: rgba(255, 209, 102, 0.35);
+}
+
+.head-chip--gold .pulse-dot {
+  background: var(--wl-gold);
+  box-shadow: 0 0 0 3px rgba(255, 209, 102, 0.22);
+}
+
 .head-title {
   font-family: var(--wl-font-display);
   font-size: clamp(1.5rem, 2.5vw, 1.85rem);
@@ -755,6 +785,13 @@ const setLang = async (v: AppLanguage) => {
   color: var(--wl-ink-strong);
   margin: 0;
   line-height: 1.15;
+}
+
+.head-title--gold {
+  background: var(--wl-gradient-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .head-subtitle {
@@ -821,12 +858,12 @@ const setLang = async (v: AppLanguage) => {
   height: 32px;
   border-radius: 50%;
   background: var(--wl-primary);
-  color: #FFFFFF;
+  color: var(--wl-on-primary);
   border: 2px solid var(--wl-surface);
   display: grid;
   place-items: center;
   cursor: pointer;
-  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.35);
+  box-shadow: 0 2px 6px rgba(105, 169, 255, 0.35);
   transition: background 0.15s ease, transform 0.15s ease;
 }
 
@@ -840,6 +877,37 @@ const setLang = async (v: AppLanguage) => {
   font-weight: 700;
   color: var(--wl-ink-strong);
   margin: 0;
+}
+
+/* Yellow-degree visualization for admin identity */
+.user-display-name.is-admin {
+  background: var(--wl-gradient-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+}
+
+.user-display-name.is-staff {
+  color: var(--wl-success);
+}
+
+.id-card--admin {
+  border-color: rgba(255, 209, 102, 0.4) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 209, 102, 0.08) 0%, transparent 32%),
+    var(--wl-surface) !important;
+  box-shadow: var(--wl-gold-ring), var(--wl-shadow-card) !important;
+}
+
+.id-card--admin .avatar-img {
+  border-color: rgba(255, 209, 102, 0.55) !important;
+  box-shadow: 0 0 0 3px rgba(255, 209, 102, 0.18), var(--shadow-sm) !important;
+}
+
+.id-card--staff {
+  border-color: rgba(62, 215, 180, 0.35) !important;
 }
 
 .user-email-text {
@@ -874,21 +942,23 @@ const setLang = async (v: AppLanguage) => {
 }
 
 .user-role-pill--admin {
-  background: rgba(124, 58, 237, 0.1);
-  color: #7C3AED;
-  border: 1px solid rgba(124, 58, 237, 0.25);
+  background: var(--wl-gold-soft);
+  color: var(--wl-gold);
+  border: 1px solid rgba(255, 209, 102, 0.4);
+  box-shadow: 0 0 0 3px rgba(255, 209, 102, 0.12), 0 2px 10px rgba(233, 168, 37, 0.18);
+  text-shadow: 0 1px 8px rgba(233, 168, 37, 0.25);
 }
 
 .user-role-pill--staff {
-  background: rgba(13, 148, 136, 0.1);
-  color: #0D9488;
-  border: 1px solid rgba(13, 148, 136, 0.25);
+  background: rgba(62, 215, 180, 0.12);
+  color: var(--wl-success);
+  border: 1px solid rgba(62, 215, 180, 0.32);
 }
 
 .user-role-pill--org {
   background: var(--wl-primary-soft);
   color: var(--wl-primary);
-  border: 1px solid rgba(79, 70, 229, 0.25);
+  border: 1px solid rgba(105, 169, 255, 0.25);
 }
 
 .user-phone-badge {
@@ -907,8 +977,8 @@ const setLang = async (v: AppLanguage) => {
 }
 
 .user-phone-badge.is-set {
-  background: rgba(79, 70, 229, 0.05);
-  border-color: rgba(79, 70, 229, 0.2);
+  background: rgba(105, 169, 255, 0.05);
+  border-color: rgba(105, 169, 255, 0.2);
 }
 
 .user-phone-badge .phone-icon {
@@ -948,7 +1018,7 @@ const setLang = async (v: AppLanguage) => {
   font-weight: 700;
   color: var(--wl-primary);
   background: var(--wl-primary-soft);
-  border: 1px solid rgba(79, 70, 229, 0.25);
+  border: 1px solid rgba(105, 169, 255, 0.25);
   padding: 0.25rem 0.65rem;
   border-radius: var(--radius-xs, 6px);
   margin-top: 0.25rem;
@@ -1017,7 +1087,7 @@ const setLang = async (v: AppLanguage) => {
   justify-content: center;
   gap: 0.45rem;
   background: var(--wl-primary-soft);
-  border: 1px solid rgba(79, 70, 229, 0.25);
+  border: 1px solid rgba(105, 169, 255, 0.25);
   color: var(--wl-primary);
   border-radius: var(--radius-sm, 10px);
   font-size: 12.5px;
@@ -1028,7 +1098,7 @@ const setLang = async (v: AppLanguage) => {
 
 .btn-manage-addr:hover {
   background: var(--wl-primary);
-  color: #FFFFFF;
+  color: var(--wl-on-primary);
 }
 
 .addr-count-hint {
@@ -1056,6 +1126,21 @@ const setLang = async (v: AppLanguage) => {
   border: 1px solid var(--wl-border);
   border-radius: var(--radius-lg, 16px);
   box-shadow: var(--wl-shadow-card);
+}
+
+.account-specs-bar--admin {
+  border-color: rgba(255, 209, 102, 0.35);
+  background:
+    linear-gradient(135deg, rgba(255, 209, 102, 0.1) 0%, transparent 45%),
+    linear-gradient(135deg, var(--wl-surface) 0%, var(--wl-surface-soft) 100%);
+}
+
+.specs-admin-name {
+  background: var(--wl-gradient-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent !important;
+  font-weight: 800;
 }
 
 .specs-bar-cell {
@@ -1119,7 +1204,7 @@ const setLang = async (v: AppLanguage) => {
   font-weight: 800;
   color: var(--wl-primary);
   background: var(--wl-primary-soft);
-  border: 1px solid rgba(79, 70, 229, 0.2);
+  border: 1px solid rgba(105, 169, 255, 0.2);
   padding: 0.15rem 0.5rem;
   border-radius: var(--radius-xs, 6px);
   letter-spacing: 0.05em;
@@ -1135,7 +1220,7 @@ const setLang = async (v: AppLanguage) => {
 .card-badge--indigo {
   color: var(--wl-primary);
   background: var(--wl-primary-soft);
-  border-color: rgba(79, 70, 229, 0.25);
+  border-color: rgba(105, 169, 255, 0.25);
 }
 
 .form-card-subtitle {
@@ -1233,7 +1318,7 @@ const setLang = async (v: AppLanguage) => {
   font-size: 11px;
   background: var(--wl-primary-soft);
   color: var(--wl-primary);
-  border: 1px solid rgba(79, 70, 229, 0.25);
+  border: 1px solid rgba(105, 169, 255, 0.25);
   border-radius: var(--radius-full);
   padding: 0.15rem 0.55rem;
 }
@@ -1300,7 +1385,7 @@ const setLang = async (v: AppLanguage) => {
   min-height: 44px;
   padding: 0 1.5rem;
   background: var(--wl-primary);
-  color: #FFFFFF;
+  color: var(--wl-on-primary);
   border: 1px solid var(--wl-primary);
   border-radius: var(--radius-sm, 10px);
   font-size: 13.5px;
@@ -1547,7 +1632,7 @@ const setLang = async (v: AppLanguage) => {
   font-weight: 700;
   color: var(--wl-primary);
   background: var(--wl-primary-soft);
-  border: 1px solid rgba(79, 70, 229, 0.2);
+  border: 1px solid rgba(105, 169, 255, 0.2);
   padding: 0.45rem 0.85rem;
   border-radius: var(--radius-sm, 8px);
   text-decoration: none;
@@ -1556,7 +1641,7 @@ const setLang = async (v: AppLanguage) => {
 
 .btn-company-addr:hover {
   background: var(--wl-primary);
-  color: #FFFFFF;
+  color: var(--wl-on-primary);
 }
 
 /* Empty Company */
@@ -1608,7 +1693,7 @@ const setLang = async (v: AppLanguage) => {
   gap: 0.35rem;
   font-size: 12px;
   font-weight: 700;
-  color: #FFFFFF;
+  color: var(--wl-on-primary);
   background: var(--wl-primary);
   padding: 0.55rem 1rem;
   border-radius: var(--radius-sm, 8px);

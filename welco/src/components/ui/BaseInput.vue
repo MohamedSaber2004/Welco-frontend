@@ -147,7 +147,7 @@ const sizeClass = computed(() => `field-control--${props.size}`)
 
 .field-control:hover:not(.is-disabled) {
   border-color: var(--wl-border-strong);
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  box-shadow: var(--shadow-xs);
 }
 
 .field-control:focus-within {

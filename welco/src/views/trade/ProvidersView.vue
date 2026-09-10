@@ -19,7 +19,7 @@ const loading = ref(true)
 const searchTerm = ref('')
 const selectedType = ref<string>('all')
 const selectedCountry = ref<string>('all')
-const sortBy = ref<'nameAsc' | 'nameDesc' | 'tierDesc' | 'tierAsc'>('nameAsc')
+const sortBy = ref<'nameAsc' | 'nameDesc'>('nameAsc')
 
 const page = ref(1)
 const pageSize = ref(12)
@@ -95,8 +95,6 @@ const getTypeLabel = (type: CompanyType): string => {
       return t('providers.distributor')
     case CompanyType.Clinic:
       return t('providers.clinic')
-    case CompanyType.Importer:
-      return t('providers.importer')
     default:
       return COMPANY_TYPE_LABEL[type] || 'Provider'
   }
@@ -134,17 +132,10 @@ const filteredProviders = computed(() => {
 
   // Sort
   list.sort((a, b) => {
-    if (sortBy.value === 'nameAsc') {
-      return a.name.localeCompare(b.name)
-    }
     if (sortBy.value === 'nameDesc') {
       return b.name.localeCompare(a.name)
     }
-    if (sortBy.value === 'tierAsc') {
-      return (a.tierLevel || 1) - (b.tierLevel || 1)
-    }
-    // tierDesc
-    return (b.tierLevel || 1) - (a.tierLevel || 1)
+    return a.name.localeCompare(b.name)
   })
 
   return list
@@ -366,7 +357,6 @@ const browseProviderProducts = (providerName: string) => {
                   <option :value="CompanyType.Hospital">{{ t('providers.hospital') }}</option>
                   <option :value="CompanyType.Distributor">{{ t('providers.distributor') }}</option>
                   <option :value="CompanyType.Clinic">{{ t('providers.clinic') }}</option>
-                  <option :value="CompanyType.Importer">{{ t('providers.importer') }}</option>
                 </select>
                 <span class="material-symbols-outlined select-wrap__chev" aria-hidden="true">expand_more</span>
               </label>
@@ -387,8 +377,6 @@ const browseProviderProducts = (providerName: string) => {
                 <select v-model="sortBy" class="toolbar__select" :aria-label="t('providers.sortBy')">
                   <option value="nameAsc">{{ t('providers.sortBy') }}: A → Z</option>
                   <option value="nameDesc">{{ t('providers.sortBy') }}: Z → A</option>
-                  <option value="tierDesc">{{ t('providers.sortBy') }}: Tier (High → Low)</option>
-                  <option value="tierAsc">{{ t('providers.sortBy') }}: Tier (Low → High)</option>
                 </select>
                 <span class="material-symbols-outlined select-wrap__chev" aria-hidden="true">expand_more</span>
               </label>
@@ -471,9 +459,6 @@ const browseProviderProducts = (providerName: string) => {
                   <span class="badge-type mono">
                     {{ getTypeLabel(provider.type) }}
                   </span>
-                  <span class="badge-tier mono">
-                    {{ t('providers.tier', { level: provider.tierLevel || 1 }) }}
-                  </span>
                 </div>
 
                 <h2 class="provider-card__name" dir="auto"><template v-for="(part, pi) in highlightParts(provider.name)" :key="pi"><mark v-if="part.hit" class="hl">{{ part.text }}</mark><template v-else>{{ part.text }}</template></template></h2>
@@ -547,17 +532,22 @@ const browseProviderProducts = (providerName: string) => {
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.1em;
-  color: var(--wl-primary);
+  color: var(--wl-gold);
   text-transform: uppercase;
+  text-shadow: var(--wl-gold-text-shadow);
 }
 
 .view-header__title {
   font-family: var(--wl-font-display);
   font-size: clamp(1.6rem, 3vw, 2rem);
   font-weight: 800;
-  color: var(--wl-ink-strong);
   letter-spacing: -0.02em;
   margin: 0;
+  background: var(--wl-gradient-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 10px rgba(233, 168, 37, 0.28)) drop-shadow(0 1px 0 rgba(6, 19, 40, 0.9));
 }
 
 .view-header__subtitle {
@@ -644,7 +634,7 @@ const browseProviderProducts = (providerName: string) => {
   color: var(--wl-ink-strong);
   outline: none;
   height: 42px;
-  font-family: inherit;
+  font-family: var(--wl-font-body);
 }
 .search-field__input::placeholder { color: var(--wl-muted-soft, var(--wl-muted)); }
 .search-field__input::-webkit-search-cancel-button { display: none; }
@@ -701,7 +691,7 @@ const browseProviderProducts = (providerName: string) => {
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
   border-radius: var(--radius-md, 12px);
-  box-shadow: var(--shadow-lg, 0 12px 20px -4px rgba(15, 23, 42, 0.07));
+  box-shadow: var(--shadow-lg, 0 12px 20px -4px rgba(0, 10, 25, 0.07));
   padding: 0.4rem;
   z-index: 30;
   max-height: 300px;
@@ -774,7 +764,7 @@ const browseProviderProducts = (providerName: string) => {
   min-height: var(--wl-control-md, 44px);
   font-size: 0.84rem;
   font-weight: 500;
-  font-family: inherit;
+  font-family: var(--wl-font-body);
   color: var(--wl-ink-strong);
   cursor: pointer;
   outline: none;
@@ -837,7 +827,7 @@ const browseProviderProducts = (providerName: string) => {
   max-width: 240px;
   background: var(--wl-primary-soft);
   color: var(--wl-primary-active, var(--wl-primary));
-  border: 1px solid rgba(79, 70, 229, 0.2);
+  border: 1px solid rgba(105, 169, 255, 0.2);
   border-radius: 999px;
   font-size: 0.76rem;
   font-weight: 600;
@@ -849,7 +839,7 @@ const browseProviderProducts = (providerName: string) => {
 .chip span:not(.material-symbols-outlined) { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .chip:hover { background: var(--wl-primary-faint); border-color: var(--wl-primary); }
 .chip .material-symbols-outlined { font-size: 14px; }
-.chip--search { background: var(--wl-ink-strong); border-color: var(--wl-ink-strong); color: #fff; }
+.chip--search { background: var(--wl-ink-strong); border-color: var(--wl-ink-strong); color: var(--wl-ink-strong); }
 .chip--search:hover { background: var(--wl-ink); }
 
 .btn-reset-filters {
@@ -891,8 +881,8 @@ const browseProviderProducts = (providerName: string) => {
 
 .provider-card:hover {
   transform: translateY(-3px);
-  box-shadow: var(--shadow-md, 0 4px 6px -1px rgba(15, 23, 42, 0.05));
-  border-color: rgba(79, 70, 229, 0.35);
+  box-shadow: var(--shadow-md, 0 4px 6px -1px rgba(0, 10, 25, 0.05));
+  border-color: rgba(105, 169, 255, 0.35);
 }
 .provider-card:focus-within { border-color: var(--wl-primary); box-shadow: var(--wl-focus-ring); }
 
@@ -955,16 +945,6 @@ const browseProviderProducts = (providerName: string) => {
   border-radius: 6px;
 }
 
-.badge-tier {
-  font-size: 0.68rem;
-  font-weight: 700;
-  background: var(--wl-info-soft);
-  color: var(--wl-info);
-  border: 1px solid rgba(14, 165, 233, 0.25);
-  padding: 0.2rem 0.5rem;
-  border-radius: 6px;
-}
-
 .provider-card__name {
   font-family: var(--wl-font-display);
   font-size: 1.05rem;
@@ -994,7 +974,7 @@ const browseProviderProducts = (providerName: string) => {
 }
 
 .provider-card__name .hl {
-  background: rgba(79, 70, 229, 0.16);
+  background: rgba(105, 169, 255, 0.16);
   color: var(--wl-primary-active, var(--wl-primary));
   border-radius: 3px;
   padding: 0 1px;
@@ -1012,7 +992,7 @@ const browseProviderProducts = (providerName: string) => {
   min-height: 40px;
   font-size: 0.8rem;
   font-weight: 600;
-  font-family: inherit;
+  font-family: var(--wl-font-body);
   color: var(--wl-primary);
   cursor: pointer;
   transition: all 0.2s ease;
@@ -1022,7 +1002,7 @@ const browseProviderProducts = (providerName: string) => {
 
 .provider-card:hover .btn-view-products {
   background: var(--wl-primary);
-  color: #ffffff;
+  color: var(--wl-on-primary);
   border-color: var(--wl-primary);
 }
 
@@ -1062,3 +1042,4 @@ const browseProviderProducts = (providerName: string) => {
   .search-field__spinner { animation-duration: 1.2s; }
 }
 </style>
+

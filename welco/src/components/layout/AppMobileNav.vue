@@ -229,7 +229,7 @@ const isPathActive = (path: string, exact = false) => {
         <!-- Sheet Header: User Identity & Profile Quick-Access -->
         <header class="sheet-head">
           <div class="sheet-user">
-            <div class="sheet-avatar" :style="{ background: user?.tint || '#4F46E5' }">
+            <div class="sheet-avatar" :style="{ background: user?.tint || '#69a9ff' }">
               <img v-if="avatarSrc" :src="avatarSrc" :alt="user?.fullName ?? 'User'" class="sheet-avatar-img" @error="avatarFailed = true; markBrokenUrl(avatarSrc)" />
               <span v-else class="sheet-avatar-text">{{ avatarInitials }}</span>
             </div>
@@ -591,7 +591,7 @@ const isPathActive = (path: string, exact = false) => {
     backdrop-filter: blur(18px) saturate(1.2);
     -webkit-backdrop-filter: blur(18px) saturate(1.2);
     border-top: 1px solid var(--wl-border);
-    box-shadow: 0 -4px 16px rgba(15, 23, 42, 0.05);
+    box-shadow: 0 -4px 16px rgba(0, 10, 25, 0.05);
     z-index: 100;
     padding-bottom: env(safe-area-inset-bottom, 0px);
     box-sizing: content-box;
@@ -623,7 +623,7 @@ const isPathActive = (path: string, exact = false) => {
     background: none;
     border: none;
     cursor: pointer;
-    font-family: inherit;
+    font-family: var(--wl-font-body);
     transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
     -webkit-tap-highlight-color: transparent;
@@ -673,8 +673,8 @@ const isPathActive = (path: string, exact = false) => {
     min-width: 16px;
     height: 16px;
     padding: 0 4px;
-    background: var(--wl-danger);
-    color: #ffffff;
+  background: var(--wl-danger);
+  color: var(--wl-on-primary);
     font-size: 9px;
     font-weight: 700;
     border-radius: 999px;
@@ -696,7 +696,7 @@ const isPathActive = (path: string, exact = false) => {
 .sheet-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.55);
+  background: rgba(0, 10, 25, 0.55);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   z-index: 150;
@@ -711,7 +711,7 @@ const isPathActive = (path: string, exact = false) => {
   background: var(--wl-surface);
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;
-  box-shadow: 0 -10px 40px rgba(15, 23, 42, 0.25);
+  box-shadow: 0 -10px 40px rgba(0, 10, 25, 0.25);
   border-top: 1px solid var(--wl-border);
   z-index: 160;
   display: flex;
@@ -751,7 +751,7 @@ const isPathActive = (path: string, exact = false) => {
   border-radius: 50%;
   display: grid;
   place-items: center;
-  color: #fff;
+  color: var(--wl-ink-strong);
   font-weight: 700;
   font-size: 12px;
   overflow: hidden;
@@ -850,7 +850,7 @@ const isPathActive = (path: string, exact = false) => {
   text-align: start;
   cursor: pointer;
   color: inherit;
-  font-family: inherit;
+  font-family: var(--wl-font-body);
   transition: all 0.12s ease;
   min-height: 52px;
 }
@@ -943,7 +943,7 @@ const isPathActive = (path: string, exact = false) => {
 
 .sheet-foot-btn--primary {
   background: var(--wl-primary);
-  color: #fff;
+  color: var(--wl-on-primary);
   border-color: var(--wl-primary);
 }
 

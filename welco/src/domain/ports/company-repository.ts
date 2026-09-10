@@ -49,7 +49,7 @@ export interface CompanyRepository {
   submitDistributorApplication(payload: DistributorApplicationPayload): Promise<DistributorApplicationDto>
   getDistributorApplications(query?: DistributorApplicationQuery): Promise<PaginatedResult<DistributorApplicationDto>>
   getDistributorApplicationById(id: string): Promise<DistributorApplicationDto>
-  approveDistributorApplication(id: string, payload?: { tierLevel?: number; accountManagerId?: string | null }): Promise<DistributorApplicationDto>
+  approveDistributorApplication(id: string, payload?: { accountManagerId?: string | null }): Promise<DistributorApplicationDto>
   rejectDistributorApplication(id: string, payload?: { reason?: string }): Promise<DistributorApplicationDto>
   getOemServices(): Promise<OemService[]>
   submitOemInquiry(payload: OemInquiryPayload): Promise<void>

@@ -208,7 +208,7 @@ const toggleSection = (key: string) => {
 
 .admin-rail {
   width: var(--wl-rail-width, 240px);
-  background: var(--wl-surface);
+  background: var(--wl-gradient-rail, var(--wl-surface));
   border: 1px solid var(--wl-border);
   border-radius: var(--radius-md, 12px);
   flex-shrink: 0;

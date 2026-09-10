@@ -128,7 +128,7 @@ const goDetail = (id: string) => {
     <!-- Saved instruments -->
     <div v-else class="product-grid">
       <article v-for="p in items" :key="p.id" class="product-card" @click="goDetail(p.id)">
-        <div class="product-media" :style="{ background: p.imageGradient || '#2B2D31' }">
+        <div class="product-media" :style="{ background: p.imageGradient || '#071A38' }">
           <AppImage
             :src="p.imageName"
             placeholder-type="product"
@@ -190,21 +190,21 @@ const goDetail = (id: string) => {
   align-items: center;
   gap: 0.45rem;
   font-size: 11px;
-  color: #64748B;
+  color: var(--wl-muted);
 }
 
 .crumb-bar a {
-  color: #64748B;
+  color: var(--wl-muted);
   text-decoration: none;
   transition: color 0.15s ease;
 }
 
 .crumb-bar a:hover {
-  color: #4F46E5;
+  color: var(--wl-primary);
 }
 
 .crumb-sep {
-  color: #CBD5E1;
+  color: var(--wl-muted-soft);
 }
 
 .crumb-active {
@@ -239,7 +239,7 @@ const goDetail = (id: string) => {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #4F46E5;
+  background: var(--wl-primary);
 }
 
 .head-title {
@@ -255,13 +255,13 @@ const goDetail = (id: string) => {
 .count-label {
   font-size: 14px;
   font-weight: 600;
-  color: #64748B;
+  color: var(--wl-muted);
   vertical-align: middle;
 }
 
 .head-subtitle {
   font-size: 13.5px;
-  color: #64748B;
+  color: var(--wl-muted);
   margin: 0.25rem 0 0;
 }
 
@@ -279,8 +279,8 @@ const goDetail = (id: string) => {
   height: 44px;
   padding: 0 1rem;
   background: var(--wl-surface);
-  border: 1.5px solid #FECDD3;
-  color: #E11D48;
+  border: 1.5px solid rgba(237, 66, 69, 0.35);
+  color: var(--wl-danger);
   border-radius: 10px;
   font-size: 13px;
   font-weight: 700;
@@ -289,7 +289,7 @@ const goDetail = (id: string) => {
 }
 
 .btn-clear-all:hover {
-  background: #FFF1F2;
+  background: var(--wl-danger-soft);
 }
 
 .btn-browse-catalog {
@@ -298,19 +298,19 @@ const goDetail = (id: string) => {
   gap: 0.45rem;
   height: 44px;
   padding: 0 1.25rem;
-  background: #4F46E5;
-  color: #FFFFFF;
+  background: var(--wl-primary);
+  color: var(--wl-on-primary);
   border: none;
   border-radius: 10px;
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 4px 12px -2px rgba(79, 70, 229, 0.35);
+  box-shadow: 0 4px 12px -2px rgba(105, 169, 255, 0.35);
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .btn-browse-catalog:hover {
-  background: #4338CA;
+  background: var(--wl-primary-hover);
   transform: translateY(-1px);
 }
 
@@ -329,14 +329,14 @@ const goDetail = (id: string) => {
   display: flex;
   flex-direction: column;
   cursor: pointer;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  box-shadow: var(--shadow-xs);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .product-card:hover {
-  border-color: #CBD5E1;
+  border-color: var(--wl-border-strong);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 8px 24px -4px rgba(0, 10, 25, 0.08);
 }
 
 .product-media {
@@ -365,12 +365,12 @@ const goDetail = (id: string) => {
   bottom: 8px;
   inset-inline-start: 8px;
   background: rgba(255, 255, 255, 0.9);
-  border: 1px solid #E2E8F0;
+  border: 1px solid var(--wl-border);
   padding: 0.15rem 0.45rem;
   border-radius: 4px;
   font-size: 10px;
   font-weight: 700;
-  color: #475569;
+  color: var(--wl-ink-soft);
 }
 
 .btn-remove-fav {
@@ -382,17 +382,17 @@ const goDetail = (id: string) => {
   border-radius: 50%;
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  color: #E11D48;
+  color: var(--wl-danger);
   display: grid;
   place-items: center;
   cursor: pointer;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+  box-shadow: var(--shadow-xs);
   transition: all 0.15s ease;
 }
 
 .btn-remove-fav:hover {
-  background: #FFF1F2;
-  border-color: #FECDD3;
+  background: var(--wl-danger-soft);
+  border-color: rgba(237, 66, 69, 0.35);
 }
 
 .product-content {
@@ -406,7 +406,7 @@ const goDetail = (id: string) => {
 .category-tag {
   font-size: 10px;
   font-weight: 700;
-  color: #4F46E5;
+  color: var(--wl-primary);
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
@@ -421,12 +421,12 @@ const goDetail = (id: string) => {
 
 .product-alt-name {
   font-size: 11px;
-  color: #94A3B8;
+  color: var(--wl-muted-soft);
 }
 
 .product-specs {
   font-size: 11px;
-  color: #64748B;
+  color: var(--wl-muted);
   margin-top: 0.2rem;
 }
 
@@ -437,7 +437,7 @@ const goDetail = (id: string) => {
   gap: 0.5rem;
   margin-top: auto;
   padding-top: 0.85rem;
-  border-top: 1px dashed #E2E8F0;
+  border-top: 1px dashed var(--wl-border);
 }
 
 .price-stack {
@@ -453,7 +453,7 @@ const goDetail = (id: string) => {
 
 .unit-text {
   font-size: 10.5px;
-  color: #64748B;
+  color: var(--wl-muted);
 }
 
 .btn-add-quote {
@@ -462,8 +462,8 @@ const goDetail = (id: string) => {
   gap: 0.3rem;
   height: 36px;
   padding: 0 0.85rem;
-  background: #4F46E5;
-  color: #FFFFFF;
+  background: var(--wl-primary);
+  color: var(--wl-on-primary);
   border: none;
   border-radius: 8px;
   font-size: 11.5px;
@@ -473,7 +473,7 @@ const goDetail = (id: string) => {
 }
 
 .btn-add-quote:hover {
-  background: #4338CA;
+  background: var(--wl-primary-hover);
 }
 
 /* Responsive */

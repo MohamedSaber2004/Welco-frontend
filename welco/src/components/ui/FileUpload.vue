@@ -319,9 +319,9 @@ const showDrop = computed(() => !hasMediaType.value || effectiveFileType.value =
 .fup__img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .fup__overlay { position: absolute; inset: auto 0 0 0; display: flex; justify-content: flex-end; align-items: center; gap: 0.4rem; padding: 0.45rem 0.6rem; background: linear-gradient(transparent, rgba(11, 28, 44, 0.75)); opacity: 0; transition: opacity 0.15s; }
 .fup__preview:hover .fup__overlay { opacity: 1; }
-.fup__action { display: inline-flex; align-items: center; gap: 0.3rem; background: rgba(11, 28, 44, 0.85); color: #fff; border: 1px solid rgba(255, 255, 255, 0.25); padding: 0.35rem 0.7rem; font-size: 0.75rem; font-weight: 600; cursor: pointer; border-radius: 6px; text-decoration: none; transition: all 0.15s ease; }
-.fup__action:hover { background: var(--wl-ink-strong); color: #fff; border-color: rgba(255, 255, 255, 0.5); }
-:root[data-theme='dark'] .fup__action:hover, :root.dark .fup__action:hover { background: #4E5058; color: #fff; }
+.fup__action { display: inline-flex; align-items: center; gap: 0.3rem; background: rgba(11, 28, 44, 0.85); color: var(--wl-ink-strong); border: 1px solid rgba(255, 255, 255, 0.25); padding: 0.35rem 0.7rem; font-size: 0.75rem; font-weight: 600; cursor: pointer; border-radius: 6px; text-decoration: none; transition: all 0.15s ease; }
+.fup__action:hover { background: var(--wl-ink-strong); color: var(--wl-ink-strong); border-color: rgba(255, 255, 255, 0.5); }
+:root[data-theme='dark'] .fup__action:hover, :root.dark .fup__action:hover { background: var(--wl-surface-hover); color: var(--wl-ink-strong); }
 .fup__action--view { background: rgba(14, 165, 233, 0.85); }
 .fup__action--view:hover { background: #0284c7; }
 .fup__action--danger:hover { background: #dc2626; }
@@ -441,7 +441,7 @@ const showDrop = computed(() => !hasMediaType.value || effectiveFileType.value =
 .fup__btn-open:hover,
 .fup__btn-inline-toggle:hover {
   background: var(--wl-primary);
-  color: #fff;
+  color: var(--wl-on-primary);
   border-color: var(--wl-primary);
 }
 .fup__btn-open .material-symbols-outlined,
@@ -497,7 +497,7 @@ const showDrop = computed(() => !hasMediaType.value || effectiveFileType.value =
   border-color: var(--wl-primary);
   background: var(--wl-primary-soft);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px -2px rgba(79, 70, 229, 0.12);
+  box-shadow: 0 4px 12px -2px rgba(105, 169, 255, 0.12);
 }
 .fup__drop:focus-visible {
   outline: 2px solid var(--wl-primary);

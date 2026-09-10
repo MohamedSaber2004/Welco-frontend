@@ -286,21 +286,23 @@ async function submit() {
   gap: 0.45rem;
   font-size: 10px;
   font-weight: 700;
-  color: var(--wl-primary);
-  background: var(--wl-primary-soft);
-  border: 1px solid rgba(var(--wl-primary-rgb), 0.3);
+  color: var(--wl-gold);
+  background: var(--wl-gold-soft);
+  border: 1px solid rgba(255, 209, 102, 0.35);
   padding: 0.2rem 0.6rem;
   border-radius: 9999px;
   letter-spacing: 0.06em;
   width: fit-content;
   margin-bottom: 0.5rem;
+  text-shadow: var(--wl-gold-text-shadow);
 }
 
 .pulse-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--wl-primary);
+  background: var(--wl-gold);
+  box-shadow: var(--wl-gold-glow-soft);
 }
 
 .oem-hero {
@@ -329,9 +331,13 @@ async function submit() {
   font-size: clamp(1.85rem, 3.5vw, 2.5rem);
   font-weight: 800;
   letter-spacing: -0.03em;
-  color: var(--wl-ink-strong);
   margin: 0;
   line-height: 1.1;
+  background: var(--wl-gradient-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 10px rgba(233, 168, 37, 0.28)) drop-shadow(0 1px 0 rgba(6, 19, 40, 0.9));
 }
 
 .hero-desc {
@@ -434,7 +440,7 @@ async function submit() {
 
 .meter-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--wl-primary), var(--wl-cobalt, #6366f1));
+  background: linear-gradient(90deg, var(--wl-primary), var(--wl-accent));
   border-radius: 9999px;
 }
 
@@ -455,8 +461,9 @@ async function submit() {
   font-size: 1.6rem;
   font-weight: 800;
   letter-spacing: -0.025em;
-  color: var(--wl-ink-strong);
   margin: 0.2rem 0 0;
+  color: var(--wl-gold-text);
+  text-shadow: var(--wl-gold-text-shadow);
 }
 
 .section-subtitle {
@@ -556,8 +563,12 @@ async function submit() {
 .inquiry-title {
   font-size: 1.6rem;
   font-weight: 800;
-  color: var(--wl-ink-strong);
   margin: 0.2rem 0 0;
+  background: var(--wl-gradient-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 10px rgba(233, 168, 37, 0.28)) drop-shadow(0 1px 0 rgba(6, 19, 40, 0.9));
 }
 
 .inquiry-desc {
@@ -677,7 +688,7 @@ async function submit() {
   gap: 0.45rem;
   height: 44px;
   background: var(--wl-primary);
-  color: #FFFFFF;
+  color: var(--wl-on-primary);
   border: none;
   border-radius: var(--wl-radius-sm);
   font-size: 13.5px;

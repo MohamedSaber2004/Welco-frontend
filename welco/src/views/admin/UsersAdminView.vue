@@ -129,11 +129,17 @@ const submitPassword = async () => {
 }
 
 const getAvatarColor = (name?: string): string => {
-  const colors = ['#4F46E5', '#0D9488', '#0284C7', '#7C3AED', '#D97706', '#E11D48']
-  if (!name) return '#4F46E5'
+  // High-visibility navy degrees: bright blue / mint / sky / gold-yellow / amber / rose
+  const colors = ['#4F95F5', '#0D9488', '#0284C7', '#E9A825', '#F8C15D', '#E11D48']
+  if (!name) return '#4F95F5'
   let hash = 0
   for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash)
-  return colors[Math.abs(hash) % colors.length] ?? '#4F46E5'
+  return colors[Math.abs(hash) % colors.length] ?? '#4F95F5'
+}
+
+const getAvatarTextColor = (bg: string): string => {
+  // Yellow / gold degrees need dark navy ink for readability, others use white
+  return bg === '#E9A825' || bg === '#F8C15D' ? '#061328' : '#FFFFFF'
 }
 
 onMounted(() => {
@@ -220,7 +226,10 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
                         <div
                           v-else
                           class="user-avatar-fallback mono"
-                          :style="{ backgroundColor: getAvatarColor(u.fullName) }"
+                          :style="{
+                            backgroundColor: getAvatarColor(u.fullName),
+                            color: getAvatarTextColor(getAvatarColor(u.fullName)),
+                          }"
                         >
                           {{ (u.fullName || 'U').slice(0, 2).toUpperCase() }}
                         </div>
@@ -230,17 +239,17 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
                         <div v-if="u.phoneNumber" class="user-phone-line mono">
                           <template v-if="getUserPhoneDetails(u.phoneNumber, u.phoneCode)">
                             <span
-                              v-if="getUserPhoneDetails(u.phoneNumber, u.phoneCode)!.flag"
+                              v-if="getUserPhoneDetails(u.phoneNumber, u.phoneCode)?.flag"
                               class="flag-icon"
-                              :title="getUserPhoneDetails(u.phoneNumber, u.phoneCode)!.countryName"
+                              :title="getUserPhoneDetails(u.phoneNumber, u.phoneCode)?.countryName"
                             >
-                              {{ getUserPhoneDetails(u.phoneNumber, u.phoneCode)!.flag }}
+                              {{ getUserPhoneDetails(u.phoneNumber, u.phoneCode)?.flag }}
                             </span>
                             <span class="phone-dial-code">
-                              {{ getUserPhoneDetails(u.phoneNumber, u.phoneCode)!.dialCode }}
+                              {{ getUserPhoneDetails(u.phoneNumber, u.phoneCode)?.dialCode }}
                             </span>
                             <span class="phone-number">
-                              {{ getUserPhoneDetails(u.phoneNumber, u.phoneCode)!.nationalNumber }}
+                              {{ getUserPhoneDetails(u.phoneNumber, u.phoneCode)?.nationalNumber }}
                             </span>
                           </template>
                           <span v-else class="user-phone">{{ u.phoneNumber }}</span>
@@ -429,13 +438,20 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
               <div
                 v-else
                 class="user-avatar-fallback mono"
-                :style="{ backgroundColor: getAvatarColor(selectedUser.fullName) }"
+                :style="{
+                  backgroundColor: getAvatarColor(selectedUser.fullName),
+                  color: getAvatarTextColor(getAvatarColor(selectedUser.fullName)),
+                }"
               >
                 {{ (selectedUser.fullName || 'U').slice(0, 2).toUpperCase() }}
               </div>
             </div>
             <div>
-              <strong class="user-details-name">{{ selectedUser.fullName }}</strong>
+              <strong
+                class="user-details-name"
+                :class="{ 'wl-text-gold-gradient': selectedUser.userType === UserType.Admin }"
+                >{{ selectedUser.fullName }}</strong
+              >
               <div class="mono text-xs text-slate-600">{{ selectedUser.email }}</div>
               <div class="user-details-badges">
                 <span
@@ -567,7 +583,7 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #4F46E5;
+  background: var(--wl-primary);
 }
 
 .head-title {
@@ -582,7 +598,7 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
 
 .head-subtitle {
   font-size: 13.5px;
-  color: #64748B;
+  color: var(--wl-muted);
   margin: 0.25rem 0 0;
 }
 
@@ -596,7 +612,7 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  box-shadow: var(--shadow-xs);
   flex-wrap: wrap;
 }
 
@@ -612,7 +628,7 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
   top: 50%;
   transform: translateY(-50%);
   font-size: 18px;
-  color: #94A3B8;
+  color: var(--wl-muted-soft);
   pointer-events: none;
 }
 
@@ -627,19 +643,19 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
   font-size: 13.5px;
   color: var(--wl-ink-strong);
   outline: none;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  box-shadow: var(--shadow-xs);
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .toolbar-search-input:focus {
-  border-color: #4F46E5;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+  border-color: var(--wl-primary);
+  box-shadow: 0 0 0 3px rgba(105, 169, 255, 0.12);
 }
 
 .counter-text {
   font-size: 12px;
   font-weight: 700;
-  color: #64748B;
+  color: var(--wl-muted);
 }
 
 /* Executive Table */
@@ -648,7 +664,7 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
   border: 1px solid var(--wl-border, #E2E8F0);
   border-radius: var(--wl-radius-card, 16px);
   overflow: hidden;
-  box-shadow: var(--wl-shadow-card, 0 1px 3px rgba(15, 23, 42, 0.05));
+  box-shadow: var(--wl-shadow-card);
 }
 
 .table-wrap {
@@ -700,7 +716,7 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
   border-radius: 50%;
   overflow: hidden;
   flex-shrink: 0;
-  background: #E2E8F0;
+  background: var(--wl-surface-hover);
 }
 
 .user-avatar-img {
@@ -735,7 +751,7 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
   align-items: center;
   gap: 0.35rem;
   font-size: 11.5px;
-  color: #64748B;
+  color: var(--wl-muted);
 }
 
 .flag-icon {
@@ -745,7 +761,7 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
 
 .phone-dial-code {
   font-weight: 700;
-  color: #4F46E5;
+  color: var(--wl-primary);
 }
 
 .phone-number {
@@ -754,7 +770,7 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
 
 .user-phone {
   font-size: 11.5px;
-  color: #64748B;
+  color: var(--wl-muted);
 }
 
 .role-pill {
@@ -767,15 +783,16 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
 }
 
 .role-pill--admin {
-  background: var(--wl-primary-soft);
-  color: var(--wl-primary);
-  border: 1px solid rgba(var(--wl-primary-rgb), 0.3);
+  background: var(--wl-gold-soft);
+  color: var(--wl-gold);
+  border: 1px solid rgba(255, 209, 102, 0.4);
+  box-shadow: 0 0 0 3px rgba(255, 209, 102, 0.1);
 }
 
 .role-pill--staff {
-  background: #F0FDF4;
-  color: #16A34A;
-  border: 1px solid #BBF7D0;
+  background: var(--wl-success-soft);
+  color: var(--wl-success);
+  border: 1px solid rgba(62, 215, 180, 0.32);
 }
 
 .role-pill--org {
@@ -801,8 +818,8 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
 }
 
 .status-dot-badge--active {
-  background: #ECFDF5;
-  color: #059669;
+  background: var(--wl-success-soft);
+  color: var(--wl-success);
 }
 .status-dot-badge--active .dot { background: #10B981; }
 
@@ -810,7 +827,7 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
   background: var(--wl-surface-soft);
   color: var(--wl-muted);
 }
-.status-dot-badge--inactive .dot { background: #94A3B8; }
+.status-dot-badge--inactive .dot { background: var(--wl-muted-soft); }
 
 .user-details-hero {
   display: flex;

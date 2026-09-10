@@ -236,32 +236,24 @@ export class ApiMarketplaceRepository implements MarketplaceRepository {
   }
 
   async getCategories(): Promise<CategoryDto[]> {
-    for (const path of [MARKETPLACE_ROUTES.categories, MARKETPLACE_ROUTES.catalogCategories]) {
-      try {
-        const raw = await this.http.get<unknown>(path, { showFeedback: false })
-        let list: CategoryDto[]
-        if (Array.isArray(raw)) {
-          list = raw as CategoryDto[]
-        } else if (raw && typeof raw === 'object') {
-          const obj = raw as Record<string, unknown>
-          if (Array.isArray(obj.data)) list = obj.data as CategoryDto[]
-          else if (Array.isArray(obj.Data)) list = obj.Data as CategoryDto[]
-          else {
-            const paginated = toPaginated<CategoryDto>(raw)
-            list = paginated ? paginated.data : (raw as CategoryDto[])
-          }
-        } else {
-          list = raw as CategoryDto[]
-        }
-        return list.map(normalizeCategory)
-      } catch (e) {
-        if (e instanceof ApiError && e.status === 404 && path !== MARKETPLACE_ROUTES.catalogCategories) {
-          continue
-        }
-        throw e
+    // NOTE: there is no /catalog/* endpoint on the backend — /categories is
+    // the only source. Do not add a fallback loop here (it only doubles 404s).
+    const raw = await this.http.get<unknown>(MARKETPLACE_ROUTES.categories, { showFeedback: false })
+    let list: CategoryDto[]
+    if (Array.isArray(raw)) {
+      list = raw as CategoryDto[]
+    } else if (raw && typeof raw === 'object') {
+      const obj = raw as Record<string, unknown>
+      if (Array.isArray(obj.data)) list = obj.data as CategoryDto[]
+      else if (Array.isArray(obj.Data)) list = obj.Data as CategoryDto[]
+      else {
+        const paginated = toPaginated<CategoryDto>(raw)
+        list = paginated ? paginated.data : (raw as CategoryDto[])
       }
+    } else {
+      list = raw as CategoryDto[]
     }
-    return []
+    return list.map(normalizeCategory)
   }
 
   async getFeaturedProducts(): Promise<ProductDto[]> {

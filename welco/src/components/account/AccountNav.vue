@@ -75,7 +75,7 @@ import { t } from '../../i18n'
   color: var(--wl-ink-strong);
   background: var(--wl-surface);
   font-weight: 600;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+  box-shadow: 0 1px 3px rgba(0, 10, 25, 0.08), 0 1px 2px rgba(0, 10, 25, 0.04);
 }
 
 .nav-icon {

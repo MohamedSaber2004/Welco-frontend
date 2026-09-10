@@ -66,19 +66,24 @@ export function useUsers() {
         pageSize: 50,
       })
 
-      const data = res as unknown as Record<string, unknown>
-      if (Array.isArray((res as unknown as { data?: unknown })?.data)) {
+      const data = res as unknown as Record<string, unknown> | null | undefined
+      if (Array.isArray((res as unknown as { data?: unknown } | null | undefined)?.data)) {
         rawUsers.value = (res as unknown as { data: UserDto[] }).data
       } else if (Array.isArray(res as unknown as UserDto[])) {
         rawUsers.value = res as unknown as UserDto[]
-      } else if (Array.isArray(data.data)) {
+      } else if (data && Array.isArray(data.data)) {
         rawUsers.value = data.data as UserDto[]
       } else {
         rawUsers.value = []
       }
     } catch (e) {
-      error.value = e instanceof Error ? e.message : t('common.loadFailed')
-      toastService.error(t('common.error'))
+      const message = e instanceof Error && e.message ? e.message : t('common.loadFailed')
+      error.value = message
+      // Surface the backend message (e.g. 500 detail) instead of a generic
+      // "Error" so the admin can report the real cause. Keep console context
+      // for Network-tab correlation.
+      console.error('[useUsers] getUsers failed:', e)
+      toastService.error(message)
     } finally {
       loading.value = false
     }

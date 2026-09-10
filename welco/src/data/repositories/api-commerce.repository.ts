@@ -2,7 +2,6 @@ import { COMMERCE_ROUTES } from '../../config/api.config'
 import type { PaginatedResult } from '../../domain/models/location'
 import type {
   CreateOrderPayload,
-  InvoiceDto,
   OrderDto,
 } from '../../domain/models/commerce'
 import type { CommerceRepository, CommerceQuery } from '../../domain/ports/commerce-repository'
@@ -76,8 +75,4 @@ export class ApiCommerceRepository implements CommerceRepository {
     return await this.http.put<string>(COMMERCE_ROUTES.orderStatus(id), { status }, { showFeedback: false })
   }
 
-  async getInvoices(orderId: string): Promise<InvoiceDto[]> {
-    const raw = await this.http.get<unknown>(`${COMMERCE_ROUTES.base}/orders/${orderId}/invoices`, { showFeedback: false })
-    return this.extractList<InvoiceDto>(raw)
-  }
 }

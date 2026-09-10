@@ -1,5 +1,6 @@
 import { AppLanguage, ThemeMode, UserType } from './user'
 export { AppLanguage, ThemeMode, UserType }
+import type { CompanyType } from './company'
 
 export interface RegisterPayload {
   fullName: string
@@ -12,6 +13,7 @@ export interface RegisterPayload {
   userType?: UserType
   language?: AppLanguage
   // Unified distributor application (OrganizationUser)
+  companyType?: CompanyType
   companyName?: string
   companyEmail?: string
   distributorCountryId?: string

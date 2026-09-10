@@ -473,21 +473,21 @@ const totalCompany = computed(() => company.addresses.value.length)
   align-items: center;
   gap: 0.45rem;
   font-size: 11px;
-  color: #64748B;
+  color: var(--wl-muted);
 }
 
 .crumb-bar a {
-  color: #64748B;
+  color: var(--wl-muted);
   text-decoration: none;
   transition: color 0.15s ease;
 }
 
 .crumb-bar a:hover {
-  color: #4F46E5;
+  color: var(--wl-primary);
 }
 
 .crumb-sep {
-  color: #CBD5E1;
+  color: var(--wl-muted-soft);
 }
 
 .crumb-active {
@@ -522,7 +522,7 @@ const totalCompany = computed(() => company.addresses.value.length)
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #4F46E5;
+  background: var(--wl-primary);
 }
 
 .head-title {
@@ -537,7 +537,7 @@ const totalCompany = computed(() => company.addresses.value.length)
 
 .head-subtitle {
   font-size: 13.5px;
-  color: #64748B;
+  color: var(--wl-muted);
   margin: 0.25rem 0 0;
 }
 
@@ -547,19 +547,19 @@ const totalCompany = computed(() => company.addresses.value.length)
   gap: 0.45rem;
   height: 44px;
   padding: 0 1.25rem;
-  background: #4F46E5;
-  color: #FFFFFF;
+  background: var(--wl-primary);
+  color: var(--wl-on-primary);
   border: none;
   border-radius: 10px;
   font-size: 13.5px;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 4px 12px -2px rgba(79, 70, 229, 0.35);
+  box-shadow: 0 4px 12px -2px rgba(105, 169, 255, 0.35);
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .btn-create-addr:hover {
-  background: #4338CA;
+  background: var(--wl-primary-hover);
   transform: translateY(-1px);
 }
 
@@ -591,8 +591,8 @@ const totalCompany = computed(() => company.addresses.value.length)
 }
 
 .tab-btn.is-active {
-  color: var(--wl-primary, #4F46E5);
-  border-bottom-color: var(--wl-primary, #4F46E5);
+  color: var(--wl-primary, #69a9ff);
+  border-bottom-color: var(--wl-primary, #69a9ff);
 }
 
 .tab-chip {
@@ -617,13 +617,13 @@ const totalCompany = computed(() => company.addresses.value.length)
 
 .banner-icon {
   font-size: 20px;
-  color: #4F46E5;
+  color: var(--wl-primary);
   flex-shrink: 0;
 }
 
 .banner-text {
   font-size: 13px;
-  color: #475569;
+  color: var(--wl-ink-soft);
   line-height: 1.5;
   margin: 0;
 }
@@ -657,8 +657,8 @@ const totalCompany = computed(() => company.addresses.value.length)
 .country-pill {
   font-size: 10px;
   font-weight: 700;
-  color: #0369A1;
-  background: #E0F2FE;
+  color: var(--wl-info);
+  background: var(--wl-info-soft);
   padding: 0.15rem 0.5rem;
   border-radius: 6px;
 }
@@ -666,9 +666,9 @@ const totalCompany = computed(() => company.addresses.value.length)
 .currency-pill {
   font-size: 10px;
   font-weight: 800;
-  color: #047857;
-  background: #ECFDF5;
-  border: 1px solid #A7F3D0;
+  color: var(--wl-success);
+  background: var(--wl-success-soft);
+  border: 1px solid rgba(87, 242, 135, 0.35);
   padding: 0.15rem 0.5rem;
   border-radius: 6px;
   letter-spacing: 0.04em;
@@ -676,7 +676,7 @@ const totalCompany = computed(() => company.addresses.value.length)
 
 .cluster-count {
   font-size: 11px;
-  color: #94A3B8;
+  color: var(--wl-muted-soft);
 }
 
 .address-cards-grid {
@@ -690,7 +690,7 @@ const totalCompany = computed(() => company.addresses.value.length)
   border: 1px solid var(--wl-border, #E2E8F0);
   border-radius: var(--wl-radius-card, 16px);
   padding: var(--wl-card-padding, 1.25rem);
-  box-shadow: var(--wl-shadow-card, 0 1px 3px rgba(15, 23, 42, 0.05));
+  box-shadow: var(--wl-shadow-card, 0 1px 3px rgba(0, 10, 25, 0.05));
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -699,8 +699,8 @@ const totalCompany = computed(() => company.addresses.value.length)
 }
 
 .address-card:hover {
-  border-color: var(--wl-border-hover, #CBD5E1);
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+  border-color: var(--wl-border-strong);
+  box-shadow: 0 4px 12px rgba(0, 10, 25, 0.06);
 }
 
 .card-main {
@@ -721,8 +721,8 @@ const totalCompany = computed(() => company.addresses.value.length)
 }
 
 .addr-icon-box--company {
-  background: #E0F2FE;
-  color: #0284C7;
+  background: var(--wl-info-soft);
+  color: var(--wl-info);
 }
 
 .addr-details {
@@ -752,15 +752,15 @@ const totalCompany = computed(() => company.addresses.value.length)
 .default-badge {
   font-size: 9px;
   font-weight: 800;
-  color: #059669;
-  background: #ECFDF5;
+  color: var(--wl-success);
+  background: var(--wl-success-soft);
   padding: 0.1rem 0.4rem;
   border-radius: 4px;
 }
 
 .building-meta {
   font-size: 12.5px;
-  color: #64748B;
+  color: var(--wl-muted);
   margin: 0;
 }
 
@@ -795,7 +795,7 @@ const totalCompany = computed(() => company.addresses.value.length)
   display: flex;
   gap: 0.5rem;
   padding-top: 0.75rem;
-  border-top: 1px solid #F1F5F9;
+  border-top: 1px solid var(--wl-border);
 }
 
 .btn-action-ghost {
@@ -816,7 +816,7 @@ const totalCompany = computed(() => company.addresses.value.length)
 }
 
 .btn-action-ghost:hover {
-  border-color: #4F46E5;
+  border-color: var(--wl-primary);
   color: var(--wl-primary);
   background: var(--wl-primary-soft);
 }
@@ -829,17 +829,17 @@ const totalCompany = computed(() => company.addresses.value.length)
   justify-content: center;
   gap: 0.3rem;
   background: var(--wl-surface);
-  border: 1px solid #FECDD3;
+  border: 1px solid rgba(237, 66, 69, 0.35);
   border-radius: 8px;
   font-size: 12px;
   font-weight: 600;
-  color: #E11D48;
+  color: var(--wl-danger);
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .btn-action-danger:hover {
-  background: #FFF1F2;
+  background: var(--wl-danger-soft);
 }
 
 /* Modals */
@@ -858,7 +858,7 @@ const totalCompany = computed(() => company.addresses.value.length)
 .vip-field-label {
   font-size: 10.5px;
   font-weight: 700;
-  color: #475569;
+  color: var(--wl-ink-soft);
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
@@ -880,8 +880,8 @@ const totalCompany = computed(() => company.addresses.value.length)
 .vip-select:focus,
 .vip-input:focus {
   background: var(--wl-surface);
-  border-color: #4F46E5;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+  border-color: var(--wl-primary);
+  box-shadow: 0 0 0 3px rgba(105, 169, 255, 0.12);
 }
 
 .fields-2col {
@@ -908,13 +908,13 @@ const totalCompany = computed(() => company.addresses.value.length)
 .vip-checkbox {
   width: 16px;
   height: 16px;
-  accent-color: #4F46E5;
+  accent-color: var(--wl-primary);
 }
 
 .modal-error-banner {
-  background: #FFF1F2;
-  border: 1px solid #FECDD3;
-  color: #E11D48;
+  background: var(--wl-danger-soft);
+  border: 1px solid rgba(237, 66, 69, 0.35);
+  color: var(--wl-danger);
   padding: 0.65rem 0.85rem;
   border-radius: 8px;
   font-size: 12.5px;
@@ -929,8 +929,8 @@ const totalCompany = computed(() => company.addresses.value.length)
 
 .btn-modal-save {
   height: 48px;
-  background: #4F46E5;
-  color: #FFFFFF;
+  background: var(--wl-primary);
+  color: var(--wl-on-primary);
   border: none;
   border-radius: 10px;
   font-size: 13.5px;
@@ -940,7 +940,7 @@ const totalCompany = computed(() => company.addresses.value.length)
 }
 
 .btn-modal-save:hover:not(:disabled) {
-  background: #4338CA;
+  background: var(--wl-primary-hover);
 }
 
 .btn-modal-cancel {
@@ -959,3 +959,4 @@ const totalCompany = computed(() => company.addresses.value.length)
   background: var(--wl-surface-soft);
 }
 </style>
+

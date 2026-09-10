@@ -80,7 +80,7 @@ onUnmounted(() => {
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.6);
+  background: rgba(0, 10, 25, 0.6);
   backdrop-filter: blur(12px) saturate(1.2);
   -webkit-backdrop-filter: blur(12px) saturate(1.2);
   display: flex;
@@ -102,10 +102,11 @@ onUnmounted(() => {
 }
 
 .modal-card {
-  background: var(--wl-surface);
+  background-color: var(--wl-surface);
+  background-image: var(--wl-gradient-modal, var(--wl-gradient-card));
   border: 1px solid var(--wl-border);
   border-radius: var(--radius-xl);
-  box-shadow: 0 24px 64px rgba(15, 23, 42, 0.18), 0 8px 24px rgba(15, 23, 42, 0.12);
+  box-shadow: var(--shadow-xl);
   display: flex;
   flex-direction: column;
   max-height: 90vh;
@@ -117,7 +118,8 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--wl-surface-soft);
+  background-color: var(--wl-surface-soft);
+  background-image: var(--wl-gradient-toolbar);
 }
 
 .modal-title {

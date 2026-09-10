@@ -430,16 +430,16 @@ async function convertToQuote() {
   color: var(--wl-primary);
 }
 .curr-chip--default {
-  border-color: rgba(79, 70, 229, 0.2);
+  border-color: rgba(105, 169, 255, 0.2);
   background: var(--wl-primary-soft);
   font-weight: 800;
 }
 
 .curr-chip.active {
   background: var(--wl-primary);
-  color: #ffffff;
+  color: var(--wl-on-primary);
   border-color: var(--wl-primary);
-  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
+  box-shadow: 0 2px 6px rgba(105, 169, 255, 0.3);
 }
 
 .curr-lock {
@@ -465,7 +465,7 @@ async function convertToQuote() {
   align-items: center;
   gap: 0.35rem;
   font-size: 10px;
-  color: #4F46E5;
+  color: var(--wl-primary);
   font-weight: 700;
   letter-spacing: 0.08em;
   margin-bottom: 0.25rem;
@@ -685,3 +685,4 @@ async function convertToQuote() {
   }
 }
 </style>
+

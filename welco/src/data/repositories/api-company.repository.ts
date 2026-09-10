@@ -98,7 +98,7 @@ export class ApiCompanyRepository implements CompanyRepository {
     return await this.http.get<DistributorApplicationDto>(COMPANY_ROUTES.distributorApplicationById(id), { showFeedback: false })
   }
 
-  async approveDistributorApplication(id: string, payload: { tierLevel?: number; accountManagerId?: string | null } = {}): Promise<DistributorApplicationDto> {
+  async approveDistributorApplication(id: string, payload: { accountManagerId?: string | null } = {}): Promise<DistributorApplicationDto> {
     return await this.http.put<DistributorApplicationDto>(COMPANY_ROUTES.approveDistributorApplication(id), payload, { showFeedback: false })
   }
 

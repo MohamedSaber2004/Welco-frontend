@@ -294,21 +294,21 @@ async function placeOrderFromQuote() {
   align-items: center;
   gap: 0.45rem;
   font-size: 11px;
-  color: #64748B;
+  color: var(--wl-muted);
 }
 
 .crumb-bar a {
-  color: #64748B;
+  color: var(--wl-muted);
   text-decoration: none;
   transition: color 0.15s ease;
 }
 
 .crumb-bar a:hover {
-  color: #4F46E5;
+  color: var(--wl-primary);
 }
 
 .crumb-sep {
-  color: #CBD5E1;
+  color: var(--wl-muted-soft);
 }
 
 .crumb-active {
@@ -351,7 +351,7 @@ async function placeOrderFromQuote() {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #4F46E5;
+  background: var(--wl-primary);
 }
 
 .quote-heading {
@@ -368,7 +368,7 @@ async function placeOrderFromQuote() {
   align-items: center;
   gap: 0.5rem;
   font-size: 11.5px;
-  color: #64748B;
+  color: var(--wl-muted);
   margin: 0.35rem 0 0;
 }
 
@@ -385,7 +385,7 @@ async function placeOrderFromQuote() {
   border: 1px solid var(--wl-border, #E2E8F0);
   border-radius: var(--wl-radius-card, 16px);
   padding: var(--wl-card-padding, 1.5rem);
-  box-shadow: var(--wl-shadow-card, 0 1px 3px rgba(15, 23, 42, 0.05));
+  box-shadow: var(--wl-shadow-card, 0 1px 3px rgba(0, 10, 25, 0.05));
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -396,7 +396,7 @@ async function placeOrderFromQuote() {
   justify-content: space-between;
   align-items: center;
   padding-bottom: 0.75rem;
-  border-bottom: 1px solid var(--wl-border-subtle, #F1F5F9);
+  border-bottom: 1px solid var(--wl-border);
 }
 
 .manifest-title-group {
@@ -476,13 +476,13 @@ async function placeOrderFromQuote() {
   border: 1px solid var(--wl-border, #E2E8F0);
   border-radius: var(--wl-radius-card, 16px);
   padding: var(--wl-card-padding, 1.25rem);
-  box-shadow: var(--wl-shadow-card, 0 1px 3px rgba(15, 23, 42, 0.05));
+  box-shadow: var(--wl-shadow-card, 0 1px 3px rgba(0, 10, 25, 0.05));
 }
 
 .side-title {
   font-size: 11px;
   font-weight: 800;
-  color: var(--wl-primary, #4F46E5);
+  color: var(--wl-primary, #69a9ff);
   letter-spacing: 0.05em;
   text-transform: uppercase;
   margin: 0 0 0.75rem;
@@ -493,12 +493,12 @@ async function placeOrderFromQuote() {
   justify-content: space-between;
   align-items: baseline;
   padding-bottom: 0.75rem;
-  border-bottom: 1px solid #F1F5F9;
+  border-bottom: 1px solid var(--wl-border);
 }
 
 .amount-label {
   font-size: 11px;
-  color: #64748B;
+  color: var(--wl-muted);
   font-weight: 700;
 }
 
@@ -513,13 +513,13 @@ async function placeOrderFromQuote() {
   align-items: center;
   gap: 0.45rem;
   font-size: 11.5px;
-  color: #64748B;
+  color: var(--wl-muted);
   margin-top: 0.65rem;
 }
 
 .decision-desc {
   font-size: 12px;
-  color: #64748B;
+  color: var(--wl-muted);
   line-height: 1.45;
   margin: 0 0 1rem;
 }
@@ -536,8 +536,8 @@ async function placeOrderFromQuote() {
   justify-content: center;
   gap: 0.45rem;
   height: 48px;
-  background: #059669;
-  color: #FFFFFF;
+  background: var(--wl-success);
+  color: var(--wl-on-primary);
   border: none;
   border-radius: 10px;
   font-size: 13.5px;
@@ -558,8 +558,8 @@ async function placeOrderFromQuote() {
   gap: 0.45rem;
   height: 44px;
   background: var(--wl-surface);
-  color: #E11D48;
-  border: 1.5px solid #FECDD3;
+  color: var(--wl-danger);
+  border: 1.5px solid rgba(237, 66, 69, 0.35);
   border-radius: 10px;
   font-size: 13px;
   font-weight: 700;
@@ -568,7 +568,7 @@ async function placeOrderFromQuote() {
 }
 
 .btn-decline:hover:not(:disabled) {
-  background: #FFF1F2;
+  background: var(--wl-danger-soft);
 }
 
 .approved-head {
@@ -577,7 +577,7 @@ async function placeOrderFromQuote() {
   gap: 0.45rem;
   font-size: 12px;
   font-weight: 800;
-  color: #059669;
+  color: var(--wl-success);
   margin-bottom: 0.4rem;
 }
 
@@ -588,8 +588,8 @@ async function placeOrderFromQuote() {
   gap: 0.45rem;
   height: 46px;
   width: 100%;
-  background: #4F46E5;
-  color: #FFFFFF;
+  background: var(--wl-primary);
+  color: var(--wl-on-primary);
   border: none;
   border-radius: 10px;
   font-size: 13px;
@@ -604,8 +604,8 @@ async function placeOrderFromQuote() {
   gap: 0.45rem;
   height: 48px;
   width: 100%;
-  background: #059669;
-  color: #FFFFFF;
+  background: var(--wl-success);
+  color: var(--wl-on-primary);
   border: none;
   border-radius: 10px;
   font-size: 13.5px;
@@ -628,7 +628,7 @@ async function placeOrderFromQuote() {
 
 .btn-view-order--secondary {
   background: var(--wl-surface);
-  color: #4F46E5;
+  color: var(--wl-primary);
   border: 1.5px solid rgba(var(--wl-primary-rgb), 0.3);
 }
 
@@ -655,7 +655,7 @@ async function placeOrderFromQuote() {
 }
 
 .btn-back-quotes:hover {
-  border-color: #4F46E5;
+  border-color: var(--wl-primary);
   color: var(--wl-primary);
   background: var(--wl-primary-soft);
 }
@@ -666,3 +666,4 @@ async function placeOrderFromQuote() {
   }
 }
 </style>
+

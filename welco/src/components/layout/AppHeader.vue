@@ -136,7 +136,7 @@ watch(isAuthed, (v) => {
         <template v-if="isAuthed">
           <div class="header__user-wrap">
             <button class="header__user" type="button" @click.stop="userMenuOpen = !userMenuOpen" :aria-expanded="userMenuOpen">
-              <span class="header__avatar" :style="{ background: user?.tint || '#4F46E5' }">
+              <span class="header__avatar" :style="{ background: user?.tint || '#69a9ff' }">
                 <img v-if="hasAvatar" :src="avatarSrc" :alt="user?.fullName ?? ''" class="header__avatar-img" @error="avatarFailed = true; markBrokenUrl(avatarSrc)" />
                 <span v-else class="header__avatar-fallback">{{ avatarInitials }}</span>
               </span>
@@ -235,7 +235,8 @@ watch(isAuthed, (v) => {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: var(--wl-header-bg);
+  background-color: var(--wl-header-bg);
+  background-image: linear-gradient(90deg, rgba(16, 64, 127, 0.55) 0%, rgba(6, 19, 40, 0.65) 40%, rgba(12, 74, 74, 0.4) 100%);
   backdrop-filter: blur(16px) saturate(1.4);
   -webkit-backdrop-filter: blur(16px) saturate(1.4);
   border-bottom: 1px solid var(--wl-header-border);
@@ -280,9 +281,13 @@ watch(isAuthed, (v) => {
   font-family: var(--wl-font-display);
   font-weight: 800;
   font-size: 16px;
-  color: var(--wl-ink-strong);
   letter-spacing: -0.025em;
   white-space: nowrap;
+  background: var(--wl-gradient-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 1px 6px rgba(233, 168, 37, 0.3)) drop-shadow(0 1px 0 rgba(6, 19, 40, 0.9));
 }
 .menu { display: flex; gap: 0.2rem; flex: 1; align-items: center; min-width: 0; overflow: hidden; }
 .menu__link {
@@ -296,7 +301,7 @@ watch(isAuthed, (v) => {
   white-space: nowrap;
 }
 .menu__link:hover { color: var(--wl-ink-strong); background: var(--wl-surface-soft); }
-.menu__link.router-link-active { color: var(--wl-ink-strong); background: var(--wl-surface-soft); font-weight: 600; }
+.menu__link.router-link-active { color: var(--wl-gold); background: var(--wl-gold-soft); font-weight: 600; text-shadow: 0 1px 0 rgba(6, 19, 40, 0.9); }
 .header__search {
   display: flex;
   align-items: center;
@@ -382,7 +387,7 @@ watch(isAuthed, (v) => {
   height: 18px;
   padding: 0 4px;
   background: var(--wl-danger);
-  color: #fff;
+  color: var(--wl-on-primary);
   font-family: var(--wl-font-mono);
   font-variant-numeric: tabular-nums;
   font-size: 10px;
@@ -407,7 +412,7 @@ watch(isAuthed, (v) => {
   white-space: nowrap;
   flex-shrink: 0;
 }
-.btn-primary { background: var(--wl-primary); color: #fff; border-color: var(--wl-primary); }
+.btn-primary { background-color: var(--wl-primary); background-image: var(--wl-gradient-primary); color: var(--wl-on-primary); border-color: rgba(105, 169, 255, 0.55); }
 .btn-primary:hover { background: var(--wl-primary-hover); }
 .btn-ghost { background: var(--wl-surface); color: var(--wl-ink-strong); border-color: var(--wl-border); }
 .btn-ghost:hover { background: var(--wl-surface-soft); }

@@ -7,6 +7,9 @@ import AppPagination from '../../components/ui/AppPagination.vue'
 import { companyRepository, companyService, locationService } from '../../di/container'
 import BaseModal from '../../components/ui/BaseModal.vue'
 import BaseButton from '../../components/ui/BaseButton.vue'
+import FileUpload from '../../components/ui/FileUpload.vue'
+import AppImage from '../../components/ui/AppImage.vue'
+import { ATTACHMENT_PLACE, MEDIA_TYPE } from '../../config/api.config'
 import { confirmService } from '../../infrastructure/feedback/confirm.service'
 import { toastService } from '../../infrastructure/feedback/toast.service'
 import { t, locale } from '../../i18n'
@@ -17,11 +20,14 @@ import type {
   UpdateCompanyPayload,
   DistributorApplicationDto,
 } from '../../domain/models/company'
+import type { OemInquiryDto } from '../../domain/ports/company-repository'
 
 const route = useRoute()
 const router = useRouter()
 
-const activeTab = ref<'companies' | 'applications'>((route.query.tab as string) === 'applications' ? 'applications' : 'companies')
+const activeTab = ref<'companies' | 'applications' | 'oem'>(
+  (route.query.tab as string) === 'applications' ? 'applications' : (route.query.tab as string) === 'oem' ? 'oem' : 'companies',
+)
 
 const companies = ref<CompanyDto[]>([])
 const loadingCompanies = ref(false)
@@ -79,9 +85,9 @@ const companyForm = ref({
   email: '',
   type: CompanyType.Distributor as CompanyType,
   countryId: '',
-  tierLevel: 1,
   status: CompanyStatus.Pending as CompanyStatus,
   isActive: true,
+  imageName: '',
 })
 
 const openCreateCompany = () => {
@@ -91,9 +97,9 @@ const openCreateCompany = () => {
     email: '',
     type: CompanyType.Distributor,
     countryId: '',
-    tierLevel: 1,
     status: CompanyStatus.Pending,
     isActive: true,
+    imageName: '',
   }
   companyFormError.value = ''
   showCompanyModal.value = true
@@ -106,9 +112,9 @@ const openEditCompany = (c: CompanyDto) => {
     email: c.email ?? '',
     type: c.type,
     countryId: c.countryId ?? '',
-    tierLevel: c.tierLevel ?? 1,
     status: c.status,
     isActive: c.isActive ?? true,
+    imageName: c.imageName ?? '',
   }
   companyFormError.value = ''
   showCompanyModal.value = true
@@ -138,10 +144,10 @@ const submitCompanyForm = async () => {
         email: f.email.trim() || null,
         type: f.type,
         countryId: f.countryId,
-        tierLevel: Number(f.tierLevel) || 1,
         status: f.status,
         accountManagerId: editingCompany.value.accountManagerId ?? null,
         isActive: f.isActive,
+        imageName: f.imageName.trim() || null,
       }
       await companyRepository.updateCompany(editingCompany.value.id, payload)
       toastService.success(t('admin.companyUpdated'))
@@ -151,7 +157,6 @@ const submitCompanyForm = async () => {
         email: f.email.trim() || null,
         type: f.type,
         countryId: f.countryId,
-        tierLevel: Number(f.tierLevel) || 1,
         status: f.status,
       }
       await companyRepository.createCompany(payload)
@@ -186,7 +191,6 @@ const toggleCompanyActive = async (c: CompanyDto) => {
       email: c.email ?? null,
       type: c.type,
       countryId: c.countryId ?? '',
-      tierLevel: c.tierLevel ?? 1,
       status: c.status,
       accountManagerId: c.accountManagerId ?? null,
       isActive: nextActive,
@@ -350,14 +354,74 @@ const confirmReject = async (app: DistributorApplicationDto) => {
   }
 }
 
-const setTab = (tab: 'companies' | 'applications') => {
+const setTab = (tab: 'companies' | 'applications' | 'oem') => {
   activeTab.value = tab
   void router.replace({ query: { ...route.query, tab } })
+}
+
+// --- OEM inquiries (public OemView submissions, dynamic content) ---
+const oemInquiries = computed(() => companyService.oemInquiries.value)
+const oemLoading = computed(() => companyService.oemInquiriesLoading.value)
+const oemSearch = ref('')
+const oemPage = ref(1)
+const oemDeletePendingId = ref<string | null>(null)
+const selectedOem = ref<OemInquiryDto | null>(null)
+const showOemDetails = ref(false)
+
+const filteredOem = computed(() => {
+  const list = Array.isArray(oemInquiries.value) ? oemInquiries.value : []
+  if (!oemSearch.value.trim()) return list
+  const q = oemSearch.value.trim().toLowerCase()
+  return list.filter((o) => {
+    if (!o) return false
+    return (
+      (o.fullName || '').toLowerCase().includes(q) ||
+      (o.email || '').toLowerCase().includes(q) ||
+      (o.companyName || '').toLowerCase().includes(q) ||
+      (o.serviceType || '').toLowerCase().includes(q) ||
+      (o.message || '').toLowerCase().includes(q)
+    )
+  })
+})
+const oemTotalPages = computed(() => Math.max(1, Math.ceil(filteredOem.value.length / 10)))
+const paginatedOem = computed(() => {
+  const start = (oemPage.value - 1) * 10
+  return filteredOem.value.slice(start, start + 10)
+})
+
+const openOemDetails = (o: OemInquiryDto) => {
+  selectedOem.value = o
+  showOemDetails.value = true
+}
+const closeOemDetails = () => {
+  showOemDetails.value = false
+  selectedOem.value = null
+}
+
+const confirmDeleteOem = async (o: OemInquiryDto) => {
+  const ok = await confirmService.confirm({
+    title: t('common.delete'),
+    message: `${o.fullName} — ${o.companyName}`,
+    variant: 'danger',
+    confirmText: t('common.delete'),
+    cancelText: t('common.cancel'),
+  })
+  if (!ok) return
+  oemDeletePendingId.value = o.id
+  try {
+    await companyService.deleteOemInquiry(o.id)
+    if (selectedOem.value?.id === o.id) closeOemDetails()
+  } catch (e) {
+    toastService.error(e instanceof Error ? e.message : t('common.error'))
+  } finally {
+    oemDeletePendingId.value = null
+  }
 }
 
 onMounted(() => {
   void loadCompanies()
   void loadApplications()
+  void companyService.loadOemInquiries()
   if (!locationService.countries.value.length) {
     void locationService.loadCountries().catch(() => {})
   }
@@ -419,6 +483,15 @@ watch([applicationSearch, statusFilter], () => {
           <span>{{ t('admin.distributorApps') }}</span>
           <span v-if="pendingCount > 0" class="tab-chip tab-chip--amber">{{ pendingCount }} {{ t('common.pending').toUpperCase() }}</span>
           <span v-else class="tab-chip">({{ applications.length }})</span>
+        </button>
+        <button
+          type="button"
+          class="tab-btn mono"
+          :class="{ 'is-active': activeTab === 'oem' }"
+          @click="setTab('oem')"
+        >
+          <span>{{ t('admin.oemInquiries') }}</span>
+          <span class="tab-chip">({{ oemInquiries.length }})</span>
         </button>
       </div>
 
@@ -695,7 +768,144 @@ watch([applicationSearch, statusFilter], () => {
           </div>
         </DataState>
       </div>
+
+      <!-- TAB 3: OEM inquiries submitted from the public OEM page -->
+      <div v-else-if="activeTab === 'oem'" class="tab-content">
+        <div class="toolbar-card">
+          <div class="search-wrap">
+            <span class="material-symbols-outlined search-icon">search</span>
+            <input
+              v-model="oemSearch"
+              :placeholder="t('common.searchPlaceholder')"
+              :aria-label="t('common.searchPlaceholder')"
+              class="toolbar-input"
+              @input="oemPage = 1"
+            />
+            <button v-if="oemSearch" type="button" class="clear-btn" @click="oemSearch = ''; oemPage = 1">
+              <span class="material-symbols-outlined text-[14px]">close</span>
+            </button>
+          </div>
+          <span class="mono counter-text">{{ filteredOem.length }} {{ t('admin.oemInquiries') }}</span>
+        </div>
+
+        <DataState
+          :loading="oemLoading && !oemInquiries.length"
+          :empty="!filteredOem.length && !oemLoading"
+          :empty-title="t('admin.oemInquiries')"
+          skeleton-type="table"
+          :skeleton-count="6"
+          min-height="320px"
+          @retry="companyService.loadOemInquiries()"
+        >
+          <div class="table-card">
+            <div class="table-wrap">
+              <table class="exec-table">
+                <thead>
+                  <tr>
+                    <th>{{ t('oem.fullName') }}</th>
+                    <th>{{ t('oem.companyName') }}</th>
+                    <th>{{ t('oem.serviceType') }}</th>
+                    <th>{{ t('oem.email') }}</th>
+                    <th>{{ t('commerce.status') }}</th>
+                    <th class="text-end">{{ t('admin.actions') }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="o in paginatedOem" :key="o.id" class="exec-row">
+                    <td>
+                      <strong class="company-name">{{ o.fullName }}</strong>
+                    </td>
+                    <td>{{ o.companyName }}</td>
+                    <td>
+                      <span class="vol-pill mono">{{ o.serviceType }}</span>
+                    </td>
+                    <td class="mono text-xs">{{ o.email }}</td>
+                    <td class="mono text-xs">{{ new Date(o.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</td>
+                    <td class="text-end">
+                      <div class="row-actions">
+                        <button
+                          type="button"
+                          class="row-action-btn"
+                          :title="t('admin.viewDetails')"
+                          :aria-label="t('admin.viewDetails')"
+                          @click="openOemDetails(o)"
+                        >
+                          <span class="material-symbols-outlined text-[18px]">visibility</span>
+                        </button>
+                        <button
+                          type="button"
+                          class="row-action-btn row-action-btn--danger"
+                          :title="t('common.delete')"
+                          :aria-label="t('common.delete')"
+                          :disabled="oemDeletePendingId === o.id"
+                          @click="confirmDeleteOem(o)"
+                        >
+                          <span class="material-symbols-outlined text-[18px]">delete</span>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <AppPagination
+              v-model:page="oemPage"
+              :total-pages="oemTotalPages"
+              :total-items="filteredOem.length"
+              :page-size="10"
+              variant="table"
+              @change="(p: number) => { oemPage = p }"
+            />
+          </div>
+        </DataState>
+      </div>
     </div>
+
+      <!-- OEM Inquiry Details Modal -->
+      <BaseModal
+        v-model="showOemDetails"
+        :title="t('admin.oemInquiries')"
+        max-width="560px"
+        @close="closeOemDetails"
+      >
+        <div v-if="selectedOem" class="admin-details">
+          <div class="details-grid">
+            <div class="detail-item">
+              <span class="detail-k mono">{{ t('oem.fullName') }}</span>
+              <strong class="detail-v">{{ selectedOem.fullName }}</strong>
+            </div>
+            <div class="detail-item">
+              <span class="detail-k mono">{{ t('oem.email') }}</span>
+              <strong class="detail-v mono">{{ selectedOem.email }}</strong>
+            </div>
+            <div class="detail-item">
+              <span class="detail-k mono">{{ t('oem.companyName') }}</span>
+              <strong class="detail-v">{{ selectedOem.companyName }}</strong>
+            </div>
+            <div class="detail-item">
+              <span class="detail-k mono">{{ t('oem.serviceType') }}</span>
+              <strong class="detail-v">{{ selectedOem.serviceType }}</strong>
+            </div>
+          </div>
+          <div class="detail-item">
+            <span class="detail-k mono">{{ t('oem.message') }}</span>
+            <p class="detail-v--pre">{{ selectedOem.message }}</p>
+          </div>
+          <div class="modal-foot">
+            <BaseButton
+              variant="secondary"
+              :loading="oemDeletePendingId === selectedOem.id"
+              @click="selectedOem && confirmDeleteOem(selectedOem)"
+            >
+              {{ t('common.delete') }}
+            </BaseButton>
+            <BaseButton variant="secondary" @click="closeOemDetails">
+              {{ t('common.close') }}
+            </BaseButton>
+          </div>
+        </div>
+      </BaseModal>
 
       <!-- Add / Edit Company Modal -->
       <BaseModal
@@ -722,8 +932,7 @@ watch([applicationSearch, statusFilter], () => {
                 <option :value="CompanyType.Hospital">{{ COMPANY_TYPE_LABEL[CompanyType.Hospital] }}</option>
                 <option :value="CompanyType.Distributor">{{ COMPANY_TYPE_LABEL[CompanyType.Distributor] }}</option>
                 <option :value="CompanyType.Clinic">{{ COMPANY_TYPE_LABEL[CompanyType.Clinic] }}</option>
-                <option :value="CompanyType.Importer">{{ COMPANY_TYPE_LABEL[CompanyType.Importer] }}</option>
-              </select>
+                </select>
             </div>
             <div class="form-field">
               <label class="field-label" for="company-country">{{ t('distributor.country') }} *</label>
@@ -737,16 +946,6 @@ watch([applicationSearch, statusFilter], () => {
           </div>
           <div class="form-row two-cols">
             <div class="form-field">
-              <label class="field-label" for="company-tier">{{ t('admin.companyTier') }}</label>
-              <select id="company-tier" v-model.number="companyForm.tierLevel" class="field-select">
-                <option :value="1">1</option>
-                <option :value="2">2</option>
-                <option :value="3">3</option>
-                <option :value="4">4</option>
-                <option :value="5">5</option>
-              </select>
-            </div>
-            <div class="form-field">
               <label class="field-label" for="company-status">{{ t('commerce.status') }} *</label>
               <select id="company-status" v-model="companyForm.status" class="field-select">
                 <option :value="CompanyStatus.Pending">{{ t('common.pending') }}</option>
@@ -754,6 +953,17 @@ watch([applicationSearch, statusFilter], () => {
                 <option :value="CompanyStatus.Rejected">{{ t('sales.statusDeclined') }}</option>
               </select>
             </div>
+          </div>
+          <div class="form-field full-width">
+            <FileUpload
+              :model-value="companyForm.imageName || null"
+              :place="ATTACHMENT_PLACE.PROVIDERS"
+              :file-type="MEDIA_TYPE.IMAGE"
+              accept="image/*"
+              :label="t('admin.companyImage')"
+              :hint="t('attachment.dropHint')"
+              @update:modelValue="companyForm.imageName = $event ?? ''"
+            />
           </div>
           <div v-if="editingCompany" class="form-field">
             <label class="toggle-label">
@@ -783,6 +993,16 @@ watch([applicationSearch, statusFilter], () => {
         @close="closeCompanyDetails"
       >
         <div v-if="selectedCompany" class="admin-details">
+          <div v-if="selectedCompany.imageName" class="details-logo">
+            <AppImage
+              :src="selectedCompany.imageName"
+              placeholder-type="company"
+              :placeholder-text="selectedCompany.name"
+              :alt="selectedCompany.name"
+              fit="contain"
+              height="96px"
+            />
+          </div>
           <div class="details-grid">
             <div class="detail-item">
               <span class="detail-k mono">{{ t('admin.companyName') }}</span>
@@ -799,10 +1019,6 @@ watch([applicationSearch, statusFilter], () => {
             <div class="detail-item">
               <span class="detail-k mono">{{ t('distributor.country') }}</span>
               <strong class="detail-v">{{ companyCountryName(selectedCompany) }}</strong>
-            </div>
-            <div class="detail-item">
-              <span class="detail-k mono">{{ t('admin.companyTier') }}</span>
-              <strong class="detail-v mono">{{ selectedCompany.tierLevel }}</strong>
             </div>
             <div class="detail-item">
               <span class="detail-k mono">{{ t('commerce.status') }}</span>
@@ -827,6 +1043,18 @@ watch([applicationSearch, statusFilter], () => {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+}
+
+.details-logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--wl-surface-soft);
+  border: 1px solid var(--wl-border);
+  border-radius: var(--radius-md);
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  min-height: 96px;
 }
 
 .companies-head {
@@ -854,7 +1082,7 @@ watch([applicationSearch, statusFilter], () => {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #4F46E5;
+  background: var(--wl-primary);
 }
 
 .head-title {
@@ -869,7 +1097,7 @@ watch([applicationSearch, statusFilter], () => {
 
 .head-subtitle {
   font-size: 13.5px;
-  color: #64748B;
+  color: var(--wl-muted);
   margin: 0.25rem 0 0;
 }
 
@@ -902,8 +1130,8 @@ watch([applicationSearch, statusFilter], () => {
 }
 
 .tab-btn.is-active {
-  color: var(--wl-primary, #4F46E5);
-  border-bottom-color: var(--wl-primary, #4F46E5);
+  color: var(--wl-primary, #69a9ff);
+  border-bottom-color: var(--wl-primary, #69a9ff);
 }
 
 .tab-chip {
@@ -917,7 +1145,7 @@ watch([applicationSearch, statusFilter], () => {
 
 .tab-chip--amber {
   background: #FEF3C7;
-  color: #92400E;
+  color: var(--wl-warning);
 }
 
 .tab-content {
@@ -936,7 +1164,7 @@ watch([applicationSearch, statusFilter], () => {
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  box-shadow: var(--shadow-xs);
   flex-wrap: wrap;
 }
 
@@ -952,7 +1180,7 @@ watch([applicationSearch, statusFilter], () => {
   position: absolute;
   inset-inline-start: 12px;
   font-size: 18px;
-  color: #94A3B8;
+  color: var(--wl-muted-soft);
   pointer-events: none;
 }
 
@@ -972,8 +1200,8 @@ watch([applicationSearch, statusFilter], () => {
 
 .toolbar-input:focus {
   background: var(--wl-surface);
-  border-color: #4F46E5;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+  border-color: var(--wl-primary);
+  box-shadow: 0 0 0 3px rgba(105, 169, 255, 0.12);
 }
 
 .status-segment-group {
@@ -991,21 +1219,21 @@ watch([applicationSearch, statusFilter], () => {
   border-radius: 6px;
   font-size: 11.5px;
   font-weight: 600;
-  color: #64748B;
+  color: var(--wl-muted);
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .seg-btn.is-active {
   background: var(--wl-surface);
-  color: #4F46E5;
+  color: var(--wl-primary);
   font-weight: 700;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+  box-shadow: var(--shadow-xs);
 }
 
 .counter-text {
   font-size: 11.5px;
-  color: #64748B;
+  color: var(--wl-muted);
   font-weight: 700;
 }
 
@@ -1015,7 +1243,7 @@ watch([applicationSearch, statusFilter], () => {
   border: 1px solid var(--wl-border, #E2E8F0);
   border-radius: var(--wl-radius-card, 16px);
   overflow: hidden;
-  box-shadow: var(--wl-shadow-card, 0 1px 3px rgba(15, 23, 42, 0.05));
+  box-shadow: var(--wl-shadow-card, 0 1px 3px rgba(0, 10, 25, 0.05));
 }
 
 .table-wrap {
@@ -1062,7 +1290,7 @@ watch([applicationSearch, statusFilter], () => {
 
 .website-row {
   font-size: 11px;
-  color: #4F46E5;
+  color: var(--wl-primary);
   margin-top: 2px;
 }
 
@@ -1093,7 +1321,7 @@ watch([applicationSearch, statusFilter], () => {
 .applicant-email,
 .applicant-phone {
   font-size: 11px;
-  color: #64748B;
+  color: var(--wl-muted);
 }
 
 .vol-pill {
@@ -1122,20 +1350,20 @@ watch([applicationSearch, statusFilter], () => {
 }
 
 .status-pill--verified {
-  background: #ECFDF5;
-  color: #059669;
+  background: var(--wl-success-soft);
+  color: var(--wl-success);
 }
 .status-pill--verified .pill-dot { background: #10B981; }
 
 .status-pill--pending {
   background: #FEF3C7;
-  color: #92400E;
+  color: var(--wl-warning);
 }
 .status-pill--pending .pill-dot { background: #F59E0B; }
 
 .status-pill--declined {
-  background: #FFF1F2;
-  color: #E11D48;
+  background: var(--wl-danger-soft);
+  color: var(--wl-danger);
 }
 .status-pill--declined .pill-dot { background: #EF4444; }
 
@@ -1149,8 +1377,8 @@ watch([applicationSearch, statusFilter], () => {
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  background: #4F46E5;
-  color: #FFFFFF;
+  background: var(--wl-primary);
+  color: var(--wl-on-primary);
   border: none;
   border-radius: 6px;
   padding: 0.35rem 0.75rem;
@@ -1161,7 +1389,7 @@ watch([applicationSearch, statusFilter], () => {
 }
 
 .btn-approve:hover {
-  background: #4338CA;
+  background: var(--wl-primary-hover);
 }
 
 .btn-reject {
@@ -1169,8 +1397,8 @@ watch([applicationSearch, statusFilter], () => {
   align-items: center;
   gap: 0.25rem;
   background: var(--wl-surface);
-  border: 1px solid #FECDD3;
-  color: #E11D48;
+  border: 1px solid rgba(237, 66, 69, 0.35);
+  color: var(--wl-danger);
   border-radius: 6px;
   padding: 0.35rem 0.75rem;
   font-size: 11.5px;
@@ -1180,10 +1408,11 @@ watch([applicationSearch, statusFilter], () => {
 }
 
 .btn-reject:hover {
-  background: #FFF1F2;
+  background: var(--wl-danger-soft);
 }
 
 .text-end {
   text-align: end;
 }
 </style>
+

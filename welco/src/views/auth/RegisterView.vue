@@ -7,6 +7,7 @@ import { toastService } from '../../infrastructure/feedback/toast.service'
 import AuthShell from '../../components/auth/AuthShell.vue'
 import PhoneInput from '../../components/ui/PhoneInput.vue'
 import { AppLanguage, UserType } from '../../domain/models/user'
+import { CompanyType } from '../../domain/models/company'
 import type { CountryDto } from '../../domain/models/location'
 import { setPendingOrg, clearPendingOrg } from '../../utils/pending-org-marker'
 
@@ -17,6 +18,7 @@ const password = ref('')
 const confirmPassword = ref('')
 const phoneNumber = ref('')
 const companyName = ref('')
+const companyType = ref<CompanyType | ''>('')
 const companyEmail = ref('')
 const distributorCountryId = ref('')
 const salesVolumeBand = ref('')
@@ -74,6 +76,10 @@ const handleRegister = async () => {
     error.value = t('auth.errCompanyRequired')
     return
   }
+  if (companyType.value === '') {
+    error.value = t('auth.errCompanyTypeRequired')
+    return
+  }
   if (!distributorCountryId.value) {
     error.value = t('auth.errCountryRequired')
     return
@@ -111,6 +117,7 @@ const handleRegister = async () => {
     phoneCountryCode: phoneCountry.value?.code ?? undefined,
     userType: UserType.OrganizationUser,
     language: locale.value === 'ar' ? AppLanguage.Ar : AppLanguage.En,
+    companyType: companyType.value,
     companyName: companyName.value.trim(),
     companyEmail: companyEmail.value.trim() || undefined,
     distributorCountryId: distributorCountryId.value,
@@ -302,6 +309,18 @@ const handleRegister = async () => {
           </div>
 
           <div class="form-group">
+            <label class="form-label mono" for="reg-company-type">
+              {{ t('auth.companyType') }} <span class="req">*</span>
+            </label>
+            <select id="reg-company-type" v-model="companyType" required class="vip-input vip-select">
+              <option value="" disabled>{{ t('auth.companyType') }}</option>
+              <option :value="CompanyType.Hospital">{{ t('providers.hospital') }}</option>
+              <option :value="CompanyType.Distributor">{{ t('providers.distributor') }}</option>
+              <option :value="CompanyType.Clinic">{{ t('providers.clinic') }}</option>
+            </select>
+          </div>
+
+          <div class="form-group">
             <label class="form-label mono" for="reg-country">
               {{ t('distributor.country') }} <span class="req">*</span>
             </label>
@@ -392,7 +411,7 @@ const handleRegister = async () => {
   height: 28px;
   border-radius: 50%;
   background: var(--wl-primary);
-  color: #FFFFFF;
+  color: var(--wl-on-primary);
   display: grid;
   place-items: center;
   font-size: 12px;
@@ -473,7 +492,7 @@ const handleRegister = async () => {
   font-size: 14px;
   font-family: var(--wl-font-body, system-ui);
   color: var(--wl-ink-strong);
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  box-shadow: var(--shadow-xs);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   outline: none;
 }
@@ -582,7 +601,7 @@ const handleRegister = async () => {
   height: 44px;
   width: 100%;
   background: var(--wl-primary);
-  color: #FFFFFF;
+  color: var(--wl-on-primary);
   border: none;
   border-radius: var(--radius-md);
   font-family: var(--wl-font-body, system-ui);
@@ -593,14 +612,14 @@ const handleRegister = async () => {
   justify-content: center;
   gap: 0.55rem;
   cursor: pointer;
-  box-shadow: 0 4px 12px -2px rgba(79, 70, 229, 0.35);
+  box-shadow: 0 4px 12px -2px rgba(105, 169, 255, 0.35);
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .vip-submit-btn:hover:not(:disabled) {
   background: var(--wl-primary-hover);
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px -2px rgba(79, 70, 229, 0.45);
+  box-shadow: 0 6px 16px -2px rgba(105, 169, 255, 0.45);
 }
 
 .vip-submit-btn:active:not(:disabled) {
@@ -657,14 +676,14 @@ const handleRegister = async () => {
 }
 
 .acct-type-opt.is-active {
-  border-color: #4F46E5;
-  background: rgba(79, 70, 229, 0.05);
-  box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.12);
+  border-color: var(--wl-primary);
+  background: rgba(105, 169, 255, 0.05);
+  box-shadow: 0 0 0 3.5px rgba(105, 169, 255, 0.12);
 }
 
 .acct-type-icon {
   font-size: 22px;
-  color: #4F46E5;
+  color: var(--wl-primary);
 }
 
 .acct-type-label {
@@ -691,3 +710,4 @@ const handleRegister = async () => {
   }
 }
 </style>
+

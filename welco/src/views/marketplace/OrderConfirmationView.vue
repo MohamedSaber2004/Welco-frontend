@@ -146,21 +146,21 @@ onMounted(async () => {
   align-items: center;
   gap: 0.45rem;
   font-size: 11px;
-  color: #64748B;
+  color: var(--wl-muted);
 }
 
 .crumb-bar a {
-  color: #64748B;
+  color: var(--wl-muted);
   text-decoration: none;
   transition: color 0.15s ease;
 }
 
 .crumb-bar a:hover {
-  color: #4F46E5;
+  color: var(--wl-primary);
 }
 
 .crumb-sep {
-  color: #CBD5E1;
+  color: var(--wl-muted-soft);
 }
 
 .crumb-active {
@@ -174,7 +174,7 @@ onMounted(async () => {
   border-radius: 20px;
   padding: 2.5rem 1.5rem;
   text-align: center;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  box-shadow: var(--shadow-xs);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -185,9 +185,9 @@ onMounted(async () => {
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: #ECFDF5;
-  border: 2px solid #A7F3D0;
-  color: #059669;
+  background: var(--wl-success-soft);
+  border: 2px solid rgba(87, 242, 135, 0.35);
+  color: var(--wl-success);
   display: grid;
   place-items: center;
   margin-bottom: 0.5rem;
@@ -211,7 +211,7 @@ onMounted(async () => {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #4F46E5;
+  background: var(--wl-primary);
 }
 
 .confirm-title {
@@ -225,7 +225,7 @@ onMounted(async () => {
 
 .confirm-subtitle {
   font-size: 14px;
-  color: #64748B;
+  color: var(--wl-muted);
   margin: 0;
   max-width: 520px;
 }
@@ -243,7 +243,7 @@ onMounted(async () => {
 
 .id-label {
   font-size: 11px;
-  color: #64748B;
+  color: var(--wl-muted);
   font-weight: 700;
 }
 
@@ -258,7 +258,7 @@ onMounted(async () => {
   border: 1px solid var(--wl-border);
   border-radius: 16px;
   padding: 1.25rem 1.5rem;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  box-shadow: var(--shadow-xs);
 }
 
 .confirm-grid {
@@ -273,7 +273,7 @@ onMounted(async () => {
   border: 1px solid var(--wl-border);
   border-radius: 16px;
   padding: 1.5rem;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  box-shadow: var(--shadow-xs);
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -283,7 +283,7 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  border-bottom: 1px solid #F1F5F9;
+  border-bottom: 1px solid var(--wl-border);
   padding-bottom: 0.75rem;
 }
 
@@ -323,7 +323,7 @@ onMounted(async () => {
 }
 
 .item-qty {
-  color: #64748B;
+  color: var(--wl-muted);
 }
 
 .item-subtotal {
@@ -336,13 +336,13 @@ onMounted(async () => {
   justify-content: space-between;
   align-items: center;
   padding-top: 1rem;
-  border-top: 1.5px dashed #E2E8F0;
+  border-top: 1.5px dashed var(--wl-border);
 }
 
 .total-label {
   font-size: 11.5px;
   font-weight: 700;
-  color: #64748B;
+  color: var(--wl-muted);
   text-transform: uppercase;
 }
 
@@ -357,7 +357,7 @@ onMounted(async () => {
   border: 1px solid var(--wl-border);
   border-radius: 16px;
   padding: 1.5rem;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  box-shadow: var(--shadow-xs);
   display: flex;
   flex-direction: column;
   gap: 0.85rem;
@@ -366,7 +366,7 @@ onMounted(async () => {
 .actions-title {
   font-size: 11px;
   font-weight: 800;
-  color: #4F46E5;
+  color: var(--wl-primary);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   margin: 0;
@@ -374,7 +374,7 @@ onMounted(async () => {
 
 .actions-desc {
   font-size: 13px;
-  color: #64748B;
+  color: var(--wl-muted);
   line-height: 1.55;
   margin: 0;
 }
@@ -393,19 +393,19 @@ onMounted(async () => {
   gap: 0.45rem;
   height: 48px;
   padding: 0 1.25rem;
-  background: #4F46E5;
-  color: #FFFFFF;
+  background: var(--wl-primary);
+  color: var(--wl-on-primary);
   border: none;
   border-radius: 10px;
   font-size: 13.5px;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 4px 12px -2px rgba(79, 70, 229, 0.35);
+  box-shadow: 0 4px 12px -2px rgba(105, 169, 255, 0.35);
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .btn-primary-action:hover {
-  background: #4338CA;
+  background: var(--wl-primary-hover);
   transform: translateY(-1px);
 }
 
@@ -427,7 +427,7 @@ onMounted(async () => {
 }
 
 .btn-secondary-action:hover {
-  border-color: #4F46E5;
+  border-color: var(--wl-primary);
   color: var(--wl-primary);
   background: var(--wl-primary-soft);
 }
@@ -438,3 +438,4 @@ onMounted(async () => {
   }
 }
 </style>
+

@@ -29,9 +29,9 @@ export function isStoredFileName(value: string | null | undefined): boolean {
   if (typeof value !== 'string') return false
   const trimmed = value.trim().replace(/^\/+/, '')
   return (
-    /^\d+_[0-9a-fA-F\-]{8,}\..+$/i.test(trimmed) ||
+    /^\d+_[0-9a-fA-F-]{8,}\..+$/i.test(trimmed) ||
     /^\d+_\d+\..+$/i.test(trimmed) ||
-    /^\d+_[a-zA-Z0-9_\-]+\.[a-zA-Z0-9]+$/i.test(trimmed)
+    /^\d+_[a-zA-Z0-9_-]+\.[a-zA-Z0-9]+$/i.test(trimmed)
   )
 }
 

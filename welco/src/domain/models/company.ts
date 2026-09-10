@@ -23,6 +23,7 @@ export interface CompanyDto {
   isActive: boolean
   isProvider?: boolean
   imageName?: string | null
+  tierLevel?: string | null
   createdAt: string
 }
 

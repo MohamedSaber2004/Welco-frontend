@@ -155,8 +155,8 @@ onMounted(loadDashboard)
             <span class="pill-dot"></span>
             {{ t('account.verifiedPartner') }}
           </span>
-          <span class="company-pill mono">
-            {{ t('account.tierLevel', { tier: myCompany.tierLevel }) }}
+          <span v-if="myCompany.tierLevel" class="company-pill mono">
+            {{ t('account.tierLevel', { tier: myCompany.tierLevel ?? '' }) }}
           </span>
           <span v-if="myCompany.countryNameEn" class="company-country mono">
             {{ myCompany.countryNameEn }}

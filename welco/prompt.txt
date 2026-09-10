@@ -1,18 +1,5 @@
-:56304/files/delta-surgical.svg:1  Failed to load resource: the server responded with a status of 404 (Not Found)
-:56304/files/citycare.svg:1  Failed to load resource: the server responded with a status of 404 (Not Found)
-:56304/files/gulf-medical.svg:1  Failed to load resource: the server responded with a status of 404 (Not Found)
-:56304/files/lifeline.svg:1  Failed to load resource: the server responded with a status of 404 (Not Found)
-:56304/files/carepoint.svg:1  Failed to load resource: the server responded with a status of 404 (Not Found)
-:56304/files/apex-surgical.svg:1  Failed to load resource: the server responded with a status of 404 (Not Found)
-:56304/files/medcore.svg:1  Failed to load resource: the server responded with a status of 404 (Not Found)
-:56304/files/demo/products/army-retractor-straight-88.jpg:1  Failed to load resource: the server responded with a status of 404 (Not Found)
-:56304/files/demo/products/metzenbaum-scissors-slim-90.jpg:1  Failed to load resource: the server responded with a status of 404 (Not Found)
-:56304/files/demo/products/needle-holder-premium-89.jpg:1  Failed to load resource: the server responded with a status of 404 (Not Found)
-:56304/files/meridian.svg:1  Failed to load resource: the server responded with a status of 404 (Not Found)
-:56304/files/demo/certs/sfda-2025.jpg:1  Failed to load resource: the server responded with a status of 404 (Not Found)
-:56304/files/demo/certs/mdsap-2024.jpg:1  Failed to load resource: the server responded with a status of 404 (Not Found)
-:56304/files/demo/certs/iso-9001-2024.jpg:1  Failed to load resource: the server responded with a status of 404 (Not Found)
-:56304/api/v1/user-management/users?pageNumber=1&pageSize=50:1  Failed to load resource: the server responded with a status of 500 (Internal Server Error)
-useUsers.ts:85 [useUsers] getUsers failed: ApiError: An internal server error occurred on the server.
-    at run (http-client.ts:268:25)
-    at async HttpClient.withSlot (http-client.ts:377:14)
+
+src/views/account/AccountDashboardView.vue(159,18): error TS2345: Argument of type '"account.tierLevel"' is not assignable to parameter of type '"common.of" | "common.pcs" | "common.more" | "common.loading" | "common.success" | "common.error" | "common.notice" | "common.ok" | "common.operationDone" | "common.networkError" | ... 1566 more ... | "providers.clinic"'.
+src/views/account/AccountDashboardView.vue(159,57): error TS2339: Property 'tierLevel' does not exist on type '{ id: string; name: string; email?: string | null | undefined; type: CompanyType; countryId?: string | undefined; countryNameEn?: string | null | undefined; countryNameAr?: string | ... 1 more ... | undefined; ... 5 more ...; createdAt: string; }'.
+ERROR: "type-check" exited with 2.
+Error: Command "npm run build" exited with 1

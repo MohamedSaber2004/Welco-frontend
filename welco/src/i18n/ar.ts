@@ -1160,6 +1160,7 @@ export const ar: Messages = {
     isoDossier: 'ملف ISO / CE',
     verifiedBuyer: 'مشترٍ معتمد',
     verifiedPartner: 'شريك معتمد',
+    tierLevel: 'المستوى {tier}',
     pipelineEyebrow: 'دورة سلسلة التوريد',
     pipelineTitle: 'سرعة المشتريات المؤسسية',
     activeLifecycle: '{count} عناصر نشطة في الدورة',

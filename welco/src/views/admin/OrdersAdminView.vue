@@ -81,7 +81,9 @@ function clearFilters() {
   localPage.value = 1
 }
 
-onMounted(() => fetchOrders())
+onMounted(async () => {
+  await fetchOrders()
+})
 
 async function advance(o: OrderDto) {
   const next = NEXT[o.status]
@@ -90,7 +92,6 @@ async function advance(o: OrderDto) {
   try {
     const res = await commerceService.updateOrderStatus(o.id, next)
     if (res.ok) {
-      // updateOrderStatus reloads a default page — restore the full admin list
       await fetchOrders()
       const fresh = commerceService.orders.value.find((x) => x.id === o.id) ?? null
       if (fresh && selectedOrder.value?.id === o.id) selectedOrder.value = fresh
@@ -147,7 +148,9 @@ function goPage(p: number) {
           <p class="head-subtitle">{{ t('admin.ordersDesc') }}</p>
         </div>
 
-        <span class="mono count-badge">{{ t('admin.consignmentsTracked', { count: filteredOrders.length }) }}</span>
+        <div class="head-actions">
+          <span class="mono count-badge">{{ t('admin.consignmentsTracked', { count: filteredOrders.length }) }}</span>
+        </div>
       </header>
 
       <!-- Search & Filter Bar -->
@@ -787,5 +790,14 @@ function goPage(p: number) {
   gap: 0.75rem;
   padding-top: 0.25rem;
 }
+
+/* ── Head Actions ── */
+.head-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
 </style>
 

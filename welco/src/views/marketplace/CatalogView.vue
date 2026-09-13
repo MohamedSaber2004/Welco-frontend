@@ -101,6 +101,17 @@ const lengthBounds = computed(() => {
   return { min: Math.min(...lens), max: Math.max(...lens) }
 })
 const hasInStock = computed(() => products.value.some((p) => p.stock > 0))
+
+const catSearch = ref('')
+const filteredSidebarCategories = computed(() => {
+  if (!catSearch.value.trim()) return categories.value
+  const q = catSearch.value.trim().toLowerCase()
+  return categories.value.filter((c) => {
+    const en = (c.nameEn || '').toLowerCase()
+    const ar = (c.nameAr || '').toLowerCase()
+    return en.includes(q) || ar.includes(q)
+  })
+})
 </script>
 
 <template>
@@ -119,7 +130,7 @@ const hasInStock = computed(() => products.value.some((p) => p.stock > 0))
       <button class="cat-pill" :class="{ 'is-active': !categoryId }" @click="categoryId = null">
         {{ t('marketplace.allCategories') }}
       </button>
-      <button v-for="c in categories.slice(0, 8)" :key="c.id" class="cat-pill" :class="{ 'is-active': categoryId === c.id }" @click="categoryId = categoryId === c.id ? null : c.id">
+      <button v-for="c in categories" :key="c.id" class="cat-pill" :class="{ 'is-active': categoryId === c.id }" @click="categoryId = categoryId === c.id ? null : c.id">
         {{ localizedCat(c) }}<span class="pill-badge mono">{{ c.productCount ?? '' }}</span>
       </button>
     </div>
@@ -151,11 +162,90 @@ const hasInStock = computed(() => products.value.some((p) => p.stock > 0))
       </div>
     </div>
 
+    <!-- Active Filters Tray -->
+    <div v-if="hasFilters" class="active-filters-tray" aria-live="polite">
+      <span class="active-filters-label mono">{{ t('catalog.filters') }}:</span>
+      
+      <button v-if="categoryId" type="button" class="filter-chip mono" @click="categoryId = null">
+        <span>{{ activeCategoryName }}</span>
+        <span class="material-symbols-outlined text-[13px]">close</span>
+      </button>
+
+      <button v-if="search" type="button" class="filter-chip mono" @click="search = ''">
+        <span>"{{ search }}"</span>
+        <span class="material-symbols-outlined text-[13px]">close</span>
+      </button>
+
+      <button v-if="sku" type="button" class="filter-chip mono" @click="sku = ''">
+        <span>SKU: {{ sku }}</span>
+        <span class="material-symbols-outlined text-[13px]">close</span>
+      </button>
+
+      <button v-if="material" type="button" class="filter-chip mono" @click="material = null">
+        <span>{{ material }}</span>
+        <span class="material-symbols-outlined text-[13px]">close</span>
+      </button>
+
+      <button v-if="availability === 'in'" type="button" class="filter-chip mono" @click="availability = 'all'">
+        <span>{{ t('catalog.inStock') }}</span>
+        <span class="material-symbols-outlined text-[13px]">close</span>
+      </button>
+
+      <button v-if="priceMin != null || priceMax != null" type="button" class="filter-chip mono" @click="priceMin = null; priceMax = null">
+        <span>${{ priceMin ?? 0 }} – ${{ priceMax ?? '∞' }}</span>
+        <span class="material-symbols-outlined text-[13px]">close</span>
+      </button>
+
+      <button v-if="lengthMin != null || lengthMax != null" type="button" class="filter-chip mono" @click="lengthMin = null; lengthMax = null">
+        <span>{{ lengthMin ?? 0 }} – {{ lengthMax ?? '∞' }} cm</span>
+        <span class="material-symbols-outlined text-[13px]">close</span>
+      </button>
+
+      <button type="button" class="clear-all-chip mono" @click="clearFilters">
+        {{ t('marketplace.clearFilters') }}
+      </button>
+    </div>
+
     <div class="catalog-grid-layout">
       <aside class="filter-sidebar" :class="{ 'is-mobile-open': showMobileFilters }">
         <div class="filter-sidebar__header md:hidden">
           <span class="mono font-bold">{{ t('catalog.filterInstruments') }}</span>
           <button type="button" class="close-filters-btn" @click="showMobileFilters = false"><span class="material-symbols-outlined">close</span></button>
+        </div>
+
+        <div class="filter-section">
+          <div class="filter-heading mono">{{ t('nav.categories') }}</div>
+          <div v-if="categories.length > 5" class="category-search-wrap">
+            <input
+              v-model="catSearch"
+              type="text"
+              class="search-input mono cat-search-input"
+              :placeholder="t('common.searchPlaceholder') + '...'"
+            />
+          </div>
+          <div class="filter-options-list" role="radiogroup" :aria-label="t('nav.categories')">
+            <label class="filter-item">
+              <input
+                type="radio"
+                name="cat-sidebar"
+                :checked="!categoryId"
+                class="filter-checkbox"
+                @change="categoryId = null"
+              />
+              <span class="filter-label">{{ t('marketplace.allCategories') }}</span>
+            </label>
+            <label v-for="c in filteredSidebarCategories" :key="c.id" class="filter-item">
+              <input
+                type="radio"
+                name="cat-sidebar"
+                :checked="categoryId === c.id"
+                class="filter-checkbox"
+                @change="categoryId = c.id"
+              />
+              <span class="filter-label">{{ localizedCat(c) }}</span>
+              <span v-if="c.productCount != null" class="filter-count mono">{{ c.productCount }}</span>
+            </label>
+          </div>
         </div>
 
         <div class="filter-section">
@@ -512,6 +602,75 @@ const hasInStock = computed(() => products.value.some((p) => p.stock > 0))
 .sort-select:focus {
   outline: none;
   border-color: var(--wl-primary);
+}
+
+.active-filters-tray {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+  padding: 0.6rem 0.85rem;
+  background: var(--wl-surface);
+  border: 1px solid var(--wl-border);
+  border-radius: 10px;
+}
+
+.active-filters-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--wl-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--wl-primary);
+  background: var(--wl-primary-soft);
+  border: 1px solid rgba(var(--wl-primary-rgb, 105, 169, 255), 0.25);
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.filter-chip:hover {
+  background: var(--wl-surface-soft);
+  border-color: var(--wl-primary);
+}
+
+.clear-all-chip {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--wl-danger);
+  background: var(--wl-danger-soft);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  margin-inline-start: auto;
+}
+
+.clear-all-chip:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: var(--wl-danger);
+}
+
+.category-search-wrap {
+  margin-bottom: 0.5rem;
+}
+
+.cat-search-input {
+  height: 32px;
+  font-size: 11.5px;
+  padding: 0 8px;
+  border-radius: 6px;
 }
 
 .catalog-grid-layout {

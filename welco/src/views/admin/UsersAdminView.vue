@@ -88,6 +88,8 @@ const showPasswordModal = ref(false)
 const passwordTarget = ref<UserDto | null>(null)
 const newPassword = ref('')
 const confirmPassword = ref('')
+const showNewPassword = ref(false)
+const showConfirmPassword = ref(false)
 const passwordError = ref('')
 const passwordLoading = ref(false)
 
@@ -95,6 +97,8 @@ const openPasswordModal = (u: UserDto) => {
   passwordTarget.value = u
   newPassword.value = ''
   confirmPassword.value = ''
+  showNewPassword.value = false
+  showConfirmPassword.value = false
   passwordError.value = ''
   showPasswordModal.value = true
 }
@@ -301,6 +305,15 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
                       </button>
                       <button
                         type="button"
+                        class="row-action-btn row-action-btn--gold"
+                        :title="t('admin.changeUserPassword')"
+                        :aria-label="t('admin.changeUserPassword')"
+                        @click="openPasswordModal(u)"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">key</span>
+                      </button>
+                      <button
+                        type="button"
                         class="row-action-btn"
                         :class="u.isActive ? 'row-action-btn--deactivate' : 'row-action-btn--activate'"
                         :title="u.isActive ? t('admin.deactivate') : t('admin.activate')"
@@ -485,10 +498,12 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
             </div>
           </div>
           <div class="modal-foot modal-foot--split">
-            <BaseButton variant="secondary" @click="selectedUser && openPasswordModal(selectedUser)">
-              <span class="material-symbols-outlined text-[16px]">key</span>
-              <span>{{ t('admin.changeUserPassword') }}</span>
-            </BaseButton>
+            <div class="modal-foot__group">
+              <BaseButton variant="secondary" @click="selectedUser && openPasswordModal(selectedUser)">
+                <span class="material-symbols-outlined text-[16px]">key</span>
+                <span>{{ t('admin.changeUserPassword') }}</span>
+              </BaseButton>
+            </div>
             <div class="modal-foot__group">
               <BaseButton variant="secondary" @click="selectedUser && openEdit(selectedUser)">
                 {{ t('common.edit') }}
@@ -505,32 +520,81 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
       <BaseModal
         v-model="showPasswordModal"
         :title="t('admin.changeUserPassword')"
-        max-width="440px"
+        max-width="460px"
         @close="closePasswordModal"
       >
         <form class="admin-modal-form" @submit.prevent="submitPassword">
+          <!-- Target user banner -->
+          <div v-if="passwordTarget" class="pw-target-banner">
+            <div class="user-avatar-wrap user-avatar-wrap--sm">
+              <img
+                v-if="passwordTarget.profilePictureName"
+                :src="resolveFileUrl(passwordTarget.profilePictureName, PLACEHOLDER)"
+                :alt="passwordTarget.fullName"
+                class="user-avatar-img"
+              />
+              <div
+                v-else
+                class="user-avatar-fallback mono text-xs"
+                :style="{
+                  backgroundColor: getAvatarColor(passwordTarget.fullName),
+                  color: getAvatarTextColor(getAvatarColor(passwordTarget.fullName)),
+                }"
+              >
+                {{ (passwordTarget.fullName || 'U').slice(0, 2).toUpperCase() }}
+              </div>
+            </div>
+            <div class="pw-target-info">
+              <span class="pw-target-name">{{ passwordTarget.fullName }}</span>
+              <span class="pw-target-email mono">{{ passwordTarget.email }}</span>
+            </div>
+          </div>
+
           <div class="form-field">
             <label class="field-label" for="new-password">{{ t('admin.userPassword') }} *</label>
-            <input
-              id="new-password"
-              v-model="newPassword"
-              type="password"
-              class="field-input mono"
-              minlength="8"
-              autocomplete="new-password"
-              required
-            />
+            <div class="pw-input-wrapper">
+              <input
+                id="new-password"
+                v-model="newPassword"
+                :type="showNewPassword ? 'text' : 'password'"
+                class="field-input mono"
+                minlength="8"
+                autocomplete="new-password"
+                required
+              />
+              <button
+                type="button"
+                class="pw-toggle-btn"
+                :aria-label="showNewPassword ? 'Hide password' : 'Show password'"
+                tabindex="-1"
+                @click="showNewPassword = !showNewPassword"
+              >
+                <span class="material-symbols-outlined text-[18px]">{{ showNewPassword ? 'visibility_off' : 'visibility' }}</span>
+              </button>
+            </div>
           </div>
+
           <div class="form-field">
-            <label class="field-label" for="confirm-password">{{ t('auth.confirmNewPassword') }}</label>
-            <input
-              id="confirm-password"
-              v-model="confirmPassword"
-              type="password"
-              class="field-input mono"
-              autocomplete="new-password"
-              required
-            />
+            <label class="field-label" for="confirm-password">{{ t('auth.confirmNewPassword') }} *</label>
+            <div class="pw-input-wrapper">
+              <input
+                id="confirm-password"
+                v-model="confirmPassword"
+                :type="showConfirmPassword ? 'text' : 'password'"
+                class="field-input mono"
+                autocomplete="new-password"
+                required
+              />
+              <button
+                type="button"
+                class="pw-toggle-btn"
+                :aria-label="showConfirmPassword ? 'Hide password' : 'Show password'"
+                tabindex="-1"
+                @click="showConfirmPassword = !showConfirmPassword"
+              >
+                <span class="material-symbols-outlined text-[18px]">{{ showConfirmPassword ? 'visibility_off' : 'visibility' }}</span>
+              </button>
+            </div>
           </div>
 
           <p v-if="passwordError" class="form-error" role="alert">{{ passwordError }}</p>
@@ -859,5 +923,76 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
 .modal-foot__group {
   display: flex;
   gap: 0.75rem;
+}
+
+/* Password Modal Additions */
+.pw-target-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: var(--wl-surface-soft);
+  border: 1px solid var(--wl-border);
+  border-radius: 10px;
+  margin-bottom: 0.5rem;
+}
+
+.user-avatar-wrap--sm {
+  width: 34px;
+  height: 34px;
+}
+
+.pw-target-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.pw-target-name {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--wl-ink-strong);
+  line-height: 1.2;
+}
+
+.pw-target-email {
+  font-size: 11.5px;
+  color: var(--wl-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pw-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.pw-input-wrapper .field-input {
+  width: 100%;
+  padding-inline-end: 40px;
+}
+
+.pw-toggle-btn {
+  position: absolute;
+  inset-inline-end: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: none;
+  color: var(--wl-muted);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: color 0.15s ease;
+}
+
+.pw-toggle-btn:hover {
+  color: var(--wl-ink-strong);
 }
 </style>

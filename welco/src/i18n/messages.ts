@@ -287,6 +287,8 @@ export type Messages = {
     passwordFair: string
     passwordGood: string
     passwordStrong: string
+    generatePassword: string
+    passwordGenerated: string
     emailPlaceholder: string
     phonePlaceholder: string
     alreadyHaveOtp: string
@@ -845,6 +847,12 @@ export type Messages = {
     consignmentsTracked: string
     orderCompleted: string
     orderDetails: string
+    createOrderForClient: string
+    selectClient: string
+    addItem: string
+    orderCreatedSuccess: string
+    errSelectClient: string
+    errAddItems: string
     contentEyebrow: string
     pages: string
     pagesDesc: string

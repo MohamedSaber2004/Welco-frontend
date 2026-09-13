@@ -95,6 +95,13 @@ table thead th.text-center {
   background: var(--wl-warning-soft);
 }
 
+.row-action-btn--gold:hover {
+  color: var(--wl-gold);
+  border-color: var(--wl-gold);
+  background: var(--wl-gold-soft);
+  box-shadow: 0 0 10px rgba(255, 209, 102, 0.25);
+}
+
 .row-action-btn:disabled {
   opacity: 0.45;
   cursor: not-allowed;

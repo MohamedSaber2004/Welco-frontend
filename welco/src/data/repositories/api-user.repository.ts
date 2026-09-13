@@ -42,6 +42,6 @@ export class ApiUserRepository implements UserRepository {
   }
 
   async changePassword(id: string, newPassword: string): Promise<void> {
-    return await this.http.put<void>(USER_MANAGEMENT_ROUTES.changePassword(id), { newPassword })
+    return await this.http.put<void>(USER_MANAGEMENT_ROUTES.changePassword(id), { id, newPassword })
   }
 }

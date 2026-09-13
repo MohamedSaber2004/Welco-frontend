@@ -14,10 +14,9 @@ import DataState from '../components/ui/DataState.vue'
 import BaseModal from '../components/ui/BaseModal.vue'
 import BaseButton from '../components/ui/BaseButton.vue'
 import AppImage from '../components/ui/AppImage.vue'
-import { productMediaUrl, resolveFileUrl } from '../utils/file-url'
+import { productMediaUrl } from '../utils/file-url'
 
 const router = useRouter()
-const isAdmin = computed(() => authService.isAdmin.value)
 const { add } = useCart()
 
 const heroSearch = ref('')
@@ -76,9 +75,6 @@ onMounted(async () => {
 
 const yearsOfExperience = computed(() => `${new Date().getFullYear() - FOUNDING_YEAR}+`)
 const activeCerts = computed(() => certifications.value.filter((c) => !c.expiryDate || new Date(c.expiryDate) > new Date()))
-const identityBadges = computed(() => {
-  return activeCerts.value.slice(0, 3).map((c) => c.certificateNumber || c.title).filter(Boolean)
-})
 const whyItems = computed(() => {
   const items: Array<{ b: string; label: string; badge: string; tone: string }> = [
     { b: `${yearsOfExperience.value}`, label: t('home.whyYears'), badge: 'EST. 1994', tone: 'indigo' },

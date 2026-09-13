@@ -13,7 +13,7 @@ import { services } from '../../di/container'
 import { confirmService } from '../../infrastructure/feedback/confirm.service'
 import { toastService } from '../../infrastructure/feedback/toast.service'
 import { t, locale } from '../../i18n'
-import { isVideoFile, parseVideoSource, productMediaUrl, resolveFileUrl } from '../../utils/file-url'
+import { isVideoFile, parseVideoSource, resolveFileUrl } from '../../utils/file-url'
 import type {
   ProductDto,
   ProductMediaDto,
@@ -449,12 +449,6 @@ const closeDetailsModal = () => {
   videoDraftTitle.value = ''
   videosError.value = ''
 }
-
-const detailsImageUrl = computed(() => {
-  const p = selectedProduct.value
-  if (!p) return ''
-  return resolveFileUrl(p.imageName ?? null, '')
-})
 
 const detailVideoItems = computed(() =>
   selectedVideos.value.filter((v) => v && (v.type !== 1 || isVideoFile(v.url))),
@@ -1287,7 +1281,7 @@ onMounted(async () => {
           </div>
           <div v-else class="details-videos">
             <span class="detail-k mono">{{ t('admin.productVideos') }} ({{ detailVideoItems.length }})</span>
-            <div v-for="(v, vi) in detailVideoItems" :key="v.id || v.url" class="details-video-item">
+            <div v-for="v in detailVideoItems" :key="v.id || v.url" class="details-video-item">
               <div class="details-video-title mono">{{ v.title || v.url }}</div>
               <div v-if="videoEmbed(v.url).type !== 'html5'" class="details-video-frame">
                 <iframe

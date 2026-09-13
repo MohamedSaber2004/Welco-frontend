@@ -89,7 +89,6 @@ const toggleLang = () => {
   max-width: 540px;
 }
 
-/* 2px Laser Sweep Accent along top border */
 .auth-card::before {
   content: '';
   position: absolute;

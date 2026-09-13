@@ -5,7 +5,6 @@ import { authService } from '../../di/container'
 import { toastService } from '../../infrastructure/feedback/toast.service'
 import { t } from '../../i18n'
 import AuthShell from '../../components/auth/AuthShell.vue'
-import { UserType } from '../../domain/models/user'
 import { isPendingOrg } from '../../utils/pending-org-marker'
 
 const router = useRouter()

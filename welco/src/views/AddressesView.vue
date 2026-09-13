@@ -62,7 +62,6 @@ const groupCurrency = (countryId: string): string | null =>
   currencyForAddressCountry(locationService.countries.value, countryId)
 
 const totalPersonal = computed(() => personal.addresses.value.length)
-const distinctPersonalCountries = computed(() => new Set(personal.addresses.value.map((a) => a.countryId)).size)
 const totalCompany = computed(() => company.addresses.value.length)
 </script>
 

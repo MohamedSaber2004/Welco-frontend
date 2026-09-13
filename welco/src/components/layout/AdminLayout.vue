@@ -5,7 +5,6 @@ import { authService } from '../../di/container'
 import { AppLanguage } from '../../domain/models/user'
 
 const isAdmin = computed(() => authService.isAdmin.value)
-const isStaff = computed(() => authService.isWelcoStaff.value)
 const canManageTerritory = computed(() => isAdmin.value)
 const canManageUsers = computed(() => isAdmin.value)
 const canManageCompanies = computed(() => isAdmin.value)

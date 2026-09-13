@@ -6,9 +6,8 @@ import { useMarketplace } from '../../composables/useMarketplace'
 import { useCart } from '../../composables/useCart'
 import { useWishlist } from '../../composables/useWishlist'
 import { toastService } from '../../infrastructure/feedback/toast.service'
-import DataState from '../../components/ui/DataState.vue'
 import SkeletonLoader from '../../components/ui/SkeletonLoader.vue'
-import { productMediaUrl, PLACEHOLDER } from '../../utils/file-url'
+import { productMediaUrl } from '../../utils/file-url'
 import BackButton from '../../components/ui/BackButton.vue'
 import AppPagination from '../../components/ui/AppPagination.vue'
 import AppImage from '../../components/ui/AppImage.vue'
@@ -33,7 +32,6 @@ const {
   lengthMax,
   priceMin,
   priceMax,
-  ceOnly,
   availability,
   localized,
   load,
@@ -103,7 +101,6 @@ const lengthBounds = computed(() => {
   return { min: Math.min(...lens), max: Math.max(...lens) }
 })
 const hasInStock = computed(() => products.value.some((p) => p.stock > 0))
-const hasMadeToOrder = computed(() => products.value.some((p) => p.stock === 0))
 </script>
 
 <template>

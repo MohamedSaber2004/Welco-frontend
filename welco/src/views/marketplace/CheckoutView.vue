@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { t, locale } from '../../i18n'
 import { useCart } from '../../composables/useCart'
@@ -7,12 +7,11 @@ import { commerceService, salesService, companyService, authService, services } 
 import ChainSteps from '../../components/ui/ChainSteps.vue'
 import BackButton from '../../components/ui/BackButton.vue'
 import AppImage from '../../components/ui/AppImage.vue'
-import { productMediaUrl } from '../../utils/file-url'
 import { toastService } from '../../infrastructure/feedback/toast.service'
 import { distinctCurrenciesFromAddresses } from '../../utils/country-currency-map'
 
 const router = useRouter()
-const { items, total, convertedTotal, targetCurrency, count, currency, toDisplayCurrency, quoteNote, clear, getConvertedPrice, setTargetCurrency, unconvertedIds, refreshConversions } = useCart()
+const { items, convertedTotal, targetCurrency, count, toDisplayCurrency, quoteNote, clear, getConvertedPrice, setTargetCurrency, unconvertedIds, refreshConversions } = useCart()
 
 const localized = (en: string, ar: string) => (locale.value === 'ar' ? ar : en)
 
@@ -20,8 +19,6 @@ const placing = ref(false)
 const submittingRfq = ref(false)
 const error = ref<string | null>(null)
 
-const selectedCurrency = computed(() => targetCurrency.value)
-const displayTotal = computed(() => Math.ceil(convertedTotal.value).toLocaleString(locale.value === 'ar' ? 'ar-EG' : 'en-US'))
 const addressCurrencyOptions = ref<string[]>([])
 
 onMounted(async () => {

@@ -7,7 +7,7 @@ import { contentService } from '../../di/container'
 import { toastService } from '../../infrastructure/feedback/toast.service'
 import SkeletonLoader from '../../components/ui/SkeletonLoader.vue'
 import DataState from '../../components/ui/DataState.vue'
-import { resolveFileUrl, isStoredFileName, PLACEHOLDER } from '../../utils/file-url'
+import { resolveFileUrl, isStoredFileName } from '../../utils/file-url'
 import BackButton from '../../components/ui/BackButton.vue'
 
 const router = useRouter()
@@ -140,8 +140,8 @@ async function submitTicket() {
     ticketSubject.value = ''
     ticketMessage.value = ''
     toastService.success(t('help.ticketCreated'))
-  } catch (err: any) {
-    const msg = err?.message || t('auth.errGeneric')
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : t('auth.errGeneric')
     ticketError.value = msg
     toastService.error(msg)
   } finally {
@@ -161,7 +161,7 @@ function scrollToEscalation() {
 }
 
 onMounted(async () => {
-  const promises: Promise<any>[] = [
+  const promises: Promise<unknown>[] = [
     contentService.loadSupport(),
     contentService.loadSupportContact(),
   ]

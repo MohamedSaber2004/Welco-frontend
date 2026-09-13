@@ -160,5 +160,5 @@ export function useCart() {
     return quoteItems.map(q => ({ productId: q.productId, quantity: q.quantity, unitPrice: q.unitPrice }))
   }
 
-  return { items, count, total, convertedTotal, targetCurrency, convertedMap, unconvertedIds, currency, currencyCode, displayCurrency, quoteNote, add, setQty, remove, clear, setNote, toOrderItems, toRfqItems, toDisplayCurrency, toOrderItemsFromQuote, getConvertedPrice, setTargetCurrency, refreshConversions }
+  return { items, count, total, convertedTotal, targetCurrency, convertedMap, unconvertedIds, currency, currencyCode, displayCurrency, quoteNote, add, setQty, remove, clear, setNote, toOrderItems, toRfqItems, toDisplayCurrency, toOrderItemsFromQuote, getConvertedPrice, setTargetCurrency, refreshConversions, currencyOf }
 }

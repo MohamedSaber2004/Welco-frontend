@@ -10,7 +10,7 @@ const props = withDefaults(
     trend?: string
     trendUp?: boolean
     sparkline?: number[]
-    tone?: 'teal' | 'indigo' | 'amber' | 'emerald' | 'rose' | 'obsidian' | 'slate'
+    tone?: 'teal' | 'indigo' | 'amber' | 'emerald' | 'rose' | 'obsidian' | 'slate' | 'gold'
   }>(),
   {
     hint: undefined,

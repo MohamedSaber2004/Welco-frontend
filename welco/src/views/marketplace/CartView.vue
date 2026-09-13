@@ -8,7 +8,6 @@ import { toastService } from '../../infrastructure/feedback/toast.service'
 import { confirmService } from '../../infrastructure/feedback/confirm.service'
 import EmptyState from '../../components/ui/EmptyState.vue'
 import QuantityStepper from '../../components/ui/QuantityStepper.vue'
-import { productMediaUrl } from '../../utils/file-url'
 import type { CurrencyDto } from '../../domain/models/marketplace'
 import BackButton from '../../components/ui/BackButton.vue'
 import AppImage from '../../components/ui/AppImage.vue'
@@ -21,19 +20,15 @@ import {
 const router = useRouter()
 const {
   items,
-  total,
   convertedTotal,
   targetCurrency,
   count,
-  currency,
-  currencyCode,
   quoteNote,
   unconvertedIds,
   setQty,
   remove,
   clear,
   setNote,
-  toDisplayCurrency,
   toRfqItems,
   getConvertedPrice,
   setTargetCurrency,

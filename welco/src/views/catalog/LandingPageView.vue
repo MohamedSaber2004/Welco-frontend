@@ -13,7 +13,7 @@ import { useCart } from '../../composables/useCart'
 import { toastService } from '../../infrastructure/feedback/toast.service'
 import type { LandingPageDto } from '../../domain/models/content'
 import type { ProductDto, CategoryDto } from '../../domain/models/marketplace'
-import { productMediaUrl, resolveFileUrl } from '../../utils/file-url'
+import { productMediaUrl } from '../../utils/file-url'
 
 const route = useRoute()
 const router = useRouter()

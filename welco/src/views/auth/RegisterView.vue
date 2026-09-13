@@ -9,7 +9,7 @@ import PhoneInput from '../../components/ui/PhoneInput.vue'
 import { AppLanguage, UserType } from '../../domain/models/user'
 import { CompanyType } from '../../domain/models/company'
 import type { CountryDto } from '../../domain/models/location'
-import { setPendingOrg, clearPendingOrg } from '../../utils/pending-org-marker'
+import { setPendingOrg } from '../../utils/pending-org-marker'
 
 const router = useRouter()
 const fullName = ref('')

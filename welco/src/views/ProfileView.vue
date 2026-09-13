@@ -9,7 +9,7 @@ import AppImage from '../components/ui/AppImage.vue'
 import { AppLanguage, UserType } from '../domain/models/user'
 import type { CompanyDto } from '../domain/models/company'
 import { CompanyType, CompanyStatus } from '../domain/models/company'
-import { resolveFileUrl, PLACEHOLDER } from '../utils/file-url'
+import { resolveFileUrl } from '../utils/file-url'
 import { resolvePhoneDetails, type DetailedPhoneInfo } from '../utils/phone'
 
 const fullName = ref('')
@@ -367,22 +367,6 @@ const setLang = async (v: AppLanguage) => {
             >
               العربية
             </button>
-          </div>
-        </div>
-
-        <!-- Appearance Card (dark-only) -->
-        <div class="card lang-card">
-          <div class="card-mini-head">
-            <span class="material-symbols-outlined text-[18px] text-indigo-600">dark_mode</span>
-            <h3 class="card-mini-title">{{ locale === 'ar' ? 'سمة المظهر' : 'Appearance' }}</h3>
-          </div>
-          <p class="card-mini-desc">{{ locale === 'ar' ? 'الوضع الداكن الاحترافي مفعّل دائمًا' : 'Professional dark mode is always on' }}</p>
-
-          <div class="lang-switch-box" dir="ltr">
-            <span class="lang-btn mono is-active" aria-current="true">
-              <span class="material-symbols-outlined text-[14px]">dark_mode</span>
-              <span>{{ locale === 'ar' ? 'داكن' : 'Dark' }}</span>
-            </span>
           </div>
         </div>
 

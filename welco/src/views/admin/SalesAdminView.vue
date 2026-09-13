@@ -20,7 +20,6 @@ const router = useRouter()
 const rfqs = salesService.rfqs
 const quotes = salesService.quotes
 const rfqTotalCount = salesService.rfqTotalCount
-const quoteTotalCount = salesService.quoteTotalCount
 const loading = ref(false)
 const fetchError = ref('')
 

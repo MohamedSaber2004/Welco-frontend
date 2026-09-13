@@ -1,7 +1,7 @@
 <script setup lang="ts">
 withDefaults(
   defineProps<{
-    variant?: 'primary' | 'secondary' | 'ghost' | 'outline' | 'danger'
+    variant?: 'primary' | 'secondary' | 'ghost' | 'outline' | 'danger' | 'gold'
     size?: 'sm' | 'md' | 'lg'
     loading?: boolean
     disabled?: boolean
@@ -16,6 +16,7 @@ withDefaults(
   <button
     :type="type"
     :disabled="disabled || loading"
+    :aria-busy="loading ? 'true' : undefined"
     :class="['btn', `btn--${variant}`, `btn--${size}`, { 'btn--block': block, 'is-loading': loading }]"
   >
     <span v-if="loading" class="btn__spinner" aria-hidden="true" />
@@ -45,9 +46,17 @@ withDefaults(
   transform: scale(0.985);
 }
 
-.btn--primary:focus-visible {
+.btn--primary:focus-visible,
+.btn--secondary:focus-visible,
+.btn--outline:focus-visible,
+.btn--ghost:focus-visible {
   outline: none;
   box-shadow: var(--wl-focus-ring);
+}
+
+.btn--gold:focus-visible {
+  outline: none;
+  box-shadow: var(--wl-gold-ring);
 }
 
 .btn--danger:focus-visible {
@@ -63,6 +72,19 @@ withDefaults(
 
 .btn--block {
   width: 100%;
+}
+
+.btn--gold {
+  background: var(--wl-gradient-gold);
+  color: var(--wl-on-gold);
+  border-color: rgba(233, 168, 37, 0.6);
+  box-shadow: var(--wl-gold-glow-soft);
+}
+.btn--gold:hover:not(:disabled) {
+  filter: brightness(1.08);
+  border-color: var(--wl-gold-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 18px rgba(233, 168, 37, 0.35);
 }
 
 .btn--primary {

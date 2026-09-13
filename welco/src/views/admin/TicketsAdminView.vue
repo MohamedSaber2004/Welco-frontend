@@ -13,7 +13,6 @@ const filter = ref<string>('')
 const searchQuery = ref<string>('')
 const page = ref(1)
 const pageSize = 10
-let searchTimer: ReturnType<typeof setTimeout> | null = null
 
 const filteredTickets = computed(() => {
   const rawList = Array.isArray(tickets.value) ? tickets.value : []

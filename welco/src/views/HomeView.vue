@@ -1052,18 +1052,6 @@ const navigateToOemFromModal = () => {
   padding-top: 0.25rem;
 }
 
-@media (max-width: 1024px) {
-  .providers-strip-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 640px) {
-  .providers-strip-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
 /* Home Certs Grid */
 .home-certs-grid {
   display: grid;
@@ -1140,12 +1128,6 @@ const navigateToOemFromModal = () => {
   font-size: var(--step--1);
   color: var(--wl-muted);
   margin-top: auto;
-}
-
-@media (max-width: 768px) {
-  .home-certs-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 .section__eyebrow {
@@ -1482,18 +1464,6 @@ const navigateToOemFromModal = () => {
     margin: 0 auto;
     width: 100%;
   }
-  .metrics-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-3);
-  }
-  .cat-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-3);
-  }
-  .product-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-4);
-  }
 }
 
 @media (max-width: 640px) {
@@ -1540,28 +1510,6 @@ const navigateToOemFromModal = () => {
   .hero__logo-box img {
     max-height: 150px;
   }
-  .metrics-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-2);
-  }
-  .metric-card {
-    padding: 0.95rem 1rem;
-    gap: 0.45rem;
-  }
-  .metric-card__value {
-    font-size: var(--step-2);
-  }
-  .cat-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-2);
-  }
-  .cat-card {
-    padding: 0.75rem 0.85rem;
-  }
-  .product-grid {
-    grid-template-columns: 1fr;
-    gap: var(--space-4);
-  }
 }
 
 @media (max-width: 440px) {
@@ -1574,13 +1522,8 @@ const navigateToOemFromModal = () => {
     padding: 0 0.85rem;
     font-size: 12px;
   }
-  .metrics-grid {
-    grid-template-columns: 1fr;
-  }
-  .cat-grid {
-    grid-template-columns: 1fr;
-  }
 }
+
 
 /* Institutional Quote Modal Styles */
 .quote-modal-desc {

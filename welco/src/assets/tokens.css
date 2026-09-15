@@ -225,7 +225,7 @@
 --wl-shadow-xl: var(--shadow-xl);
 --wl-shadow-primary: var(--wl-shadow-primary);
 }
-}
+
 @media (max-width: 768px) {
   :root {
     --wl-gutter: 1rem;

@@ -522,9 +522,10 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
 
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-6);
 }
+
 
 .product-card {
   background: var(--wl-surface);
@@ -738,11 +739,9 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
     width: 100%;
   }
   .product-grid {
-    grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
   }
   .related-grid {
-    grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
   }
 }
@@ -776,16 +775,15 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
     justify-content: center;
   }
   .product-grid {
-    grid-template-columns: 1fr;
     gap: 0.85rem;
   }
   .related-grid {
-    grid-template-columns: 1fr;
     gap: 0.75rem;
   }
   .section-title {
     font-size: 1.25rem;
   }
+
   .section-head {
     margin-bottom: 1.15rem;
   }

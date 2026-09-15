@@ -1210,7 +1210,7 @@ const filteredSidebarCategories = computed(() => {
 
 @media (max-width: 1120px) {
   .products-grid {
-    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4);
   }
 }
 

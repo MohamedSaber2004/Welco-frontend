@@ -1816,7 +1816,7 @@ const resolvedDescription = computed(() => {
 /* Videos Grid */
 .video-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: var(--space-4);
 }
 
@@ -2086,7 +2086,7 @@ const resolvedDescription = computed(() => {
 
 .related-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: var(--space-6);
 }
 
@@ -2279,18 +2279,12 @@ const resolvedDescription = computed(() => {
     grid-template-columns: 1fr;
     gap: var(--space-8);
   }
-  .related-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
 }
 
 @media (max-width: 860px) {
   .pdp-inquiry-panel {
     grid-template-columns: 1fr;
     gap: var(--space-6);
-  }
-  .video-grid {
-    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -2305,9 +2299,6 @@ const resolvedDescription = computed(() => {
   }
   .pdp-hero-image {
     max-height: 280px;
-  }
-  .pdp-specs-strip {
-    grid-template-columns: repeat(2, 1fr);
   }
   .pdp-order-actions {
     flex-direction: column;
@@ -2324,12 +2315,6 @@ const resolvedDescription = computed(() => {
     flex-direction: column;
   }
   .inquiry-form {
-    grid-template-columns: 1fr;
-  }
-  .related-grid {
-    grid-template-columns: 1fr;
-  }
-  .video-grid {
     grid-template-columns: 1fr;
   }
   .spec-row {

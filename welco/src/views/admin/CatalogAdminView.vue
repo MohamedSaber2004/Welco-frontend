@@ -24,6 +24,7 @@ import type {
   CreateCategoryPayload,
   UpdateCategoryPayload,
 } from '../../domain/models/marketplace'
+import { formatPrice } from '../../utils/format'
 
 const route = useRoute()
 const router = useRouter()
@@ -811,7 +812,7 @@ onMounted(async () => {
                       {{ localized(p.categoryNameEn, p.categoryNameAr) }}</span>
                   </td>
                   <td>
-                    <strong class="mono price-val">{{ Math.ceil(p.price).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ p.currencySymbol || p.currencyCode || p.currency }}</strong>
+                    <strong class="mono price-val">{{ formatPrice(p.price, locale) }} {{ p.currencySymbol || p.currencyCode || p.currency }}</strong>
                   </td>
                   <td>
                     <span
@@ -1234,7 +1235,7 @@ onMounted(async () => {
             <div class="detail-item">
               <span class="detail-k mono">{{ t('admin.price') }}</span>
               <strong class="detail-v mono"
-                >{{ Math.ceil(selectedProduct.price).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}
+                >{{ formatPrice(selectedProduct.price, locale) }}
                 {{
                   selectedProduct.currencySymbol ||
                   selectedProduct.currencyCode ||
@@ -2457,4 +2458,8 @@ onMounted(async () => {
   padding: 0.25rem 0.5rem;
 }
 </style>
+
+
+
+
 

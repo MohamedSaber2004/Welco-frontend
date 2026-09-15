@@ -1168,7 +1168,6 @@ export const en: Messages = {
     isoDossier: 'ISO / CE Dossier',
     verifiedBuyer: 'VERIFIED BUYER',
     verifiedPartner: 'Verified Partner',
-    tierLevel: 'Tier {tier}',
     pipelineEyebrow: 'SUPPLY CHAIN LIFECYCLE',
     pipelineTitle: 'Institutional Procurement Velocity',
     activeLifecycle: '{count} active lifecycle items',

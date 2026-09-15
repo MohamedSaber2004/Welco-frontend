@@ -59,13 +59,13 @@ export function resolveFileUrl(storedName: string | null | undefined, fallback =
     return `${API_BASE_URL}/${trimmed}`
   }
   const cleanName = trimmed.replace(/^\/+/, '')
-  if (isStoredFileName(cleanName) || cleanName.includes('.')) {
+  // Only true backend-stored names (timestamped `123_...ext`) hit /files/.
+  // Bare seed names like `gulf-medical.svg` have no backend file — return
+  // fallback immediately instead of 404-spamming the console on every mount.
+  if (isStoredFileName(cleanName)) {
     return `${API_BASE_URL}/files/${cleanName}`
   }
   if (trimmed.startsWith('/')) return trimmed
-  if (cleanName.length > 0) {
-    return `${API_BASE_URL}/files/${cleanName}`
-  }
   return fallback
 }
 

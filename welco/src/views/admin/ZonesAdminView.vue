@@ -464,7 +464,7 @@ const closeDetails = () => {
 
 .head-title {
   font-family: var(--wl-font-display, system-ui);
-  font-size: 1.68rem;
+  font-size: var(--step-2, 1.68rem);
   font-weight: 800;
   letter-spacing: -0.025em;
   color: var(--wl-ink-strong);

@@ -24,7 +24,6 @@ const sortBy = ref<'nameAsc' | 'nameDesc'>('nameAsc')
 const page = ref(1)
 const pageSize = ref(12)
 
-// ── Enhanced search UX state ──
 const searchInput = ref<HTMLInputElement | null>(null)
 const searchFocused = ref(false)
 const showSuggestions = ref(false)
@@ -48,7 +47,7 @@ try {
     const parsed = JSON.parse(raw)
     if (Array.isArray(parsed)) recentSearches.value = parsed.filter((x) => typeof x === 'string').slice(0, 5)
   }
-} catch { /* ignore */ }
+} catch { }
 
 const persistRecent = () => {
   try { localStorage.setItem(RECENT_KEY, JSON.stringify(recentSearches.value.slice(0, 5))) } catch { /* ignore */ }

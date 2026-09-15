@@ -11,6 +11,7 @@ import { productMediaUrl } from '../../utils/file-url'
 import BackButton from '../../components/ui/BackButton.vue'
 import AppPagination from '../../components/ui/AppPagination.vue'
 import AppImage from '../../components/ui/AppImage.vue'
+import { formatPrice } from '../../utils/format'
 
 const route = useRoute()
 const router = useRouter()
@@ -347,7 +348,7 @@ const filteredSidebarCategories = computed(() => {
                 <div class="catalog-card__origin mono">{{ p.manufacturerEn || t('catalog.fallbackMfr') }} · {{ p.isActive ? t('catalog.ceMarked') : '' }}<span v-if="p.lengthCm" class="length-chip mono"><span class="length-dot" aria-hidden="true"></span>{{ p.lengthCm }} cm</span></div>
                 <div class="catalog-card__foot">
                   <div class="price-col">
-                    <strong class="catalog-card__price mono">{{ Math.ceil(p.price).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} <span class="currency-tag">{{ p.currencySymbol || p.currencyCode || p.currency || '$' }}</span></strong>
+                    <strong class="catalog-card__price mono">{{ formatPrice(p.price, locale) }} <span class="currency-tag">{{ p.currencySymbol || p.currencyCode || p.currency || '$' }}</span></strong>
                     <span v-if="p.unit" class="unit-tag mono">/ {{ p.unit }}</span>
                   </div>
                   <span v-if="p.rating" class="rating-tag mono">★ {{ p.rating.toFixed(1) }}</span>
@@ -865,7 +866,7 @@ const filteredSidebarCategories = computed(() => {
 
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: var(--space-6);
 }
 
@@ -1276,4 +1277,8 @@ const filteredSidebarCategories = computed(() => {
   }
 }
 </style>
+
+
+
+
 

@@ -8,6 +8,7 @@ import StatusPill from '../../components/ui/StatusPill.vue'
 import SkeletonLoader from '../../components/ui/SkeletonLoader.vue'
 import BackButton from '../../components/ui/BackButton.vue'
 import type { OrderDto } from '../../domain/models/commerce'
+import { formatPrice } from '../../utils/format'
 
 const route = useRoute()
 const router = useRouter()
@@ -79,9 +80,9 @@ onMounted(async () => {
             <div v-for="it in order.items" :key="it.id" class="item-row">
               <div class="item-name">{{ it.productNameEn }}</div>
               <div class="item-calc mono">
-                <span class="item-qty">{{ it.quantity }} × {{ Math.ceil(it.unitPrice).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</span>
+                <span class="item-qty">{{ it.quantity }} × {{ formatPrice(it.unitPrice, locale) }}</span>
                 <strong class="item-subtotal">
-                  {{ Math.ceil(it.quantity * it.unitPrice).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ order.currencyCode }}
+                  {{ formatPrice(it.quantity * it.unitPrice, locale) }} {{ order.currencyCode }}
                 </strong>
               </div>
             </div>
@@ -90,7 +91,7 @@ onMounted(async () => {
           <div class="total-row">
             <span class="total-label mono">{{ t('commerce.total') }}</span>
             <strong class="total-value mono">
-              {{ Math.ceil(order.totalAmount).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ order.currencyCode }}
+              {{ formatPrice(order.totalAmount, locale) }} {{ order.currencyCode }}
             </strong>
           </div>
         </section>
@@ -438,4 +439,8 @@ onMounted(async () => {
   }
 }
 </style>
+
+
+
+
 

@@ -155,8 +155,9 @@ export class ApiContentRepository implements ContentRepository {
   }
 
   async getTradeShows(): Promise<TradeShowEventDto[]> {
+    // Backend has no /api/v1/trade-shows endpoint — fall back to landing-pages.
     try {
-      const raw = await this.http.get<unknown>(CONTENT_ROUTES.tradeShows, { showFeedback: false })
+      const raw = await this.http.get<unknown>(`${CONTENT_ROUTES.landingPages}?type=tradeshow`, { showFeedback: false })
       return this.extractList<TradeShowEventDto>(raw)
     } catch {
       return []

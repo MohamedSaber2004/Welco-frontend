@@ -1,6 +1,7 @@
 import { COMMERCE_ROUTES } from '../../config/api.config'
 import type { PaginatedResult } from '../../domain/models/location'
 import type {
+  CartDto,
   CreateOrderPayload,
   OrderDto,
 } from '../../domain/models/commerce'
@@ -73,6 +74,22 @@ export class ApiCommerceRepository implements CommerceRepository {
 
   async updateOrderStatus(id: string, status: string): Promise<string> {
     return await this.http.put<string>(COMMERCE_ROUTES.orderStatus(id), { status }, { showFeedback: false })
+  }
+
+  async createCart(body: { userId?: string; sessionId?: string; currencyId?: string }): Promise<CartDto> {
+    return await this.http.post<CartDto>(COMMERCE_ROUTES.carts, body, { showFeedback: false })
+  }
+
+  async addItem(cartId: string, body: { productId: string; quantity: number; unitPriceSnapshot: number }): Promise<CartDto> {
+    return await this.http.post<CartDto>(COMMERCE_ROUTES.cartItems(cartId), body, { showFeedback: false })
+  }
+
+  async getBySession(sessionId: string): Promise<CartDto> {
+    return await this.http.get<CartDto>(COMMERCE_ROUTES.cartBySession(sessionId), { showFeedback: false })
+  }
+
+  async clearCart(cartId: string): Promise<void> {
+    await this.http.post<void>(COMMERCE_ROUTES.cartClear(cartId), {}, { showFeedback: false })
   }
 
 }

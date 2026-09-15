@@ -10,6 +10,7 @@ import SkeletonLoader from '../../components/ui/SkeletonLoader.vue'
 import ErrorState from '../../components/ui/ErrorState.vue'
 import BaseButton from '../../components/ui/BaseButton.vue'
 import { useWishlist } from '../../composables/useWishlist'
+import { formatPrice } from '../../utils/format'
 
 const { wishlistIds } = useWishlist()
 const router = useRouter()
@@ -208,7 +209,7 @@ onMounted(loadDashboard)
 
         <StatCard
           :label="t('account.statYtd')"
-          :value="`${Math.ceil(ytdValue).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US')} ${orderCurrency}`"
+          :value="`${formatPrice(ytdValue, locale)} ${orderCurrency}`"
           tone="slate"
           :trend="t('account.trendYtd')"
           :sparkline="realOrderSpendSparkline"
@@ -289,7 +290,7 @@ onMounted(loadDashboard)
 
               <div class="quote-right">
                 <span class="quote-amount mono-num">
-                  {{ Math.ceil(q.amount).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ q.currency || 'USD' }}
+                  {{ formatPrice(q.amount, locale) }} {{ q.currency || 'USD' }}
                 </span>
                 <StatusPill :status="q.status" />
               </div>
@@ -341,7 +342,7 @@ onMounted(loadDashboard)
 
               <div class="quote-right">
                 <span class="quote-amount mono-num">
-                  ${{ Math.ceil(r.total ?? 0).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}
+                  ${{ formatPrice(r.total ?? 0, locale) }}
                 </span>
                 <StatusPill :status="r.status" />
               </div>
@@ -1243,3 +1244,7 @@ onMounted(loadDashboard)
       }
     }
 </style>
+
+
+
+

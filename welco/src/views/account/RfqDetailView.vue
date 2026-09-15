@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { t, locale } from '../../i18n'
 import { salesService } from '../../di/container'
@@ -9,14 +9,31 @@ import ChainSteps from '../../components/ui/ChainSteps.vue'
 import SkeletonLoader from '../../components/ui/SkeletonLoader.vue'
 import DataState from '../../components/ui/DataState.vue'
 import BackButton from '../../components/ui/BackButton.vue'
+import FileUpload from '../../components/ui/FileUpload.vue'
+import { toUploadPlace } from '../../application/attachment.service'
 import { resolveFileUrl } from '../../utils/file-url'
 import type { RfqDto } from '../../domain/models/sales'
+import { formatPrice } from '../../utils/format'
 
 const route = useRoute()
 const router = useRouter()
 const rfq = ref<RfqDto | null>(null)
 const loading = ref(true)
 const linkedQuote = ref<{ id: string; status: string } | null>(null)
+const rfqAttachment = ref<string | null>(null)
+
+// NOTE: backend has no RFQ attachment linkage yet — FileUpload here is
+// reference-only (uploads immediately, renders a link, never stored on the
+// RFQ payload). Reset on id change so a prior RFQ's file never bleeds through.
+// (Tickets append `[attachment:name]` into the message payload — see
+// MyTicketsView.vue:58 — but RFQs expose no post-create note/update endpoint
+// to persist it, so we deliberately do not invent one here.)
+watch(
+  () => route.params.id,
+  () => {
+    rfqAttachment.value = null
+  },
+)
 
 const localized = (en: string, ar: string) => (locale.value === 'ar' ? ar : en)
 
@@ -115,7 +132,7 @@ onMounted(async () => {
 
               <div class="rfq-item-details">
                 <h3 class="rfq-item-name">{{ localized(it.productNameEn, it.productNameAr || it.productNameEn) }}</h3>
-                <div class="rfq-item-qty mono">{{ t('account.qtyUnits', { count: it.quantity }) }} · {{ Math.ceil(it.unitPrice ?? 0).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} USD {{ t('account.perUnitShort') }}</div>
+                <div class="rfq-item-qty mono">{{ t('account.qtyUnits', { count: it.quantity }) }} · {{ formatPrice(it.unitPrice ?? 0, locale) }} USD {{ t('account.perUnitShort') }}</div>
                 <div v-if="it.notes" class="rfq-item-notes mono">
                   <span class="font-bold">{{ t('account.specLabel') }}</span> {{ it.notes }}
                 </div>
@@ -136,8 +153,21 @@ onMounted(async () => {
             <h2 class="side-title mono">{{ t('commerce.total') }}</h2>
             <div class="amount-val-box">
               <span class="mono amount-label">{{ t('sales.amount') }}</span>
-              <strong class="mono amount-big">${{ Math.ceil(rfq.total ?? 0).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} USD</strong>
+              <strong class="mono amount-big">${{ formatPrice(rfq.total ?? 0, locale) }} USD</strong>
             </div>
+          </section>
+
+          <!-- Supporting Document -->
+          <section class="card attach-card">
+            <h2 class="side-title mono">{{ t('attachment.uploadFile') }}</h2>
+            <FileUpload v-model="rfqAttachment" :place="toUploadPlace('rfq')" />
+            <a
+              v-if="rfqAttachment"
+              :href="resolveFileUrl(rfqAttachment)"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="mono attach-link"
+            >{{ rfqAttachment }}</a>
           </section>
 
           <!-- Linked Quote Card -->
@@ -461,6 +491,18 @@ onMounted(async () => {
   line-height: 1.45;
 }
 
+.attach-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.attach-link {
+  font-size: 11.5px;
+  color: var(--wl-primary);
+  word-break: break-all;
+}
+
 .btn-view-quote {
   display: inline-flex;
   align-items: center;
@@ -538,4 +580,8 @@ onMounted(async () => {
   }
 }
 </style>
+
+
+
+
 

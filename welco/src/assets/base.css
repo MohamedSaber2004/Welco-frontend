@@ -483,10 +483,8 @@ input[type="checkbox"]:focus-visible, input[type="radio"]:focus-visible { box-sh
 .actions { display: flex; gap: 0.4rem; }
 
 /* ── Grids ── */
-.product-grid { display: grid; grid-template-columns: repeat(3, minmax(280px, 1fr)); gap: 1rem; }
-.supplier-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
-@media (max-width: 1024px) { .product-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 760px) { .product-grid, .supplier-grid { grid-template-columns: 1fr; } }
+.product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--space-4); }
+.supplier-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: var(--space-4); }
 
 /* ── Scrollbar ── */
 *::-webkit-scrollbar { width: 6px; height: 6px; }

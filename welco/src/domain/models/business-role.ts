@@ -26,8 +26,18 @@ export function isAdminContext(ctx: BusinessRoleContext): boolean {
   return roleList(ctx).includes('admin') || ctx.userType === UserType.Admin || ctx.userType === 1
 }
 
+export function isStaffRole(role: string | null | undefined): boolean {
+  if (typeof role !== 'string') return false
+  const n = role.trim().toLowerCase()
+  return n === 'welcostaff' || n === 'snulstaff'
+}
+
 export function isStaffContext(ctx: BusinessRoleContext): boolean {
-  return roleList(ctx).includes('welcostaff') || ctx.userType === UserType.WelcoStaff || ctx.userType === 3
+  return (
+    roleList(ctx).some((r) => isStaffRole(r)) ||
+    ctx.userType === UserType.WelcoStaff ||
+    ctx.userType === 3
+  )
 }
 
 export function isOrganizationUserContext(ctx: BusinessRoleContext): boolean {

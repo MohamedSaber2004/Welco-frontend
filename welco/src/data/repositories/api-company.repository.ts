@@ -107,18 +107,9 @@ export class ApiCompanyRepository implements CompanyRepository {
   }
 
   async getOemServices(): Promise<OemService[]> {
-    try {
-      const raw = await this.http.get<unknown>(COMPANY_ROUTES.oemServices, { showFeedback: false })
-      if (Array.isArray(raw)) return raw as OemService[]
-      if (raw && typeof raw === 'object') {
-        const obj = raw as Record<string, unknown>
-        if (Array.isArray(obj.data)) return obj.data as OemService[]
-        if (Array.isArray(obj.Data)) return obj.Data as OemService[]
-      }
-      return []
-    } catch {
-      return []
-    }
+    // Backend has no /api/v1/oem-services endpoint (truth is /api/v1/oem-inquiries).
+    // Keep the port method for callers (OemView) but return empty — no HTTP call.
+    return []
   }
 
   async submitOemInquiry(payload: OemInquiryPayload): Promise<void> {

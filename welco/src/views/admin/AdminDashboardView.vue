@@ -12,6 +12,7 @@ import StatusPill from '../../components/ui/StatusPill.vue'
 import { useUserLookup } from '../../composables/useUserLookup'
 import type { AuditLogDto } from '../../domain/models/audit-log'
 import { t, locale } from '../../i18n'
+import { formatPrice } from '../../utils/format'
 
 const isStaffOnly = computed(() => authSvc.isWelcoStaff.value && !authSvc.isAdmin.value)
 
@@ -571,7 +572,7 @@ onUnmounted(_removeListeners)
               <div class="dash-mini-main">
                 <div class="flex items-center gap-2">
                   <strong class="dash-mini-id mono">{{ order.orderNumber }}</strong>
-                  <span class="priority-chip priority-chip--order mono text-[10px]">{{ order.currencySymbol || '$' }}{{ Math.ceil(order.totalAmount ?? 0).toLocaleString() }}</span>
+                  <span class="priority-chip priority-chip--order mono text-[10px]">{{ order.currencySymbol || '$' }}{{ formatPrice(order.totalAmount ?? 0, locale) }}</span>
                 </div>
                 <span class="dash-mini-sub mono">{{ t('account.lineItemsCount', { count: order.items?.length || 0 }) }}</span>
               </div>
@@ -2249,4 +2250,7 @@ onUnmounted(_removeListeners)
   gap: 0.75rem;
 }
 </style>
+
+
+
 

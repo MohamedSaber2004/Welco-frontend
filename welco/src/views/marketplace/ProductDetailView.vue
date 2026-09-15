@@ -14,6 +14,7 @@ import BaseModal from '../../components/ui/BaseModal.vue'
 import EmptyState from '../../components/ui/EmptyState.vue'
 import AppImage from '../../components/ui/AppImage.vue'
 import { productMediaUrl, resolveFileUrl, PLACEHOLDER, PLACEHOLDER_PNG, parseVideoSource } from '../../utils/file-url'
+import { formatPrice } from '../../utils/format'
 
 const route = useRoute()
 const router = useRouter()
@@ -541,7 +542,7 @@ const resolvedDescription = computed(() => {
             <div class="pdp-price-header">
               <div class="price-figure-wrap">
                 <strong class="pdp-price-figure mono">
-                  {{ Math.ceil(product.price).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}
+                  {{ formatPrice(product.price, locale) }}
                 </strong>
                 <span class="pdp-currency-unit mono">{{ currencySymbol }}</span>
                 <span class="pdp-unit-caption mono">
@@ -888,7 +889,7 @@ const resolvedDescription = computed(() => {
               </div>
               <div class="rel-foot">
                 <strong class="mono rel-price">
-                  {{ Math.ceil(p.price).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ p.currencySymbol || p.currencyCode || p.currency || '$' }}
+                  {{ formatPrice(p.price, locale) }} {{ p.currencySymbol || p.currencyCode || p.currency || '$' }}
                 </strong>
                 <span class="rel-cta-hint mono">{{ t('admin.certView') }} <span class="icon--directional">→</span></span>
               </div>
@@ -1326,7 +1327,7 @@ const resolvedDescription = computed(() => {
 /* Quick Specs Strip */
 .pdp-specs-strip {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
   gap: var(--space-3);
   padding: var(--space-3) var(--space-4);
   background: var(--wl-surface);
@@ -2354,4 +2355,8 @@ const resolvedDescription = computed(() => {
   border-bottom-color: var(--wl-primary);
 }
 </style>
+
+
+
+
 

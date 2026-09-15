@@ -15,6 +15,7 @@ import BaseModal from '../components/ui/BaseModal.vue'
 import BaseButton from '../components/ui/BaseButton.vue'
 import AppImage from '../components/ui/AppImage.vue'
 import { productMediaUrl } from '../utils/file-url'
+import { formatPrice } from '../utils/format'
 
 const router = useRouter()
 const { add } = useCart()
@@ -327,7 +328,7 @@ const navigateToOemFromModal = () => {
                 <div class="mono product-card__meta-alt" dir="auto">{{ locale === 'en' ? p.nameAr : p.nameEn }}</div>
                 <div class="mono product-card__meta">{{ p.manufacturerEn || 'Welco Surgical' }} · CE Class IIa</div>
                 <div class="product-card__foot">
-                  <strong class="mono-num">{{ Math.ceil(p.price).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ p.currencySymbol || '$' }}</strong>
+                  <strong class="mono-num">{{ formatPrice(p.price, locale) }} {{ p.currencySymbol || '$' }}</strong>
                   <button class="btn btn-primary btn-sm" type="button" @click.stop="handleAdd(p.id)">
                     <span class="material-symbols-outlined text-[15px]">add_shopping_cart</span>
                     <span>{{ t('marketplace.addToQuote') }}</span>
@@ -952,7 +953,7 @@ const navigateToOemFromModal = () => {
 
 .providers-strip-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: var(--space-4);
 }
 
@@ -1066,7 +1067,7 @@ const navigateToOemFromModal = () => {
 /* Home Certs Grid */
 .home-certs-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: var(--space-4);
 }
 
@@ -1170,7 +1171,7 @@ const navigateToOemFromModal = () => {
 /* Metrics Grid */
 .metrics-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: var(--space-3);
 }
 
@@ -1234,7 +1235,7 @@ const navigateToOemFromModal = () => {
 /* Categories Grid */
 .cat-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: var(--space-4);
 }
 
@@ -1325,7 +1326,7 @@ const navigateToOemFromModal = () => {
 /* Products Grid */
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: var(--space-4);
 }
 
@@ -1833,3 +1834,7 @@ const navigateToOemFromModal = () => {
   }
 }
 </style>
+
+
+
+

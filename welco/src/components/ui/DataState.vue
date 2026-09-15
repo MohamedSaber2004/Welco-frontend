@@ -520,20 +520,10 @@ const delay = (i: number) => ({ '--delay': `${i * 70}ms` } as Record<string, str
 
 /* grids */
 .sk-grid { display: grid; width: 100%; }
-.sk-grid--catalog { grid-template-columns: repeat(3, 1fr); }
-.sk-grid--category { grid-template-columns: repeat(4, 1fr); }
-.sk-grid--stats { grid-template-columns: repeat(4, 1fr); }
-.sk-grid--location { grid-template-columns: repeat(3, 1fr); align-items: start; }
-
-@media (max-width: 1120px) {
-  .sk-grid--catalog { grid-template-columns: repeat(2, 1fr); }
-  .sk-grid--category { grid-template-columns: repeat(3, 1fr); }
-  .sk-grid--stats { grid-template-columns: repeat(2, 1fr); }
-}
-
-@media (max-width: 760px) {
-  .sk-grid--catalog, .sk-grid--category, .sk-grid--stats, .sk-grid--location { grid-template-columns: 1fr; }
-}
+.sk-grid--catalog { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+.sk-grid--category { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+.sk-grid--stats { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+.sk-grid--location { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); align-items: start; }
 
 /* category */
 .sk-cat {

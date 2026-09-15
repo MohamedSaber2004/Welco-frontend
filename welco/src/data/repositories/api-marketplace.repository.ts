@@ -322,8 +322,7 @@ export class ApiMarketplaceRepository implements MarketplaceRepository {
       `${PRODUCT_API_BASE_URL}${MARKETPLACE_ROUTES.currencies}`,
       MARKETPLACE_ROUTES.currencies,
     ]
-    const dedupeCurrencies = (items: CurrencyDto[]): CurrencyDto[] => {
-      const seenId = new Set<string>()
+    const dedupeCurrencies = (items: CurrencyDto[]): CurrencyDto[] => {      const seenId = new Set<string>()
       const seenCode = new Set<string>()
       const result: CurrencyDto[] = []
       for (const c of items) {
@@ -340,6 +339,21 @@ export class ApiMarketplaceRepository implements MarketplaceRepository {
     }
 
     for (const path of candidates) {
+      // Unpaginated full list first (GET /api/v1/currencies/all).
+      try {
+        const raw = await this.http.get<unknown>(`${path}/all`, { showFeedback: false })
+        if (Array.isArray(raw)) {
+          const all = dedupeCurrencies(raw as CurrencyDto[])
+          if (all.length) return all
+        }
+        if (raw && typeof raw === 'object') {
+          const obj = raw as Record<string, unknown>
+          const items = (Array.isArray(obj.data) ? obj.data : Array.isArray(obj.Data) ? obj.Data : []) as CurrencyDto[]
+          if (items.length) return dedupeCurrencies(items)
+        }
+      } catch {
+        // fall through to paged loop below (older backends without /all)
+      }
       try {
         const url = `${path}${path.includes('?') ? '&' : '?'}pageSize=50&pageNumber=1`
         const raw = await this.http.get<unknown>(url, { showFeedback: false })

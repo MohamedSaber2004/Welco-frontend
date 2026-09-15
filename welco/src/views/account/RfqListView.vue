@@ -9,6 +9,7 @@ import DataState from '../../components/ui/DataState.vue'
 import BackButton from '../../components/ui/BackButton.vue'
 import AppPagination from '../../components/ui/AppPagination.vue'
 import { RFQ_STATUSES } from '../../domain/models/sales'
+import { formatPrice } from '../../utils/format'
 
 const router = useRouter()
 const rfqs = salesService.rfqs
@@ -181,7 +182,7 @@ onMounted(() => {
                   </div>
                 </td>
                 <td>
-                  <strong class="mono amount-text">${{ Math.ceil(r.total ?? 0).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</strong>
+                  <strong class="mono amount-text">${{ formatPrice(r.total ?? 0, locale) }}</strong>
                 </td>
                 <td>
                   <StatusPill :status="r.status" />
@@ -533,3 +534,7 @@ onMounted(() => {
   align-self: flex-start;
 }
 </style>
+
+
+
+

@@ -1,5 +1,5 @@
 import { EXCHANGE_RATE_ROUTES, PRODUCT_API_BASE_URL } from '../../config/api.config'
-import type { ConversionResultDto, ExchangeRateDto, ExchangeRateSyncLogDto } from '../../domain/models/exchange-rate'
+import type { ConversionResultDto, ConvertCartTotalRequest, ConvertCartTotalResult, ExchangeRateDto, ExchangeRateSyncLogDto } from '../../domain/models/exchange-rate'
 import type { ExchangeRateRepository } from '../../domain/ports/exchange-rate-repository'
 import type { HttpClient } from '../../infrastructure/http/http-client'
 import { ApiError } from '../../infrastructure/http/api-error'
@@ -25,72 +25,6 @@ function normalizeList(raw: unknown): ExchangeRateDto[] {
   // Handle Result wrapper with array inside
   if (Array.isArray((raw as Record<string, unknown>)?.data)) return (raw as Record<string, unknown>).data as ExchangeRateDto[]
   return []
-}
-
-// ── Public fallback providers (CORS `*`, no key) ─────────────────────────────
-// Used only when the Welco backend has no usable rates (gateway 404 / product
-// 500 / "No rates available" 400). Keeps cart/checkout conversion working.
-async function fetchPublicRates(base: string): Promise<ExchangeRateDto[] | null> {
-  const upper = base.toUpperCase()
-  // 1) open.er-api.com — full ISO list (~160 currencies)
-  try {
-    const ctrl = new AbortController()
-    const t = setTimeout(() => ctrl.abort(), 12000)
-    try {
-      const res = await fetch(`https://open.er-api.com/v6/latest/${encodeURIComponent(upper)}`, {
-        signal: ctrl.signal,
-      })
-      if (res.ok) {
-        const json = (await res.json()) as { result?: string; rates?: Record<string, number>; time_last_update_utc?: string }
-        if (json?.rates && typeof json.rates === 'object') {
-          const date = (json.time_last_update_utc ?? new Date().toISOString()).slice(0, 10)
-          return Object.entries(json.rates)
-            .filter(([, v]) => typeof v === 'number' && Number.isFinite(v) && v > 0)
-            .map(([code, rate]) => ({
-              id: `public-${upper}-${code}`,
-              baseCurrency: upper,
-              targetCurrency: code.toUpperCase(),
-              rate,
-              rateDate: date,
-              source: 'open.er-api.com',
-              fetchedAt: new Date().toISOString(),
-            }))
-        }
-      }
-    } finally {
-      clearTimeout(t)
-    }
-  } catch { /* try next provider */ }
-  // 2) frankfurter.app — ECB majors only, but very reliable
-  try {
-    const ctrl = new AbortController()
-    const t = setTimeout(() => ctrl.abort(), 12000)
-    try {
-      const res = await fetch(`https://api.frankfurter.app/latest?base=${encodeURIComponent(upper)}`, {
-        signal: ctrl.signal,
-      })
-      if (res.ok) {
-        const json = (await res.json()) as { rates?: Record<string, number>; date?: string }
-        if (json?.rates && typeof json.rates === 'object') {
-          const date = json.date ?? new Date().toISOString().slice(0, 10)
-          return Object.entries(json.rates)
-            .filter(([, v]) => typeof v === 'number' && Number.isFinite(v) && v > 0)
-            .map(([code, rate]) => ({
-              id: `public-${upper}-${code}`,
-              baseCurrency: upper,
-              targetCurrency: code.toUpperCase(),
-              rate,
-              rateDate: date,
-              source: 'frankfurter.app',
-              fetchedAt: new Date().toISOString(),
-            }))
-        }
-      }
-    } finally {
-      clearTimeout(t)
-    }
-  } catch { /* give up -> caller shows original prices */ }
-  return null
 }
 
 export class ApiExchangeRateRepository implements ExchangeRateRepository {
@@ -121,19 +55,13 @@ export class ApiExchangeRateRepository implements ExchangeRateRepository {
     const upper = base.toUpperCase()
     const gatewayPath =
       upper === 'USD' ? EXCHANGE_RATE_ROUTES.latest : EXCHANGE_RATE_ROUTES.latestByBase(upper)
-    // Primary: product microservice directly (public, CORS `*`). The gateway
-    // currently has NO /exchange-rates route (404), so hitting it first only
-    // produces console noise. Gateway stays as secondary for forward-compat.
-    const candidates = [this.productUrl(gatewayPath), gatewayPath]
+    const candidates = [gatewayPath, this.productUrl(gatewayPath)]
     try {
       const raw = await this.getFirst(candidates)
-      const list = normalizeList(raw)
-      if (list.length) return list
-    } catch { /* fall through to public providers */ }
-
-    const pub = await fetchPublicRates(upper)
-    if (pub && pub.length) return pub
-    return []
+      return normalizeList(raw)
+    } catch {
+      return []
+    }
   }
 
   async getPair(from: string, to: string): Promise<ExchangeRateDto | null> {
@@ -152,8 +80,8 @@ export class ApiExchangeRateRepository implements ExchangeRateRepository {
     }
     try {
       const raw = await this.getFirst([
-        this.productUrl(EXCHANGE_RATE_ROUTES.pair(f, tt)),
         EXCHANGE_RATE_ROUTES.pair(f, tt),
+        this.productUrl(EXCHANGE_RATE_ROUTES.pair(f, tt)),
       ])
       return unwrap<ExchangeRateDto>(raw)
     } catch { /* derive from latest table below */ }
@@ -190,8 +118,8 @@ export class ApiExchangeRateRepository implements ExchangeRateRepository {
     const qs = new URLSearchParams({ from: f, to: tt, amount: String(amount) }).toString()
     try {
       const raw = await this.getFirst([
-        this.productUrl(`${EXCHANGE_RATE_ROUTES.convert}?${qs}`),
         `${EXCHANGE_RATE_ROUTES.convert}?${qs}`,
+        this.productUrl(`${EXCHANGE_RATE_ROUTES.convert}?${qs}`),
       ])
       return unwrap<ConversionResultDto>(raw)
     } catch {
@@ -199,12 +127,14 @@ export class ApiExchangeRateRepository implements ExchangeRateRepository {
       // instead of surfacing the backend 400/500 to the shopper.
       const pair = await this.getPair(f, tt)
       if (pair) {
+        // Backend-compatible fallback rounding (AwayFromZero, 2dp).
+        const rounded = (Math.sign(amount * pair.rate) * Math.round(Math.abs(amount * pair.rate) * 100 + 1e-9)) / 100
         return {
           amount,
           fromCurrency: f,
           toCurrency: tt,
           rate: pair.rate,
-          convertedAmount: amount * pair.rate,
+          convertedAmount: rounded,
           rateDate: pair.rateDate,
           source: pair.source,
         }
@@ -213,11 +143,28 @@ export class ApiExchangeRateRepository implements ExchangeRateRepository {
     }
   }
 
+  async convertCartTotal(payload: ConvertCartTotalRequest): Promise<ConvertCartTotalResult> {
+    const candidates = [
+      this.productUrl(EXCHANGE_RATE_ROUTES.cartTotal),
+      EXCHANGE_RATE_ROUTES.cartTotal,
+    ];
+    let lastErr: unknown = null
+    for (const p of candidates) {
+      try {
+        const raw = await this.http.post<unknown>(p, payload, { showFeedback: false })
+        return unwrap<ConvertCartTotalResult>(raw)
+      } catch (e) {
+        lastErr = e
+      }
+    }
+    throw lastErr
+  }
+
   async getHistory(base: string, date: string): Promise<ExchangeRateDto[]> {
     try {
       const raw = await this.getFirst([
-        this.productUrl(EXCHANGE_RATE_ROUTES.history(base, date)),
         EXCHANGE_RATE_ROUTES.history(base, date),
+        this.productUrl(EXCHANGE_RATE_ROUTES.history(base, date)),
       ])
       const data = unwrap<ExchangeRateDto[] | { data: ExchangeRateDto[] }>(raw)
       if (Array.isArray(data)) return data
@@ -242,8 +189,8 @@ export class ApiExchangeRateRepository implements ExchangeRateRepository {
   async getSyncLogs(take = 20): Promise<ExchangeRateSyncLogDto[]> {
     const qs = `?take=${take}`
     const candidates = [
-      this.productUrl(`${EXCHANGE_RATE_ROUTES.syncLogs}${qs}`),
       `${EXCHANGE_RATE_ROUTES.syncLogs}${qs}`,
+      this.productUrl(`${EXCHANGE_RATE_ROUTES.syncLogs}${qs}`),
     ]
     try {
       const raw = await this.getFirst(candidates)

@@ -10,6 +10,7 @@ import SkeletonLoader from '../../components/ui/SkeletonLoader.vue'
 import DataState from '../../components/ui/DataState.vue'
 import BackButton from '../../components/ui/BackButton.vue'
 import type { OrderDto } from '../../domain/models/commerce'
+import { formatPrice } from '../../utils/format'
 
 const route = useRoute()
 const router = useRouter()
@@ -106,12 +107,12 @@ function statusIndex(o: OrderDto): number {
                 <div class="item-math mono">
                   <span>{{ t('account.qtyUnits', { count: it.quantity }) }}</span>
                   <span>•</span>
-                  <span>{{ Math.ceil(it.unitPrice).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ order.currencyCode }} {{ t('account.perUnitShort') }}</span>
+                  <span>{{ formatPrice(it.unitPrice, locale) }} {{ order.currencyCode }} {{ t('account.perUnitShort') }}</span>
                 </div>
               </div>
 
               <div class="item-subtotal mono">
-                {{ Math.ceil(it.quantity * it.unitPrice).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ order.currencyCode }}
+                {{ formatPrice(it.quantity * it.unitPrice, locale) }} {{ order.currencyCode }}
               </div>
             </article>
           </div>
@@ -119,7 +120,7 @@ function statusIndex(o: OrderDto): number {
           <div class="manifest-foot">
             <span class="mono foot-label">{{ t('commerce.total') }}</span>
             <strong class="mono foot-total">
-              {{ Math.ceil(order.totalAmount).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ order.currencyCode }}
+              {{ formatPrice(order.totalAmount, locale) }} {{ order.currencyCode }}
             </strong>
           </div>
         </main>
@@ -441,4 +442,8 @@ function statusIndex(o: OrderDto): number {
   }
 }
 </style>
+
+
+
+
 

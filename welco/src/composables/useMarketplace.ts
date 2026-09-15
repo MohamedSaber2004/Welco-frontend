@@ -13,7 +13,6 @@ function useDebounced<T>(source: () => T, delay = 350) {
   return debounced
 }
 
-/** Coerce range input to a valid bound: NaN/empty/negative -> null. */
 function toCleanBound(v: number | string | null | undefined): number | null {
   if (v == null || v === '') return null
   const n = typeof v === 'number' ? v : Number(v)
@@ -21,7 +20,6 @@ function toCleanBound(v: number | string | null | undefined): number | null {
   return n
 }
 
-/** Order a min/max pair so min <= max (swaps inverted ranges). */
 function orderedPair(a: number | null, b: number | null): [number | null, number | null] {
   if (a != null && b != null && a > b) return [b, a]
   return [a, b]
@@ -44,8 +42,6 @@ export function useMarketplace() {
 
   const debouncedSearch = useDebounced(() => search.value, 350)
   const debouncedSku = useDebounced(() => sku.value, 350)
-  // Range fields update on every keystroke — debounce so typing a bound
-  // doesn't fire one request per digit.
   const debouncedLengthMin = useDebounced(() => lengthMin.value, 500)
   const debouncedLengthMax = useDebounced(() => lengthMax.value, 500)
   const debouncedPriceMin = useDebounced(() => priceMin.value, 500)
@@ -53,9 +49,6 @@ export function useMarketplace() {
 
   const localized = (en: string, ar: string) => locale.value === 'ar' ? ar : en
 
-  // Keep raw refs clean: a cleared/invalid number input must collapse back
-  // to null instead of sticking at NaN/'' (which would poison the query and
-  // permanently trip the "has filters" flag).
   watch([lengthMin, lengthMax, priceMin, priceMax], () => {
     const l0 = toCleanBound(lengthMin.value)
     const l1 = toCleanBound(lengthMax.value)

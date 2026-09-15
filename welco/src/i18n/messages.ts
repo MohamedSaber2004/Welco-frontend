@@ -1167,7 +1167,6 @@ export type Messages = {
     isoDossier: string
     verifiedBuyer: string
     verifiedPartner: string
-    tierLevel: string
     pipelineEyebrow: string
     pipelineTitle: string
     activeLifecycle: string

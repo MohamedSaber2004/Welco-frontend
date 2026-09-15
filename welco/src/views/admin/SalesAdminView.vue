@@ -13,6 +13,7 @@ import { confirmService } from '../../infrastructure/feedback/confirm.service'
 import { t, locale } from '../../i18n'
 import type { QuoteDto, RfqDto } from '../../domain/models/sales'
 import { RFQ_STATUSES, QUOTE_STATUSES } from '../../domain/models/sales'
+import { formatPrice } from '../../utils/format'
 
 const route = useRoute()
 const router = useRouter()
@@ -493,7 +494,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
                     </div>
                   </td>
                   <td>
-                    <strong class="mono amount-num">${{ Math.ceil(r.total ?? 0).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</strong>
+                    <strong class="mono amount-num">${{ formatPrice(r.total ?? 0, locale) }}</strong>
                   </td>
                   <td>
                     <StatusPill :status="r.status" />
@@ -632,7 +633,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
                   </td>
                   <td>
                     <strong class="mono amount-num">
-                      ${{ Math.ceil(q.amount).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ q.currency || 'USD' }}
+                      ${{ formatPrice(q.amount, locale) }} {{ q.currency || 'USD' }}
                     </strong>
                   </td>
                   <td>
@@ -773,8 +774,8 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
                 <tr v-for="it in selectedQuote.items" :key="it.id">
                   <td class="product-title-cell">{{ locale === 'ar' ? (it.productNameAr || it.productNameEn) : it.productNameEn }}</td>
                   <td class="text-end mono">{{ it.quantity }}</td>
-                  <td class="text-end mono">${{ Math.ceil(it.unitPrice).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</td>
-                  <td class="text-end mono subtotal-num">${{ Math.ceil(it.quantity * it.unitPrice).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</td>
+                  <td class="text-end mono">${{ formatPrice(it.unitPrice, locale) }}</td>
+                  <td class="text-end mono subtotal-num">${{ formatPrice(it.quantity * it.unitPrice, locale) }}</td>
                 </tr>
               </tbody>
             </table>
@@ -787,7 +788,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
             </div>
             <div class="total-quote-box">
               <span class="total-label mono">{{ t('commerce.total') }}</span>
-              <strong class="total-value mono">${{ Math.ceil(selectedQuote.amount).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ selectedQuote.currency || 'USD' }}</strong>
+              <strong class="total-value mono">${{ formatPrice(selectedQuote.amount, locale) }} {{ selectedQuote.currency || 'USD' }}</strong>
             </div>
           </div>
 
@@ -850,7 +851,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
                     />
                   </td>
                   <td class="text-end mono subtotal-num">
-                    ${{ Math.ceil(l.quantity * l.unitPrice).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}
+                    ${{ formatPrice(l.quantity * l.unitPrice, locale) }}
                   </td>
                 </tr>
               </tbody>
@@ -865,7 +866,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 
             <div class="total-quote-box">
               <span class="total-label mono">{{ t('admin.totalProposal') }}</span>
-              <strong class="total-value mono">${{ Math.ceil(quoteAmount).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</strong>
+              <strong class="total-value mono">${{ formatPrice(quoteAmount, locale) }}</strong>
             </div>
           </div>
 
@@ -1770,4 +1771,8 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
   border-top: 1px solid var(--wl-border);
 }
 </style>
+
+
+
+
 

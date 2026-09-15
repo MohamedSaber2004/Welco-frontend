@@ -11,6 +11,7 @@ import SkeletonLoader from '../../components/ui/SkeletonLoader.vue'
 import DataState from '../../components/ui/DataState.vue'
 import BackButton from '../../components/ui/BackButton.vue'
 import type { QuoteDto } from '../../domain/models/sales'
+import { formatPrice } from '../../utils/format'
 
 const route = useRoute()
 const router = useRouter()
@@ -176,12 +177,12 @@ async function placeOrderFromQuote() {
                 <div class="item-math mono">
                   <span>{{ t('account.qtyUnits', { count: it.quantity }) }}</span>
                   <span>•</span>
-                  <span>{{ Math.ceil(it.unitPrice).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ quote.currency || 'USD' }} {{ t('account.perUnitShort') }}</span>
+                  <span>{{ formatPrice(it.unitPrice, locale) }} {{ quote.currency || 'USD' }} {{ t('account.perUnitShort') }}</span>
                 </div>
               </div>
 
               <div class="item-subtotal mono">
-                {{ Math.ceil(it.quantity * it.unitPrice).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ quote.currency || 'USD' }}
+                {{ formatPrice(it.quantity * it.unitPrice, locale) }} {{ quote.currency || 'USD' }}
               </div>
             </article>
           </div>
@@ -194,7 +195,7 @@ async function placeOrderFromQuote() {
             <div class="amount-val-box">
               <span class="mono amount-label">{{ t('commerce.total') }}</span>
               <strong class="mono amount-big">
-                ${{ Math.ceil(quote.amount).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ quote.currency || 'USD' }}
+                ${{ formatPrice(quote.amount, locale) }} {{ quote.currency || 'USD' }}
               </strong>
             </div>
             <div class="validity-row mono">
@@ -666,4 +667,8 @@ async function placeOrderFromQuote() {
   }
 }
 </style>
+
+
+
+
 

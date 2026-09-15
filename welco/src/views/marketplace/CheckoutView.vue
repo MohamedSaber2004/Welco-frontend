@@ -9,6 +9,7 @@ import BackButton from '../../components/ui/BackButton.vue'
 import AppImage from '../../components/ui/AppImage.vue'
 import { toastService } from '../../infrastructure/feedback/toast.service'
 import { distinctCurrenciesFromAddresses } from '../../utils/country-currency-map'
+import { formatPrice } from '../../utils/format'
 
 const router = useRouter()
 const { items, displayTotal, targetCurrency, count, toDisplayCurrency, quoteNote, clear, getServerLine, setTargetCurrency, unconvertedIds, refreshServerTotal } = useCart()
@@ -189,7 +190,7 @@ async function convertToQuote() {
 
               <div class="line-item__pricing">
                 <div class="mono line-item__calc">
-                  <span>{{ (getServerLine(it.product.id)?.ceiledUnit ?? Math.ceil(it.product.price)).toLocaleString(locale==='ar'?'ar-EG':'en-US') }} {{ (it.product.currencyCode||'USD').toUpperCase() }}</span>
+                  <span>{{ formatPrice(getServerLine(it.product.id)?.ceiledUnit ?? it.product.price, locale) }} {{ (it.product.currencyCode||'USD').toUpperCase() }}</span>
                   <span v-if="getServerLine(it.product.id)"> → {{ it.quantity }} × {{ getServerLine(it.product.id)!.convertedUnit.toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ targetCurrency }}</span>
                   <span v-else> × {{ it.quantity }}</span>
                 </div>
@@ -697,4 +698,7 @@ async function convertToQuote() {
   }
 }
 </style>
+
+
+
 

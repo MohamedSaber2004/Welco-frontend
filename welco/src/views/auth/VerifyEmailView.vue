@@ -62,10 +62,6 @@ const handleVerify = async () => {
   loading.value = false
 
   if (res.ok) {
-    // Organization path = the signup was UserType.OrganizationUser WITH company
-    // fields (or a pending-org marker was set): an admin must accept the
-    // request to join the platform. Customer path (UserType.Customer = 4,
-    // buyer without company) goes straight in.
     let registeredAsOrg = false
     try {
       const raw = sessionStorage.getItem('welco-pending-register')
@@ -162,6 +158,7 @@ const handleResend = async () => {
             id="verify-otp-input"
             v-model="otpCode"
             type="text"
+            inputmode="numeric"
             maxlength="8"
             required
             placeholder="123456"
@@ -217,7 +214,7 @@ const handleResend = async () => {
   gap: 0.85rem;
   background: var(--wl-success-soft);
   border: 1px solid var(--wl-border);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   padding: 1rem 1.15rem;
 }
 
@@ -248,7 +245,7 @@ const handleResend = async () => {
   color: var(--wl-ink-strong);
   background: var(--wl-surface);
   padding: 1px 5px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   border: 1px solid var(--wl-border);
 }
 
@@ -313,7 +310,7 @@ const handleResend = async () => {
   padding: 0.75rem 1rem;
   background: var(--wl-danger-soft);
   border: 1px solid var(--wl-border);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   color: var(--wl-danger);
   font-size: 13px;
   font-weight: 500;
@@ -334,14 +331,14 @@ const handleResend = async () => {
   justify-content: center;
   gap: 0.55rem;
   cursor: pointer;
-  box-shadow: 0 4px 12px -2px rgba(105, 169, 255, 0.35);
+  box-shadow: var(--shadow-card);
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .vip-submit-btn:hover:not(:disabled) {
   background: var(--wl-primary-hover);
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px -2px rgba(105, 169, 255, 0.45);
+  box-shadow: var(--shadow-hover);
 }
 
 .vip-submit-btn:active:not(:disabled) {

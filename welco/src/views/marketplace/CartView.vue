@@ -20,7 +20,8 @@ import {
 const router = useRouter()
 const {
   items,
-  convertedTotal,
+  displayTotal,
+  serverTotalLoading,
   targetCurrency,
   count,
   quoteNote,
@@ -30,12 +31,15 @@ const {
   clear,
   setNote,
   toRfqItems,
-  getConvertedPrice,
+  getServerLine,
   setTargetCurrency,
-  refreshConversions,
+  refreshServerTotal,
 } = useCart()
 const localized = (en?: string | null, ar?: string | null) =>
   locale.value === 'ar' ? ar || en || '' : en || ar || ''
+/** Backend totals only — no client-side math. Null until quoted. */
+const fmtQuote = (v: number | null) =>
+  v == null ? '…' : v.toLocaleString(locale.value === 'ar' ? 'ar-EG' : 'en-US')
 
 const submittingRfq = ref(false)
 const availableCurrencies = ref<CurrencyDto[]>([])
@@ -62,7 +66,7 @@ onMounted(async () => {
     availableCurrencies.value = []
   }
   try { await services.exchangeRateService.loadLatest('USD') } catch { }
-  try { await refreshConversions() } catch { }
+  try { await refreshServerTotal() } catch { }
   try {
     await services.locationService.loadCountries().catch(() => {})
     // /companies/my requires auth — skip for guests to avoid a 401.
@@ -225,8 +229,8 @@ async function handleRefreshRates() {
   if (isRefreshingRates.value) return
   isRefreshingRates.value = true
   try {
-    await services.exchangeRateService.loadLatest('USD')
-    await refreshConversions()
+    services.exchangeRateService.clearCache()
+    await refreshServerTotal()
     toastService.success(t('cart.liveRateBadge'))
   } catch {
     // fallback
@@ -531,14 +535,13 @@ const submitRfq = async () => {
                     <span>{{ t('marketplace.minOrder', { qty: it.product.minOrderQty }) }}</span>
                   </div>
                   <div class="cart-line__price mono">
-                    <div v-if="(it.product.currencyCode||'USD').toUpperCase()!==targetCurrency" class="orig-price-wrap">
-                      <span class="orig-pill">{{ t('cart.originalPrice') }} {{ Math.ceil(it.product.price).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ it.product.currencyCode || 'USD' }}</span>
-                      <span class="material-symbols-outlined text-[12px] conv-arrow icon--directional">arrow_forward</span>
-                    </div>
                     <div class="active-unit-price">
-                      <strong class="active-unit-val">{{ activeCurrencyMeta.symbol }} {{ Math.ceil(getConvertedPrice(it.product)).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</strong>
-                      <span class="active-unit-code">{{ targetCurrency }}</span>
+                      <strong class="active-unit-val">{{ (getServerLine(it.product.id)?.ceiledUnit ?? Math.ceil(it.product.price)).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ (it.product.currencyCode || 'USD').toUpperCase() }}</strong>
                       <span class="active-unit-per">{{ t('account.perUnitShort') }}</span>
+                    </div>
+                    <div v-if="getServerLine(it.product.id)" class="orig-price-wrap">
+                      <span class="orig-pill">≈ {{ getServerLine(it.product.id)!.convertedUnit.toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ targetCurrency }}</span>
+                      <span class="material-symbols-outlined text-[12px] conv-arrow icon--directional">arrow_forward</span>
                     </div>
                   </div>
                 </div>
@@ -556,7 +559,7 @@ const submitRfq = async () => {
                   <span class="total-lbl">{{ t('commerce.subtotal') }}</span>
                   <strong class="total-fig">
                     <span class="total-sym">{{ activeCurrencyMeta.symbol }}</span>
-                    <span>{{ Math.ceil(getConvertedPrice(it.product) * it.quantity).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</span>
+                    <span>{{ fmtQuote(getServerLine(it.product.id)?.lineTotal ?? null) }}</span>
                     <span class="total-code">{{ targetCurrency }}</span>
                   </strong>
                 </div>
@@ -587,7 +590,7 @@ const submitRfq = async () => {
           <div class="summary-rows">
             <div class="summary-row">
               <span class="mono">{{ count }} {{ t('marketplace.products') }}</span>
-              <strong class="mono">{{ activeCurrencyMeta.symbol }} {{ Math.ceil(convertedTotal).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ targetCurrency }}</strong>
+              <strong class="mono">{{ activeCurrencyMeta.symbol }} {{ fmtQuote(displayTotal) }} {{ targetCurrency }}</strong>
             </div>
 
             <div class="summary-divider"></div>
@@ -596,8 +599,9 @@ const submitRfq = async () => {
               <span class="total-lbl mono">{{ t('commerce.total') }}</span>
               <strong class="total-val mono">
                 <span class="total-sym">{{ activeCurrencyMeta.symbol }}</span>
-                <span>{{ Math.ceil(convertedTotal).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</span>
+                <span>{{ fmtQuote(displayTotal) }}</span>
                 <span class="total-curr">{{ targetCurrency }}</span>
+                <span v-if="serverTotalLoading" class="mono" aria-hidden="true">…</span>
               </strong>
             </div>
 
@@ -624,7 +628,7 @@ const submitRfq = async () => {
           <div class="summary-actions">
             <button class="btn btn-primary btn-block btn-lg" type="button" @click="goCheckout">
               <span class="material-symbols-outlined text-[18px]">shopping_cart_checkout</span>
-              <span>{{ t('commerce.placeOrder') }} · {{ activeCurrencyMeta.symbol }} {{ Math.ceil(convertedTotal).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ targetCurrency }}</span>
+              <span>{{ t('commerce.placeOrder') }} · {{ activeCurrencyMeta.symbol }} {{ fmtQuote(displayTotal) }} {{ targetCurrency }}</span>
             </button>
 
             <button
@@ -945,7 +949,7 @@ const submitRfq = async () => {
 .curr-pills-wrap {
   display: flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: var(--space-2);
   flex-wrap: wrap;
   position: relative;
 }
@@ -953,31 +957,36 @@ const submitRfq = async () => {
 .curr-pill {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: var(--space-1);
   height: 38px;
-  padding: 0 0.75rem;
+  padding: 0 var(--space-3);
   background: var(--wl-surface);
-  border: 1.5px solid var(--wl-border, #E2E8F0);
-  border-radius: 9px;
-  font-size: 12px;
+  border: 1.5px solid var(--wl-border);
+  border-radius: var(--radius-sm);
+  font-size: var(--step-0);
   font-weight: 700;
-  color: var(--wl-ink-strong, #0F172A);
+  color: var(--wl-ink-strong);
   cursor: pointer;
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: var(--shadow-xs);
+  box-shadow: var(--shadow-card);
 }
 
-.curr-pill:hover {
-  border-color: var(--wl-primary, #69a9ff);
-  color: var(--wl-primary, #69a9ff);
+.curr-pill:hover:not(:disabled) {
+  border-color: var(--wl-primary);
+  color: var(--wl-primary);
   transform: translateY(-1px);
 }
 
+.curr-pill:focus-visible {
+  outline: 2px solid var(--wl-primary);
+  outline-offset: 2px;
+}
+
 .curr-pill.is-active {
-  background: var(--wl-primary, #69a9ff);
-  border-color: var(--wl-primary, #69a9ff);
+  background: var(--wl-primary);
+  border-color: var(--wl-primary);
   color: var(--wl-on-primary);
-  box-shadow: 0 3px 10px rgba(105, 169, 255, 0.3);
+  box-shadow: var(--wl-primary-shadow);
 }
 
 .curr-pill.is-active .pill-sym {
@@ -1002,7 +1011,7 @@ const submitRfq = async () => {
   opacity: 0.85;
   background: var(--wl-surface-soft);
   padding: 0.1rem 0.35rem;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 }
 
 .pill-addr-dot {
@@ -1012,14 +1021,14 @@ const submitRfq = async () => {
 .curr-pill--more {
   background: var(--wl-surface-soft);
   border-style: dashed;
-  color: var(--wl-muted, #64748B);
+  color: var(--wl-muted);
 }
 
 .curr-pill--more:hover,
 .curr-pill--more.is-open {
   border-style: solid;
-  border-color: var(--wl-primary, #69a9ff);
-  color: var(--wl-primary, #69a9ff);
+  border-color: var(--wl-primary);
+  color: var(--wl-primary);
   background: var(--wl-primary-soft);
 }
 
@@ -1043,13 +1052,13 @@ const submitRfq = async () => {
   width: 330px;
   max-width: 90vw;
   background: var(--wl-surface);
-  border: 1px solid var(--wl-border, #E2E8F0);
-  border-radius: 12px;
-  box-shadow: 0 14px 36px -4px rgba(0, 10, 25, 0.15), 0 4px 12px rgba(0, 10, 25, 0.08);
-  padding: 0.75rem;
+  border: 1px solid var(--wl-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-hover);
+  padding: var(--space-2);
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: var(--space-2);
   z-index: 70;
   animation: popoverFadeIn 0.16s ease-out;
 }
@@ -1067,31 +1076,31 @@ const submitRfq = async () => {
 
 .search-ic {
   position: absolute;
-  inset-inline-start: 10px;
+  inset-inline-start: var(--space-2);
   font-size: 18px;
-  color: var(--wl-muted, #94A3B8);
+  color: var(--wl-muted);
   pointer-events: none;
 }
 
 .popover-search-input {
   width: 100%;
   height: 38px;
-  padding: 0 10px;
+  padding: 0 var(--space-2);
   padding-inline-start: 34px;
   padding-inline-end: 28px;
   background: var(--wl-surface-soft);
-  border: 1.5px solid var(--wl-border, var(--wl-border));
-  border-radius: 8px;
-  font-size: 12.5px;
-  color: var(--wl-ink-strong, #0F172A);
+  border: 1.5px solid var(--wl-border);
+  border-radius: var(--radius-sm);
+  font-size: var(--step-0);
+  color: var(--wl-ink-strong);
   outline: none;
   transition: all 0.15s ease;
 }
 
 .popover-search-input:focus {
   background: var(--wl-surface);
-  border-color: var(--wl-primary, #69a9ff);
-  box-shadow: 0 0 0 3px rgba(105, 169, 255, 0.1);
+  border-color: var(--wl-primary);
+  box-shadow: var(--wl-focus-ring);
 }
 
 .clear-search-btn {
@@ -1099,7 +1108,7 @@ const submitRfq = async () => {
   inset-inline-end: 8px;
   background: transparent;
   border: none;
-  color: var(--wl-muted, #94A3B8);
+  color: var(--wl-muted);
   cursor: pointer;
   display: grid;
   place-items: center;
@@ -1126,11 +1135,11 @@ const submitRfq = async () => {
 .popover-item-btn {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  padding: 0.55rem 0.65rem;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-2);
   background: transparent;
   border: 1px solid transparent;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   text-align: start;
   cursor: pointer;
   transition: all 0.14s ease;
@@ -1139,7 +1148,7 @@ const submitRfq = async () => {
 
 .popover-item-btn:hover {
   background: var(--wl-surface-soft);
-  border-color: var(--wl-border, var(--wl-border));
+  border-color: var(--wl-border);
 }
 
 .popover-item-btn.is-active {
@@ -1155,7 +1164,7 @@ const submitRfq = async () => {
 .p-info {
   display: flex;
   flex-direction: column;
-  gap: 0.1rem;
+  gap: var(--space-1);
   flex: 1;
   min-width: 0;
 }
@@ -1163,76 +1172,76 @@ const submitRfq = async () => {
 .p-line-1 {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: var(--space-1);
 }
 
 .p-country {
-  font-size: 12.5px;
+  font-size: var(--step-0);
   font-weight: 700;
-  color: var(--wl-ink-strong, #0F172A);
+  color: var(--wl-ink-strong);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .p-addr-badge {
-  font-size: 9.5px;
+  font-size: var(--step--1);
   font-weight: 700;
-  color: var(--wl-primary, #69a9ff);
+  color: var(--wl-primary);
 }
 
 .p-line-2 {
-  font-size: 11px;
-  color: var(--wl-muted, #64748B);
+  font-size: var(--step--1);
+  color: var(--wl-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .p-code-badge {
-  font-size: 11px;
+  font-size: var(--step--1);
   font-weight: 800;
-  color: var(--wl-ink-strong, #0F172A);
+  color: var(--wl-ink-strong);
   background: var(--wl-surface-soft);
-  padding: 0.15rem 0.4rem;
-  border-radius: 5px;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
 }
 
 .p-sym-badge {
-  font-size: 11px;
+  font-size: var(--step--1);
   font-weight: 700;
-  color: var(--wl-primary, #69a9ff);
+  color: var(--wl-primary);
   background: var(--wl-primary-soft);
-  padding: 0.15rem 0.35rem;
-  border-radius: 5px;
+  padding: var(--space-1) var(--space-1);
+  border-radius: var(--radius-sm);
 }
 
 .popover-empty {
-  padding: 1.5rem 1rem;
+  padding: var(--space-6) var(--space-3);
   text-align: center;
-  font-size: 12px;
-  color: var(--wl-muted, #64748B);
+  font-size: var(--step-0);
+  color: var(--wl-muted);
 }
 
 .popover-footer {
-  padding-top: 0.45rem;
-  border-top: 1px solid var(--wl-border, #F1F5F9);
-  font-size: 10.5px;
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--wl-border);
+  font-size: var(--step--1);
   font-weight: 600;
-  color: var(--wl-muted, #94A3B8);
+  color: var(--wl-muted);
   text-align: center;
 }
 
 .rate-warn {
   display: flex;
   align-items: center;
-  gap: 0.45rem;
-  padding: 0.6rem 1.15rem;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
   background: var(--wl-warning-soft);
   border: 1px solid var(--wl-warning);
   color: var(--wl-amber);
-  border-radius: 10px;
-  font-size: 11.5px;
+  border-radius: var(--radius-md);
+  font-size: var(--step--1);
   font-weight: 600;
 }
 
@@ -1240,13 +1249,13 @@ const submitRfq = async () => {
 .cart-items-card {
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  border-radius: 14px;
-  padding: 1.5rem;
-  box-shadow: var(--wl-shadow-card);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-card);
 }
 
 .items-card-head {
-  margin-bottom: 1.25rem;
+  margin-bottom: var(--space-4);
 }
 
 .items-heading {
@@ -1262,13 +1271,13 @@ const submitRfq = async () => {
 }
 
 .items-count-pill {
-  font-size: 11px;
+  font-size: var(--step--1);
   font-weight: 600;
   color: var(--wl-muted);
   background: var(--wl-surface-soft);
   border: 1px solid var(--wl-border);
-  padding: 0.2rem 0.6rem;
-  border-radius: 9999px;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-full);
 }
 
 /* Lines */
@@ -1281,8 +1290,8 @@ const submitRfq = async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 1.5rem;
-  padding: 1.25rem 0;
+  gap: var(--space-6);
+  padding: var(--space-4) 0;
   border-bottom: 1px solid var(--wl-surface-soft);
   flex-wrap: wrap;
 }
@@ -1294,7 +1303,7 @@ const submitRfq = async () => {
 .cart-line__media {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: var(--space-4);
   flex: 1;
   min-width: 260px;
 }
@@ -1302,7 +1311,7 @@ const submitRfq = async () => {
 .cart-thumb {
   width: 64px;
   height: 64px;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--wl-border);
   display: grid;
   place-items: center;
@@ -1319,13 +1328,13 @@ const submitRfq = async () => {
 .cart-line__details {
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: var(--space-1);
   flex: 1;
   min-width: 0;
 }
 
 .cart-line__title {
-  font-size: 0.98rem;
+  font-size: var(--step-0);
   font-weight: 700;
   color: var(--wl-ink-strong);
   margin: 0;
@@ -1333,39 +1342,39 @@ const submitRfq = async () => {
 }
 
 .cart-line__title-alt {
-  font-size: 11px;
+  font-size: var(--step--1);
   color: var(--wl-muted);
 }
 
 .cart-line__meta {
-  font-size: 11px;
+  font-size: var(--step--1);
   color: var(--wl-muted);
   display: flex;
-  gap: 0.4rem;
+  gap: var(--space-1);
 }
 
 .cart-line__price {
-  font-size: 11.5px;
+  font-size: var(--step--1);
   color: var(--wl-ink-strong);
   font-weight: 600;
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: var(--space-1);
 }
 
 .orig-price-wrap {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: var(--space-1);
 }
 
 .orig-pill {
-  font-size: 10.5px;
+  font-size: var(--step--1);
   color: var(--wl-muted);
   background: var(--wl-surface-soft);
   border: 1px solid var(--wl-border);
-  padding: 0.1rem 0.45rem;
-  border-radius: 4px;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
 }
 
 .conv-arrow {
@@ -1375,30 +1384,30 @@ const submitRfq = async () => {
 .active-unit-price {
   display: inline-flex;
   align-items: baseline;
-  gap: 0.3rem;
+  gap: var(--space-1);
 }
 
 .active-unit-val {
-  font-size: 13.5px;
+  font-size: var(--step-0);
   font-weight: 700;
   color: var(--wl-ink-strong);
 }
 
 .active-unit-code {
-  font-size: 11px;
+  font-size: var(--step--1);
   font-weight: 700;
   color: var(--wl-muted);
 }
 
 .active-unit-per {
-  font-size: 11px;
+  font-size: var(--step--1);
   color: var(--wl-muted);
 }
 
 .cart-line__controls {
   display: flex;
   align-items: center;
-  gap: 1.25rem;
+  gap: var(--space-5);
   flex-shrink: 0;
 }
 
@@ -1406,18 +1415,18 @@ const submitRfq = async () => {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 0.1rem;
+  gap: var(--space-1);
   min-width: 110px;
 }
 
 .total-lbl {
-  font-size: 9.5px;
+  font-size: var(--step--1);
   color: var(--wl-muted);
   letter-spacing: 0.05em;
 }
 
 .total-fig {
-  font-size: 14px;
+  font-size: var(--step-0);
   font-weight: 800;
   color: var(--wl-ink-strong);
 }
@@ -1427,7 +1436,7 @@ const submitRfq = async () => {
   border: 1px solid var(--wl-border);
   width: 34px;
   height: 34px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   color: var(--wl-muted);
   cursor: pointer;
   display: grid;
@@ -1435,10 +1444,15 @@ const submitRfq = async () => {
   transition: all 0.15s ease;
 }
 
-.line-remove-btn:hover {
-  background: rgba(220, 38, 38, 0.08);
-  border-color: rgba(220, 38, 38, 0.3);
+.line-remove-btn:hover:not(:disabled) {
+  background: var(--wl-danger-soft);
+  border-color: var(--wl-danger);
   color: var(--wl-danger);
+}
+
+.line-remove-btn:focus-visible {
+  outline: 2px solid var(--wl-primary);
+  outline-offset: 2px;
 }
 
 /* Summary Column */
@@ -1450,9 +1464,9 @@ const submitRfq = async () => {
 .summary-card {
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  border-radius: 16px;
-  padding: 1.65rem 1.75rem;
-  box-shadow: var(--wl-shadow-card);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-card);
   position: relative;
   overflow: hidden;
 }
@@ -1463,14 +1477,14 @@ const submitRfq = async () => {
   top: 0;
   inset-inline: 0;
   height: 2px;
-  background: var(--wl-laser-sweep);
+  background: var(--wl-gradient-gold);
 }
 
 .summary-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.25rem;
+  margin-bottom: var(--space-4);
 }
 
 .summary-title {
@@ -1483,36 +1497,36 @@ const submitRfq = async () => {
 }
 
 .summary-badge {
-  font-size: 9.5px;
+  font-size: var(--step--1);
   font-weight: 700;
   color: var(--wl-primary);
   background: var(--wl-primary-soft);
   border: 1px solid var(--wl-border);
-  padding: 0.15rem 0.5rem;
-  border-radius: 9999px;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-full);
 }
 
 .summary-rows {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--space-3);
 }
 
 .summary-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 13px;
+  font-size: var(--step-0);
 }
 
 .summary-divider {
   height: 1px;
   background: var(--wl-border);
-  margin: 0.4rem 0;
+  margin: var(--space-1) 0;
 }
 
 .summary-row--total {
-  font-size: 14px;
+  font-size: var(--step-0);
 }
 
 .total-lbl {
@@ -1537,47 +1551,47 @@ const submitRfq = async () => {
   font-size: 1.15rem;
   font-weight: 800;
   color: var(--wl-primary);
-  margin-inline-end: 0.25rem;
+  margin-inline-end: var(--space-1);
 }
 
 .total-code {
-  font-size: 11px;
+  font-size: var(--step--1);
   font-weight: 700;
   color: var(--wl-muted);
-  margin-inline-start: 0.35rem;
+  margin-inline-start: var(--space-1);
 }
 
 .sum-code {
-  font-size: 11px;
+  font-size: var(--step--1);
   font-weight: 700;
   color: var(--wl-muted);
-  margin-inline-start: 0.3rem;
+  margin-inline-start: var(--space-1);
 }
 
 .fx-live-note {
   display: flex;
   align-items: center;
-  gap: 0.45rem;
-  padding: 0.65rem 0.85rem;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
   background: var(--wl-success-soft);
   border: 1px solid var(--wl-border);
-  border-radius: 8px;
-  font-size: 11.5px;
+  border-radius: var(--radius-sm);
+  font-size: var(--step--1);
   color: var(--wl-success);
-  margin-top: 0.75rem;
+  margin-top: var(--space-3);
   line-height: 1.4;
 }
 
 /* Notes Block */
 .notes-block {
-  margin: 1.25rem 0 1.5rem;
+  margin: var(--space-4) 0 var(--space-6);
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: var(--space-1);
 }
 
 .notes-lbl {
-  font-size: 10.5px;
+  font-size: var(--step--1);
   font-weight: 700;
   color: var(--wl-muted);
   letter-spacing: 0.05em;
@@ -1585,11 +1599,11 @@ const submitRfq = async () => {
 
 .notes-textarea {
   border: 1px solid var(--wl-border);
-  border-radius: 10px;
-  padding: 0.75rem 0.9rem;
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
   background: var(--wl-surface);
   font-family: var(--wl-font-body);
-  font-size: 13px;
+  font-size: var(--step-0);
   color: var(--wl-ink-strong);
   resize: vertical;
   line-height: 1.5;
@@ -1605,7 +1619,7 @@ const submitRfq = async () => {
 .summary-actions {
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
+  gap: var(--space-2);
 }
 
 @media (max-width: 980px) {

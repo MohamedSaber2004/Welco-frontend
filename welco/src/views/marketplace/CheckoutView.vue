@@ -11,7 +11,10 @@ import { toastService } from '../../infrastructure/feedback/toast.service'
 import { distinctCurrenciesFromAddresses } from '../../utils/country-currency-map'
 
 const router = useRouter()
-const { items, convertedTotal, targetCurrency, count, toDisplayCurrency, quoteNote, clear, getConvertedPrice, setTargetCurrency, unconvertedIds, refreshConversions } = useCart()
+const { items, displayTotal, targetCurrency, count, toDisplayCurrency, quoteNote, clear, getServerLine, setTargetCurrency, unconvertedIds, refreshServerTotal } = useCart()
+/** Backend totals only — no client-side math. Null until quoted. */
+const fmtQuote = (v: number | null) =>
+  v == null ? '…' : v.toLocaleString(locale.value === 'ar' ? 'ar-EG' : 'en-US')
 
 const localized = (en: string, ar: string) => (locale.value === 'ar' ? ar : en)
 
@@ -29,7 +32,7 @@ onMounted(async () => {
   // Needed to resolve the cart currency code to its id for the order payload.
   void services.marketplaceService.loadCurrencies().catch(() => {})
   try { await services.exchangeRateService.loadLatest('USD') } catch { }
-  try { await refreshConversions() } catch { }
+  try { await refreshServerTotal() } catch { }
   // Derive address-based currency options
   try {
     await services.locationService.loadCountries().catch(() => {})
@@ -56,7 +59,7 @@ async function placeOrder() {
       companyId: companyService.myCompany.value?.id ?? undefined,
       currencyId,
       currencyCode: code,
-      items: items.value.map((i) => ({ productId: i.product.id, quantity: i.quantity, unitPrice: getConvertedPrice(i.product) })),
+      items: items.value.map((i) => ({ productId: i.product.id, quantity: i.quantity, unitPrice: getServerLine(i.product.id)?.convertedUnit ?? i.product.price })),
     })
     if (res.ok && res.order) {
       clear()
@@ -186,11 +189,12 @@ async function convertToQuote() {
 
               <div class="line-item__pricing">
                 <div class="mono line-item__calc">
-                  <span v-if="(it.product.currencyCode||'USD').toUpperCase()!==targetCurrency"> {{ Math.ceil(it.product.price).toLocaleString(locale==='ar'?'ar-EG':'en-US') }} {{ it.product.currencyCode }} → </span>
-                  {{ it.quantity }} × {{ Math.ceil(getConvertedPrice(it.product)).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ targetCurrency }}
+                  <span>{{ (getServerLine(it.product.id)?.ceiledUnit ?? Math.ceil(it.product.price)).toLocaleString(locale==='ar'?'ar-EG':'en-US') }} {{ (it.product.currencyCode||'USD').toUpperCase() }}</span>
+                  <span v-if="getServerLine(it.product.id)"> → {{ it.quantity }} × {{ getServerLine(it.product.id)!.convertedUnit.toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ targetCurrency }}</span>
+                  <span v-else> × {{ it.quantity }}</span>
                 </div>
                 <strong class="mono line-item__total">
-                  {{ Math.ceil(it.quantity * getConvertedPrice(it.product)).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ targetCurrency }}
+                  {{ fmtQuote(getServerLine(it.product.id)?.lineTotal ?? null) }} {{ targetCurrency }}
                 </strong>
               </div>
             </article>
@@ -210,7 +214,7 @@ async function convertToQuote() {
           <div class="summary-rows">
             <div class="summary-row">
               <span class="mono">{{ t('commerce.subtotal') }}</span>
-              <strong class="mono">{{ Math.ceil(convertedTotal).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ targetCurrency }}</strong>
+              <strong class="mono">{{ fmtQuote(displayTotal) }} {{ targetCurrency }}</strong>
             </div>
 
             <div class="summary-row">
@@ -223,7 +227,7 @@ async function convertToQuote() {
             <div class="summary-row summary-row--total">
               <span class="total-label mono">{{ t('commerce.total') }}</span>
               <strong class="total-val mono">
-                {{ Math.ceil(convertedTotal).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} <span class="total-curr">{{ targetCurrency }}</span>
+                {{ fmtQuote(displayTotal) }} <span class="total-curr">{{ targetCurrency }}</span>
               </strong>
             </div>
           </div>
@@ -273,15 +277,15 @@ async function convertToQuote() {
 .checkout-nav {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.25rem;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
 }
 
 .breadcrumb {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 11px;
+  gap: var(--space-2);
+  font-size: var(--step--1);
   color: var(--wl-muted);
 }
 
@@ -295,6 +299,11 @@ async function convertToQuote() {
   color: var(--wl-primary);
 }
 
+.breadcrumb a:focus-visible {
+  outline: 2px solid var(--wl-primary);
+  outline-offset: 2px;
+}
+
 .breadcrumb .sep {
   color: var(--wl-border);
 }
@@ -306,24 +315,24 @@ async function convertToQuote() {
 
 /* Header */
 .checkout-hero {
-  margin-bottom: 1.75rem;
+  margin-bottom: var(--space-6);
 }
 
 .checkout-eyebrow {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
-  font-size: 10px;
+  gap: var(--space-2);
+  font-size: var(--step--1);
   color: var(--wl-primary);
   font-weight: 700;
   letter-spacing: 0.08em;
-  margin-bottom: 0.4rem;
+  margin-bottom: var(--space-1);
 }
 
 .secure-dot {
   width: 7px;
   height: 7px;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   background: var(--wl-success);
   box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
 }
@@ -335,31 +344,31 @@ async function convertToQuote() {
   letter-spacing: -0.025em;
   color: var(--wl-ink-strong);
   line-height: 1.1;
-  margin: 0 0 0.4rem;
+  margin: 0 0 var(--space-1);
 }
 
 .checkout-desc {
-  font-size: 0.95rem;
+  font-size: var(--step-0);
   color: var(--wl-ink-soft);
   margin: 0;
 }
 
 .stepper-wrap {
-  margin-bottom: 2rem;
+  margin-bottom: var(--space-8);
 }
 
 /* Layout */
 .checkout-layout {
   display: grid;
   grid-template-columns: 1fr 390px;
-  gap: 2.25rem;
+  gap: var(--space-8);
   align-items: start;
 }
 
 .checkout-main {
   display: flex;
   flex-direction: column;
-  gap: 1.75rem;
+  gap: var(--space-6);
 }
 
 /* Currency Card */
@@ -367,24 +376,24 @@ async function convertToQuote() {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.95rem 1.25rem;
+  padding: var(--space-3) var(--space-4);
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  border-radius: 12px;
-  box-shadow: var(--shadow-xs);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
   flex-wrap: wrap;
-  gap: 0.85rem;
+  gap: var(--space-3);
 }
 
 .curr-selector-left {
   display: flex;
   align-items: center;
-  gap: 0.85rem;
+  gap: var(--space-3);
   flex-wrap: wrap;
 }
 
 .curr-label {
-  font-size: 10.5px;
+  font-size: var(--step--1);
   color: var(--wl-muted);
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -393,39 +402,45 @@ async function convertToQuote() {
 .rate-warn {
   display: flex;
   align-items: center;
-  gap: 0.45rem;
-  margin-top: 0.75rem;
-  padding: 0.6rem 1.25rem;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  padding: var(--space-2) var(--space-3);
   background: var(--wl-warning-soft);
   border: 1px solid var(--wl-warning);
   color: var(--wl-amber);
-  border-radius: 12px;
-  font-size: 11.5px;
+  border-radius: var(--radius-md);
+  font-size: var(--step--1);
   font-weight: 600;
 }
 
 .curr-chips {
   display: flex;
-  gap: 0.4rem;
+  gap: var(--space-2);
   flex-wrap: wrap;
 }
 
 .curr-chip {
   border: 1px solid var(--wl-border);
-  padding: 0.3rem 0.75rem;
-  font-size: 11.5px;
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--step--1);
   background: var(--wl-surface-soft);
   color: var(--wl-ink-soft);
   cursor: pointer;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   font-weight: 700;
   transition: all 0.16s var(--wl-ease-spring);
 }
 
-.curr-chip:hover {
+.curr-chip:hover:not(:disabled) {
   border-color: var(--wl-primary);
   color: var(--wl-primary);
 }
+
+.curr-chip:focus-visible {
+  outline: 2px solid var(--wl-primary);
+  outline-offset: 2px;
+}
+
 .curr-chip--default {
   border-color: rgba(105, 169, 255, 0.2);
   background: var(--wl-primary-soft);
@@ -436,11 +451,11 @@ async function convertToQuote() {
   background: var(--wl-primary);
   color: var(--wl-on-primary);
   border-color: var(--wl-primary);
-  box-shadow: 0 2px 6px rgba(105, 169, 255, 0.3);
+  box-shadow: var(--wl-primary-shadow);
 }
 
 .curr-lock {
-  font-size: 10.5px;
+  font-size: var(--step--1);
   color: var(--wl-muted);
 }
 
@@ -448,24 +463,24 @@ async function convertToQuote() {
 .checkout-card {
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  border-radius: 14px;
-  padding: 1.5rem;
-  box-shadow: var(--wl-shadow-card);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-card);
 }
 
 .checkout-card__head {
-  margin-bottom: 1.25rem;
+  margin-bottom: var(--space-4);
 }
 
 .card-eyebrow {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  font-size: 10px;
+  gap: var(--space-1);
+  font-size: var(--step--1);
   color: var(--wl-primary);
   font-weight: 700;
   letter-spacing: 0.08em;
-  margin-bottom: 0.25rem;
+  margin-bottom: var(--space-1);
 }
 
 .card-heading {
@@ -481,13 +496,13 @@ async function convertToQuote() {
 }
 
 .item-count-chip {
-  font-size: 11px;
+  font-size: var(--step--1);
   font-weight: 600;
   color: var(--wl-muted);
   background: var(--wl-surface-soft);
   border: 1px solid var(--wl-border);
-  padding: 0.2rem 0.6rem;
-  border-radius: 9999px;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-full);
 }
 
 /* Line items */
@@ -499,8 +514,8 @@ async function convertToQuote() {
 .line-item {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 0.85rem 0;
+  gap: var(--space-4);
+  padding: var(--space-2) 0;
   border-bottom: 1px solid var(--wl-surface-soft);
 }
 
@@ -511,7 +526,7 @@ async function convertToQuote() {
 .line-item__thumb {
   width: 44px;
   height: 44px;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--wl-border);
   display: grid;
   place-items: center;
@@ -531,18 +546,18 @@ async function convertToQuote() {
 }
 
 .line-item__name {
-  font-size: 0.95rem;
+  font-size: var(--step-0);
   font-weight: 700;
   color: var(--wl-ink-strong);
-  margin: 0 0 0.2rem;
+  margin: 0 0 var(--space-1);
   line-height: 1.3;
 }
 
 .line-item__sub {
-  font-size: 11px;
+  font-size: var(--step--1);
   color: var(--wl-muted);
   display: flex;
-  gap: 0.4rem;
+  gap: var(--space-1);
 }
 
 .line-item__pricing {
@@ -551,12 +566,12 @@ async function convertToQuote() {
 }
 
 .line-item__calc {
-  font-size: 11px;
+  font-size: var(--step--1);
   color: var(--wl-muted);
 }
 
 .line-item__total {
-  font-size: 13.5px;
+  font-size: var(--step-0);
   color: var(--wl-ink-strong);
   font-weight: 700;
 }
@@ -570,9 +585,9 @@ async function convertToQuote() {
 .summary-card {
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  border-radius: 16px;
-  padding: 1.65rem 1.75rem;
-  box-shadow: var(--wl-shadow-card);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-card);
   position: relative;
   overflow: hidden;
 }
@@ -583,14 +598,14 @@ async function convertToQuote() {
   top: 0;
   inset-inline: 0;
   height: 2px;
-  background: var(--wl-laser-sweep);
+  background: var(--wl-gradient-gold);
 }
 
 .summary-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.25rem;
+  margin-bottom: var(--space-4);
 }
 
 .summary-title {
@@ -603,36 +618,36 @@ async function convertToQuote() {
 }
 
 .summary-badge {
-  font-size: 9.5px;
+  font-size: var(--step--1);
   font-weight: 700;
   color: var(--wl-success);
   background: var(--wl-success-soft);
   border: 1px solid var(--wl-border);
-  padding: 0.15rem 0.5rem;
-  border-radius: 9999px;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-full);
 }
 
 .summary-rows {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--space-3);
 }
 
 .summary-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 12.5px;
+  font-size: var(--step-0);
 }
 
 .summary-divider {
   height: 1px;
   background: var(--wl-border);
-  margin: 0.4rem 0;
+  margin: var(--space-1) 0;
 }
 
 .summary-row--total {
-  font-size: 14px;
+  font-size: var(--step-0);
 }
 
 .total-label {
@@ -656,21 +671,21 @@ async function convertToQuote() {
 .summary-note-box {
   display: flex;
   align-items: flex-start;
-  gap: 0.45rem;
-  font-size: 11px;
+  gap: var(--space-2);
+  font-size: var(--step--1);
   color: var(--wl-muted);
   background: var(--wl-surface-soft);
   border: 1px solid var(--wl-border);
-  border-radius: 8px;
-  padding: 0.65rem 0.85rem;
-  margin: 1.15rem 0 1.35rem;
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-3);
+  margin: var(--space-4) 0 var(--space-5);
   line-height: 1.5;
 }
 
 .summary-actions {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: var(--space-2);
 }
 
 @media (max-width: 980px) {

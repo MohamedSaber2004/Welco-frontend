@@ -173,10 +173,10 @@ html.theme-transition, html.theme-transition *, html.theme-transition *::before,
   min-width: 320px;
   height: 44px;
   color: var(--wl-muted);
-  box-shadow: var(--shadow-xs);
+  box-shadow: var(--shadow-card);
   transition: border-color var(--wl-transition), box-shadow var(--wl-transition), transform 0.15s ease;
 }
-.search-bar:hover { border-color: var(--wl-border-strong); box-shadow: var(--shadow-sm); }
+.search-bar:hover { border-color: var(--wl-border-strong); box-shadow: var(--shadow-card); }
 .search-bar:focus-within { border-color: var(--wl-primary); box-shadow: var(--wl-focus-ring); transform: translateY(-0.5px); }
 .search-bar input { border: none; background: transparent; outline: none; width: 100%; font-size: 0.92rem; color: var(--wl-ink); font-weight: 500; font-family: var(--wl-font-body); }
 .search-bar input::placeholder { color: var(--wl-muted); opacity: 0.85; }
@@ -204,7 +204,7 @@ html.theme-transition, html.theme-transition *, html.theme-transition *::before,
   background: var(--wl-gradient-panel, var(--wl-surface));
   border: 1px solid var(--wl-border);
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-xs);
+  box-shadow: var(--shadow-card);
 }
 .toolbar__pills { display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 2px; }
 .toolbar__controls { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
@@ -215,7 +215,7 @@ html.theme-transition, html.theme-transition *, html.theme-transition *::before,
   align-items: center;
   gap: 0.35rem;
   padding: 0.22rem 0.65rem;
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-sm);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -262,7 +262,7 @@ textarea,
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
   border-radius: var(--radius-sm);
-  box-shadow: var(--shadow-xs);
+  box-shadow: var(--shadow-card);
   transition: border-color 0.22s var(--wl-ease-spring), box-shadow 0.22s var(--wl-ease-spring), background-color 0.2s ease, transform 0.15s ease, color 0.15s ease;
   outline: none;
 }
@@ -271,7 +271,7 @@ select:hover:not(:disabled):not(:focus),
 textarea:hover:not(:disabled):not(:focus),
 .field__input:hover:not(:disabled):not(:focus) {
   border-color: var(--wl-border-strong);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-card);
 }
 input:focus,
 select:focus,
@@ -289,7 +289,7 @@ input:disabled, select:disabled, textarea:disabled, .field__input:disabled, .fie
 input[aria-invalid='true'], .field__input[aria-invalid='true'], .has-error input { border-color: var(--wl-danger) !important; box-shadow: var(--wl-focus-ring-danger) !important; }
 
 /* Size modifiers */
-.input-sm, .control-sm { min-height: 36px !important; height: 36px !important; padding: 0 0.75rem !important; font-size: 13px !important; border-radius: var(--radius-xs) !important; }
+.input-sm, .control-sm { min-height: 36px !important; height: 36px !important; padding: 0 0.75rem !important; font-size: 13px !important; border-radius: var(--radius-sm) !important; }
 .input-md, .control-md { min-height: 44px !important; height: 44px !important; padding: 0 1rem !important; font-size: 14px !important; border-radius: var(--radius-sm) !important; }
 .input-lg, .control-lg { min-height: 52px !important; height: 52px !important; padding: 0 1.25rem !important; font-size: 15.5px !important; border-radius: var(--radius-md) !important; }
 
@@ -390,7 +390,7 @@ input[type="checkbox"]:focus-visible, input[type="radio"]:focus-visible { box-sh
   background: var(--wl-surface);
   color: var(--wl-ink-strong);
   border: 1px solid var(--wl-border);
-  box-shadow: var(--shadow-xs);
+  box-shadow: var(--shadow-card);
 }
 .btn-ghost:hover:not(:disabled) {
   background: var(--wl-surface-soft);
@@ -402,7 +402,7 @@ input[type="checkbox"]:focus-visible, input[type="radio"]:focus-visible { box-sh
   background: var(--wl-surface);
   color: var(--wl-primary);
   border: 1px solid rgba(79, 70, 229, 0.35);
-  box-shadow: var(--shadow-xs);
+  box-shadow: var(--shadow-card);
 }
 .btn-outline:hover:not(:disabled) {
   border-color: var(--wl-primary);
@@ -412,7 +412,7 @@ input[type="checkbox"]:focus-visible, input[type="radio"]:focus-visible { box-sh
 }
 .btn-danger-ghost { background: transparent; color: var(--wl-danger); border: 1px solid var(--wl-danger); }
 .btn-danger-ghost:hover:not(:disabled) { background: var(--wl-danger); color: #fff; }
-.btn-sm { min-height: 34px; padding: 0 12px; font-size: 12.5px; border-radius: var(--radius-xs); }
+.btn-sm { min-height: 34px; padding: 0 12px; font-size: 12.5px; border-radius: var(--radius-sm); }
 .btn-lg { min-height: 46px; padding: 0 22px; font-size: 14.5px; border-radius: var(--radius-md); font-weight: 700; }
 .btn-block { width: 100%; }
 
@@ -791,7 +791,7 @@ html[dir='rtl'] input.mono-num::placeholder {
 .pagination { display: flex; justify-content: center; align-items: center; gap: 0.45rem; margin-top: 1.5rem; }
 .page-btn {
   padding: 0.45rem 0.85rem;
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-sm);
   border: 1px solid var(--wl-border);
   background: var(--wl-surface);
   color: var(--wl-ink-soft);
@@ -840,7 +840,7 @@ html[dir='rtl'] input.mono-num::placeholder {
 /* ── Line Items ── */
 .line-item { display: flex; align-items: center; gap: 1rem; padding: 0.9rem 0; border-bottom: 1px solid rgba(0, 0, 0, 0.04); }
 .line-item:last-child { border-bottom: none; }
-.line-item__thumb { width: 48px; height: 48px; border: 1px solid var(--wl-border); display: grid; place-items: center; color: var(--wl-muted); flex-shrink: 0; font-size: 0.9rem; overflow: hidden; border-radius: var(--radius-xs); background: var(--wl-surface-soft); }
+.line-item__thumb { width: 48px; height: 48px; border: 1px solid var(--wl-border); display: grid; place-items: center; color: var(--wl-muted); flex-shrink: 0; font-size: 0.9rem; overflow: hidden; border-radius: var(--radius-sm); background: var(--wl-surface-soft); }
 .line-item__thumb-img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .line-item__name { font-size: 0.92rem; font-weight: 600; color: var(--wl-ink-strong); }
 .line-item__sub { font-size: 0.74rem; color: var(--wl-muted); }
@@ -860,7 +860,7 @@ html[dir='rtl'] input.mono-num::placeholder {
 .empty-state .mono { color: var(--wl-muted); }
 
 /* ── Modal Card ── */
-.modal-card { border-radius: var(--radius-lg); box-shadow: var(--shadow-xl); border: 1px solid var(--wl-border); }
+.modal-card { border-radius: var(--radius-md); box-shadow: var(--shadow-card); border: 1px solid var(--wl-border); }
 
 /* ── Compact inputs, project-wide ──
    Shrinks the legacy 48px copy-pasted input classes down to the 40px
@@ -890,7 +890,7 @@ textarea.vip-input {
 .vip-48-input:hover:not(:disabled):not(:focus),
 .vip-track-input:hover:not(:disabled):not(:focus) {
   border-color: var(--wl-border-strong) !important;
-  box-shadow: var(--shadow-sm) !important;
+  box-shadow: var(--shadow-card) !important;
 }
 
 /* Google's Material Symbols webfont pins `direction: ltr` on

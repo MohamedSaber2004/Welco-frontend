@@ -363,6 +363,9 @@ const delay = (i: number) => ({ '--delay': `${i * 70}ms` } as Record<string, str
 </template>
 
 <style scoped>
+/* ── Root wrapper ──────────────────────────────────────── */
+.data-state { width: 100%; }
+
 /* ── Loading skeleton ─────────────────────────────────── */
 .data-state__loading {
   width: 100%;

@@ -1059,6 +1059,14 @@ const filteredSidebarCategories = computed(() => {
   padding-top: var(--space-2);
 }
 
+@media (max-width: 640px) {
+  .catalog-card__foot {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-2);
+  }
+}
+
 .price-col {
   display: flex;
   flex-direction: column;

@@ -1443,6 +1443,14 @@ const navigateToOemFromModal = () => {
   padding-top: var(--space-3);
 }
 
+@media (max-width: 640px) {
+  .product-card__foot {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-2);
+  }
+}
+
 @media (max-width: 1024px) {
   .hero__inner {
     padding: var(--space-8) var(--wl-gutter) var(--space-6);

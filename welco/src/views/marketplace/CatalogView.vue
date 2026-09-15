@@ -1255,9 +1255,6 @@ const filteredSidebarCategories = computed(() => {
   .catalog-page {
     padding: var(--space-4) var(--space-3) var(--space-10);
   }
-  .products-grid {
-    grid-template-columns: 1fr;
-  }
   .catalog-card__title {
     min-height: auto;
   }

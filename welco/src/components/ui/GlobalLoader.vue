@@ -20,7 +20,7 @@ const props = withDefaults(
   },
 )
 
-const emit = defineEmits<{ complete: [] }>()
+const emit = defineEmits<{ complete: []; dismiss: [] }>()
 
 const route = useRoute()
 const router = useRouter()

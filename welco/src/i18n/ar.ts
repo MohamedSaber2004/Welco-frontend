@@ -1493,7 +1493,7 @@ export const ar: Messages = {
     orthopedicLine: 'خط العظام',
     productionOnline: 'خلايا الإنتاج متصلة',
   },
-  attachment: {
+attachment: {
     upload: 'رفع',
     uploadImage: 'رفع صورة',
     uploadFile: 'رفع ملف',
@@ -1506,6 +1506,7 @@ export const ar: Messages = {
     remove: 'إزالة',
     removeImage: 'إزالة الصورة',
     preview: 'معاينة',
+    edit: 'تعديل',
     unsupportedType: 'نوع الملف غير مدعوم',
     fileTooLarge: 'الملف كبير جدًا',
     uploadFailed: 'فشل الرفع',

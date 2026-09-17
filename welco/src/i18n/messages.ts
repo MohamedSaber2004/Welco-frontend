@@ -1504,6 +1504,7 @@ export type Messages = {
     remove: string
     removeImage: string
     preview: string
+    edit: string
     unsupportedType: string
     fileTooLarge: string
     uploadFailed: string

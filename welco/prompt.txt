@@ -1,15 +1,13 @@
-    <!--<section class="section" aria-labelledby="metrics-heading">
-      <div class="section__inner">
-        <h2 id="metrics-heading" class="visually-hidden">{{ t('home.metricsHeading') }}</h2>
-        <div class="metrics-grid">
-          <div v-for="item in whyItems" :key="item.b" class="metric-card" :class="`metric-card--${item.tone}`">
-            <div class="metric-card__top">
-              <span class="mono metric-card__label">{{ item.label }}</span>
-              <span class="metric-card__badge mono" :class="`badge--${item.tone}`">{{ item.badge }}</span>
-            </div>
-            <div class="metric-card__value mono-num">{{ item.b }}</div>
-            <div class="metric-card__bar" :class="`bar--${item.tone}`"></div>
-          </div>
-        </div>
-      </div>
-    </section>-->
+  - vite:vue transform (40%, 3.2s, 218 calls)
+Those rows are 40% of the build; the rest of the 84% is below.
+Not measurable — 1 hook whose calls overlap, so elapsed time covers work other calls were doing. Profile with `node --cpu-prof`:
+  - vite:css transform (72 calls)
+See https://rolldown.rs/reference/InputOptions.checks#plugintimings for more details.
+src/components/ui/FileUpload.vue(127,5): error TS2304: Cannot find name 'hasError'.
+src/components/ui/FileUpload.vue(128,5): error TS2304: Cannot find name 'isLoaded'.
+src/components/ui/FileUpload.vue(235,28): error TS2532: Object is possibly 'undefined'.
+src/components/ui/FileUpload.vue(235,53): error TS2532: Object is possibly 'undefined'.
+src/components/ui/FileUpload.vue(303,19): error TS2345: Argument of type '"attachment.edit"' is not assignable to parameter of type '"common.of" | "common.pcs" | "common.more" | "common.loading" | "common.success" | "common.error" | "common.notice" | "common.ok" | "common.operationDone" | "common.networkError" | ... 1574 more ... | "providers.clinic"'.
+src/components/ui/GlobalLoader.vue(173,70): error TS2345: Argument of type '"dismiss"' is not assignable to parameter of type '"complete"'.
+ERROR: "type-check" exited with 2.
+Error: Command "npm run build" exited with 1

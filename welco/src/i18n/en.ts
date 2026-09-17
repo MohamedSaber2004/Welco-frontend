@@ -1505,6 +1505,7 @@ export const en: Messages = {
     remove: 'Remove',
     removeImage: 'Remove image',
     preview: 'Preview',
+    edit: 'Edit',
     unsupportedType: 'This file type is not supported',
     fileTooLarge: 'File is too large',
     uploadFailed: 'Upload failed',

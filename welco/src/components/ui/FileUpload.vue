@@ -56,7 +56,9 @@ const imgZoom = ref(1)
 const imgPanX = ref(0)
 const imgPanY = ref(0)
 const isDragging = ref(false)
-const dragStart = ref({ x: 0, y: 0 })
+const dragStart = ref<{ x: number; y: number }>({ x: 0, y: 0 })
+const hasError = ref(false)
+const isLoaded = ref(false)
 
 function resetImageState() {
   isImageLoaded.value = false
@@ -232,7 +234,7 @@ function resetZoom() { imgZoom.value = 1; imgPanX.value = 0; imgPanY.value = 0 }
 function onLightboxTouchStart(e: TouchEvent) {
   if (e.touches.length === 1) {
     isDragging.value = true
-    dragStart.value = { x: e.touches[0].clientX, y: e.touches[0].clientY }
+    dragStart.value = { x: e.touches[0]?.clientX ?? 0, y: e.touches[0]?.clientY ?? 0 }
   }
 }
 

@@ -24,7 +24,6 @@ watch(locale, () => {
   document.title = k ? `${t(k)} · Welco` : 'Welco'
 })
 
-// Footer appears ONLY on landing pages, and NEVER in any dashboards or account views
 const showFooter = computed(() => {
   if (route.meta?.isLandingPage) return true
   if (route.meta?.hideFooter) return false
@@ -32,7 +31,6 @@ const showFooter = computed(() => {
   const path = route.path || ''
   const name = String(route.name || '')
 
-  // Never show on any dashboard, admin, staff, account, profile or auth route
   if (
     path.startsWith('/admin') ||
     path.startsWith('/account') ||
@@ -60,7 +58,6 @@ const showFooter = computed(() => {
   )
 })
 
-// Show call us fixed button only on the home page
 const showWhatsApp = computed(() => route.name === 'home' || route.path === '/')
 
 const whatsAppOffset = computed(() => '')
@@ -90,4 +87,4 @@ const whatsAppOffset = computed(() => '')
 </template>
 
 <style>
-/* global page transition already in main.css */</style>
+</style>

@@ -41,9 +41,9 @@ const onKeyDown = (e: KeyboardEvent) => {
   }
   if (e.key === 'Tab' && props.modelValue) {
     const focusable = getFocusable()
-    if (focusable.length === 0) return
     const first = focusable[0]
     const last = focusable[focusable.length - 1]
+    if (!first || !last) return
     if (e.shiftKey) {
       if (document.activeElement === first || !modalContainer.value?.contains(document.activeElement)) {
         e.preventDefault()
@@ -74,8 +74,9 @@ onMounted(async () => {
   if (props.modelValue) {
     await nextTick()
     const focusable = getFocusable()
-    if (focusable.length > 0) {
-      focusable[0].focus()
+    const first = focusable[0]
+    if (first) {
+      first.focus()
     } else if (modalContainer.value) {
       modalContainer.value.focus()
     }
@@ -128,14 +129,10 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   padding: var(--wl-gutter, var(--space-4));
-  z-index: 999;
-}
-:root.dark .modal-backdrop,
-:root[data-theme='dark'] .modal-backdrop {
-  background: rgba(0, 0, 0, 0.72);
-}
+z-index: 999;
+  }
 
-.modal-container {
+  .modal-container {
   width: 100%;
   max-height: 90vh;
   display: flex;

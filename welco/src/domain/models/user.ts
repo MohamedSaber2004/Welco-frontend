@@ -2,6 +2,7 @@ export enum UserType {
   Admin = 1,
   OrganizationUser = 2,
   WelcoStaff = 3,
+  Client = 4,
 }
 
 export enum AppLanguage {

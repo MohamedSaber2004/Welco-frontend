@@ -1,4 +1,4 @@
-import { MARKETPLACE_ROUTES, PRODUCT_API_BASE_URL } from '../../config/api.config'
+import { MARKETPLACE_ROUTES } from '../../config/api.config'
 import type { MarketplaceRepository, MarketplaceQuery } from '../../domain/ports/marketplace-repository'
 import type { PaginatedResult } from '../../domain/models/location'
 import type {
@@ -315,13 +315,8 @@ export class ApiMarketplaceRepository implements MarketplaceRepository {
   }
 
   async getCurrencies(): Promise<CurrencyDto[]> {
-    // Primary: product microservice directly — public (200 anonymous, CORS `*`).
-    // Gateway /api/v1/currencies currently 401s anonymous users, so trying it
-    // first only produces console noise + empty selectors.
-    const candidates = [
-      `${PRODUCT_API_BASE_URL}${MARKETPLACE_ROUTES.currencies}`,
-      MARKETPLACE_ROUTES.currencies,
-    ]
+    // Gateway-only: /api/v1/currencies allows anonymous GET (Ocelot, all envs).
+    const candidates = [MARKETPLACE_ROUTES.currencies]
     const dedupeCurrencies = (items: CurrencyDto[]): CurrencyDto[] => {      const seenId = new Set<string>()
       const seenCode = new Set<string>()
       const result: CurrencyDto[] = []

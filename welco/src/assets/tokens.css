@@ -1,231 +1,237 @@
-/* Welco — Classic Control-Panel Design System · NAVY CLASSIC ONLY
- * SmarterASP-classic degrees: deep navy #061328 · panel #071A38 · table-head #0B274F
- * Link blue #69a9ff · action accent #d8e8ff (navy ink) · mint #3ed7b4 · amber #f8c15d
- * Compact classic density: 12px base · 36px header controls · 32px toolbar controls
- * Plus Jakarta Sans & Sora Display · Inter Body · Alexandria & IBM Plex Sans Arabic · JetBrains Mono Data
- * NOTE: light mode has been removed — :root IS the navy classic theme.
+/* Welco — Clinical Control-Panel Design System
+ * Light mode only (Clinical White with Navy Classic accents)
+ * Plus Jakarta Sans & Sora Display · Inter Body · JetBrains Mono Data
  */
 @import url('https://fonts.googleapis.com/css2?family=Alexandria:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Sora:wght@500;600;700;800&display=swap');
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 
-  /* ── TYPE — one ratio: 1.250 major third ── */
+  /* ── TYPE (one ratio: 1.250 major third) ── */
   --wl-font-display: 'Plus Jakarta Sans', 'Sora', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --wl-font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --wl-font-mono: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, monospace;
-  --step--1: 0.84rem; --step-0: 1rem; --step-1: 1.25rem;
-  --step-2: 1.563rem; --step-3: 1.953rem; --step-4: 2.441rem;
+  --step--1: 0.84rem;
+  --step-0: 1rem;
+  --step-1: 1.25rem;
+  --step-2: 1.563rem;
+  --step-3: 1.953rem;
+  --step-4: 2.441rem;
+  --wl-leading-body: 1.6;
+  --wl-leading-display: 1.14;
 
-  /* ── SPACE — 4px harmonic base ── */
-  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
-  --space-5: 20px; --space-6: 24px; --space-8: 32px; --space-10: 40px;
-  --space-12: 48px; --space-16: 64px;
+  /* ── SPACE (4px harmonic base) ── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
 
-  /* ── COLOR — one ramp, one accent ── */
-  --base: #061328;
-  --surface: #071A38;
-  --surface-soft: #0B274F;
-  --ink: #d8e8ff;
-  --ink-strong: #f4f8ff;
-  --ink-soft: #bfcfe8;
-  --muted: #9db5d0;
-  --line: rgba(116, 169, 255, 0.24);
-  --line-strong: rgba(151, 190, 255, 0.42);
-  --primary: #69a9ff;
-  --primary-hover: #8abcff;
-  --primary-soft: rgba(105, 169, 255, 0.14);
-  --accent: #d8e8ff;
-  --gold: #FFD166;
-  --success: #3ed7b4;
-  --danger: #f26d6d;
-  --warning: #f8c15d;
+  /* ── COLOR — Clinical White with Navy Classic accents ── */
+  --base: #ffffff;
+  --surface: #f8fafc;
+  --surface-soft: #f1f5f9;
+  --ink: #1e293b;
+  --ink-strong: #0f172a;
+  --ink-soft: #64748b;
+  --muted: #94a3b8;
+  --muted-soft: #cbd5e1;
+  --line: #e2e8f0;
+  --line-strong: #cbd5e1;
 
-  /* ── RADIUS — three values only ── */
+  /* Navy Classic accents */
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --primary-soft: rgba(37, 99, 235, 0.08);
+  --gold: #b45309;
+  --gold-soft: rgba(180, 83, 9, 0.08);
+  --success: #059669;
+  --success-soft: rgba(5, 150, 105, 0.08);
+  --danger: #dc2626;
+  --danger-soft: rgba(220, 38, 38, 0.08);
+  --warning: #d97706;
+  --warning-soft: rgba(217, 119, 6, 0.08);
+
+  /* Semantic color */
+  --accent: var(--primary);
+  --accent-hover: var(--primary-hover);
+  --accent-soft: var(--primary-soft);
+  --on-accent: #ffffff;
+
+  /* Gradient tokens */
+  --wl-gradient-rail: linear-gradient(180deg, #f1f5f9 0%, #f8fafc 45%, #ffffff 100%);
+  --wl-gradient-card: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 42%, #e2e8f0 100%);
+  --wl-gradient-panel: linear-gradient(135deg, #f1f5f9 0%, #f8fafc 55%, #ffffff 100%);
+  --wl-gradient-primary: linear-gradient(135deg, #3b82f6 0%, #2563eb 45%, #10b981 100%);
+  --wl-gradient-gold: linear-gradient(135deg, #eab36a 0%, #b45309 45%, #92400e 100%);
+  --wl-gradient-table-head: linear-gradient(90deg, #dbeafe 0%, #bfdbfe 45%, #dcfce7 100%);
+  --wl-gradient-toolbar: linear-gradient(90deg, rgba(37, 99, 235, 0.06) 0%, rgba(15, 23, 42, 0.03) 40%, rgba(5, 150, 105, 0.04) 100%);
+  --wl-gradient-chip: linear-gradient(90deg, rgba(37, 99, 235, 0.08), rgba(5, 150, 105, 0.06));
+  --wl-laser-sweep: linear-gradient(90deg, transparent, var(--primary), var(--surface), transparent);
+
+  /* Shadows (light mode — soft elevation) */
+  --shadow-card: 0 0 0 1px rgba(0, 0, 0, 0.04), 0 4px 16px -2px rgba(0, 0, 0, 0.08), 0 12px 24px -4px rgba(0, 0, 0, 0.06);
+  --shadow-hover: 0 8px 24px -4px rgba(0, 0, 0, 0.12), 0 16px 32px -8px rgba(0, 0, 0, 0.08);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.04), 0 2px 4px -2px rgba(0, 0, 0, 0.03);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.04), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+
+  /* ── RADIUS (three values only) ── */
+  --radius-xs: 4px;
   --radius-sm: 6px;
   --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 999px;
   --radius-pill: 999px;
 
-  /* ── SHADOW — two only ── */
-  --shadow-card: 0 0 0 1px rgba(116, 169, 255, 0.1), 0 10px 30px rgba(0, 10, 25, 0.5);
-  --shadow-hover: 0 4px 16px -2px rgba(0, 10, 25, 0.5), 0 10px 24px -4px rgba(105, 169, 255, 0.12);
+  /* ── Gold text effects (Navy Classic) ── */
+  --wl-gold-text: #92400e;
+  --wl-gold-text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9), 0 2px 14px rgba(180, 83, 9, 0.35);
+  --wl-gold-title-shadow: 0 1px 0 rgba(255, 255, 255, 0.9), 0 4px 26px rgba(180, 83, 9, 0.28), 0 2px 8px rgba(0, 0, 0, 0.15);
+  --wl-gold-glow-soft: 0 0 0 3px rgba(180, 83, 9, 0.12), 0 4px 18px rgba(180, 83, 9, 0.18);
+  --wl-gold-text-filter: drop-shadow(0 2px 10px rgba(180, 83, 9, 0.28)) drop-shadow(0 1px 0 rgba(255, 255, 255, 0.9));
+
+  /* ── State tokens ── */
+  --wl-surface-hover: rgba(37, 99, 235, 0.04);
+  --wl-field: rgba(255, 255, 255, 0.98);
+  --wl-primary-ring: 0 0 0 4px rgba(37, 99, 235, 0.15);
+  --wl-primary-shadow: 0 4px 18px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(37, 99, 235, 0.18);
+  --wl-primary-glow: 0 0 0 3.5px rgba(37, 99, 235, 0.15), 0 2px 10px rgba(37, 99, 235, 0.18);
+  --wl-focus-ring: 0 0 0 3.5px rgba(37, 99, 235, 0.2), 0 2px 10px rgba(37, 99, 235, 0.2);
+  --wl-focus-ring-danger: 0 0 0 3.5px rgba(220, 38, 38, 0.2);
+
+  /* ── Backward-compatible aliases (one name, one value) ── */
+  --wl-primary: var(--primary);
+  --wl-primary-hover: var(--primary-hover);
+  --wl-primary-soft: var(--primary-soft);
+  --wl-primary-rgb: 37, 99, 235;
+  --wl-accent: var(--accent);
+  --wl-accent-hover: var(--accent-hover);
+  --wl-accent-soft: var(--accent-soft);
+  --wl-accent-rgb: 37, 99, 235;
+  --wl-success: var(--success);
+  --wl-success-soft: var(--success-soft);
+  --wl-success-rgb: 5, 150, 105;
+  --wl-danger: var(--danger);
+  --wl-danger-soft: var(--danger-soft);
+  --wl-danger-rgb: 220, 38, 38;
+  --wl-warning: var(--warning);
+  --wl-warning-soft: var(--warning-soft);
+  --wl-warning-rgb: 217, 119, 6;
+  --wl-info: var(--primary);
+  --wl-info-soft: var(--primary-soft);
+  --wl-muted: var(--muted);
+  --wl-muted-soft: var(--muted-soft);
+  --wl-ink: var(--ink);
+  --wl-ink-strong: var(--ink-strong);
+  --wl-ink-soft: var(--ink-soft);
+  --wl-line: var(--line);
+  --wl-line-strong: var(--line-strong);
+  --wl-border: var(--line);
+  --wl-border-strong: var(--line-strong);
+  --wl-surface: var(--surface);
+  --wl-surface-soft: var(--surface-soft);
+  --wl-surface-hover: var(--wl-surface-hover);
+  --wl-bg-app: var(--base);
+  --wl-bg-surface: var(--surface);
+  --wl-bg-surface-soft: var(--surface-soft);
+  --wl-paper: var(--base);
+  --wl-paper-rgb: 255, 255, 255;
+  --wl-surface-rgb: 248, 250, 252;
+  --wl-ink-rgb: 30, 41, 59;
+  --wl-ink-strong-rgb: 15, 23, 42;
+  --wl-ink-soft-rgb: 100, 116, 139;
+  --wl-muted-rgb: 148, 163, 187;
+  --wl-on-primary: var(--base);
+  --wl-on-accent: var(--on-accent);
+  --wl-gold: var(--gold);
+  --wl-gold-hover: var(--gold);
+  --wl-gold-soft: var(--gold-soft);
+  --wl-gold-rgb: 180, 83, 9;
+  --wl-emerald: var(--success);
+  --wl-emerald-soft: var(--success-soft);
+  --wl-emerald-rgb: 5, 150, 105;
+  --wl-emerald-faint: #D1FAE5;
+  --wl-teal: #0D9488;
+  --wl-teal-soft: rgba(13, 148, 136, 0.08);
+  --wl-teal-dark: #0f766e;
+  --wl-teal-faint: #CCFBF1;
+  --wl-rose: #E11D48;
+  --wl-rose-soft: rgba(225, 29, 72, 0.08);
+  --wl-rose-faint: #FCE7F3;
+  --wl-amber-faint: #FEF3C7;
+  --wl-danger-faint: #FCA5A5;
+  --wl-indigo: #4F46E5;
+  --wl-indigo-soft: rgba(79, 70, 229, 0.08);
+  --wl-indigo-light: #6366F1;
+  --wl-primary-light: #69a9ff;
+  --wl-primary-active: #818CF8;
+  --wl-sky: #0284C7;
+  --wl-sky-soft: rgba(2, 132, 199, 0.08);
+  --wl-blue: #4F95F5;
+  --wl-blue-soft: rgba(79, 149, 245, 0.08);
+  --wl-gold-light: #F8C15D;
+  --wl-admin: var(--gold);
+  --wl-admin-soft: var(--gold-soft);
+  --wl-shadow: var(--shadow-card);
+  --wl-shadow-sm: var(--shadow-sm);
+  --wl-shadow-md: var(--shadow-md);
+  --wl-shadow-lg: var(--shadow-xl);
+  --wl-shadow-xl: var(--shadow-xl);
+  --wl-shadow-card: var(--shadow-card);
+  --wl-shadow-hover: var(--shadow-hover);
+  --wl-shadow-modal: var(--shadow-xl);
+  --wl-transition: 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  --wl-ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --wl-max-width: 1280px;
+  --wl-max-width-admin: 1560px;
+  --wl-header-height: 56px;
+  --wl-touch-min: 44px;
+  --wl-header-search-min: 170px;
+  --wl-header-search-max: 230px;
+  --wl-rail-width: 240px;
+  --wl-rail-collapsed: 64px;
+  --wl-gutter: 1.5rem;
+  --wl-section: 4rem;
+  --wl-page-padding-top: 1.75rem;
+  --wl-page-padding-bottom: 3.5rem;
+  --wl-page-gap: 1.5rem;
+  --wl-section-gap: 3.5rem;
+  --wl-card-padding: 1.5rem;
+  --wl-card-padding-sm: 1rem;
+  --wl-card-padding-lg: 2rem;
+  --wl-form-gap: 1.25rem;
+  --wl-field-gap: 0.45rem;
+  --wl-table-cell-padding-y: 8px;
+  --wl-table-cell-padding-x: 9px;
+  --wl-table-cell-padding: var(--wl-table-cell-padding-y) var(--wl-table-cell-padding-x);
+  --wl-modal-padding: 1.5rem;
+  --wl-modal-padding-sm: 1rem;
+  --wl-control-sm: 32px;
+  --wl-control-md: 36px;
+  --wl-control-lg: 44px;
+  --wl-table-action-size: 27px;
+  --wl-primary-active: var(--primary-hover);
+  --wl-primary-faint: var(--primary-soft);
+  --wl-text-primary: var(--ink-strong);
+  --wl-text-secondary: var(--ink);
+  --wl-text-muted: var(--muted);
+  --wl-row-alt: var(--surface-soft);
+  --wl-app-glow:
+    radial-gradient(900px 420px at 12% -4%, rgba(5, 150, 105, 0.04), transparent 60%),
+    radial-gradient(1000px 480px at 88% -6%, rgba(100, 140, 255, 0.06), transparent 62%),
+    radial-gradient(760px 340px at 50% 110%, rgba(37, 99, 235, 0.04), transparent 60%),
+    linear-gradient(180deg, #f8fafc 0%, #f1f5f9 34%, #ffffff 100%);
+  --wl-dir-sign: 1;
 }
 
-/* ── Backward-compatible aliases ──
- * Legacy names resolve to canonical tokens. These will be removed
- * after all views/components are migrated. DO NOT add new references
- * to these aliases — use canonical names instead. */
-:root {
---wl-primary: var(--primary);
---wl-primary-hover: var(--primary-hover);
---wl-primary-soft: var(--primary-soft);
---wl-primary-rgb: 105, 169, 255;
---wl-accent: var(--accent);
---wl-accent-hover: var(--accent-hover);
---wl-accent-soft: var(--accent-soft);
---wl-accent-rgb: 216, 232, 255;
---wl-gold-rgb: 255, 209, 102;
---wl-danger-rgb: 242, 109, 109;
---wl-success-rgb: 62, 215, 180;
---wl-warning-rgb: 248, 193, 93;
---wl-info-rgb: 105, 169, 255;
---wl-paper-rgb: 6, 19, 40;
---wl-surface-rgb: 7, 26, 56;
---wl-ink-rgb: 216, 232, 255;
---wl-ink-strong-rgb: 244, 248, 255;
---wl-ink-soft-rgb: 191, 207, 232;
---wl-muted-rgb: 157, 181, 208;
---wl-indigo: var(--primary);
---wl-indigo-hover: var(--primary-hover);
---wl-indigo-soft: var(--primary-soft);
---wl-indigo-rgb: var(--primary-rgb);
---wl-violet: var(--primary);
---wl-violet-soft: var(--primary-soft);
---wl-teal: var(--primary);
---wl-teal-hover: var(--primary-hover);
---wl-teal-soft: var(--primary-soft);
---wl-teal-faint: var(--primary-soft);
---wl-teal-ring: var(--primary-ring);
---wl-teal-rgb: var(--primary-rgb);
---wl-amber-rgb: var(--accent-rgb);
---wl-amber: var(--accent);
---wl-amber-soft: var(--accent-soft);
---wl-brass: var(--accent);
---wl-brass-soft: var(--accent-soft);
---wl-medical-blue-soft: var(--primary-soft);
---wl-medical-blue-faint: var(--primary-soft);
---wl-steril-amber-soft: var(--accent-soft);
---wl-steril-amber-strong: var(--accent);
---bg-surface: var(--surface);
---bg-surface-soft: var(--surface-soft);
---border-color: var(--line);
---wl-obsidian: var(--ink-strong);
---wl-stone: var(--base);
---wl-radius-lg: var(--radius-md);
---wl-radius-xl: var(--radius-md);
---wl-on-primary: var(--base);
---wl-on-accent: var(--base);
---wl-admin: var(--gold);
---wl-admin-soft: var(--gold-soft);
---wl-admin-ring: var(--gold-ring);
---wl-gold: var(--gold);
---wl-gold-hover: var(--gold-hover);
---wl-gold-active: var(--gold-active);
---wl-gold-soft: var(--gold-soft);
---wl-gold-faint: var(--gold-faint);
---wl-gold-ring: var(--gold-ring);
---wl-gold-text: #FFD66B;
---wl-gold-text-shadow: 0 1px 0 rgba(6, 19, 40, 0.9), 0 2px 14px rgba(233, 168, 37, 0.35);
---wl-gold-title-shadow: 0 1px 0 rgba(6, 19, 40, 0.9), 0 4px 26px rgba(233, 168, 37, 0.28), 0 2px 8px rgba(0, 0, 0, 0.45);
---wl-gold-glow-soft: 0 0 0 3px rgba(255, 209, 102, 0.14), 0 4px 18px rgba(233, 168, 37, 0.22);
---wl-success: var(--success);
---wl-success-soft: var(--success-soft);
---wl-success-ring: 0 0 0 4px rgba(62, 215, 180, 0.16);
---wl-warning: var(--warning);
---wl-warning-soft: var(--warning-soft);
---wl-danger: var(--danger);
---wl-danger-soft: var(--danger-soft);
---wl-danger-ring: 0 0 0 4px rgba(242, 109, 109, 0.16);
---wl-info: var(--primary);
---wl-info-soft: var(--primary-soft);
---wl-focus-ring: 0 0 0 3.5px rgba(105, 169, 255, 0.22), 0 2px 10px rgba(105, 169, 255, 0.2);
---wl-focus-ring-danger: 0 0 0 3.5px rgba(242, 109, 109, 0.2);
---wl-muted-soft: #7c8da0;
---wl-ink-strong: var(--ink-strong);
---wl-ink: var(--ink);
---wl-ink-soft: var(--ink-soft);
---wl-muted: var(--muted);
---wl-line: var(--line);
---wl-line-strong: var(--line-strong);
---wl-border: var(--line);
---wl-border-strong: var(--line-strong);
---wl-surface: var(--surface);
---wl-surface-soft: var(--surface-soft);
---wl-surface-hover: rgba(84, 151, 255, 0.16);
---wl-surface-muted: var(--base);
---wl-row-alt: var(--surface-soft);
---wl-field: rgba(8, 28, 58, 0.98);
---wl-header-bg: rgba(6, 19, 40, 0.9);
---wl-header-border: rgba(116, 169, 255, 0.18);
---wl-text-primary: var(--ink-strong);
---wl-text-secondary: var(--ink);
---wl-text-muted: var(--muted);
---wl-bg-app: var(--base);
---wl-bg-surface: var(--surface);
---wl-bg-surface-soft: var(--surface-soft);
---wl-paper: var(--base);
---wl-card: var(--surface-soft);
---wl-app-glow:
-  radial-gradient(900px 420px at 12% -4%, rgba(62, 215, 180, 0.1), transparent 60%),
-  radial-gradient(1000px 480px at 88% -6%, rgba(139, 124, 255, 0.14), transparent 62%),
-  radial-gradient(circle at 50% 0%, rgba(114, 177, 255, 0.24), transparent 34%);
---wl-gradient-card: linear-gradient(135deg, #0e2f63 0%, #0a2350 42%, #081d3d 100%);
---wl-gradient-panel: linear-gradient(135deg, #0c2a55 0%, #0a2248 55%, #071a38 100%);
---wl-gradient-rail: linear-gradient(180deg, #0d2c5c 0%, #0a2148 45%, #061328 100%);
---wl-gradient-table-head: linear-gradient(90deg, #10407f 0%, #0e2e5e 45%, #0c4a4a 100%);
---wl-gradient-primary: linear-gradient(135deg, #8abcff 0%, #69a9ff 45%, #3ed7b4 100%);
---wl-gradient-gold: linear-gradient(135deg, #FFE29A 0%, #FFD166 45%, #E9A825 100%);
---wl-gradient-gold-soft: linear-gradient(135deg, rgba(255, 226, 154, 0.18) 0%, rgba(255, 209, 102, 0.12) 50%, rgba(233, 168, 37, 0.1) 100%);
---wl-gradient-secondary: linear-gradient(135deg, #12365f 0%, #0e2c58 50%, #0a2248 100%);
---wl-gradient-toolbar: linear-gradient(90deg, rgba(105, 169, 255, 0.16) 0%, rgba(62, 215, 180, 0.1) 50%, rgba(139, 124, 255, 0.14) 100%);
---wl-gradient-chip: linear-gradient(90deg, rgba(105, 169, 255, 0.22), rgba(62, 215, 180, 0.18));
---wl-gradient-modal: linear-gradient(160deg, #0d2c5c 0%, #081d3d 100%);
---wl-gradient-app:
-  radial-gradient(900px 420px at 12% -4%, rgba(62, 215, 180, 0.1), transparent 60%),
-  radial-gradient(1000px 480px at 88% -6%, rgba(139, 124, 255, 0.14), transparent 62%),
-  radial-gradient(760px 340px at 50% 110%, rgba(105, 169, 255, 0.08), transparent 60%),
-  linear-gradient(180deg, #0a2148 0%, #071a38 34%, #061328 100%);
---wl-gradient-hero: radial-gradient(720px 320px at 18% 0%, rgba(105, 169, 255, 0.2), transparent 60%), radial-gradient(560px 280px at 85% 10%, rgba(62, 215, 180, 0.12), transparent 60%), linear-gradient(180deg, #0a2350 0%, #061328 100%);
---wl-laser-sweep: linear-gradient(90deg, transparent, #69a9ff, #d8e8ff, transparent);
---wl-transition: 0.18s cubic-bezier(0.16, 1, 0.3, 1);
---wl-ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
---wl-shadow: var(--shadow-card);
---wl-shadow-sm: var(--shadow-sm);
---wl-shadow-md: var(--shadow-md);
---wl-shadow-lg: var(--shadow-lg);
---wl-shadow-modal: var(--shadow-xl);
---wl-shadow-hover: var(--shadow-hover);
---wl-max-width: 1280px;
---wl-max-width-admin: 1560px;
---wl-header-height: 56px;
---wl-touch-min: 44px;
---wl-header-search-min: 170px;
---wl-header-search-max: 230px;
---wl-rail-width: 240px;
---wl-rail-collapsed: 64px;
---wl-gutter: 1.5rem;
---wl-section: 4rem;
---wl-page-padding-top: 1.75rem;
---wl-page-padding-bottom: 3.5rem;
---wl-page-gap: 1.5rem;
---wl-section-gap: 3.5rem;
---wl-card-padding: 1.5rem;
---wl-card-padding-sm: 1rem;
---wl-card-padding-lg: 2rem;
---wl-form-gap: 1.25rem;
---wl-field-gap: 0.45rem;
---wl-table-cell-padding-y: 8px;
---wl-table-cell-padding-x: 9px;
---wl-table-cell-padding: var(--wl-table-cell-padding-y) var(--wl-table-cell-padding-x);
---wl-modal-padding: 1.5rem;
---wl-modal-padding-sm: 1rem;
---wl-control-sm: 32px;
---wl-control-md: 36px;
---wl-control-lg: 44px;
---wl-table-action-size: 27px;
---wl-primary-active: var(--primary-hover);
---wl-primary-faint: var(--primary-soft);
---wl-primary-ring: 0 0 0 4px rgba(105, 169, 255, 0.2);
---wl-primary-shadow: 0 4px 18px rgba(4, 12, 28, 0.55), 0 2px 8px rgba(105, 169, 255, 0.18);
---wl-primary-glow: 0 0 0 3.5px rgba(105, 169, 255, 0.2), 0 2px 10px rgba(105, 169, 255, 0.22);
---wl-accent-hover: var(--accent-hover);
---wl-accent-faint: var(--accent-faint);
---wl-accent-ring: 0 0 0 4px rgba(216, 232, 255, 0.16);
---wl-shadow-card: var(--shadow-card);
---wl-shadow-xl: var(--shadow-xl);
---wl-shadow-primary: var(--wl-shadow-primary);
-}
-
+/* ── Responsive overrides ── */
 @media (max-width: 768px) {
   :root {
     --wl-gutter: 1rem;
@@ -243,6 +249,7 @@
     --wl-modal-padding: 1.15rem;
   }
 }
+
 @media (max-width: 480px) {
   :root {
     --wl-gutter: 0.85rem;
@@ -257,6 +264,7 @@
     --wl-modal-padding: 0.85rem;
   }
 }
+
 @media (max-width: 360px) {
   :root {
     --wl-gutter: 0.65rem;

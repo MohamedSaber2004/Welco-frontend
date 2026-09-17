@@ -327,8 +327,6 @@ router.beforeEach(async (to) => {
     isAuthenticated = auth.isAuthenticated
   }
 
-  // Seller = Admin + internal staff. isWelcoStaff covers both WelcoStaff and
-  // SnulStaff roles (see isStaffRole), so no direct string compare here.
   const isSeller = auth.isAdmin.value || auth.isWelcoStaff.value
 
   if (isAuthenticated && isSeller && (to.name === 'home' || to.path === '/')) {

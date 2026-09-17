@@ -77,27 +77,27 @@ withDefaults(
 .btn--gold {
   background: var(--wl-gradient-gold);
   color: var(--wl-on-gold);
-  border-color: rgba(233, 168, 37, 0.6);
+  border-color: var(--wl-gold-soft);
   box-shadow: var(--wl-gold-glow-soft);
 }
 .btn--gold:hover:not(:disabled) {
   filter: brightness(1.08);
   border-color: var(--wl-gold-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 18px rgba(233, 168, 37, 0.35);
+  box-shadow: var(--wl-gold-glow-soft);
 }
 
 .btn--primary {
   background: var(--wl-primary);
   color: var(--wl-on-primary);
-  border-color: var(--wl-primary);
+  border-color: var(--wl-primary-soft);
   box-shadow: var(--wl-shadow-primary);
 }
 .btn--primary:hover:not(:disabled) {
   background: var(--wl-primary-hover);
   border-color: var(--wl-primary-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 14px -2px rgba(105, 169, 255, 0.45);
+  box-shadow: var(--wl-primary-glow);
 }
 
 .btn--secondary {
@@ -141,7 +141,7 @@ withDefaults(
   background: var(--wl-danger);
   color: var(--wl-on-primary);
   border-color: var(--wl-danger);
-  box-shadow: 0 2px 8px rgba(242, 109, 109, 0.25);
+  box-shadow: var(--wl-danger-soft);
 }
 
 .btn--danger:hover:not(:disabled) {
@@ -152,27 +152,27 @@ withDefaults(
 
 /* Control heights conforming to VIP ergonomic floor */
 .btn--sm {
-  height: 36px;
-  min-height: 36px;
+  height: var(--wl-control-sm);
+  min-height: var(--wl-control-sm);
   padding: 0 0.85rem;
   font-size: 0.82rem;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
 }
 
 .btn--md {
-  height: 44px;
-  min-height: 44px;
+  height: var(--wl-control-md);
+  min-height: var(--wl-control-md);
   padding: 0 1.25rem;
   font-size: 0.88rem;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
 }
 
 .btn--lg {
-  height: 52px;
-  min-height: 52px;
+  height: var(--wl-control-lg);
+  min-height: var(--wl-control-lg);
   padding: 0 1.65rem;
   font-size: 0.95rem;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
 }
 
 .btn__spinner {

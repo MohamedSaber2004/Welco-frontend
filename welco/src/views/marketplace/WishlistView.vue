@@ -128,7 +128,7 @@ const goDetail = (id: string) => {
     <!-- Saved instruments -->
     <div v-else class="product-grid">
       <article v-for="p in items" :key="p.id" class="product-card" @click="goDetail(p.id)">
-        <div class="product-media" :style="{ background: p.imageGradient || '#071A38' }">
+        <div class="product-media" :style="{ background: p.imageGradient || 'var(--wl-surface-soft)' }">
           <AppImage
             :src="p.imageName"
             placeholder-type="product"

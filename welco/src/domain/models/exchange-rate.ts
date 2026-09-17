@@ -61,17 +61,3 @@ export interface LatestRatesResponse {
   baseCurrency?: string
 }
 
-export type SyncStatusType = 'Pending' | 'Success' | 'Failed' | 'Partial'
-
-export interface ExchangeRateSyncLogDto {
-  id: string
-  baseCurrency: string
-  status: number | SyncStatusType
-  ratesCount: number
-  source: string
-  startedAt: string
-  completedAt?: string | null
-  errorMessage?: string | null
-  createdAt?: string
-}
-

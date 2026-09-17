@@ -1419,7 +1419,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 
 /* Workflow Banner */
 .workflow-banner {
-  background: linear-gradient(135deg, #071A38 0%, rgba(105, 169, 255, 0.14) 100%);
+  background: linear-gradient(135deg, var(--wl-surface) 0%, rgba(105, 169, 255, 0.14) 100%);
   border: 1px solid rgba(151, 190, 255, 0.35);
   border-radius: 14px;
   padding: 1.15rem 1.35rem;

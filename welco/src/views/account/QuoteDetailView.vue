@@ -70,7 +70,6 @@ async function placeOrderFromQuote() {
   if (!ok) return
   placingOrder.value = true
   try {
-    // The order belongs to the company that owns the RFQ this quote answers.
     let companyId: string | undefined
     const rfq = await salesService.getRfq(quote.value.rfqId)
     companyId = rfq?.companyId
@@ -82,7 +81,6 @@ async function placeOrderFromQuote() {
       toastService.info(t('distributor.pendingApproval'))
       return
     }
-    // Customer-only: ensure quote belongs to my company
     const myCompanyId = companyService.myCompany.value?.id
     if (myCompanyId && rfq && rfq.companyId !== myCompanyId) {
       toastService.error(t('common.error'))
@@ -116,7 +114,6 @@ async function placeOrderFromQuote() {
   <div class="page-shell quote-detail-view">
     <BackButton fallback="/account/quotes" variant="minimal" class="mb-3" />
 
-    <!-- Breadcrumb -->
     <nav class="crumb-bar mono" :aria-label="t('common.breadcrumb')">
       <router-link to="/account">{{ t('account.dashboard') }}</router-link>
       <span class="crumb-sep icon--directional">/</span>
@@ -137,7 +134,6 @@ async function placeOrderFromQuote() {
     />
 
     <template v-else-if="quote">
-      <!-- Executive Header -->
       <header class="detail-header">
         <div class="header-main">
           <div class="head-chip mono">
@@ -155,12 +151,9 @@ async function placeOrderFromQuote() {
         <StatusPill :status="quote.status" />
       </header>
 
-      <!-- Account Navigation Tab Bar -->
       <AccountNav />
 
-      <!-- Detail 2-Column Grid -->
       <div class="detail-grid">
-        <!-- Main: Line items -->
         <main class="manifest-card">
           <div class="manifest-head">
             <div class="manifest-title-group">
@@ -188,7 +181,6 @@ async function placeOrderFromQuote() {
           </div>
         </main>
 
-        <!-- Sidebar: Commercial Summary & Decisions -->
         <aside class="side-panel">
           <section class="card amount-card">
             <h2 class="side-title mono">{{ t('sales.amount') }}</h2>
@@ -204,7 +196,6 @@ async function placeOrderFromQuote() {
             </div>
           </section>
 
-          <!-- Decision Action Block if Sent or Draft -->
           <section
             v-if="quote.status === 'Sent' || quote.status === 'Draft'"
             class="card decision-card"
@@ -234,7 +225,6 @@ async function placeOrderFromQuote() {
             </div>
           </section>
 
-          <!-- Approved State Banner -->
           <section v-else-if="quote.status === 'Approved'" class="card approved-card">
             <div class="approved-head mono">
               <span class="material-symbols-outlined text-[18px]">check_circle</span>
@@ -260,7 +250,6 @@ async function placeOrderFromQuote() {
             </button>
           </section>
 
-          <!-- Action Stack -->
           <div class="side-actions-stack">
             <button
               type="button"

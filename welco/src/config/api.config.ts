@@ -12,12 +12,6 @@ export function resolveGateway(target: string | undefined): string {
   return ((import.meta.env.VITE_API_BASE_URL as string | undefined) ?? '').trim() || WELCO_GW
 }
 
-export const PRODUCT_API_BASE_URL = (
-  (import.meta.env.VITE_PRODUCT_API_BASE_URL as string | undefined)
-    ? (import.meta.env.VITE_PRODUCT_API_BASE_URL as string)
-    : 'https://welco-product.runasp.net'
-).replace(/\/+$/, '')
-
 export const isAbsoluteUrl = (path: string): boolean =>
   /^https?:\/\//i.test(path)
 
@@ -81,9 +75,6 @@ export const EXCHANGE_RATE_ROUTES = {
   pair: (from: string, to: string) => `/api/v1/exchange-rates/${encodeURIComponent(from)}/${encodeURIComponent(to)}`,
   convert: '/api/v1/exchange-rates/convert',
   cartTotal: '/api/v1/exchange-rates/cart-total',
-  history: (base: string, date: string) => `/api/v1/exchange-rates/history/${encodeURIComponent(base)}/${encodeURIComponent(date)}`,
-  sync: '/api/v1/exchange-rates/sync',
-  syncLogs: '/api/v1/exchange-rates/sync/logs',
 } as const
 
 export const WISHLIST_ROUTES = {

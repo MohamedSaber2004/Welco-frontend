@@ -8,7 +8,6 @@ import type {
   HelpCategoryDto,
   LandingPageDto,
   LandingPageQuery,
-  TradeShowEventDto,
   CreateDocumentPayload,
   CreateLandingPagePayload,
   UpdateLandingPagePayload,
@@ -152,16 +151,6 @@ export class ApiContentRepository implements ContentRepository {
 
   async deleteFaq(id: string): Promise<void> {
     await this.http.del<void>(CONTENT_ROUTES.faqById(id))
-  }
-
-  async getTradeShows(): Promise<TradeShowEventDto[]> {
-    // Backend has no /api/v1/trade-shows endpoint — fall back to landing-pages.
-    try {
-      const raw = await this.http.get<unknown>(`${CONTENT_ROUTES.landingPages}?type=tradeshow`, { showFeedback: false })
-      return this.extractList<TradeShowEventDto>(raw)
-    } catch {
-      return []
-    }
   }
 
   async getMyTickets(): Promise<import('../../domain/models/content').SupportTicketDto[]> {

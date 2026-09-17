@@ -503,7 +503,7 @@ onMounted(loadDashboard)
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  filter: drop-shadow(0 2px 10px rgba(233, 168, 37, 0.28)) drop-shadow(0 1px 0 rgba(6, 19, 40, 0.9));
+  filter: var(--wl-gold-text-filter);
 }
 
 .org-desc {
@@ -762,10 +762,6 @@ onMounted(loadDashboard)
       border-radius: var(--radius-pill);
       overflow: hidden;
       margin-top: var(--space-1);
-    }
-
-    :root[data-theme='dark'] .step-bar {
-      background: rgba(255, 255, 255, 0.08);
     }
 
     .step-bar__fill {

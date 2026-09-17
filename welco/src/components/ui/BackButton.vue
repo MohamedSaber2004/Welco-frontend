@@ -128,9 +128,4 @@ const handleBack = async () => {
   background: none;
   transform: translateX(calc(-3px * var(--wl-dir-sign, 1)));
 }
-:root.dark .back-button--outline,
-:root[data-theme='dark'] .back-button--outline {
-  background: var(--wl-surface);
-  border-color: var(--wl-border);
-}
 </style>

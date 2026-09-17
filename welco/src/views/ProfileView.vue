@@ -968,8 +968,8 @@ const setLang = async (v: AppLanguage) => {
 }
 
 .user-phone-badge.is-set {
-  background: rgba(105, 169, 255, 0.05);
-  border-color: rgba(105, 169, 255, 0.2);
+  background: var(--wl-primary-soft);
+  border-color: var(--wl-primary-soft);
 }
 
 .user-phone-badge .phone-icon {
@@ -1211,7 +1211,7 @@ const setLang = async (v: AppLanguage) => {
 .card-badge--indigo {
   color: var(--wl-primary);
   background: var(--wl-primary-soft);
-  border-color: rgba(105, 169, 255, 0.25);
+  border-color: var(--wl-primary-soft);
 }
 
 .form-card-subtitle {

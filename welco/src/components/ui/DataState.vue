@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onBeforeUnmount } from 'vue'
 import { t } from '../../i18n'
+import BaseButton from './BaseButton.vue'
 
 /* ── Props ───────────────────────────────────────────────
  * New unified API  → state / loadingDelay / emptyVariant / errorRecoverable / onRetry / icon
@@ -33,14 +34,11 @@ const props = withDefaults(
     retryText?: string
     errorCode?: string
 
-    /* success state extras */
-    successTitle?: string
-    successMessage?: string
-
     /* skeleton / loading props */
     skeletonType?: 'text' | 'card' | 'circle' | 'table-row' | 'custom'
       | 'product-card' | 'catalog-grid' | 'category-grid' | 'stats-grid'
       | 'table' | 'pdp' | 'list' | 'form' | 'location-grid' | 'hero' | 'pills'
+      | 'provider-grid' | 'cert-grid'
     skeletonLines?: number
     skeletonCount?: number
     skeletonWidth?: string
@@ -75,8 +73,6 @@ const props = withDefaults(
     errorMessage: 'Unable to load data. Please check your connection and try again.',
     retryText: 'Retry',
     errorCode: undefined,
-    successTitle: undefined,
-    successMessage: undefined,
     skeletonType: 'text',
     skeletonLines: 1,
     skeletonCount: 6,
@@ -176,10 +172,6 @@ const emptyDescription = computed(() => emptyCopy.value.description)
 const errorTitle = computed(() => props.errorTitle || 'Something went wrong')
 const errorMessage = computed(() => props.errorMessage || 'Unable to load data. Please check your connection and try again.')
 
-/* ── Success-state copy helpers ───────────────────────── */
-const successTitle = computed(() => props.successTitle || 'Success')
-const successMessage = computed(() => props.successMessage || 'Operation completed successfully.')
-
 /* ── Skeleton helpers ─────────────────────────────────── */
 const gridCount = computed(() => {
   const t = props.skeletonType
@@ -191,7 +183,7 @@ const gridCount = computed(() => {
   return props.skeletonCount ?? 1
 })
 
-const delay = (i: number) => ({ '--delay': `${i * 70}ms` } as Record<string, string>)
+const delay = (i: number) => ({ animationDelay: `${i * 70}ms` })
 </script>
 
 <template>
@@ -229,13 +221,74 @@ const delay = (i: number) => ({ '--delay': `${i * 70}ms` } as Record<string, str
           <div class="sk" :style="{ width: skeletonWidth, height: skeletonHeight, ...delay(1) }" />
         </template>
         <template v-else-if="skeletonType === 'product-card'">
-          <div class="sk-card" :style="delay(1)"><div class="sk-card__media sk" :style="delay(1)"><div class="sk-card__media-badge sk" style="width:56px;height:16px;border-radius:var(--radius-pill);position:absolute;top:10px;inset-inline-start:10px" /><div class="sk-card__media-badge sk" style="width:62px;height:18px;border-radius:var(--radius-pill);position:absolute;top:10px;inset-inline-end:10px" /></div><div class="sk-card__body"><div class="sk sk--text" style="width:42%;height:10px" :style="delay(2)" /><div class="sk sk--text" style="width:96%;height:14px" :style="delay(3)" /><div class="sk sk--text" style="width:78%;height:14px" :style="delay(4)" /><div class="sk sk--text" style="width:52%;height:10px;margin-top:2px" :style="delay(5)" /><div class="sk-card__foot"><div style="display:flex;flex-direction:column;gap:6px;flex:1"><div class="sk" style="width:84px;height:16px;border-radius:var(--radius-sm)" :style="delay(6)" /><div class="sk" style="width:110px;height:10px;border-radius:var(--radius-sm)" :style="delay(7)" /></div><div class="sk" style="width:44px;height:16px;border-radius:var(--radius-pill)" :style="delay(8)" /></div><div class="sk-card__actions"><div class="sk" style="height:34px;flex:1;border-radius:var(--radius-md)" :style="delay(9)" /><div class="sk" style="height:34px;flex:1;border-radius:var(--radius-md)" :style="delay(10)" /></div></div></div>
+          <div class="sk-card" :style="delay(1)">
+            <div class="sk-card__media sk" :style="delay(1)"></div>
+            <div class="sk-card__body">
+              <div class="sk sk--text" style="width:42%;height:10px" :style="delay(2)"></div>
+              <div class="sk sk--text" style="width:96%;height:14px" :style="delay(3)"></div>
+              <div class="sk sk--text" style="width:78%;height:14px" :style="delay(4)"></div>
+              <div class="sk sk--text" style="width:52%;height:10px;margin-top:2px" :style="delay(5)"></div>
+              <div class="sk-card__foot">
+                <div style="display:flex;flex-direction:column;gap:6px;flex:1">
+                  <div class="sk" style="width:84px;height:16px;border-radius:var(--radius-sm)" :style="delay(6)"></div>
+                  <div class="sk" style="width:110px;height:10px;border-radius:var(--radius-sm)" :style="delay(7)"></div>
+                </div>
+                <div class="sk" style="width:44px;height:16px;border-radius:var(--radius-pill)" :style="delay(8)"></div>
+              </div>
+              <div class="sk-card__actions">
+                <div class="sk" style="height:34px;flex:1;border-radius:var(--radius-md)" :style="delay(9)"></div>
+                <div class="sk" style="height:34px;flex:1;border-radius:var(--radius-md)" :style="delay(10)"></div>
+              </div>
+            </div>
+          </div>
         </template>
         <template v-else-if="skeletonType === 'catalog-grid'">
-          <div class="sk-grid sk-grid--catalog" :style="{ gap: skeletonGap || '1.5rem' }"><div v-for="i in gridCount" :key="i" class="sk-card" :style="delay(i)"><div class="sk-card__media sk" :style="delay(i)"><div class="sk sk--badge sk--badge-left" :style="delay(i)" /><div class="sk sk--badge sk--badge-right" :style="delay(i+1)" /></div><div class="sk-card__body"><div class="sk sk--eyebrow" :style="delay(i+1)" /><div class="sk sk--title" :style="delay(i+2)" /><div class="sk sk--title sk--title-short" :style="delay(i+3)" /><div class="sk sk--caption" :style="delay(i+4)" /><div class="sk-card__foot"><div style="display:flex;flex-direction:column;gap:6px"><div class="sk sk--price" :style="delay(i+5)" /><div class="sk sk--caption-sm" :style="delay(i+6)" /></div><div class="sk sk--rating" :style="delay(i+7)" /></div><div class="sk-card__actions"><div class="sk sk--btn" :style="delay(i+8)" /><div class="sk sk--btn sk--btn-primary" :style="delay(i+9)" /></div></div></div></div>
+          <div class="sk-grid sk-grid--catalog" :style="{ gap: skeletonGap || '1.5rem' }">
+            <div v-for="i in gridCount" :key="i" class="sk-card" :style="delay(i)">
+              <div class="sk-card__media sk" :style="delay(i)"></div>
+              <div class="sk-card__body">
+                <div class="sk sk--title" :style="delay(i+1)"></div>
+                <div class="sk sk--title sk--title-short" :style="delay(i+2)"></div>
+                <div class="sk sk--caption" :style="delay(i+3)"></div>
+                <div class="sk-card__foot">
+                  <div style="display:flex;flex-direction:column;gap:6px">
+                    <div class="sk sk--price" :style="delay(i+4)"></div>
+                    <div class="sk sk--caption-sm" :style="delay(i+5)"></div>
+                  </div>
+                  <div class="sk-card__actions">
+                    <div class="sk sk--btn" :style="delay(i+6)"></div>
+                    <div class="sk sk--btn sk--btn-primary" :style="delay(i+7)"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </template>
         <template v-else-if="skeletonType === 'category-grid'">
           <div class="sk-grid sk-grid--category" :style="{ gap: skeletonGap || '1rem' }"><div v-for="i in gridCount" :key="i" class="sk-cat" :style="delay(i)"><div class="sk sk-cat__media" :style="delay(i)" /><div class="sk-cat__body"><div class="sk" style="width:72%;height:13px;border-radius:var(--radius-sm);margin:0 auto" :style="delay(i+2)" /><div class="sk" style="width:46%;height:9px;border-radius:var(--radius-pill);margin:6px auto 0" :style="delay(i+3)" /></div></div></div>
+        </template>
+        <template v-else-if="skeletonType === 'provider-grid'">
+          <div class="sk-grid sk-grid--provider" :style="{ gap: skeletonGap || '1rem' }">
+            <div v-for="i in gridCount" :key="i" class="sk-provider" :style="delay(i)">
+              <div class="sk-provider__logo sk" :style="delay(i)"></div>
+              <div class="sk-provider__body">
+                <div class="sk sk--pill" style="width:36%;height:12px;margin:0 auto" :style="delay(i+2)"></div>
+                <div class="sk sk--caption" style="width:60%;height:9px;margin:6px auto 0" :style="delay(i+3)"></div>
+              </div>
+            </div>
+          </div>
+        </template>
+        <template v-else-if="skeletonType === 'cert-grid'">
+          <div class="sk-grid sk-grid--cert" :style="{ gap: skeletonGap || '1rem' }">
+            <div v-for="i in gridCount" :key="i" class="sk-cert" :style="delay(i)">
+              <div class="sk-cert__media sk" :style="delay(i)"></div>
+              <div class="sk-cert__body">
+                <div class="sk sk--pill" style="width:30%;height:11px;margin:0 auto" :style="delay(i+2)"></div>
+                <div class="sk sk--title" style="width:76%;height:12px;margin:6px auto 0" :style="delay(i+3)"></div>
+                <div class="sk sk--caption" style="width:50%;height:9px;margin:4px auto 0" :style="delay(i+4)"></div>
+              </div>
+            </div>
+          </div>
         </template>
         <template v-else-if="skeletonType === 'stats-grid'">
           <div class="sk-grid sk-grid--stats" :style="{ gap: skeletonGap || '1rem' }"><div v-for="i in gridCount" :key="i" class="sk-stat" :style="delay(i)"><div class="sk sk-stat__icon" :style="delay(i)" /><div class="sk-stat__body"><div class="sk" style="width:68%;height:10px;border-radius:var(--radius-sm)" :style="delay(i+1)" /><div class="sk" style="width:44%;height:20px;border-radius:var(--radius-sm);margin-top:8px" :style="delay(i+2)" /><div class="sk" style="width:56%;height:9px;border-radius:var(--radius-sm);margin-top:8px" :style="delay(i+3)" /></div></div></div>
@@ -347,14 +400,9 @@ const delay = (i: number) => ({ '--delay': `${i * 70}ms` } as Record<string, str
 
     <!-- ══ Success ═══════════════════════════════════════════ -->
     <div v-else-if="resolvedState === 'success'" class="data-state__success">
-      <div class="data-state__success__icon" aria-hidden="true">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--wl-success)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M20 6L9 17l-5-5" />
-        </svg>
+      <div class="data-state__success__content">
+        <slot />
       </div>
-      <h3 v-if="successTitle" class="data-state__success__title">{{ successTitle }}</h3>
-      <p v-if="successMessage" class="data-state__success__desc">{{ successMessage }}</p>
-      <slot />
     </div>
 
     <!-- ══ Default / custom content ════════════════════════ -->
@@ -410,46 +458,27 @@ const delay = (i: number) => ({ '--delay': `${i * 70}ms` } as Record<string, str
   border: 1px solid var(--wl-line);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .sk::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    transform: translateX(-100%);
-    background: linear-gradient(90deg, transparent 0%, transparent 40%, var(--skeleton-highlight) 50%, transparent 60%, transparent 100%);
-    animation: sk-sweep 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-    animation-delay: var(--delay, 0ms);
-    will-change: transform;
+  @media (prefers-reduced-motion: no-preference) {
+    .sk {
+      animation: sk-pulse 3.2s ease-in-out infinite;
+      will-change: opacity;
+    }
   }
 
-  @keyframes sk-sweep {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
+  @media (prefers-reduced-motion: reduce) {
+    .sk { animation: none; }
   }
 
   @keyframes sk-pulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.94; }
   }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .sk::after { display: none; }
-  .sk { animation: none; }
-}
 
 .skeleton-root {
   --skeleton-base: var(--wl-surface-soft);
   --skeleton-highlight: rgba(255,255,255,0.58);
   --skeleton-pulse-from: var(--wl-surface-soft);
   --skeleton-pulse-to: #E6EEEE;
-}
-
-:root[data-theme='dark'] .skeleton-root {
-  --skeleton-base: #1A2E44;
-  --skeleton-highlight: rgba(255,255,255,0.14);
-  --skeleton-pulse-from: #1A2E44;
-  --skeleton-pulse-to: #223A55;
 }
 
 /* card */
@@ -521,10 +550,60 @@ const delay = (i: number) => ({ '--delay': `${i * 70}ms` } as Record<string, str
 .sk--badge-left { inset-inline-start: 10px; }
 .sk--badge-right { inset-inline-end: 10px; }
 
+/* provider */
+.sk-provider {
+  background: var(--wl-surface);
+  border: 1px solid var(--wl-line);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--wl-shadow-card);
+}
+
+.sk-provider__logo {
+  height: 110px;
+  border-bottom: 1px solid var(--wl-line);
+  background: linear-gradient(180deg, var(--wl-surface-soft) 0%, var(--wl-surface) 100%);
+}
+
+.sk-provider__body {
+  padding: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--wl-surface);
+}
+
+/* cert */
+.sk-cert {
+  background: var(--wl-surface);
+  border: 1px solid var(--wl-line);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--wl-shadow-card);
+}
+
+.sk-cert__media {
+  height: 160px;
+  border-bottom: 1px solid var(--wl-line);
+  background: var(--wl-surface-soft);
+}
+
+.sk-cert__body {
+  padding: 0.95rem 0.9rem 1.05rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--wl-surface);
+}
+
 /* grids */
 .sk-grid { display: grid; width: 100%; }
 .sk-grid--catalog { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
 .sk-grid--category { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+.sk-grid--provider { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+.sk-grid--cert { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
 .sk-grid--stats { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
 .sk-grid--location { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); align-items: start; }
 
@@ -698,18 +777,9 @@ const delay = (i: number) => ({ '--delay': `${i * 70}ms` } as Record<string, str
   align-items: center;
 }
 
-:root[data-theme='dark'] .sk-table__head,
-:root.dark .sk-table__head {
-  background: #111214;
-}
-
 .sk-table__head .sk {
-  background: rgba(255,255,255,0.12);
+  background: rgba(0, 0, 0, 0.06);
   border: none;
-}
-
-:root[data-theme='dark'] .sk-table__head .sk {
-  background: rgba(255,255,255,0.08);
 }
 
 .sk-table__row {
@@ -839,8 +909,6 @@ const delay = (i: number) => ({ '--delay': `${i * 70}ms` } as Record<string, str
   mask: radial-gradient(680px 320px at 50% 38%, black 38%, transparent 82%);
   pointer-events: none;
 }
-
-:root[data-theme='dark'] .data-state__empty__grid { opacity: 0.05; }
 
 .data-state__empty--fill { flex: 1; min-height: 320px; }
 .data-state__empty--compact { padding: 1.8rem 1.25rem 1.5rem; min-height: 180px; }
@@ -1128,40 +1196,18 @@ const delay = (i: number) => ({ '--delay': `${i * 70}ms` } as Record<string, str
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: clamp(2rem, 4vw, 3rem) clamp(1.25rem, 3vw, 2.5rem) 2rem;
+  padding: clamp(1.5rem, 3vw, 2.5rem) clamp(1.25rem, 3vw, 2.5rem) 2rem;
   background: var(--wl-surface);
-  border: 1px solid var(--wl-success);
+  border: 1px solid var(--wl-gold);
   border-radius: var(--radius-md);
   box-shadow: var(--wl-shadow-card);
   isolation: isolate;
   min-height: 200px;
 }
 
-.data-state__success__icon {
-  width: 56px;
-  height: 56px;
-  display: grid;
-  place-items: center;
-  border-radius: var(--radius-pill);
-  background: var(--wl-success-soft);
-  border: 1px solid var(--wl-success);
-  margin-bottom: 1.25rem;
-}
-
-.data-state__success__title {
-  font-family: var(--wl-font-display);
-  font-size: 1.15rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  color: var(--wl-ink-strong);
-  margin-bottom: 0.5rem;
-}
-
-.data-state__success__desc {
-  color: var(--wl-ink-soft);
-  font-size: 0.9rem;
-  line-height: 1.55;
-  max-width: 36ch;
+.data-state__success__content {
+  align-self: stretch;
+  width: 100%;
 }
 
 /* ── Entrance animations ──────────────────────────────── */

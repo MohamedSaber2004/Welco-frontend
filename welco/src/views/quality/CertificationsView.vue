@@ -126,7 +126,6 @@ const goPage = (p: number) => {
         <span class="mono count-badge">{{ t('certifications.certsValid', { count: certs.length }) }}</span>
       </div>
 
-      <!-- Search & Filter Toolbar -->
       <div class="cert-toolbar">
         <div class="search-box">
           <span class="material-symbols-outlined search-icon">search</span>
@@ -228,7 +227,6 @@ const goPage = (p: number) => {
           </article>
         </div>
 
-        <!-- Pagination -->
         <AppPagination
           v-if="totalPages > 1"
           :page="page"
@@ -426,7 +424,7 @@ const goPage = (p: number) => {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  filter: drop-shadow(0 2px 10px rgba(233, 168, 37, 0.28)) drop-shadow(0 1px 0 rgba(6, 19, 40, 0.9));
+  filter: var(--wl-gold-text-filter);
   line-height: 1.1;
 }
 

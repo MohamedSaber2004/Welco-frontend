@@ -29,7 +29,7 @@ const close = () => modalService.close()
   z-index: 9998;
   display: grid;
   place-items: center;
-  background: rgba(11, 28, 44, 0.5);
+  background: rgba(0, 0, 0, 0.45);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   padding: 1rem;

@@ -119,7 +119,7 @@ onMounted(async () => {
 
           <div class="items-stack">
             <article v-for="it in rfq.items" :key="it.id" class="rfq-item-card">
-              <div class="thumb-box" :style="{ background: it.imageGradient || '#071A38' }">
+              <div class="thumb-box" :style="{ background: it.imageGradient || 'var(--wl-surface-soft)' }">
                 <img
                   v-if="it.imageName"
                   :src="resolveFileUrl(it.imageName)"

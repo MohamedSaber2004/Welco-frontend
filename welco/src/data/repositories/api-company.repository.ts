@@ -50,7 +50,6 @@ export class ApiCompanyRepository implements CompanyRepository {
   async getMyCompany(): Promise<CompanyDto | null> {
     const raw = await this.http.get<Record<string, unknown> | null>(`${COMPANY_ROUTES.base}/companies/my`, { showFeedback: false })
     if (!raw || typeof raw !== 'object') return null
-    // Normalize id — backend may return Id, id, companyId or CompanyId
     const pick = (...keys: string[]): unknown => {
       for (const k of keys) if (k in raw && raw[k] !== undefined && raw[k] !== null && raw[k] !== '') return raw[k]
       return undefined
@@ -107,8 +106,6 @@ export class ApiCompanyRepository implements CompanyRepository {
   }
 
   async getOemServices(): Promise<OemService[]> {
-    // Backend has no /api/v1/oem-services endpoint (truth is /api/v1/oem-inquiries).
-    // Keep the port method for callers (OemView) but return empty — no HTTP call.
     return []
   }
 
@@ -135,9 +132,6 @@ export class ApiCompanyRepository implements CompanyRepository {
     await this.http.del<void>(COMPANY_ROUTES.oemInquiryById(id), { showFeedback: false })
   }
 
-  // ── Company Addresses ────────────────────────────────────────────────
-  // Backend supports many addresses per company across same or different countries
-  // Each address has its own CountryId → CityId → ZoneId lineage
 
   private extractCompanyAddrArray(raw: unknown): CompanyAddressDto[] {
     if (Array.isArray(raw)) return raw as CompanyAddressDto[]

@@ -407,7 +407,7 @@ const toggleSection = (key: string) => {
   height: 6px;
   border-radius: 50%;
   background: var(--wl-success);
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.16);
+  box-shadow: 0 0 0 3px var(--wl-success-soft);
 }
 
 .admin-rail--collapsed .admin-link__label,

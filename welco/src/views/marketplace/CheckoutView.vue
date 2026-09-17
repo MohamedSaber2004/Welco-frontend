@@ -443,7 +443,7 @@ async function convertToQuote() {
 }
 
 .curr-chip--default {
-  border-color: rgba(105, 169, 255, 0.2);
+  border-color: var(--wl-primary-soft);
   background: var(--wl-primary-soft);
   font-weight: 800;
 }

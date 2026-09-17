@@ -1,2 +1,15 @@
-snul-gateway.runasp.net/api/v1/exchange-rates/cart-total:1  Failed to load resource: the server responded with a status of 401 ()
-snul-gateway.runasp.net/api/v1/exchange-rates/cart-total:1  Failed to load resource: the server responded with a status of 401 ()
+    <!--<section class="section" aria-labelledby="metrics-heading">
+      <div class="section__inner">
+        <h2 id="metrics-heading" class="visually-hidden">{{ t('home.metricsHeading') }}</h2>
+        <div class="metrics-grid">
+          <div v-for="item in whyItems" :key="item.b" class="metric-card" :class="`metric-card--${item.tone}`">
+            <div class="metric-card__top">
+              <span class="mono metric-card__label">{{ item.label }}</span>
+              <span class="metric-card__badge mono" :class="`badge--${item.tone}`">{{ item.badge }}</span>
+            </div>
+            <div class="metric-card__value mono-num">{{ item.b }}</div>
+            <div class="metric-card__bar" :class="`bar--${item.tone}`"></div>
+          </div>
+        </div>
+      </div>
+    </section>-->

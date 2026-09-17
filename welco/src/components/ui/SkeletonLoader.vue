@@ -7,6 +7,7 @@ const props = withDefaults(
     type?: 'text' | 'card' | 'circle' | 'table-row' | 'custom'
       | 'product-card' | 'catalog-grid' | 'category-grid' | 'stats-grid'
       | 'table' | 'pdp' | 'list' | 'form' | 'location-grid' | 'hero' | 'pills'
+      | 'provider-grid' | 'cert-grid'
     lines?: number
     count?: number
     width?: string
@@ -27,6 +28,8 @@ const gridCount = computed(() => {
   if (t === 'stats-grid') return props.count ?? 4
   if (t === 'location-grid') return props.count ?? 3
   if (t === 'pills') return props.count ?? 6
+  if (t === 'provider-grid') return props.count ?? 4
+  if (t === 'cert-grid') return props.count ?? 4
   return props.count ?? 1
 })
 </script>

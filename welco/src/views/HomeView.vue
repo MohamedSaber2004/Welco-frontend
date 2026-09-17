@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { authService, services, contentRepository, companyRepository } from '../di/container'
 import { t, locale } from '../i18n'
 import type { CategoryDto, ProductDto } from '../domain/models/marketplace'
-import type { CountryDto } from '../domain/models/location'
 import type { CertificationDto } from '../domain/models/certification'
 import type { LandingPageDto } from '../domain/models/content'
 import type { CompanyDto } from '../domain/models/company'
@@ -27,7 +26,6 @@ const goSearch = () => {
 
 const featured = ref<ProductDto[]>([])
 const cats = ref<CategoryDto[]>([])
-const countries = ref<CountryDto[]>([])
 const certifications = ref<CertificationDto[]>([])
 const landingPages = ref<LandingPageDto[]>([])
 const aboutPage = ref<LandingPageDto | null>(null)
@@ -43,7 +41,6 @@ onMounted(async () => {
     await Promise.allSettled([
       svc.loadCategories(),
       svc.loadFeatured(),
-      services.locationService.loadCountries().then(() => (countries.value = [...services.locationService.countries.value])).catch(() => []),
       services.certificationService.load(),
       services.contentService.loadSupport(),
       contentRepository.getLandingPages({ pageNumber: 1, pageSize: 20 }).then((p) => (landingPages.value = p.data)).catch(() => []),
@@ -74,23 +71,6 @@ onMounted(async () => {
   }
 })
 
-const yearsOfExperience = computed(() => `${new Date().getFullYear() - FOUNDING_YEAR}+`)
-const activeCerts = computed(() => certifications.value.filter((c) => !c.expiryDate || new Date(c.expiryDate) > new Date()))
-const whyItems = computed(() => {
-  const items: Array<{ b: string; label: string; badge: string; tone: string }> = [
-    { b: `${yearsOfExperience.value}`, label: t('home.whyYears'), badge: 'EST. 1994', tone: 'indigo' },
-  ]
-  const isoCert = activeCerts.value.find((c) => c.certificateNumber?.toUpperCase().includes('ISO') || c.title?.toUpperCase().includes('ISO'))
-  const certBadge = isoCert ? isoCert.certificateNumber || isoCert.title : activeCerts.value[0]?.certificateNumber || activeCerts.value[0]?.title
-  if (certBadge) {
-    items.push({ b: certBadge, label: t('home.whyCertified'), badge: 'AUDITED', tone: 'emerald' })
-  }
-  if (countries.value.length > 0) {
-    items.push({ b: `${countries.value.length}+`, label: t('home.whyCountries'), badge: 'GLOBAL', tone: 'teal' })
-  }
-  items.push({ b: 'OEM / ODM', label: t('home.whyOem'), badge: 'DIRECT', tone: 'amber' })
-  return items
-})
 const localized = (en?: string | null, ar?: string | null) => locale.value === 'ar' ? (ar || en || '') : (en || ar || '')
 const handleAdd = (id: string) => {
   const p = (featured.value.find(x => x.id === id) ?? services.marketplaceService.products.value.find((x) => x.id === id))
@@ -189,72 +169,57 @@ const navigateToOemFromModal = () => {
       </div>
     </header>
 
-    <!-- Our Providers Section -->
-    <section class="section section--providers" aria-labelledby="providers-heading">
-      <div class="section__inner">
-        <div class="section-head">
-          <div>
-            <div class="mono section__eyebrow">{{ t('home.ourProvidersEyebrow') }}</div>
-            <h2 id="providers-heading" class="section-title">{{ t('home.ourProviders') }}</h2>
-          </div>
-          <router-link to="/providers" class="btn btn-ghost btn-sm view-all-btn">
-            <span>{{ t('common.viewAll') }}</span>
-            <span class="icon--directional">→</span>
-          </router-link>
-        </div>
-        <p class="section-desc">{{ t('home.ourProvidersSubtitle') }}</p>
+<!-- Our Providers Section -->
+<section class="section section--providers" aria-labelledby="providers-heading">
+  <div class="section__inner">
+    <div class="section-head">
+      <div>
+        <div class="mono section__eyebrow">{{ t('home.ourProvidersEyebrow') }}</div>
+        <h2 id="providers-heading" class="section-title">{{ t('home.ourProviders') }}</h2>
+      </div>
+      <router-link to="/providers" class="btn btn-ghost btn-sm view-all-btn">
+        <span>{{ t('common.viewAll') }}</span>
+        <span class="icon--directional">→</span>
+      </router-link>
+    </div>
+    <p class="section-desc">{{ t('home.ourProvidersSubtitle') }}</p>
 
-        <DataState :loading="loading && !providers.length" :empty="!providers.length && !loading" skeleton-type="catalog-grid" :skeleton-count="4" min-height="160px">
-          <div class="providers-strip-grid">
-            <router-link
-              v-for="p in providers"
-              :key="p.id"
-              :to="{ name: 'marketplace', query: { search: p.name } }"
-              class="provider-tile"
-            >
-              <div class="provider-tile__logo">
-                <AppImage
-                  :src="p.imageName"
-                  placeholder-type="company"
-                  :placeholder-text="p.name"
-                  :alt="p.name"
-                  fit="contain"
-                  height="70px"
-                />
-              </div>
-              <div class="provider-tile__info">
-                <div class="provider-tile__top">
-                  <span class="provider-tile__badge mono">
-                    <span class="material-symbols-outlined text-[12px]">verified</span>
-                    {{ t('home.verifiedSupplier') }}
-                  </span>
-                </div>
-                <h3 class="provider-tile__name" dir="auto">{{ p.name }}</h3>
-                <div v-if="p.countryNameEn || p.countryNameAr" class="provider-tile__country mono">
-                  <span class="material-symbols-outlined text-[13px] text-teal-600">public</span>
-                  <span>{{ localized(p.countryNameEn, p.countryNameAr) }}</span>
-                </div>
-              </div>
-            </router-link>
+    <DataState :loading="loading && !providers.length" :empty="!providers.length && !loading" skeleton-type="provider-grid" :skeleton-count="4" min-height="250px">
+      <div class="providers-strip-grid">
+        <router-link
+          v-for="p in providers"
+          :key="p.id"
+          :to="{ name: 'marketplace', query: { search: p.name } }"
+          class="provider-tile"
+        >
+          <div class="provider-tile__logo">
+            <AppImage
+              :src="p.imageName"
+              placeholder-type="company"
+              :placeholder-text="p.name"
+              :alt="p.name"
+              fit="contain"
+              height="70px"
+            />
           </div>
-        </DataState>
-      </div>
-    </section>
-    <section class="section" aria-labelledby="metrics-heading">
-      <div class="section__inner">
-        <h2 id="metrics-heading" class="visually-hidden">{{ t('home.metricsHeading') }}</h2>
-        <div class="metrics-grid">
-          <div v-for="item in whyItems" :key="item.b" class="metric-card" :class="`metric-card--${item.tone}`">
-            <div class="metric-card__top">
-              <span class="mono metric-card__label">{{ item.label }}</span>
-              <span class="metric-card__badge mono" :class="`badge--${item.tone}`">{{ item.badge }}</span>
+          <div class="provider-tile__info">
+            <div class="provider-tile__top">
+              <span class="provider-tile__badge mono">
+                {{ t('home.verifiedSupplier') }}
+              </span>
             </div>
-            <div class="metric-card__value mono-num">{{ item.b }}</div>
-            <div class="metric-card__bar" :class="`bar--${item.tone}`"></div>
+            <h3 class="provider-tile__name" dir="auto">{{ p.name }}</h3>
+            <div v-if="p.countryNameEn || p.countryNameAr" class="provider-tile__country mono">
+              <span class="material-symbols-outlined text-[13px] text-teal-600">public</span>
+              <span>{{ localized(p.countryNameEn, p.countryNameAr) }}</span>
+            </div>
           </div>
-        </div>
+        </router-link>
       </div>
-    </section>
+    </DataState>
+  </div>
+</section>
+
     <section class="section section--soft" aria-labelledby="cat-heading">
       <div class="section__inner">
         <div class="section-head">
@@ -342,7 +307,7 @@ const navigateToOemFromModal = () => {
     </section>
 
     <!-- Audited Quality Standards Section -->
-    <section v-if="certifications.length" class="section section--soft" aria-labelledby="home-certs-heading">
+    <section class="section section--soft" aria-labelledby="home-certs-heading">
       <div class="section__inner">
         <div class="section-head">
           <div>
@@ -354,30 +319,32 @@ const navigateToOemFromModal = () => {
             <span class="icon--directional">→</span>
           </router-link>
         </div>
-        <div class="home-certs-grid">
-          <article
-            v-for="c in certifications.slice(0, 3)"
-            :key="c.id"
-            class="home-cert-card"
-            @click="router.push('/certifications')"
-          >
-            <div class="home-cert-card__media">
-              <AppImage
-                :src="c.certificationImageName"
-                placeholder-type="document"
-                :placeholder-text="c.certificateNumber || c.title"
-                :alt="c.title"
-                aspect-ratio="16/10"
-                fit="contain"
-              />
-            </div>
-            <div class="home-cert-card__body">
-              <div class="home-cert-card__badge mono">{{ c.certificateNumber || 'ISO / CE' }}</div>
-              <h3 class="home-cert-card__title">{{ c.title }}</h3>
-              <div class="home-cert-card__meta mono">{{ c.issuer }}</div>
-            </div>
-          </article>
-        </div>
+        <DataState :loading="loading && !certifications.length" :empty="!certifications.length && !loading" skeleton-type="cert-grid" :skeleton-count="4" min-height="300px">
+          <div class="home-certs-grid">
+            <article
+              v-for="c in certifications.slice(0, 3)"
+              :key="c.id"
+              class="home-cert-card"
+              @click="router.push('/certifications')"
+            >
+              <div class="home-cert-card__media">
+                <AppImage
+                  :src="c.certificationImageName"
+                  placeholder-type="document"
+                  :placeholder-text="c.certificateNumber || c.title"
+                  :alt="c.title"
+                  aspect-ratio="16/10"
+                  fit="contain"
+                />
+              </div>
+              <div class="home-cert-card__body">
+                <div class="home-cert-card__badge mono">{{ c.certificateNumber || 'ISO / CE' }}</div>
+                <h3 class="home-cert-card__title">{{ c.title }}</h3>
+                <div class="home-cert-card__meta mono">{{ c.issuer }}</div>
+              </div>
+            </article>
+          </div>
+        </DataState>
       </div>
     </section>
     <section class="section section--soft" aria-labelledby="about-heading">
@@ -400,19 +367,15 @@ const navigateToOemFromModal = () => {
             </router-link>
           </div>
         </div>
-        <div class="about-media">
+<div class="about-media">
           <img src="/logo.jpeg" alt="Welco" class="about-media__img" loading="lazy" />
-          <div class="mono about-media__badge">{{ yearsOfExperience }} · EST. 1994</div>
         </div>
       </div>
     </section>
 
-    <!-- Request Institutional Price Quote Modal -->
+<!-- Request Institutional Price Quote Modal -->
     <BaseModal v-model="priceModalOpen" :title="t('home.quoteModalTitle')" max-width="580px">
       <div v-if="priceSubmitted" class="quote-modal-success">
-        <div class="success-icon-badge">
-          <span class="material-symbols-outlined text-[36px] text-emerald-600">verified</span>
-        </div>
         <h3 class="success-head">{{ t('home.quoteSubmittedTitle') }}</h3>
         <p class="success-body">{{ t('home.quoteSubmittedDesc') }}</p>
 
@@ -633,7 +596,7 @@ const navigateToOemFromModal = () => {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  filter: drop-shadow(0 2px 10px rgba(233, 168, 37, 0.28)) drop-shadow(0 1px 0 rgba(6, 19, 40, 0.9));
+  filter: var(--wl-gold-text-filter);
 }
 
 .hero p {
@@ -939,8 +902,31 @@ const navigateToOemFromModal = () => {
 
 /* Our Providers Section */
 .section--providers {
-  background: var(--wl-surface-soft, #0B274F);
-  border-bottom: 1px solid var(--wl-border, #e2e8f0);
+  background: var(--wl-surface-soft);
+  border-bottom: 1px solid var(--wl-border);
+  padding: var(--space-8) 0;
+}
+
+.section-desc {
+  font-size: var(--step-0);
+  color: var(--wl-muted, #64748b);
+  margin: calc(var(--space-2) * -1) 0 var(--space-6);
+  max-width: 680px;
+}
+
+/* Home Cards Grid - Fixed 4-column grid on desktop/laptop, centered in container */
+.home-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+  max-width: var(--wl-max-width);
+  margin-inline: auto;
+}
+
+/* Our Providers Section */
+.section--providers {
+  background: var(--wl-surface-soft);
+  border-bottom: 1px solid var(--wl-border);
   padding: var(--space-8) 0;
 }
 
@@ -953,13 +939,27 @@ const navigateToOemFromModal = () => {
 
 .providers-strip-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: var(--space-4);
+  max-width: var(--wl-max-width);
+  margin-inline: auto;
+}
+
+@media (max-width: 1024px) {
+  .providers-strip-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .providers-strip-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .provider-tile {
-  background: var(--wl-surface, #071A38);
-  border: 1px solid var(--wl-border, #e2e8f0);
+  background: var(--wl-surface);
+  border: 1px solid var(--wl-border);
   border-radius: var(--radius-md);
   overflow: hidden;
   display: flex;
@@ -995,7 +995,7 @@ const navigateToOemFromModal = () => {
 
 .provider-tile__logo {
   height: 110px;
-  background: linear-gradient(180deg, var(--wl-surface-soft, #0B274F) 0%, var(--wl-surface, #071A38) 100%);
+  background: linear-gradient(180deg, var(--wl-surface-soft) 0%, var(--wl-surface) 100%);
   border-bottom: 1px solid var(--wl-border);
   padding: var(--space-3);
   display: flex;
@@ -1052,11 +1052,25 @@ const navigateToOemFromModal = () => {
   padding-top: 0.25rem;
 }
 
-/* Home Certs Grid */
+/* Home Certs Grid - Fixed 4-column grid on desktop, centered */
 .home-certs-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: var(--space-4);
+  max-width: var(--wl-max-width);
+  margin-inline: auto;
+}
+
+@media (max-width: 1024px) {
+  .home-certs-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .home-certs-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .home-cert-card {
@@ -1150,75 +1164,25 @@ const navigateToOemFromModal = () => {
   margin: 0;
 }
 
-/* Metrics Grid */
-.metrics-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: var(--space-3);
-}
-
-.metric-card {
-  background: var(--wl-surface);
-  border: 1px solid var(--wl-border);
-  border-radius: var(--radius-md);
-  padding: var(--space-4);
-  box-shadow: var(--shadow-card);
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
-  position: relative;
-  overflow: hidden;
-}
-
-.metric-card__top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.metric-card__label {
-  font-size: 11px;
-  color: var(--wl-muted);
-  font-weight: 600;
-}
-
-.metric-card__badge {
-  font-size: 9.5px;
-  font-weight: 700;
-  padding: var(--space-1) var(--space-2);
-  border-radius: var(--radius-pill);
-}
-
-.metric-card__value {
-  font-size: var(--step-3);
-  font-weight: 800;
-  color: var(--wl-ink-strong);
-  letter-spacing: -0.02em;
-}
-
-.metric-card__bar {
-  height: 3px;
-  border-radius: var(--radius-pill);
-  width: 100%;
-}
-
-.badge--indigo { background: var(--wl-primary-soft); color: var(--wl-primary); }
-.bar--indigo { background: var(--wl-primary); }
-
-.badge--emerald { background: var(--wl-success-soft); color: var(--wl-success); }
-.bar--emerald { background: #10B981; }
-
-.badge--teal { background: var(--wl-primary-soft); color: var(--wl-primary); }
-.bar--teal { background: var(--wl-primary); }
-
-.badge--amber { background: var(--wl-warning-soft); color: var(--wl-warning); }
-.bar--amber { background: var(--wl-warning); }
-
 /* Categories Grid */
 .cat-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: var(--space-4);
+  max-width: var(--wl-max-width);
+  margin-inline: auto;
+}
+
+@media (max-width: 1024px) {
+  .cat-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .cat-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .cat-card {
@@ -1236,7 +1200,7 @@ const navigateToOemFromModal = () => {
 
 .cat-card:hover {
   transform: translateY(-2px);
-  border-color: rgba(105, 169, 255, 0.3);
+  border-color: var(--wl-primary-soft);
   box-shadow: var(--shadow-hover);
 }
 
@@ -1308,8 +1272,22 @@ const navigateToOemFromModal = () => {
 /* Products Grid */
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: var(--space-4);
+  max-width: var(--wl-max-width);
+  margin-inline: auto;
+}
+
+@media (max-width: 1024px) {
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .product-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .product-card {
@@ -1324,7 +1302,7 @@ const navigateToOemFromModal = () => {
 
 .product-card:hover {
   transform: translateY(-2px);
-  border-color: rgba(105, 169, 255, 0.3);
+  border-color: var(--wl-primary-soft);
   box-shadow: var(--shadow-hover);
 }
 
@@ -1568,8 +1546,8 @@ const navigateToOemFromModal = () => {
 .modal-sel,
 .modal-txt {
   width: 100%;
-  background: var(--wl-surface-soft, #0B274F);
-  border: 1.5px solid var(--wl-border, #E2E8F0);
+  background: var(--wl-surface-soft);
+  border: 1.5px solid var(--wl-border);
   border-radius: var(--radius-md);
   color: var(--wl-ink-strong, #0F172A);
   font-size: var(--step-0);
@@ -1625,17 +1603,6 @@ const navigateToOemFromModal = () => {
   align-items: center;
   text-align: center;
   padding: var(--space-6) var(--space-2);
-}
-
-.success-icon-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: var(--wl-success-soft);
-  margin-bottom: var(--space-4);
 }
 
 .success-head {
@@ -1754,35 +1721,18 @@ const navigateToOemFromModal = () => {
   position: relative;
   border-radius: var(--radius-md);
   overflow: hidden;
-  border: 1px solid var(--wl-line, #e2e8f0);
+  border: 1px solid var(--wl-border);
   background: var(--wl-surface, #fff);
 }
 
 .about-media__img {
-  width: 100%;
-  height: 100%;
-  min-height: 260px;
-  object-fit: cover;
+  width: 85%;
+  max-width: 600px;
+  height: auto;
+  min-height: 180px;
+  object-fit: contain;
   display: block;
-}
-
-.about-media__badge {
-  position: absolute;
-  inset-inline-start: 1rem;
-  bottom: 1rem;
-  background: rgba(11, 29, 42, 0.85);
-  color: var(--wl-ink-strong);
-  font-size: var(--step--1);
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  padding: 0.4rem 0.8rem;
-  border-radius: var(--radius-pill);
-}
-
-@media (max-width: 860px) {
-  .about-grid {
-    grid-template-columns: 1fr;
-  }
+  margin: 0 auto;
 }
 </style>
 

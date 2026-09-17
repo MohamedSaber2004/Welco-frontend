@@ -176,7 +176,7 @@ async function refreshServerTotal(): Promise<void> {
           convertedUnit: converted.convertedAmount,
           lineTotal: converted.convertedAmount * item.quantity,
           rate: converted.rate,
-          ceiledUnit: nativePrice,
+          ceiledUnit: Math.ceil(nativePrice),
         }
       }),
     )
@@ -284,13 +284,12 @@ export function useCart() {
     return items.value.map(i => ({
       productId: i.product.id,
       quantity: i.quantity,
-      // Backend-quoted unit when priced, else native DB price (no local math).
-      unitPrice: getServerLine(i.product.id)?.convertedUnit ?? i.product.price,
+      unitPrice: Math.ceil(getServerLine(i.product.id)?.convertedUnit ?? i.product.price),
     }))
   }
 
   function toRfqItems(): CreateRfqItemPayload[] {
-    return items.value.map(i => ({ productId: i.product.id, quantity: i.quantity, unitPrice: getServerLine(i.product.id)?.convertedUnit ?? i.product.price }))
+    return items.value.map(i => ({ productId: i.product.id, quantity: i.quantity, unitPrice: Math.ceil(getServerLine(i.product.id)?.convertedUnit ?? i.product.price) }))
   }
 
   function toDisplayCurrency(): string {

@@ -71,10 +71,10 @@ const sparkPath = computed(() => {
 })
 
 const strokeColor = computed(() => {
-  if (props.tone === 'emerald' || (props.trend && isPositive.value)) return '#3ed7b4'
-  if (props.tone === 'rose' || (props.trend && isNegative.value)) return '#f26d6d'
-  if (props.tone === 'amber') return '#f8c15d'
-  return '#69a9ff'
+  if (props.tone === 'emerald' || (props.trend && isPositive.value)) return 'var(--wl-success)'
+  if (props.tone === 'rose' || (props.trend && isNegative.value)) return 'var(--wl-danger)'
+  if (props.tone === 'amber') return 'var(--wl-warning)'
+  return 'var(--wl-primary)'
 })
 </script>
 
@@ -207,13 +207,13 @@ const strokeColor = computed(() => {
 .trend--positive {
   background: var(--wl-success-soft);
   color: var(--wl-success);
-  border-color: rgba(16, 185, 129, 0.18);
+  border-color: var(--wl-success-soft);
 }
 
 .trend--negative {
   background: var(--wl-danger-soft);
   color: var(--wl-danger);
-  border-color: rgba(244, 63, 94, 0.18);
+  border-color: var(--wl-danger-soft);
 }
 
 .trend--neutral {
@@ -292,7 +292,7 @@ const strokeColor = computed(() => {
   text-shadow: var(--wl-gold-text-shadow);
 }
 .stat-card--gold {
-  border-color: rgba(255, 209, 102, 0.35) !important;
+  border-color: var(--wl-gold-soft) !important;
   box-shadow: var(--wl-gold-glow-soft), var(--wl-shadow-card) !important;
 }
 .stat-card--indigo .stat-card__value { color: var(--wl-ink-strong); }

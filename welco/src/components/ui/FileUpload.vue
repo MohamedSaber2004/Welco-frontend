@@ -21,6 +21,7 @@ const props = withDefaults(
     label?: string
     hint?: string
     disabled?: boolean
+    isEditable?: boolean
   }>(),
   {
     modelValue: null,
@@ -32,6 +33,7 @@ const props = withDefaults(
     label: undefined,
     hint: undefined,
     disabled: false,
+    isEditable: false,
   },
 )
 
@@ -39,6 +41,7 @@ const emit = defineEmits<{
   'update:modelValue': [value: string | null]
   uploaded: [storedName: string]
   removed: []
+  replaced: [storedName: string]
 }>()
 
 const fileInput = ref<HTMLInputElement | null>(null)
@@ -46,6 +49,23 @@ const uploading = ref(false)
 const progress = ref(0)
 const error = ref('')
 const showInlinePdf = ref(false)
+const isImageLoaded = ref(false)
+const showLightbox = ref(false)
+const imgLoadError = ref(false)
+const imgZoom = ref(1)
+const imgPanX = ref(0)
+const imgPanY = ref(0)
+const isDragging = ref(false)
+const dragStart = ref({ x: 0, y: 0 })
+
+function resetImageState() {
+  isImageLoaded.value = false
+  imgLoadError.value = false
+  imgZoom.value = 1
+  imgPanX.value = 0
+  imgPanY.value = 0
+  isDragging.value = false
+}
 
 const effectiveFileType = computed<number | undefined>(() => {
   if (props.fileType !== undefined) return props.fileType
@@ -100,6 +120,15 @@ watch(
   },
 )
 
+watch(
+  () => props.modelValue,
+  () => {
+    resetImageState()
+    hasError.value = false
+    isLoaded.value = false
+  },
+)
+
 function validate(file: File): string | null {
   const mt = effectiveFileType.value ?? guessMediaTypeFromFile(file)
   if (effectiveFileType.value !== undefined) {
@@ -135,6 +164,32 @@ async function handleFile(file: File) {
   }
 }
 
+async function replaceFile(file: File) {
+  error.value = ''
+  const invalid = validate(file)
+  if (invalid) {
+    error.value = invalid
+    return
+  }
+  uploading.value = true
+  progress.value = 0
+  const mt = effectiveFileType.value ?? guessMediaTypeFromFile(file)
+  try {
+    const res = await attachmentService.replace({ name: props.modelValue ?? '', file, place: props.place, fileType: mt })
+    if (res.ok) {
+      emit('replaced', res.data)
+      emit('update:modelValue', res.data)
+    } else {
+      error.value = t('attachment.uploadFailed')
+    }
+  } catch (e) {
+    error.value = t('attachment.uploadFailed')
+  } finally {
+    uploading.value = false
+    progress.value = 0
+  }
+}
+
 function onInput(e: Event) {
   const input = e.target as HTMLInputElement
   const file = input.files?.[0]
@@ -159,6 +214,54 @@ function triggerPick() {
 }
 
 const showDrop = computed(() => !hasMediaType.value || effectiveFileType.value === 0)
+
+function onImageLoad() {
+  isImageLoaded.value = true
+  imgLoadError.value = false
+}
+
+function onImageError() {
+  isImageLoaded.value = false
+  imgLoadError.value = true
+}
+
+function zoomIn() { imgZoom.value = Math.min(imgZoom.value + 0.25, 4) }
+function zoomOut() { imgZoom.value = Math.max(imgZoom.value - 0.25, 0.5) }
+function resetZoom() { imgZoom.value = 1; imgPanX.value = 0; imgPanY.value = 0 }
+
+function onLightboxTouchStart(e: TouchEvent) {
+  if (e.touches.length === 1) {
+    isDragging.value = true
+    dragStart.value = { x: e.touches[0].clientX, y: e.touches[0].clientY }
+  }
+}
+
+function onLightboxTouchEnd(e: TouchEvent) {
+  isDragging.value = false
+}
+
+function onDragStart(e: MouseEvent) {
+  if (!showLightbox.value || !previewUrl.value) return
+  isDragging.value = true
+  dragStart.value = { x: e.clientX - imgPanX.value, y: e.clientY - imgPanY.value }
+}
+
+function onDragMove(e: MouseEvent) {
+  if (!isDragging.value) return
+  imgPanX.value = e.clientX - dragStart.value.x
+  imgPanY.value = e.clientY - dragStart.value.y
+}
+
+function onDragEnd() {
+  isDragging.value = false
+}
+
+function onZoomWheel(e: WheelEvent) {
+  if (!showLightbox.value) return
+  e.preventDefault()
+  if (e.deltaY < 0) zoomIn()
+  else zoomOut()
+}
 </script>
 
 <template>
@@ -169,25 +272,47 @@ const showDrop = computed(() => !hasMediaType.value || effectiveFileType.value =
     </span>
 
     <div class="fup__body">
-      <!-- Existing image preview -->
-      <div v-if="previewUrl && isImage" class="fup__preview" :style="{ aspectRatio: ratio }">
-        <img :src="previewUrl" :alt="label ?? t('attachment.preview')" class="fup__img" />
-        <div class="fup__overlay">
-          <a
-            :href="previewUrl"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="fup__action fup__action--view"
-            :title="t('attachment.preview')"
-          >
-            <span class="material-symbols-outlined">open_in_new</span>
-            <span>{{ t('attachment.preview') }}</span>
-          </a>
-          <button type="button" class="fup__action fup__action--danger" :disabled="uploading || disabled" @click="remove">
-            <span class="material-symbols-outlined">delete</span> {{ t('attachment.remove') }}
-          </button>
-        </div>
-      </div>
+<!-- Existing image preview -->
+       <div v-if="previewUrl && isImage" class="fup__preview" :style="{ aspectRatio: ratio }" @click="showLightbox = true">
+         <img
+           :src="previewUrl"
+           :alt="label ?? t('attachment.preview')"
+           class="fup__img"
+           @load="onImageLoad"
+           @error="onImageError"
+         />
+         <div class="fup__overlay">
+           <a
+             :href="previewUrl"
+             target="_blank"
+             rel="noopener noreferrer"
+             class="fup__action fup__action--view"
+             :title="t('attachment.preview')"
+           >
+             <span class="material-symbols-outlined">open_in_new</span>
+             <span>{{ t('attachment.preview') }}</span>
+           </a>
+           <button
+             type="button"
+             class="fup__action fup__action--secondary"
+             :disabled="uploading || disabled"
+             @click="triggerPick"
+             v-if="props.isEditable"
+           >
+             <span class="material-symbols-outlined">edit</span>
+             {{ t('attachment.edit') }}
+           </button>
+           <button
+             type="button"
+             class="fup__action fup__action--danger"
+             :disabled="uploading || disabled"
+             @click="remove"
+           >
+             <span class="material-symbols-outlined">delete</span>
+             {{ t('attachment.remove') }}
+           </button>
+         </div>
+       </div>
 
       <!-- Document / PDF / Non-image file card -->
       <div v-else-if="modelValue && !isImage" class="fup__file-card">
@@ -303,8 +428,44 @@ const showDrop = computed(() => !hasMediaType.value || effectiveFileType.value =
       />
     </div>
 
-    <p v-if="error" class="fup__error" role="alert">{{ error }}</p>
+    <!-- Lightbox Zoom Overlay -->
+    <Transition name="lightbox">
+      <div
+        v-if="showLightbox && previewUrl && isImage"
+        class="fup__lightbox"
+        @click="showLightbox = false"
+        @touchstart="onLightboxTouchStart"
+        @touchend="onLightboxTouchEnd"
+      >
+        <button class="fup__lightbox-close" type="button" @click="showLightbox = false" aria-label="Close zoom">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+        <button class="fup__lightbox-zoom-in" type="button" @click.stop="zoomIn" aria-label="Zoom in">
+          <span class="material-symbols-outlined">zoom_in</span>
+        </button>
+        <button class="fup__lightbox-zoom-out" type="button" @click.stop="zoomOut" aria-label="Zoom out">
+          <span class="material-symbols-outlined">zoom_out</span>
+        </button>
+        <button class="fup__lightbox-reset" type="button" @click.stop="resetZoom" aria-label="Reset zoom">
+          <span class="material-symbols-outlined">center_focus_strong</span>
+        </button>
+        <img
+          :src="previewUrl"
+          :alt="label ?? t('attachment.preview')"
+          class="fup__lightbox-img"
+          :style="{ transform: `scale(${imgZoom}) translate(${imgPanX / imgZoom}px, ${imgPanY / imgZoom}px)` }"
+          @mousedown="onDragStart"
+          @mousemove="onDragMove"
+          @mouseup="onDragEnd"
+          @mouseleave="onDragEnd"
+          @wheel="onZoomWheel"
+        />
+        <div class="fup__lightbox-info" v-if="label">{{ label }}</div>
+      </div>
+    </Transition>
   </div>
+
+  <p v-if="error" class="fup__error" role="alert">{{ error }}</p>
 </template>
 
 <style scoped>
@@ -315,15 +476,18 @@ const showDrop = computed(() => !hasMediaType.value || effectiveFileType.value =
 
 .fup__body { position: relative; }
 
-.fup__preview { position: relative; border: 1px solid var(--wl-line); background: var(--wl-surface); overflow: hidden; border-radius: var(--wl-radius); }
+.fup__preview { position: relative; border: 1px solid var(--wl-line); background: var(--wl-surface); overflow: hidden; border-radius: var(--wl-radius); cursor: zoom-in; }
 .fup__img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.fup__overlay { position: absolute; inset: auto 0 0 0; display: flex; justify-content: flex-end; align-items: center; gap: 0.4rem; padding: 0.45rem 0.6rem; background: linear-gradient(transparent, rgba(11, 28, 44, 0.75)); opacity: 0; transition: opacity 0.15s; }
+.fup__preview .fup__img { transition: transform 0.3s ease; }
+.fup__preview:hover .fup__img { transform: scale(1.02); }
+.fup__overlay { position: absolute; inset: auto 0 0 0; display: flex; justify-content: flex-end; align-items: center; gap: 0.4rem; padding: 0.45rem 0.6rem; background: linear-gradient(transparent, rgba(0, 0, 0, 0.65)); opacity: 0; transition: opacity 0.15s; }
 .fup__preview:hover .fup__overlay { opacity: 1; }
-.fup__action { display: inline-flex; align-items: center; gap: 0.3rem; background: rgba(11, 28, 44, 0.85); color: var(--wl-ink-strong); border: 1px solid rgba(255, 255, 255, 0.25); padding: 0.35rem 0.7rem; font-size: 0.75rem; font-weight: 600; cursor: pointer; border-radius: 6px; text-decoration: none; transition: all 0.15s ease; }
+.fup__action { display: inline-flex; align-items: center; gap: 0.3rem; background: rgba(0, 0, 0, 0.75); color: var(--wl-ink-strong); border: 1px solid rgba(255, 255, 255, 0.25); padding: 0.35rem 0.7rem; font-size: 0.75rem; font-weight: 600; cursor: pointer; border-radius: 6px; text-decoration: none; transition: all 0.15s ease; }
 .fup__action:hover { background: var(--wl-ink-strong); color: var(--wl-ink-strong); border-color: rgba(255, 255, 255, 0.5); }
-:root[data-theme='dark'] .fup__action:hover, :root.dark .fup__action:hover { background: var(--wl-surface-hover); color: var(--wl-ink-strong); }
 .fup__action--view { background: rgba(14, 165, 233, 0.85); }
 .fup__action--view:hover { background: #0284c7; }
+.fup__action--secondary { background: rgba(255, 255, 255, 0.9); }
+.fup__action--secondary:hover { background: var(--wl-primary); color: var(--wl-on-primary); }
 .fup__action--danger:hover { background: #dc2626; }
 .fup__action .material-symbols-outlined { font-size: 15px; }
 
@@ -519,4 +683,108 @@ const showDrop = computed(() => !hasMediaType.value || effectiveFileType.value =
 .fup__bar { height: 100%; background: var(--wl-primary); transition: width 0.15s ease; }
 
 .fup__error { font-size: 0.78rem; font-weight: 600; color: var(--wl-danger); margin: 0; }
+
+/* Lightbox Styles */
+.fup__lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(8px);
+}
+.fup__lightbox[dir="rtl"] {
+  direction: rtl;
+}
+.fup__lightbox-content {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+}
+.fup__lightbox-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  width: 3rem;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+.fup__lightbox-close:hover { background: rgba(255, 255, 255, 1); }
+.fup__lightbox-controls {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  z-index: 10;
+}
+.fup__lightbox-controls button {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  width: 2.8rem;
+  height: 2.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+.fup__lightbox-controls button:hover { background: rgba(255, 255, 255, 1); }
+.fup__lightbox-img {
+  max-width: 90vw;
+  max-height: 80vh;
+  border-radius: var(--wl-radius-lg);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease-out;
+  cursor: grab;
+}
+.fup__lightbox-img:active { cursor: grabbing; }
+.fup__lightbox-info {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80vw;
+}
+
+/* Transition */
+.lightbox-enter-active,
+.lightbox-leave-active {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.lightbox-enter-from,
+.lightbox-leave-to { opacity: 0; }
+
+/* Handle touch actions */
+@media (pointer: coarse) {
+  .fup__lightbox-img { touch-action: pinch-zoom; }
+}
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  .fup__lightbox-img,
+  .fup__lightbox-close,
+  .fup__lightbox-controls button {
+    transition: none !important;
+  }
+  .lightbox-enter-active,
+  .lightbox-leave-active {
+    transition: none !important;
+  }
+}
 </style>

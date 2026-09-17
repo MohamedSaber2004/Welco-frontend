@@ -264,9 +264,8 @@ table thead th.text-center {
   gap: 0.75rem;
 }
 
-/* ── Corrupted-font repair: legacy Tailwind slate/indigo/emerald text on navy ──
- * These utilities were designed for light backgrounds and render near-invisible
- * (or muddy grey) on the navy-classic dark theme. Remap them to theme tokens so
+/* ── Corrupted-font repair: legacy Tailwind slate/indigo/emerald text rendered invisible
+ * on the Clinical White / Navy Classic light theme. Remap them to theme tokens so
  * every view — profile, admin tables, account — regains readable visualization.
  * Placed AFTER @tailwind utilities so it wins over generated classes. */
 .text-slate-900,
@@ -762,5 +761,23 @@ code, kbd, samp,
 .skeleton-text,
 .loading-card {
   box-shadow: none !important;
+}
+
+/* ── Gold text/filter overrides ── */
+.wl-gold-title,
+.wl-gold-text,
+.wl-gold-metric {
+  filter: var(--wl-gold-text-filter) !important;
+}
+.wl-gold-eyebrow {
+  text-shadow: none !important;
+}
+.row-action-btn--gold {
+  box-shadow: var(--wl-gold-glow-soft) !important;
+}
+
+/* Center card grids */
+.product-grid, .supplier-grid, .help-grid, .article-grid, .stats-grid, .staff-queues-grid, .quick-actions-grid, .bento-grid, .pipeline-stepper, .territory-grid, .account-specs-bar, .company-specs-grid, .pillars-grid, .stats-strip {
+  justify-content: center;
 }
 

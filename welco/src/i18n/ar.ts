@@ -1,5 +1,6 @@
 import type { Messages } from './messages'
 
+
 export const ar: Messages = {
   common: {
     loading: 'جاري التحميل...',

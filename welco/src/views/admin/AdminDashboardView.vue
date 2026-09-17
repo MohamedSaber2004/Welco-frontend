@@ -12,6 +12,7 @@ import StatusPill from '../../components/ui/StatusPill.vue'
 import { useUserLookup } from '../../composables/useUserLookup'
 import type { AuditLogDto } from '../../domain/models/audit-log'
 import { t, locale } from '../../i18n'
+import { formatPrice } from '../../utils/format'
 
 const isStaffOnly = computed(() => authSvc.isWelcoStaff.value && !authSvc.isAdmin.value)
 
@@ -136,9 +137,9 @@ const totalSevenMonthOps = computed(() => {
 const territoryData = computed(() => {
   const max = Math.max(liveCounts.value.countries, liveCounts.value.cities, liveCounts.value.zones, 1)
   return [
-    { label: t('admin.countries'), value: liveCounts.value.countries, pct: Math.round((liveCounts.value.countries / max) * 100), color: '#69a9ff', icon: 'public', desc: t('admin.sovereignRoot') },
-    { label: t('admin.cities'), value: liveCounts.value.cities, pct: Math.round((liveCounts.value.cities / max) * 100), color: '#8abcff', icon: 'location_city', desc: t('admin.regionalHubs') },
-    { label: t('admin.zones'), value: liveCounts.value.zones, pct: Math.round((liveCounts.value.zones / max) * 100), color: '#10B981', icon: 'my_location', desc: t('admin.deliveryAnchors') },
+    { label: t('admin.countries'), value: liveCounts.value.countries, pct: Math.round((liveCounts.value.countries / max) * 100), color: 'var(--wl-primary-light)', icon: 'public', desc: t('admin.sovereignRoot') },
+    { label: t('admin.cities'), value: liveCounts.value.cities, pct: Math.round((liveCounts.value.cities / max) * 100), color: 'var(--wl-primary-active)', icon: 'location_city', desc: t('admin.regionalHubs') },
+    { label: t('admin.zones'), value: liveCounts.value.zones, pct: Math.round((liveCounts.value.zones / max) * 100), color: 'var(--wl-success)', icon: 'my_location', desc: t('admin.deliveryAnchors') },
   ]
 })
 
@@ -156,10 +157,10 @@ const activeDonutSegment = ref<{ label: string; value: number; pct: number; colo
 
 const platformData = computed(() => {
   const items = [
-    { label: t('admin.products'), value: stats.value.products, color: '#69a9ff', to: '/admin/catalog?tab=products' },
-    { label: t('admin.categoriesTitle'), value: stats.value.categories, color: '#8abcff', to: '/admin/catalog?tab=categories' },
-    { label: t('admin.users'), value: stats.value.users, color: '#10B981', to: '/admin/users' },
-    { label: t('admin.distributorApps'), value: stats.value.pendingApps, color: '#F59E0B', to: '/admin/companies' },
+    { label: t('admin.products'), value: stats.value.products, color: 'var(--wl-primary-light)', to: '/admin/catalog?tab=products' },
+    { label: t('admin.categoriesTitle'), value: stats.value.categories, color: 'var(--wl-primary-active)', to: '/admin/catalog?tab=categories' },
+    { label: t('admin.users'), value: stats.value.users, color: 'var(--wl-success)', to: '/admin/users' },
+    { label: t('admin.distributorApps'), value: stats.value.pendingApps, color: 'var(--wl-warning)', to: '/admin/companies' },
   ]
   const total = items.reduce((s, i) => s + i.value, 0) || 1
   let acc = 0
@@ -379,8 +380,8 @@ onUnmounted(_removeListeners)
       </div>
     </header>
 
-    <div v-if="loading">
-      <SkeletonLoader type="stats-grid" :count="6" />
+    <div v-if="loading" class="stats-grid">
+      <SkeletonLoader type="stats-grid" :count="6" gap="1.25rem" />
     </div>
 
     <!-- Staff Metrics Cards Grid (Focused, high-impact operational counters) -->
@@ -571,7 +572,7 @@ onUnmounted(_removeListeners)
               <div class="dash-mini-main">
                 <div class="flex items-center gap-2">
                   <strong class="dash-mini-id mono">{{ order.orderNumber }}</strong>
-                  <span class="priority-chip priority-chip--order mono text-[10px]">{{ order.currencySymbol || '$' }}{{ Math.ceil(order.totalAmount ?? 0).toLocaleString() }}</span>
+                  <span class="priority-chip priority-chip--order mono text-[10px]">{{ order.currencySymbol || '$' }}{{ formatPrice(order.totalAmount ?? 0, locale) }}</span>
                 </div>
                 <span class="dash-mini-sub mono">{{ t('account.lineItemsCount', { count: order.items?.length || 0 }) }}</span>
               </div>
@@ -667,15 +668,15 @@ onUnmounted(_removeListeners)
           <div class="curve-chart-container">
             <svg class="curve-chart-svg" viewBox="0 0 540 180" preserveAspectRatio="none">
               <defs>
-                <linearGradient id="curveGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#69a9ff" stop-opacity="0.32" />
-                  <stop offset="60%" stop-color="#8abcff" stop-opacity="0.10" />
-                  <stop offset="100%" stop-color="#8abcff" stop-opacity="0.0" />
+<linearGradient id="curveGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="var(--wl-primary-light)" stop-opacity="0.32" />
+                  <stop offset="60%" stop-color="var(--wl-primary-active)" stop-opacity="0.10" />
+                  <stop offset="100%" stop-color="var(--wl-primary-active)" stop-opacity="0.0" />
                 </linearGradient>
                 <linearGradient id="laserStrokeGrad" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0%" stop-color="#69a9ff" />
-                  <stop offset="50%" stop-color="#8abcff" />
-                  <stop offset="100%" stop-color="#818CF8" />
+                  <stop offset="0%" stop-color="var(--wl-primary-light)" />
+                  <stop offset="50%" stop-color="var(--wl-primary-active)" />
+                  <stop offset="100%" stop-color="var(--wl-primary-active)" />
                 </linearGradient>
               </defs>
 
@@ -997,8 +998,8 @@ onUnmounted(_removeListeners)
           </div>
         </button>
 
-        <button type="button" class="quick-btn" @click="openContactModal">
-          <span class="material-symbols-outlined quick-btn__icon" style="color:#0D9488">contact_support</span>
+<button type="button" class="quick-btn" @click="openContactModal">
+          <span class="material-symbols-outlined quick-btn__icon" style="color:var(--wl-teal)">contact_support</span>
           <div class="quick-btn__text">
             <strong>{{ t('admin.supportChannels') }}</strong>
             <span>{{ t('admin.supportChannelsSub') }}</span>
@@ -1102,7 +1103,7 @@ onUnmounted(_removeListeners)
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  filter: drop-shadow(0 2px 10px rgba(233, 168, 37, 0.28)) drop-shadow(0 1px 0 rgba(6, 19, 40, 0.9));
+  filter: var(--wl-gold-text-filter);
 }
 
 .dash-head__desc {
@@ -1138,13 +1139,13 @@ onUnmounted(_removeListeners)
   height: 7px;
   border-radius: 50%;
   background: var(--wl-success);
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.18);
+  box-shadow: 0 0 0 3px var(--wl-success-soft);
   flex-shrink: 0;
 }
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 1fr;
   gap: 1.25rem;
   margin-bottom: 1.75rem;
 }
@@ -1297,9 +1298,6 @@ onUnmounted(_removeListeners)
   stroke-width: 1;
   stroke-dasharray: 4 4;
 }
-:root[data-theme='dark'] .chart-gridline {
-  stroke: rgba(255, 255, 255, 0.06);
-}
 
 .chart-gridline--base {
   stroke-dasharray: none;
@@ -1346,11 +1344,11 @@ onUnmounted(_removeListeners)
 }
 
 .chart-point {
-  fill: #ffffff;
-  stroke: #69a9ff;
+  fill: var(--wl-ink-strong);
+  stroke: var(--wl-primary);
   stroke-width: 2.5;
   transition: all 0.2s var(--wl-ease-spring);
-  filter: drop-shadow(0 0 4px rgba(105, 169, 255, 0.4));
+  filter: drop-shadow(0 0 4px rgba(var(--wl-primary-rgb), 0.4));
 }
 
 .chart-point-hit {
@@ -1360,7 +1358,7 @@ onUnmounted(_removeListeners)
 
 .chart-point-group:hover .chart-point {
   r: 6.5;
-  stroke: #69a9ff;
+  stroke: var(--wl-primary);
   stroke-width: 3.5;
 }
 
@@ -1693,7 +1691,7 @@ onUnmounted(_removeListeners)
 
 .quick-btn:hover {
   background: var(--wl-surface-soft);
-  border-color: rgba(105, 169, 255, 0.25);
+  border-color: var(--wl-primary-soft);
   transform: translateY(-1px);
   box-shadow: var(--shadow-sm);
 }
@@ -1745,7 +1743,7 @@ onUnmounted(_removeListeners)
 }
 
 .staff-queue-card:hover {
-  border-color: rgba(105, 169, 255, 0.25);
+  border-color: var(--wl-primary-soft);
   box-shadow: var(--shadow-md);
 }
 
@@ -1786,7 +1784,7 @@ onUnmounted(_removeListeners)
 }
 
 .queue-icon--emerald {
-  background: rgba(16, 185, 129, 0.12);
+  background: var(--wl-success-soft);
   color: var(--wl-success);
 }
 
@@ -1830,9 +1828,9 @@ onUnmounted(_removeListeners)
 }
 
 .priority-chip--order {
-  background: rgba(105, 169, 255, 0.1);
+  background: var(--wl-primary-soft);
   color: var(--wl-primary);
-  border-color: rgba(105, 169, 255, 0.2);
+  border-color: var(--wl-primary-soft);
 }
 
 .dash-link {
@@ -1876,7 +1874,7 @@ onUnmounted(_removeListeners)
 
 .dash-mini-item:hover {
   background: var(--wl-surface);
-  border-color: rgba(105, 169, 255, 0.4);
+  border-color: var(--wl-border-strong);
   transform: translateY(-1px);
 }
 
@@ -2006,9 +2004,9 @@ onUnmounted(_removeListeners)
 }
 
 .role-badge--staff {
-  background: rgba(16, 185, 129, 0.12);
+  background: var(--wl-success-soft);
   color: var(--wl-success);
-  border: 1px solid rgba(16, 185, 129, 0.25);
+  border: 1px solid var(--wl-success-soft);
 }
 
 .role-badge--org {
@@ -2077,7 +2075,7 @@ onUnmounted(_removeListeners)
 
 @media (max-width: 980px) {
   .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
     gap: 1rem;
     margin-bottom: 1.25rem;
   }
@@ -2249,4 +2247,7 @@ onUnmounted(_removeListeners)
   gap: 0.75rem;
 }
 </style>
+
+
+
 

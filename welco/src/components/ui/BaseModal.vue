@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, watch } from 'vue'
+import { onMounted, onUnmounted, ref, watch, nextTick } from 'vue'
 import { t } from '../../i18n'
 
 const props = withDefaults(
@@ -18,6 +18,17 @@ const emit = defineEmits<{
   close: []
 }>()
 
+const modalContainer = ref<HTMLElement | null>(null)
+
+const getFocusable = () => {
+  if (!modalContainer.value) return []
+  return Array.from(
+    modalContainer.value.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+    ),
+  ).filter((el) => !el.hasAttribute('disabled'))
+}
+
 const handleClose = () => {
   emit('update:modelValue', false)
   emit('close')
@@ -26,6 +37,24 @@ const handleClose = () => {
 const onKeyDown = (e: KeyboardEvent) => {
   if (e.key === 'Escape' && props.modelValue) {
     handleClose()
+    return
+  }
+  if (e.key === 'Tab' && props.modelValue) {
+    const focusable = getFocusable()
+    const first = focusable[0]
+    const last = focusable[focusable.length - 1]
+    if (!first || !last) return
+    if (e.shiftKey) {
+      if (document.activeElement === first || !modalContainer.value?.contains(document.activeElement)) {
+        e.preventDefault()
+        last.focus()
+      }
+    } else {
+      if (document.activeElement === last || !modalContainer.value?.contains(document.activeElement)) {
+        e.preventDefault()
+        first.focus()
+      }
+    }
   }
 }
 
@@ -40,7 +69,20 @@ watch(
   },
 )
 
-onMounted(() => window.addEventListener('keydown', onKeyDown))
+onMounted(async () => {
+  window.addEventListener('keydown', onKeyDown)
+  if (props.modelValue) {
+    await nextTick()
+    const focusable = getFocusable()
+    const first = focusable[0]
+    if (first) {
+      first.focus()
+    } else if (modalContainer.value) {
+      modalContainer.value.focus()
+    }
+  }
+})
+
 onUnmounted(() => {
   window.removeEventListener('keydown', onKeyDown)
   document.body.style.overflow = ''
@@ -51,7 +93,7 @@ onUnmounted(() => {
   <Teleport to="body">
     <Transition name="modal-fade">
       <div v-if="modelValue" class="modal-backdrop" @click.self="handleClose">
-        <div class="modal-container" :style="{ maxWidth }" role="dialog" aria-modal="true">
+        <div class="modal-container" :style="{ maxWidth }" ref="modalContainer" role="dialog" aria-modal="true" tabindex="-1">
           <div class="modal-card">
             <div v-if="title || $slots.header" class="modal-header">
               <slot name="header">
@@ -87,14 +129,10 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   padding: var(--wl-gutter, var(--space-4));
-  z-index: 999;
-}
-:root.dark .modal-backdrop,
-:root[data-theme='dark'] .modal-backdrop {
-  background: rgba(0, 0, 0, 0.72);
-}
+z-index: 999;
+  }
 
-.modal-container {
+  .modal-container {
   width: 100%;
   max-height: 90vh;
   display: flex;
@@ -105,8 +143,8 @@ onUnmounted(() => {
   background-color: var(--wl-surface);
   background-image: var(--wl-gradient-modal, var(--wl-gradient-card));
   border: 1px solid var(--wl-border);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-xl);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
   display: flex;
   flex-direction: column;
   max-height: 90vh;
@@ -138,7 +176,7 @@ onUnmounted(() => {
   place-items: center;
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-pill);
   font-size: 13px;
   color: var(--wl-muted);
   cursor: pointer;
@@ -170,7 +208,7 @@ onUnmounted(() => {
     padding: var(--space-2);
   }
   .modal-card {
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-md);
     max-height: 94vh;
   }
 }

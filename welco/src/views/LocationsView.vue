@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { authService } from '../di/container'
 import { t } from '../i18n'
 import { useLocations } from '../composables/useLocations'
@@ -22,6 +22,30 @@ const {
 } = useLocations()
 
 const isOrganizationUser = computed(() => authService.isOrganizationUser.value)
+
+const territoryColumns = ref<HTMLElement[]>([])
+const activeColumnIndex = ref(0)
+
+const handleTerritoryKeydown = (e: KeyboardEvent, columnIndex: number) => {
+  const columns = territoryColumns.value
+  if (!columns.length) return
+
+  if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+    e.preventDefault()
+    const dir = e.key === 'ArrowRight' ? 1 : -1
+    const next = (columnIndex + dir + columns.length) % columns.length
+    activeColumnIndex.value = next
+    const nextCol = columns[next]
+    if (!nextCol) return
+    const items = nextCol.querySelectorAll<HTMLElement>('.territory-item')
+    const first = items[0]
+    if (first) {
+      first.focus()
+    } else {
+      nextCol.focus()
+    }
+  }
+}
 </script>
 
 <template>
@@ -90,9 +114,16 @@ const isOrganizationUser = computed(() => authService.isOrganizationUser.value)
     />
 
     <!-- 3. Cascading 3-Column Territory Explorer -->
-    <div v-else class="territory-grid">
+    <div v-else class="territory-grid" role="grid">
       <!-- Column 1: Countries -->
-      <section class="territory-col">
+      <section
+        class="territory-col"
+        ref="(el) => { if (el) territoryColumns[0] = el as HTMLElement }"
+        @keydown="handleTerritoryKeydown($event, 0)"
+        role="gridcell"
+        aria-label="Countries column"
+        tabindex="0"
+      >
         <div class="col-head">
           <div class="col-title-row">
             <div class="col-title-group">
@@ -111,7 +142,7 @@ const isOrganizationUser = computed(() => authService.isOrganizationUser.value)
           compact
         />
 
-        <div v-else class="item-list-box" role="listbox">
+        <div v-else class="item-list-box" role="listbox" aria-label="Countries">
           <button
             v-for="c in filteredCountries"
             :key="c.id"
@@ -129,7 +160,14 @@ const isOrganizationUser = computed(() => authService.isOrganizationUser.value)
       </section>
 
       <!-- Column 2: Cities -->
-      <section class="territory-col">
+      <section
+        class="territory-col"
+        ref="(el) => { if (el) territoryColumns[1] = el as HTMLElement }"
+        @keydown="handleTerritoryKeydown($event, 1)"
+        role="gridcell"
+        aria-label="Cities column"
+        tabindex="0"
+      >
         <div class="col-head">
           <div class="col-title-row">
             <div class="col-title-group">
@@ -156,7 +194,7 @@ const isOrganizationUser = computed(() => authService.isOrganizationUser.value)
           compact
         />
 
-        <div v-else class="item-list-box" role="listbox">
+        <div v-else class="item-list-box" role="listbox" aria-label="Cities">
           <button
             v-for="c in cities"
             :key="c.id"
@@ -173,7 +211,14 @@ const isOrganizationUser = computed(() => authService.isOrganizationUser.value)
       </section>
 
       <!-- Column 3: Zones -->
-      <section class="territory-col">
+      <section
+        class="territory-col"
+        ref="(el) => { if (el) territoryColumns[2] = el as HTMLElement }"
+        @keydown="handleTerritoryKeydown($event, 2)"
+        role="gridcell"
+        aria-label="Zones column"
+        tabindex="0"
+      >
         <div class="col-head">
           <div class="col-title-row">
             <div class="col-title-group">
@@ -220,8 +265,8 @@ const isOrganizationUser = computed(() => authService.isOrganizationUser.value)
 .crumb-bar {
   display: flex;
   align-items: center;
-  gap: 0.45rem;
-  font-size: 11px;
+  gap: var(--space-2);
+  font-size: var(--step--1);
   color: var(--wl-muted);
 }
 
@@ -233,6 +278,24 @@ const isOrganizationUser = computed(() => authService.isOrganizationUser.value)
 
 .crumb-bar a:hover {
   color: var(--wl-primary);
+}
+
+.crumb-bar a:active:not(:disabled) {
+  color: var(--wl-primary-hover);
+}
+
+.crumb-bar a:focus-visible {
+  outline: none;
+  box-shadow: var(--wl-focus-ring);
+}
+
+.crumb-bar a:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.crumb-bar a[aria-busy="true"] {
+  pointer-events: none;
 }
 
 .crumb-sep {
@@ -248,30 +311,30 @@ const isOrganizationUser = computed(() => authService.isOrganizationUser.value)
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  gap: 1.5rem;
+  gap: var(--space-6);
   flex-wrap: wrap;
 }
 
 .head-info {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: var(--space-1);
 }
 
 .head-chip {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  font-size: 10px;
+  font-size: var(--step--1);
   font-weight: 700;
   color: var(--wl-gold);
   background: var(--wl-gold-soft);
   border: 1px solid rgba(255, 209, 102, 0.35);
-  padding: 0.2rem 0.6rem;
-  border-radius: 9999px;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-pill);
   letter-spacing: 0.06em;
   width: fit-content;
-  margin-bottom: 0.4rem;
+  margin-bottom: var(--space-1);
   text-shadow: var(--wl-gold-text-shadow);
 }
 
@@ -285,7 +348,7 @@ const isOrganizationUser = computed(() => authService.isOrganizationUser.value)
 
 .head-title {
   font-family: var(--wl-font-display, system-ui);
-  font-size: 1.68rem;
+  font-size: var(--step-3);
   font-weight: 800;
   letter-spacing: -0.025em;
   margin: 0;
@@ -294,32 +357,32 @@ const isOrganizationUser = computed(() => authService.isOrganizationUser.value)
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  filter: drop-shadow(0 2px 10px rgba(233, 168, 37, 0.28)) drop-shadow(0 1px 0 rgba(6, 19, 40, 0.9));
+  filter: var(--wl-gold-text-filter);
 }
 
 .head-subtitle {
-  font-size: 13.5px;
+  font-size: var(--step-0);
   color: var(--wl-muted);
-  margin: 0.25rem 0 0;
+  margin: var(--space-1) 0 0;
   max-width: 540px;
 }
 
 .cascade-pills {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.6rem;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
 }
 
 .pill-node {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  font-size: 11px;
+  font-size: var(--step--1);
   font-weight: 700;
   color: var(--wl-muted);
-  padding: 0.15rem 0.5rem;
-  border-radius: 6px;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
   background: var(--wl-surface-soft);
   border: 1px solid var(--wl-border);
 }
@@ -365,8 +428,8 @@ const isOrganizationUser = computed(() => authService.isOrganizationUser.value)
   padding-inline-start: 38px;
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  border-radius: var(--wl-radius-sm);
-  font-size: 13.5px;
+  border-radius: var(--radius-sm);
+  font-size: var(--step-0);
   color: var(--wl-ink-strong);
   outline: none;
   box-shadow: var(--wl-shadow-card);
@@ -383,14 +446,14 @@ const isOrganizationUser = computed(() => authService.isOrganizationUser.value)
 .territory-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1.25rem;
+  gap: var(--space-4);
 }
 
 .territory-col {
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  border-radius: 16px;
-  padding: 1.25rem;
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
   display: flex;
   flex-direction: column;
   min-height: 480px;
@@ -400,10 +463,10 @@ const isOrganizationUser = computed(() => authService.isOrganizationUser.value)
 .col-head {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  padding-bottom: 0.85rem;
+  gap: var(--space-1);
+  padding-bottom: var(--space-3);
   border-bottom: 1px solid var(--wl-border);
-  margin-bottom: 0.75rem;
+  margin-bottom: var(--space-3);
 }
 
 .col-title-row {
@@ -419,24 +482,24 @@ const isOrganizationUser = computed(() => authService.isOrganizationUser.value)
 }
 
 .col-title {
-  font-size: 14.5px;
+  font-size: var(--step-0);
   font-weight: 800;
   color: var(--wl-ink-strong);
   margin: 0;
 }
 
 .count-pill {
-  font-size: 11px;
+  font-size: var(--step--1);
   font-weight: 700;
   color: var(--wl-ink-soft);
   background: var(--wl-surface-soft);
   border: 1px solid var(--wl-border);
-  padding: 0.15rem 0.5rem;
-  border-radius: 9999px;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-pill);
 }
 
 .col-eyebrow {
-  font-size: 10px;
+  font-size: var(--step--1);
   font-weight: 700;
   color: var(--wl-muted);
   letter-spacing: 0.05em;
@@ -446,7 +509,7 @@ const isOrganizationUser = computed(() => authService.isOrganizationUser.value)
 .item-list-box {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: var(--space-2);
   overflow-y: auto;
   max-height: 460px;
   padding-inline-end: 2px;
@@ -455,13 +518,13 @@ const isOrganizationUser = computed(() => authService.isOrganizationUser.value)
 .territory-item {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
-  padding: 0.65rem 0.85rem;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
   border: 1px solid var(--wl-border);
   background: var(--wl-surface);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   color: var(--wl-ink-strong);
-  font-size: 13.5px;
+  font-size: var(--step-0);
   font-weight: 600;
   cursor: pointer;
   text-align: start;
@@ -474,20 +537,39 @@ const isOrganizationUser = computed(() => authService.isOrganizationUser.value)
   background: var(--wl-surface-soft);
 }
 
+.territory-item:active:not(:disabled) {
+  transform: scale(0.995);
+}
+
+.territory-item:focus-visible {
+  outline: none;
+  box-shadow: var(--wl-focus-ring);
+}
+
+.territory-item:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.territory-item[aria-busy="true"] {
+  pointer-events: none;
+}
+
 .territory-item.is-selected {
   background: var(--wl-primary);
   border-color: var(--wl-primary);
   color: var(--wl-on-primary);
-  box-shadow: 0 4px 12px -2px var(--wl-primary-ring);
+  box-shadow: var(--shadow-hover);
 }
 
 .code-tag {
-  font-size: 10px;
+  font-size: var(--step--1);
   font-weight: 700;
-  padding: 0.15rem 0.45rem;
+  padding: var(--space-1) var(--space-2);
   background: var(--wl-surface-soft);
   color: var(--wl-ink-soft);
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   letter-spacing: 0.04em;
 }
 
@@ -522,13 +604,13 @@ const isOrganizationUser = computed(() => authService.isOrganizationUser.value)
 .zone-item-static {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  padding: 0.65rem 0.85rem;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
   border: 1px solid var(--wl-border);
   background: var(--wl-surface-soft);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   color: var(--wl-ink-strong);
-  font-size: 13.5px;
+  font-size: var(--step-0);
   font-weight: 600;
 }
 
@@ -540,12 +622,12 @@ const isOrganizationUser = computed(() => authService.isOrganizationUser.value)
 }
 
 .zone-badge {
-  font-size: 10px;
+  font-size: var(--step--1);
   font-weight: 700;
   color: var(--wl-primary);
   background: var(--wl-primary-faint);
-  padding: 0.15rem 0.5rem;
-  border-radius: 6px;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
 }
 
 @media (max-width: 1024px) {

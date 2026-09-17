@@ -6,6 +6,11 @@ import type { TokenStore } from './token-store'
 import type { AuthBridge } from './auth-bridge'
 import type { ModalService } from '../feedback/modal.service'
 
+export function normalizeEnvelope<T>(raw: any): T {
+  if (raw && typeof raw === 'object' && 'data' in raw && 'isSuccess' in raw) return raw.data as T;
+  return raw as T;
+}
+
 export interface HttpClientDependencies {
   tokenStore: TokenStore
   authBridge: AuthBridge
@@ -69,6 +74,8 @@ export class HttpClient {
 
   private dedupeMap = new Map<string, Promise<unknown>>()
 
+  private refreshPromise: Promise<boolean> | null = null
+
   constructor(dependencies: HttpClientDependencies) {
     this.tokenStore = dependencies.tokenStore
     this.authBridge = dependencies.authBridge
@@ -117,8 +124,11 @@ export class HttpClient {
     const silentPath = NO_FEEDBACK_PATHS.some((candidate) => routingPath.startsWith(candidate))
 
     if (this.tokenStore.hasAccessToken() && this.tokenStore.isAccessTokenExpired()) {
-      this.tokenStore.clear()
-      this.authBridge.onSessionExpired()
+      const pendingRefresh = this.tokenStore.getRefreshToken()
+      if (!pendingRefresh || this.tokenStore.isRefreshTokenExpired()) {
+        this.tokenStore.clear()
+        this.authBridge.onSessionExpired()
+      }
     }
 
     const headers: Record<string, string> = { ...extraHeaders, 'Accept-Language': locale.value }
@@ -147,6 +157,8 @@ export class HttpClient {
 
     const run = async (): Promise<T> => {
       await this.waitForRateLimit(path)
+      const isRefreshRequest = routingPath.startsWith(AUTH_ROUTES.refreshToken)
+      let refreshedOnce = false
 
       for (let attempt = 0; ; attempt++) {
         let response: Response
@@ -158,6 +170,24 @@ export class HttpClient {
           const error = new ApiError(0, msg)
           if (wantsFeedback && !isAbort) this.feedback.showError(isAbort ? msg : t('common.networkError'))
           throw error
+        }
+
+        // ── Silent refresh: on 401 with a stored refresh token, rotate once
+        // (single-flight) and retry with the new access token. ──
+        if (
+          response.status === 401 &&
+          !silentPath &&
+          !isRefreshRequest &&
+          !refreshedOnce &&
+          this.tokenStore.getRefreshToken()
+        ) {
+          const refreshed = await this.tryRefresh()
+          if (refreshed) {
+            refreshedOnce = true
+            const newToken = this.tokenStore.getAccessToken()
+            if (newToken) headers['Authorization'] = `Bearer ${newToken}`
+            continue
+          }
         }
 
         // A 401 against an expired access token means the session is dead →
@@ -405,5 +435,65 @@ export class HttpClient {
     if (waitMs <= 0) return
     if (waitMs > MAX_RATE_LIMIT_WAIT_MS) throw new ApiError(429, 'Rate limit exceeded', {}, true)
     await sleep(waitMs)
+  }
+
+  private tryRefresh(): Promise<boolean> {
+    if (this.refreshPromise) return this.refreshPromise
+    const started = this.doRefresh()
+    this.refreshPromise = started
+    void started.finally(() => {
+      if (this.refreshPromise === started) this.refreshPromise = null
+    })
+    return started
+  }
+
+  private async doRefresh(): Promise<boolean> {
+    const refreshToken = this.tokenStore.getRefreshToken()
+    if (!refreshToken || this.tokenStore.isRefreshTokenExpired()) return false
+    try {
+      const response = await fetch(this.resolveUrl(AUTH_ROUTES.refreshToken), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept-Language': locale.value },
+        body: JSON.stringify({ refreshToken }),
+      })
+      if (!response.ok) return false
+      const raw = (await response.json().catch(() => null)) as Record<string, unknown> | null
+      if (!raw || typeof raw !== 'object') return false
+      const data =
+        'data' in raw && 'isSuccess' in raw ? (raw.data as Record<string, unknown>) : raw
+      if (!data || typeof data !== 'object') return false
+      const accessToken = (data['accessToken'] ?? data['AccessToken']) as unknown
+      if (typeof accessToken !== 'string' || !accessToken) return false
+      const nextRefresh = (data['refreshToken'] ?? data['RefreshToken']) as unknown
+      const nextExpiry = (data['refreshTokenExpiryTime'] ?? data['RefreshTokenExpiryTime']) as unknown
+      this.tokenStore.setTokens({
+        accessToken,
+        refreshToken: typeof nextRefresh === 'string' && nextRefresh ? nextRefresh : refreshToken,
+        refreshTokenExpiryTime:
+          typeof nextExpiry === 'string' && nextExpiry
+            ? nextExpiry
+            : this.tokenStore.getRefreshTokenExpiryTime(),
+      })
+      try {
+        const session = this.tokenStore.getSession<Record<string, unknown>>()
+        if (session && typeof session === 'object') {
+          const updated = {
+            ...session,
+            accessToken,
+            refreshToken: typeof nextRefresh === 'string' && nextRefresh ? nextRefresh : refreshToken,
+            refreshTokenExpiryTime:
+              typeof nextExpiry === 'string' && nextExpiry
+                ? nextExpiry
+                : (session['refreshTokenExpiryTime'] as string | undefined) ?? '',
+          }
+          this.tokenStore.saveSession(updated)
+        }
+      } catch {
+        // Session sync is best-effort; rotated tokens are already persisted.
+      }
+      return true
+    } catch {
+      return false
+    }
   }
 }

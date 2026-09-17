@@ -206,6 +206,10 @@ export class TokenStore {
     return Date.now() >= exp - 60_000
   }
 
+  isExpiringSoon(exp: number, windowSec = 300): boolean {
+    return exp - Math.floor(Date.now() / 1000) < windowSec
+  }
+
   saveSession<T>(session: T): void {
     this.cachedSession = session
     try {

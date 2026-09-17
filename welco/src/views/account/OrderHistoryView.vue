@@ -9,6 +9,7 @@ import DataState from '../../components/ui/DataState.vue'
 import BackButton from '../../components/ui/BackButton.vue'
 import AppPagination from '../../components/ui/AppPagination.vue'
 import { ORDER_STATUSES } from '../../domain/models/commerce'
+import { formatPrice } from '../../utils/format'
 
 const router = useRouter()
 const orders = commerceService.orders
@@ -176,7 +177,7 @@ onMounted(() => {
                 </td>
                 <td>
                   <strong class="mono amount-text">
-                    {{ Math.ceil(o.totalAmount).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ o.currencyCode }}
+                    {{ formatPrice(o.totalAmount, locale) }} {{ o.currencyCode }}
                   </strong>
                 </td>
                 <td>
@@ -506,4 +507,8 @@ onMounted(() => {
   align-self: flex-start;
 }
 </style>
+
+
+
+
 

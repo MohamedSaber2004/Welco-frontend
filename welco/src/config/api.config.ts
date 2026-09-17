@@ -3,11 +3,14 @@ const RAW_API_BASE = ((import.meta.env.VITE_API_BASE_URL as string | undefined) 
 
 export const API_BASE_URL = RAW_API_BASE ? RAW_API_BASE.replace(/\/+$/, '') : ''
 
-export const PRODUCT_API_BASE_URL = (
-  (import.meta.env.VITE_PRODUCT_API_BASE_URL as string | undefined)
-    ? (import.meta.env.VITE_PRODUCT_API_BASE_URL as string)
-    : 'https://welco-product.runasp.net'
-).replace(/\/+$/, '')
+const WELCO_GW = 'https://welco-gateway.runasp.net'
+const SNUL_GW = 'https://snul-gateway.runasp.net'
+export function resolveGateway(target: string | undefined): string {
+  if (target === 'snul') return SNUL_GW
+  if (target === '') return WELCO_GW
+  if (target === 'welco') return WELCO_GW
+  return ((import.meta.env.VITE_API_BASE_URL as string | undefined) ?? '').trim() || WELCO_GW
+}
 
 export const isAbsoluteUrl = (path: string): boolean =>
   /^https?:\/\//i.test(path)
@@ -71,9 +74,7 @@ export const EXCHANGE_RATE_ROUTES = {
   latestByBase: (base: string) => `/api/v1/exchange-rates/latest/${encodeURIComponent(base)}`,
   pair: (from: string, to: string) => `/api/v1/exchange-rates/${encodeURIComponent(from)}/${encodeURIComponent(to)}`,
   convert: '/api/v1/exchange-rates/convert',
-  history: (base: string, date: string) => `/api/v1/exchange-rates/history/${encodeURIComponent(base)}/${encodeURIComponent(date)}`,
-  sync: '/api/v1/exchange-rates/sync',
-  syncLogs: '/api/v1/exchange-rates/sync/logs',
+  cartTotal: '/api/v1/exchange-rates/cart-total',
 } as const
 
 export const WISHLIST_ROUTES = {
@@ -132,7 +133,6 @@ export const CONTENT_ROUTES = {
   helpArticleBySlug: (slug: string) => `/api/v1/help/articles/slug/${slug}`,
   faqs: '/api/v1/help/faqs',
   faqById: (id: string) => `/api/v1/help/faqs/${id}`,
-  tradeShows: '/api/v1/trade-shows',
 } as const
 
 export const SUPPORT_ROUTES = {
@@ -156,7 +156,6 @@ export const COMPANY_ROUTES = {
   distributorApplicationById: (id: string) => `/api/v1/user-management/distributor-applications/${id}`,
   approveDistributorApplication: (id: string) => `/api/v1/user-management/distributor-applications/${id}/approve`,
   rejectDistributorApplication: (id: string) => `/api/v1/user-management/distributor-applications/${id}/reject`,
-  oemServices: '/api/v1/oem-services',
   oemInquiries: '/api/v1/oem-inquiries',
   oemInquiryById: (id: string) => `/api/v1/oem-inquiries/${id}`,
   auditLogs: '/api/v1/user-management/audit-logs',

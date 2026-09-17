@@ -14,6 +14,7 @@ import { toastService } from '../../infrastructure/feedback/toast.service'
 import type { LandingPageDto } from '../../domain/models/content'
 import type { ProductDto, CategoryDto } from '../../domain/models/marketplace'
 import { productMediaUrl } from '../../utils/file-url'
+import { formatPrice } from '../../utils/format'
 
 const route = useRoute()
 const router = useRouter()
@@ -123,7 +124,6 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
               <BaseButton variant="outline" @click="router.push({ name: 'marketplace' })">{{ t('landing.requestQuote') }}</BaseButton>
             </div>
             <div class="lp-credentials mono">
-              <span class="material-symbols-outlined cred-icon">verified</span>
               <span>{{ t('landing.manufactured') }}</span>
             </div>
           </div>
@@ -170,7 +170,7 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
                 <h3 class="product-card__name" dir="auto">{{ localized(p.nameEn, p.nameAr) }}</h3>
                 <div class="product-card__meta mono">{{ p.material || '—' }} <span class="meta-dot">·</span> {{ p.lengthCm ? `${p.lengthCm} cm` : '—' }}</div>
                 <div class="product-card__bottom">
-                  <span class="price-val mono-num">{{ Math.ceil(p.price).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ p.currencySymbol || p.currencyCode || '$' }}</span>
+                  <span class="price-val mono-num">{{ formatPrice(p.price, locale) }} {{ p.currencySymbol || p.currencyCode || '$' }}</span>
                   <button class="add-quote-btn" type="button" @click="handleAddToQuote($event, p)">{{ t('marketplace.addToQuote') }}</button>
                 </div>
               </div>
@@ -271,7 +271,7 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
 
 .lp-hero {
   position: relative;
-  border-radius: 16px;
+  border-radius: var(--wl-radius-xl);
   background: linear-gradient(135deg, var(--wl-surface) 0%, var(--wl-surface-soft) 100%);
   border: 1px solid var(--wl-border);
   padding: 2.75rem 2.5rem;
@@ -319,20 +319,20 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--wl-success);
-  box-shadow: 0 0 8px var(--wl-success-border);
+  background: var(--wl-gold);
+  box-shadow: 0 0 8px var(--wl-gold-glow-soft);
 }
 
 .lp-tag {
   background: var(--wl-gold-soft);
   color: var(--wl-gold);
   padding: 0.2rem 0.55rem;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   border: 1px solid rgba(255, 209, 102, 0.35);
-  text-shadow: 0 1px 0 rgba(6, 19, 40, 0.9);
+  text-shadow: var(--wl-gold-text-shadow);
 }
 
 .lp-url {
@@ -350,7 +350,7 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  filter: drop-shadow(0 2px 10px rgba(233, 168, 37, 0.28)) drop-shadow(0 1px 0 rgba(6, 19, 40, 0.9));
+  filter: var(--wl-gold-text-filter);
 }
 
 .lp-body {
@@ -376,15 +376,10 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
   color: var(--wl-muted);
 }
 
-.cred-icon {
-  font-size: 16px;
-  color: var(--wl-success);
-}
-
 .lp-spec-card {
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  border-radius: 12px;
+  border-radius: var(--wl-radius-lg);
   padding: 1.5rem;
   box-shadow: var(--wl-shadow-card);
 }
@@ -410,14 +405,14 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
   align-items: center;
   gap: 0.35rem;
   font-size: 10px;
-  color: var(--wl-success);
+  color: var(--wl-gold);
   font-weight: 600;
 }
 
 .spec-dot {
   width: 5px;
   height: 5px;
-  background: var(--wl-success);
+  background: var(--wl-gold);
   border-radius: 50%;
 }
 
@@ -521,14 +516,15 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
 
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-6);
 }
+
 
 .product-card {
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  border-radius: 12px;
+  border-radius: var(--wl-radius-lg);
   overflow: hidden;
   cursor: pointer;
   box-shadow: var(--wl-shadow-card);
@@ -571,7 +567,7 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
   padding: 0.15rem 0.45rem;
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   color: var(--wl-ink-strong);
   font-weight: 600;
   backdrop-filter: blur(4px);
@@ -627,7 +623,7 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
   font-size: 11.5px;
   font-weight: 600;
   padding: 0.35rem 0.65rem;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   transition: all 0.15s ease;
 }
@@ -642,7 +638,7 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
 .cat-card {
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  border-radius: 12px;
+  border-radius: var(--wl-radius-lg);
   padding: 1rem;
   text-decoration: none;
   display: flex;
@@ -650,8 +646,9 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
   gap: 0.5rem;
   transition: all 0.2s ease;
 }
+
 .cat-card:hover { border-color: var(--wl-primary); transform: translateY(-1px); }
-.cat-media { height: 100px; display: grid; place-items: center; background: var(--wl-surface-soft); border-radius: 8px; overflow: hidden; }
+.cat-media { height: 100px; display: grid; place-items: center; background: var(--wl-surface-soft); border-radius: var(--radius-md); overflow: hidden; }
 .cat-media__img { max-width: 100%; max-height: 100%; object-fit: contain; padding: 0.5rem; }
 .cat-media__icon { font-size: 28px; color: var(--wl-muted); }
 .cat-body { display: flex; flex-direction: column; }
@@ -665,14 +662,14 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
 
 .related-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-4);
 }
 
 .related-card {
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  border-radius: 12px;
+  border-radius: var(--wl-radius-lg);
   padding: 1.25rem;
   text-decoration: none;
   display: flex;
@@ -737,11 +734,9 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
     width: 100%;
   }
   .product-grid {
-    grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
   }
   .related-grid {
-    grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
   }
 }
@@ -775,16 +770,15 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
     justify-content: center;
   }
   .product-grid {
-    grid-template-columns: 1fr;
     gap: 0.85rem;
   }
   .related-grid {
-    grid-template-columns: 1fr;
     gap: 0.75rem;
   }
   .section-title {
     font-size: 1.25rem;
   }
+
   .section-head {
     margin-bottom: 1.15rem;
   }
@@ -800,4 +794,8 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
   }
 }
 </style>
+
+
+
+
 

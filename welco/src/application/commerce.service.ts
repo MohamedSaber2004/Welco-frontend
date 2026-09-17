@@ -80,3 +80,7 @@ export class CommerceService {
     }
   }
 }
+
+export function buildCreateCartPayload(userId: string | null, sessionId: string, currencyId?: string) {
+  return userId ? { userId, currencyId } : { sessionId, currencyId }
+}

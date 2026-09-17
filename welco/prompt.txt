@@ -1,5 +1,15 @@
-
-src/views/account/AccountDashboardView.vue(159,18): error TS2345: Argument of type '"account.tierLevel"' is not assignable to parameter of type '"common.of" | "common.pcs" | "common.more" | "common.loading" | "common.success" | "common.error" | "common.notice" | "common.ok" | "common.operationDone" | "common.networkError" | ... 1566 more ... | "providers.clinic"'.
-src/views/account/AccountDashboardView.vue(159,57): error TS2339: Property 'tierLevel' does not exist on type '{ id: string; name: string; email?: string | null | undefined; type: CompanyType; countryId?: string | undefined; countryNameEn?: string | null | undefined; countryNameAr?: string | ... 1 more ... | undefined; ... 5 more ...; createdAt: string; }'.
-ERROR: "type-check" exited with 2.
-Error: Command "npm run build" exited with 1
+    <!--<section class="section" aria-labelledby="metrics-heading">
+      <div class="section__inner">
+        <h2 id="metrics-heading" class="visually-hidden">{{ t('home.metricsHeading') }}</h2>
+        <div class="metrics-grid">
+          <div v-for="item in whyItems" :key="item.b" class="metric-card" :class="`metric-card--${item.tone}`">
+            <div class="metric-card__top">
+              <span class="mono metric-card__label">{{ item.label }}</span>
+              <span class="metric-card__badge mono" :class="`badge--${item.tone}`">{{ item.badge }}</span>
+            </div>
+            <div class="metric-card__value mono-num">{{ item.b }}</div>
+            <div class="metric-card__bar" :class="`bar--${item.tone}`"></div>
+          </div>
+        </div>
+      </div>
+    </section>-->

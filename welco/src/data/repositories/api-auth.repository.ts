@@ -53,6 +53,10 @@ export class ApiAuthRepository implements AuthRepository {
     return this.http.post<AuthResponseDto>(AUTH_ROUTES.refreshToken, payload, { showFeedback: false })
   }
 
+  refresh(refreshToken: string): Promise<AuthResponseDto> {
+    return this.http.post<AuthResponseDto>(AUTH_ROUTES.refreshToken, { refreshToken }, { showFeedback: false })
+  }
+
   getProfile(): Promise<UserProfileDto> {
     return this.http.get<UserProfileDto>(AUTH_ROUTES.profile, { showFeedback: false })
   }

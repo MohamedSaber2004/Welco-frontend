@@ -1,4 +1,4 @@
-import { MARKETPLACE_ROUTES, PRODUCT_API_BASE_URL } from '../../config/api.config'
+import { MARKETPLACE_ROUTES } from '../../config/api.config'
 import type { MarketplaceRepository, MarketplaceQuery } from '../../domain/ports/marketplace-repository'
 import type { PaginatedResult } from '../../domain/models/location'
 import type {
@@ -315,15 +315,9 @@ export class ApiMarketplaceRepository implements MarketplaceRepository {
   }
 
   async getCurrencies(): Promise<CurrencyDto[]> {
-    // Primary: product microservice directly — public (200 anonymous, CORS `*`).
-    // Gateway /api/v1/currencies currently 401s anonymous users, so trying it
-    // first only produces console noise + empty selectors.
-    const candidates = [
-      `${PRODUCT_API_BASE_URL}${MARKETPLACE_ROUTES.currencies}`,
-      MARKETPLACE_ROUTES.currencies,
-    ]
-    const dedupeCurrencies = (items: CurrencyDto[]): CurrencyDto[] => {
-      const seenId = new Set<string>()
+    // Gateway-only: /api/v1/currencies allows anonymous GET (Ocelot, all envs).
+    const candidates = [MARKETPLACE_ROUTES.currencies]
+    const dedupeCurrencies = (items: CurrencyDto[]): CurrencyDto[] => {      const seenId = new Set<string>()
       const seenCode = new Set<string>()
       const result: CurrencyDto[] = []
       for (const c of items) {
@@ -340,6 +334,21 @@ export class ApiMarketplaceRepository implements MarketplaceRepository {
     }
 
     for (const path of candidates) {
+      // Unpaginated full list first (GET /api/v1/currencies/all).
+      try {
+        const raw = await this.http.get<unknown>(`${path}/all`, { showFeedback: false })
+        if (Array.isArray(raw)) {
+          const all = dedupeCurrencies(raw as CurrencyDto[])
+          if (all.length) return all
+        }
+        if (raw && typeof raw === 'object') {
+          const obj = raw as Record<string, unknown>
+          const items = (Array.isArray(obj.data) ? obj.data : Array.isArray(obj.Data) ? obj.Data : []) as CurrencyDto[]
+          if (items.length) return dedupeCurrencies(items)
+        }
+      } catch {
+        // fall through to paged loop below (older backends without /all)
+      }
       try {
         const url = `${path}${path.includes('?') ? '&' : '?'}pageSize=50&pageNumber=1`
         const raw = await this.http.get<unknown>(url, { showFeedback: false })

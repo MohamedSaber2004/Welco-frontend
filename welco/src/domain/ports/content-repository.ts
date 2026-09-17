@@ -7,7 +7,6 @@ import type {
   HelpCategoryDto,
   LandingPageDto,
   LandingPageQuery,
-  TradeShowEventDto,
   CreateDocumentPayload,
   CreateLandingPagePayload,
   UpdateLandingPagePayload,
@@ -37,7 +36,6 @@ export interface ContentRepository {
   createFaq(payload: { question: string; answer: string; sortOrder?: number }): Promise<FaqItemDto>
   updateFaq(id: string, payload: { question: string; answer: string; sortOrder?: number; isActive?: boolean }): Promise<FaqItemDto>
   deleteFaq(id: string): Promise<void>
-  getTradeShows(): Promise<TradeShowEventDto[]>
   getMyTickets(): Promise<SupportTicketDto[]>
   getTickets(params?: { pageNumber?: number; pageSize?: number; status?: string; searchTerm?: string }): Promise<SupportTicketDto[]>
   createTicket(payload: { subject: string; message: string }): Promise<SupportTicketDto>

@@ -35,7 +35,6 @@ const toggleLang = async () => {
   }
 }
 
-// Collapsible sub-menus state
 const openSections = ref<Record<string, boolean>>({
   territory: true,
   sales: true,
@@ -89,7 +88,6 @@ const toggleSection = (key: string) => {
           </div>
         </template>
 
-        <!-- Commerce & Operations Group -->
         <button v-if="!collapsed" type="button" class="admin-section-toggle mono" @click="toggleSection('sales')">
           <span>{{ t('admin.commerce') }}</span>
           <span class="material-symbols-outlined section-arrow" :class="{ 'is-open': openSections.sales }">expand_more</span>
@@ -109,7 +107,6 @@ const toggleSection = (key: string) => {
           </router-link>
         </div>
 
-        <!-- Catalog & Quality Group -->
         <button v-if="!collapsed" type="button" class="admin-section-toggle mono" @click="toggleSection('catalog')">
           <span>{{ t('admin.catalog') }}</span>
           <span class="material-symbols-outlined section-arrow" :class="{ 'is-open': openSections.catalog }">expand_more</span>
@@ -129,7 +126,6 @@ const toggleSection = (key: string) => {
           </router-link>
         </div>
 
-        <!-- Support, People & Audit Group -->
         <button v-if="!collapsed" type="button" class="admin-section-toggle mono" @click="toggleSection('support')">
           <span>{{ t('admin.system') }}</span>
           <span class="material-symbols-outlined section-arrow" :class="{ 'is-open': openSections.support }">expand_more</span>
@@ -411,7 +407,7 @@ const toggleSection = (key: string) => {
   height: 6px;
   border-radius: 50%;
   background: var(--wl-success);
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.16);
+  box-shadow: 0 0 0 3px var(--wl-success-soft);
 }
 
 .admin-rail--collapsed .admin-link__label,

@@ -166,7 +166,7 @@ const handleError = (e: Event) => {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background-color: var(--wl-surface-soft, #0B274F);
+  background-color: var(--wl-surface-soft);
   transition: background-color 0.2s ease;
 }
 
@@ -194,7 +194,7 @@ const handleError = (e: Event) => {
   justify-content: center;
   gap: 6px;
   padding: 12px;
-  background: linear-gradient(145deg, var(--wl-surface-soft, #0B274F) 0%, var(--wl-surface, #071A38) 100%);
+  background: linear-gradient(145deg, var(--wl-surface-soft) 0%, var(--wl-surface) 100%);
   user-select: none;
   overflow: hidden;
 }
@@ -261,8 +261,8 @@ const handleError = (e: Event) => {
   width: 44px;
   height: 44px;
   border-radius: var(--wl-radius-md, 10px);
-  background: var(--wl-surface, #071A38);
-  border: 1px solid var(--wl-border, #e2e8f0);
+  background: var(--wl-surface);
+  border: 1px solid var(--wl-border);
   box-shadow: 0 2px 4px rgba(0, 10, 25, 0.04);
   position: relative;
   z-index: 1;

@@ -24,7 +24,6 @@ const sortBy = ref<'nameAsc' | 'nameDesc'>('nameAsc')
 const page = ref(1)
 const pageSize = ref(12)
 
-// ── Enhanced search UX state ──
 const searchInput = ref<HTMLInputElement | null>(null)
 const searchFocused = ref(false)
 const showSuggestions = ref(false)
@@ -48,7 +47,7 @@ try {
     const parsed = JSON.parse(raw)
     if (Array.isArray(parsed)) recentSearches.value = parsed.filter((x) => typeof x === 'string').slice(0, 5)
   }
-} catch { /* ignore */ }
+} catch { }
 
 const persistRecent = () => {
   try { localStorage.setItem(RECENT_KEY, JSON.stringify(recentSearches.value.slice(0, 5))) } catch { /* ignore */ }
@@ -547,7 +546,7 @@ const browseProviderProducts = (providerName: string) => {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  filter: drop-shadow(0 2px 10px rgba(233, 168, 37, 0.28)) drop-shadow(0 1px 0 rgba(6, 19, 40, 0.9));
+  filter: var(--wl-gold-text-filter);
 }
 
 .view-header__subtitle {
@@ -827,7 +826,7 @@ const browseProviderProducts = (providerName: string) => {
   max-width: 240px;
   background: var(--wl-primary-soft);
   color: var(--wl-primary-active, var(--wl-primary));
-  border: 1px solid rgba(105, 169, 255, 0.2);
+  border: 1px solid var(--wl-primary-soft);
   border-radius: 999px;
   font-size: 0.76rem;
   font-weight: 600;
@@ -882,7 +881,7 @@ const browseProviderProducts = (providerName: string) => {
 .provider-card:hover {
   transform: translateY(-3px);
   box-shadow: var(--shadow-md, 0 4px 6px -1px rgba(0, 10, 25, 0.05));
-  border-color: rgba(105, 169, 255, 0.35);
+  border-color: var(--wl-primary-soft);
 }
 .provider-card:focus-within { border-color: var(--wl-primary); box-shadow: var(--wl-focus-ring); }
 
@@ -974,7 +973,7 @@ const browseProviderProducts = (providerName: string) => {
 }
 
 .provider-card__name .hl {
-  background: rgba(105, 169, 255, 0.16);
+  background: var(--wl-primary-soft);
   color: var(--wl-primary-active, var(--wl-primary));
   border-radius: 3px;
   padding: 0 1px;

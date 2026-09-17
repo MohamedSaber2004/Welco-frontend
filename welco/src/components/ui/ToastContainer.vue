@@ -70,11 +70,11 @@ const toasts = toastService.toasts
 }
 
 .toast--success {
-  border-inline-start-color: var(--wl-success);
+  border-inline-start-color: var(--wl-gold);
   background: var(--wl-surface);
   border-color: var(--wl-border);
 }
-.toast--success::after { background: var(--wl-success); opacity: 1; }
+.toast--success::after { background: var(--wl-gold); opacity: 1; }
 
 .toast--error {
   border-inline-start-color: var(--wl-danger);

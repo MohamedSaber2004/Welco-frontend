@@ -77,15 +77,10 @@ const toggleLang = () => {
   padding: 1.75rem 1.85rem 1.5rem;
   display: flex;
   flex-direction: column;
-  transition: max-width 0.2s ease;
-}
+transition: max-width 0.2s ease;
+  }
 
-:root.dark .auth-card,
-:root[data-theme='dark'] .auth-card {
-  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.45);
-}
-
-.auth-card--wide {
+  .auth-card--wide {
   max-width: 540px;
 }
 

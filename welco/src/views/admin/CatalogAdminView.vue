@@ -24,6 +24,7 @@ import type {
   CreateCategoryPayload,
   UpdateCategoryPayload,
 } from '../../domain/models/marketplace'
+import { formatPrice } from '../../utils/format'
 
 const route = useRoute()
 const router = useRouter()
@@ -53,7 +54,6 @@ const setTab = (tab: TabKey) => {
 
 const localized = (en?: string, ar?: string) => (locale.value === 'ar' ? ar || en || '' : en || ar || '')
 
-// --- Common References ---
 const categories = ref<CategoryDto[]>([])
 const currencies = ref<CurrencyDto[]>([])
 
@@ -456,7 +456,6 @@ const detailVideoItems = computed(() =>
 
 const videoEmbed = (url: string) => parseVideoSource(url)
 
-// --- Product videos manager (bulk sync, mirrors the public PDP videos tab) ---
 const videoDraftUrl = ref('')
 const videoDraftTitle = ref('')
 const videosSaving = ref(false)
@@ -511,12 +510,6 @@ const removeVideo = (index: number) => {
   void persistVideos(next)
 }
 
-// ----------------------------------------------------
-// 4. CATEGORY ACTIONS: add / details / edit / delete
-// Backend: POST / PUT {id} (IsActive) / DELETE {id} / GET {id}
-// Image upload reuses the attachment service (place=providers,
-// fileType=image) — the stored name is served via /files/{name}.
-// ----------------------------------------------------
 const showCategoryModal = ref(false)
 const editingCategory = ref<CategoryDto | null>(null)
 const categoryFormLoading = ref(false)
@@ -811,7 +804,7 @@ onMounted(async () => {
                       {{ localized(p.categoryNameEn, p.categoryNameAr) }}</span>
                   </td>
                   <td>
-                    <strong class="mono price-val">{{ Math.ceil(p.price).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ p.currencySymbol || p.currencyCode || p.currency }}</strong>
+                    <strong class="mono price-val">{{ formatPrice(p.price, locale) }} {{ p.currencySymbol || p.currencyCode || p.currency }}</strong>
                   </td>
                   <td>
                     <span
@@ -1155,6 +1148,7 @@ onMounted(async () => {
                 accept="image/*"
                 :label="t('admin.productImage')"
                 :hint="t('attachment.dropHint')"
+                :is-editable="true"
                 @update:modelValue="productForm.imageName = $event ?? ''"
               />
             </div>
@@ -1228,13 +1222,17 @@ onMounted(async () => {
                 </span>
               </div>
             </div>
+            <BaseButton variant="secondary" size="sm" class="details-edit-image-btn" @click="openEditProduct(selectedProduct)">
+              <span class="material-symbols-outlined text-[16px]">edit</span>
+              <span>{{ t('admin.editImage') }}</span>
+            </BaseButton>
           </div>
 
           <div class="details-grid">
             <div class="detail-item">
               <span class="detail-k mono">{{ t('admin.price') }}</span>
               <strong class="detail-v mono"
-                >{{ Math.ceil(selectedProduct.price).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}
+                >{{ formatPrice(selectedProduct.price, locale) }}
                 {{
                   selectedProduct.currencySymbol ||
                   selectedProduct.currencyCode ||
@@ -1923,6 +1921,13 @@ onMounted(async () => {
   display: flex;
   gap: 1rem;
   align-items: flex-start;
+  position: relative;
+}
+
+.details-edit-image-btn {
+  margin-left: auto;
+  flex-shrink: 0;
+  align-self: flex-start;
 }
 
 .details-thumb {
@@ -2361,7 +2366,7 @@ onMounted(async () => {
 .video-tab-btn.is-active {
   color: var(--wl-primary);
   background: var(--wl-primary-soft);
-  border-color: rgba(105, 169, 255, 0.2);
+  border-color: var(--wl-primary-soft);
 }
 
 .add-video-body {
@@ -2457,4 +2462,8 @@ onMounted(async () => {
   padding: 0.25rem 0.5rem;
 }
 </style>
+
+
+
+
 

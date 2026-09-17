@@ -223,14 +223,12 @@ const isAuthed = computed(() => authService.isAuthenticated)
   padding: 0.25rem 0.65rem;
   border-radius: 9999px;
 }
-:root.dark .telemetry-pill, :root[data-theme='dark'] .telemetry-pill { border-color: rgba(52,211,153,0.22); }
-
 .status-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
   background: currentColor;
-  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25);
+  box-shadow: 0 0 0 2px var(--wl-success-soft);
 }
 
 @media (max-width: 1024px) {

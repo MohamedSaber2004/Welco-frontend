@@ -11,6 +11,14 @@ import { t } from '../i18n'
 
 export type AttachmentResult<T = string> = { ok: true; data: T } | { ok: false; error: string }
 
+export function toUploadPlace(ctx: 'avatar' | 'product' | 'ticket' | 'rfq'): number {
+  return ctx === 'avatar' ? 0 : ctx === 'product' ? 2 : 1
+}
+
+export function toMediaType(kind: string): number {
+  return kind.startsWith('image/') ? 0 : kind.startsWith('video/') ? 1 : kind.startsWith('audio/') ? 2 : 3
+}
+
 export class AttachmentService {
   readonly uploading = ref(false)
   readonly progress = ref(0)

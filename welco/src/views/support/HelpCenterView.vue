@@ -24,7 +24,6 @@ const isAuthed = computed(() => authService.isAuthenticated)
 const isBuyer = computed(() => authService.isOrganizationUser.value)
 const isSeller = computed(() => authService.isAdmin.value || authService.isWelcoStaff.value)
 
-// Ticket Creation State
 const ticketSubject = ref('')
 const ticketMessage = ref('')
 const submittingTicket = ref(false)
@@ -176,7 +175,6 @@ function categoryName(id: string): string {
   return categories.value.find((c) => c.id === id)?.name ?? id
 }
 
-// Images that 404 — those cards fall back to an icon instead of a broken frame.
 const brokenThumbs = ref(new Set<string>())
 function markThumbBroken(key: string): void {
   brokenThumbs.value.add(key)
@@ -195,11 +193,6 @@ interface CategoryVisual {
   name: string
 }
 
-/**
- * Visual for a help category, resolved from backend data only:
- * stored upload -> image, otherwise a material icon. Articles carry no
- * image of their own, so they reuse their category's visual.
- */
 function categoryVisual(categoryId?: string | null, fallback = 'article'): CategoryVisual {
   const cat = categories.value.find((c) => c.id === categoryId)
   const icon = (cat?.icon ?? '').trim()
@@ -213,7 +206,6 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
 
 <template>
   <div class="page-shell">
-    <!-- Breadcrumbs / Back Bar -->
     <div class="help-nav-bar">
       <BackButton fallback="/" variant="ghost" />
       <nav class="help-crumb mono" :aria-label="t('common.breadcrumb')">
@@ -223,7 +215,6 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
       </nav>
     </div>
 
-    <!-- Enhanced Hero with Support Diagnostics Graphics -->
     <section class="help-hero">
       <div class="help-hero__grid">
         <div class="help-hero__copy">
@@ -234,7 +225,6 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
           <h1 class="help-title">{{ t('help.title') }}</h1>
           <p class="help-desc">{{ t('help.subtitle') }}</p>
 
-          <!-- 48px VIP Search Control -->
           <div class="help-search-box">
             <div class="help-search-input-wrap">
               <span class="material-symbols-outlined search-icon" aria-hidden="true">search</span>
@@ -256,7 +246,6 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
               <span v-else class="search-kbd mono" aria-hidden="true">ESC</span>
             </div>
 
-            <!-- Quick Filter Tags -->
             <div v-if="quickTags.length" class="quick-tags-wrap">
               <span class="quick-tags-label mono">{{ t('help.popularTopics') }}</span>
               <button
@@ -272,7 +261,6 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
           </div>
         </div>
 
-        <!-- Right Side: Bespoke Surgical Support Telemetry & Architecture Graphic -->
         <div class="help-hero__graphic" aria-hidden="true">
           <div class="telemetry-card">
             <div class="telemetry-head">
@@ -283,7 +271,6 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
               <span class="telemetry-sla mono">&lt; 2h SLA</span>
             </div>
 
-            <!-- Interactive Architecture SVG Schematic -->
             <div class="schematic-container">
               <svg class="schematic-svg" viewBox="0 0 320 190" fill="none">
                 <defs>
@@ -293,40 +280,34 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
                   </linearGradient>
                 </defs>
 
-                <!-- Connecting Laser Lines -->
                 <line x1="160" y1="95" x2="60" y2="45" class="laser-line" />
                 <line x1="160" y1="95" x2="260" y2="45" class="laser-line" />
                 <line x1="160" y1="95" x2="60" y2="150" class="laser-line" />
                 <line x1="160" y1="95" x2="260" y2="150" class="laser-line" />
 
-                <!-- Center Node (Welco Clinical Support) -->
                 <circle cx="160" cy="95" r="28" class="node-center-outer" />
                 <circle cx="160" cy="95" r="20" class="node-center-inner" />
                 <text x="160" y="93" text-anchor="middle" class="node-center-text mono">WELCO</text>
                 <text x="160" y="103" text-anchor="middle" class="node-center-sub mono">SUPPORT</text>
 
-                <!-- Peripheral Node: Top-Left (Sterilization IFU) -->
                 <g class="sat-node sat-node--teal">
                   <circle cx="60" cy="45" r="18" class="sat-circle" />
                   <text x="60" y="43" text-anchor="middle" class="sat-title mono">IFU 134°C</text>
                   <text x="60" y="52" text-anchor="middle" class="sat-desc mono">STERILE</text>
                 </g>
 
-                <!-- Peripheral Node: Top-Right (RFQ & Contracts) -->
                 <g class="sat-node sat-node--indigo">
                   <circle cx="260" cy="45" r="18" class="sat-circle" />
                   <text x="260" y="43" text-anchor="middle" class="sat-title mono">B2B RFQ</text>
                   <text x="260" y="52" text-anchor="middle" class="sat-desc mono">CONTRACTS</text>
                 </g>
 
-                <!-- Peripheral Node: Bottom-Left (Freight & Logistics) -->
                 <g class="sat-node sat-node--amber">
                   <circle cx="60" cy="150" r="18" class="sat-circle" />
                   <text x="60" y="148" text-anchor="middle" class="sat-title mono">FREIGHT</text>
                   <text x="60" y="157" text-anchor="middle" class="sat-desc mono">INCOTERMS</text>
                 </g>
 
-                <!-- Peripheral Node: Bottom-Right (Regulatory & CE) -->
                 <g class="sat-node sat-node--emerald">
                   <circle cx="260" cy="150" r="18" class="sat-circle" />
                   <text x="260" y="148" text-anchor="middle" class="sat-title mono">CE · MDR</text>
@@ -359,7 +340,6 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
     <SkeletonLoader v-if="loading" type="category-grid" :count="6" />
 
     <template v-else>
-      <!-- Enhanced Guide Cards (No 'view all' text links) -->
       <section v-if="guideCards.length" class="guides-section">
         <div class="help-grid">
           <article
@@ -369,7 +349,6 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
             :class="{ 'help-card--empty': !card.isLinked && !card.count, 'help-card--linked': card.isLinked }"
             @click="onGuideClick(card)"
           >
-            <!-- Card Laser Top Accent -->
             <div class="help-card__accent" :style="{ background: card.def.color }"></div>
 
             <div class="help-card__top">
@@ -390,7 +369,6 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
             <h3 class="help-card__title">{{ card.cat?.name ?? card.def.title }}</h3>
             <p v-if="card.desc" class="help-card__desc">{{ card.desc }}</p>
 
-            <!-- Bottom Information Pill without redundant 'view all' text -->
             <div class="help-card__footer">
               <span class="help-card__count mono">
                 {{ card.count ? t('help.protocolsDocumented', { count: card.count }) : t('help.technicalGuide') }}
@@ -401,7 +379,6 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
         </div>
       </section>
 
-      <!-- Knowledge Base Articles Directory -->
       <section class="article-section">
         <div class="section-head">
           <div>
@@ -414,7 +391,6 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
           <span class="article-counter mono">{{ t('help.articlesLoaded', { count: filteredArticles.length }) }}</span>
         </div>
 
-        <!-- Topic Tabs -->
         <div class="cat-pills" role="tablist">
           <button
             class="pill"
@@ -482,7 +458,6 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
         </DataState>
       </section>
 
-      <!-- Frequently Asked Questions Accordion -->
       <section class="faq-section">
         <div class="section-head">
           <div>
@@ -525,7 +500,6 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
         </div>
       </section>
 
-      <!-- Role-Specific Action Panels -->
       <section v-if="isBuyer && isAuthed" class="help-role-card">
         <div class="role-card__left">
           <div class="role-card__icon-wrap">
@@ -558,7 +532,6 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
         </div>
       </section>
 
-      <!-- Direct Contact & Ticket Creation Escalation Desk -->
       <section id="direct-escalation" class="help-contact-banner">
         <div class="contact-header">
           <div class="contact-copy">
@@ -582,7 +555,6 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
         </div>
 
         <div class="escalation-grid">
-          <!-- Left Column: Direct Communication Channels -->
           <div class="escalation-channels">
             <div class="channel-group-header">
               <div class="channel-group-title mono">
@@ -612,7 +584,6 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
                 <span class="material-symbols-outlined channel-arrow icon--directional">open_in_new</span>
               </a>
 
-              <!-- WhatsApp Quick Dispatch -->
               <a
                 v-if="contentService.supportContact.value.whatsAppNumber"
                 class="channel-card"
@@ -631,7 +602,6 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
                 <span class="material-symbols-outlined channel-arrow icon--directional">open_in_new</span>
               </a>
 
-              <!-- Engineering Hotline Desk -->
               <a
                 v-if="contentService.supportContact.value.phoneNumber"
                 class="channel-card"
@@ -655,7 +625,6 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
             </div>
           </div>
 
-          <!-- Right Column: Interactive Ticket Form or Sign-in Prompt -->
           <div class="escalation-form-panel">
             <div class="form-panel-header">
               <div class="panel-badge mono">
@@ -665,7 +634,6 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
               <p class="panel-subtitle">{{ t('help.ticketPanelSubtitle') }}</p>
             </div>
 
-            <!-- Authenticated: Ticket Form -->
             <div v-if="isAuthed" class="ticket-card-content">
               <!-- Success State -->
               <div v-if="ticketSuccess" class="ticket-success-state">
@@ -686,7 +654,6 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
                 </div>
               </div>
 
-              <!-- Form State -->
               <form v-else class="ticket-form" @submit.prevent="submitTicket">
                 <div class="form-field">
                   <label class="form-label mono" for="ticket-subject">
@@ -736,7 +703,6 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
               </form>
             </div>
 
-            <!-- Unauthenticated: Guest Prompt Card -->
             <div v-else class="ticket-guest-card">
               <div class="guest-card-icon">
                 <span class="material-symbols-outlined">lock_open</span>
@@ -868,7 +834,6 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
   max-width: 580px;
 }
 
-/* 48px VIP Search Control */
 .help-search-box {
   display: flex;
   flex-direction: column;
@@ -967,8 +932,8 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
 }
 
 .quick-tag-btn:hover {
-  background: rgba(105, 169, 255, 0.08);
-  border-color: rgba(105, 169, 255, 0.3);
+  background: var(--wl-primary-soft);
+  border-color: var(--wl-primary-soft);
   color: var(--wl-primary);
   transform: translateY(-0.5px);
 }
@@ -1156,7 +1121,7 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
 
 .help-card:hover {
   transform: translateY(-3px);
-  border-color: rgba(105, 169, 255, 0.3);
+  border-color: var(--wl-primary-soft);
   box-shadow: var(--shadow-md);
 }
 
@@ -1670,11 +1635,7 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
   background: var(--wl-surface);
   color: var(--wl-primary);
 }
-:root.dark .my-tickets-badge-link:hover .tickets-count-pill,
-:root[data-theme='dark'] .my-tickets-badge-link:hover .tickets-count-pill {
-  background: var(--wl-surface);
-  color: var(--wl-primary);
-}
+
 
 /* 2-Column Escalation Grid */
 .escalation-grid {

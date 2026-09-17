@@ -10,6 +10,7 @@ import SkeletonLoader from '../../components/ui/SkeletonLoader.vue'
 import EmptyState from '../../components/ui/EmptyState.vue'
 import BackButton from '../../components/ui/BackButton.vue'
 import AppImage from '../../components/ui/AppImage.vue'
+import { formatPrice } from '../../utils/format'
 
 const router = useRouter()
 const { add } = useCart()
@@ -127,7 +128,7 @@ const goDetail = (id: string) => {
     <!-- Saved instruments -->
     <div v-else class="product-grid">
       <article v-for="p in items" :key="p.id" class="product-card" @click="goDetail(p.id)">
-        <div class="product-media" :style="{ background: p.imageGradient || '#071A38' }">
+        <div class="product-media" :style="{ background: p.imageGradient || 'var(--wl-surface-soft)' }">
           <AppImage
             :src="p.imageName"
             placeholder-type="product"
@@ -163,7 +164,7 @@ const goDetail = (id: string) => {
           <div class="product-footer">
             <div class="price-stack">
               <strong class="price-val mono">
-                {{ Math.ceil(p.price).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ p.currencySymbol || p.currencyCode || '$' }}
+                {{ formatPrice(p.price, locale) }} {{ p.currencySymbol || p.currencyCode || '$' }}
               </strong>
               <span v-if="p.unit" class="unit-text mono">
                 {{ t('marketplace.perUnit', { unit: locale === 'ar' ? (p.unitAr || p.unit) : p.unit }) }}
@@ -544,3 +545,7 @@ const goDetail = (id: string) => {
   }
 }
 </style>
+
+
+
+

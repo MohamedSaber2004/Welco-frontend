@@ -5,7 +5,6 @@ import type {
   HelpArticleDto,
   HelpCategoryDto,
   LandingPageDto,
-  TradeShowEventDto,
   CreateDocumentPayload,
   SupportContactDto,
   UpdateSupportContactPayload,
@@ -17,7 +16,6 @@ export class ContentService {
   readonly helpCategories = ref<HelpCategoryDto[]>([])
   readonly helpArticles = ref<HelpArticleDto[]>([])
   readonly faqs = ref<FaqItemDto[]>([])
-  readonly tradeShows = ref<TradeShowEventDto[]>([])
   readonly tickets = ref<import('../domain/models/content').SupportTicketDto[]>([])
   readonly myTickets = ref<import('../domain/models/content').SupportTicketDto[]>([])
   readonly supportContact = ref<SupportContactDto>({
@@ -60,25 +58,22 @@ export class ContentService {
   async loadSupport(): Promise<void> {
     this.loading.value = true
     try {
-      // Use allSettled so trade-shows or single help failure doesn't block other help data
+      // Use allSettled so a single help failure doesn't block other help data
       const results = await Promise.allSettled([
         this.repo.getHelpCategories(),
         this.repo.getHelpArticles(),
         this.repo.getFaqs(),
-        this.repo.getTradeShows(),
         this.loadSupportContact(),
       ])
       const categories = results[0].status === 'fulfilled' ? results[0].value : []
       const articles = results[1].status === 'fulfilled' ? results[1].value : []
       const faqs = results[2].status === 'fulfilled' ? results[2].value : []
-      const shows = results[3].status === 'fulfilled' ? results[3].value : []
       if (import.meta.env.DEV && results.some((r) => r.status === 'rejected')) {
         console.warn('[content] loadSupport partial failure', results)
       }
       this.helpCategories.value = categories
       this.helpArticles.value = articles
       this.faqs.value = faqs
-      this.tradeShows.value = shows
     } catch (e) {
       if (import.meta.env.DEV) console.warn('[content] loadSupport failed', e)
     } finally {

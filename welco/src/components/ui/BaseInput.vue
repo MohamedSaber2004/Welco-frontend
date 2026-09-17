@@ -8,6 +8,7 @@ const props = withDefaults(
     label?: string
     placeholder?: string
     type?: string
+    loading?: boolean
     error?: string
     required?: boolean
     disabled?: boolean
@@ -24,6 +25,7 @@ const props = withDefaults(
     placeholder: undefined,
     type: 'text',
     error: undefined,
+    loading: false,
     required: false,
     disabled: false,
     autocomplete: undefined,
@@ -53,13 +55,13 @@ const sizeClass = computed(() => `field-control--${props.size}`)
 </script>
 
 <template>
-  <div class="field" :class="{ 'has-error': Boolean(error), 'is-disabled': disabled }">
+  <div class="field" :class="{ 'has-error': Boolean(error), 'is-disabled': disabled, 'is-loading': loading }">
     <label v-if="label" :for="id" class="field__label">
       <span>{{ label }}</span>
       <span v-if="required" class="field__req" aria-hidden="true">*</span>
     </label>
 
-    <div class="field-control" :class="[sizeClass, { 'has-prefix': icon || $slots.prefix, 'has-suffix': clearable || $slots.suffix }]">
+    <div class="field-control" :class="[sizeClass, { 'has-prefix': icon || $slots.prefix, 'has-suffix': clearable || $slots.suffix || loading }]">
       <span v-if="icon || $slots.prefix" class="field-icon field-icon--prefix">
         <slot name="prefix">
           <span class="material-symbols-outlined text-[18px]">{{ icon }}</span>
@@ -76,9 +78,12 @@ const sizeClass = computed(() => `field-control--${props.size}`)
         :autocomplete="autocomplete"
         :inputmode="inputmode as never"
         :aria-invalid="Boolean(error)"
+        :aria-busy="loading ? 'true' : undefined"
         class="field__input"
         @input="onInput"
       />
+
+      <span v-if="loading" class="field__spinner" aria-hidden="true" />
 
       <button
         v-if="clearable && modelValue"
@@ -152,8 +157,9 @@ const sizeClass = computed(() => `field-control--${props.size}`)
 
 .field-control:focus-within {
   border-color: var(--wl-primary);
-  box-shadow: var(--wl-focus-ring);
-  transform: translateY(-0.5px);
+  outline: 2px solid var(--wl-primary);
+  outline-offset: 2px;
+  box-shadow: var(--wl-focus-ring) !important;
   background: var(--wl-surface);
 }
 
@@ -264,13 +270,25 @@ const sizeClass = computed(() => `field-control--${props.size}`)
   background: var(--wl-surface);
 }
 
-.is-disabled {
+.field-control.is-disabled {
   opacity: 0.55;
+  background: var(--wl-surface-soft);
   cursor: not-allowed;
 }
 
-.is-disabled .field-control {
-  background: var(--wl-surface-soft);
+.is-loading .field-control {
+  padding-inline-end: 2.5rem;
+}
+
+.field__spinner {
+  position: absolute;
+  inset-inline-end: 0.75rem;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--wl-border);
+  border-top-color: var(--wl-primary);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
   pointer-events: none;
 }
 

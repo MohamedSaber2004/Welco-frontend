@@ -1,43 +1,24 @@
 import { ref } from 'vue'
-import type { ConversionResultDto, ExchangeRateDto, ExchangeRateSyncLogDto } from '../domain/models/exchange-rate'
+import type { ConversionResultDto, ConvertCartTotalRequest, ConvertCartTotalResult, ExchangeRateDto } from '../domain/models/exchange-rate'
 import type { ExchangeRateRepository } from '../domain/ports/exchange-rate-repository'
 
 
 export class ExchangeRateService {
   readonly latestRates = ref<Map<string, number>>(new Map())
   readonly lastUpdated = ref<string | null>(null)
-  /** 'live' | 'public' | null — lets UI badge offline rates honestly. */
-  readonly lastUpdatedSource = ref<'live' | 'public' | null>(null)
+  /** 'live' | null — lets UI badge whether backend rates are loaded. */
+  readonly lastUpdatedSource = ref<'live' | null>(null)
   readonly loading = ref(false)
-  readonly syncLogs = ref<ExchangeRateSyncLogDto[]>([])
-  readonly syncing = ref(false)
-  readonly loadingLogs = ref(false)
-  private cache = new Map<string, { rates: Map<string, number>; fetchedAt: number; source: 'live' | 'public' }>()
-  private readonly TTL_MS = 60 * 60 * 1000 // 60 min for live rates
-  private readonly FALLBACK_TTL_MS = 10 * 60 * 1000 // 10 min negative-cache so we don't spam a broken backend
 
   constructor(private readonly repo: ExchangeRateRepository) {}
 
-  private cacheKey(base: string): string { return `latest:${base.toUpperCase()}` }
-
-  private classify(rates: ExchangeRateDto[]): 'live' | 'public' {
-    if (!rates.length) return 'live'
-    const src = (rates[0]?.source ?? '').toLowerCase()
-    if (src.includes('er-api') || src.includes('frankfurter') || src.startsWith('public-')) return 'public'
+  private classify(_rates: ExchangeRateDto[]): 'live' {
+    // Live only — every rate comes from the Welco backend (FastForex fetch-one).
     return 'live'
   }
 
+  /** Live daily rates. No cache — every call hits the backend (FastForex fetch-one). */
   async loadLatest(base = 'USD'): Promise<Map<string, number>> {
-    const key = this.cacheKey(base)
-    const cached = this.cache.get(key)
-    if (cached) {
-      const ttl = cached.source === 'live' ? this.TTL_MS : this.FALLBACK_TTL_MS
-      if (Date.now() - cached.fetchedAt < ttl) {
-        this.latestRates.value = new Map(cached.rates)
-        this.lastUpdatedSource.value = cached.source
-        return this.latestRates.value
-      }
-    }
     this.loading.value = true
     try {
       const rates = await this.repo.getLatest(base)
@@ -48,22 +29,13 @@ export class ExchangeRateService {
         this.latestRates.value = map
         this.lastUpdated.value = new Date().toISOString()
         this.lastUpdatedSource.value = source
-        this.cache.set(key, { rates: new Map(map), fetchedAt: Date.now(), source })
         return map
       }
-      // Backend + public providers both empty -> no rates (callers show
-      // original prices with an "unavailable" badge instead of fake numbers)
       this.latestRates.value = new Map()
       this.lastUpdated.value = ''
       this.lastUpdatedSource.value = null
       return this.latestRates.value
     } catch {
-      // fallback to cached rates when available
-      if (cached) {
-        this.latestRates.value = new Map(cached.rates)
-        this.lastUpdatedSource.value = cached.source
-        return this.latestRates.value
-      }
       this.latestRates.value = new Map()
       this.lastUpdated.value = ''
       this.lastUpdatedSource.value = null
@@ -73,7 +45,7 @@ export class ExchangeRateService {
     }
   }
 
-  // Local conversion using cached latest rates + base=USD logic (no extra API call)
+  // Live conversion using fresh latest rates (no cache — extra API call each time)
   async convertLocal(amount: number, from: string, to: string, base = 'USD'): Promise<number> {
     from = from.toUpperCase().trim()
     to = to.toUpperCase().trim()
@@ -98,12 +70,12 @@ export class ExchangeRateService {
     return amount * (toRate / fromRate)
   }
 
+  /** Live convert via backend (FastForex fetch-one). No cache — every call hits the API. */
   async convert(amount: number, from: string, to: string): Promise<ConversionResultDto> {
-    // Try server-side convert for precision / correct rounding per currency
     try {
       return await this.repo.convert(amount, from, to)
     } catch {
-      // fallback to local calc
+      // fallback to live calc (still hits the API, no cache)
       const converted = await this.convertLocal(amount, from, to)
       return {
         amount,
@@ -112,9 +84,14 @@ export class ExchangeRateService {
         rate: amount === 0 ? 1 : converted / amount,
         convertedAmount: converted,
         rateDate: new Date().toISOString().slice(0, 10),
-        source: this.lastUpdatedSource.value === 'live' ? 'local-cache' : (this.lastUpdatedSource.value ?? 'local-cache'),
+        source: 'live',
       }
     }
+  }
+
+  /** Backend cart total: live rates for every line + ceiling total. No fallback here — caller decides. */
+  async convertCartTotal(payload: ConvertCartTotalRequest): Promise<ConvertCartTotalResult> {
+    return await this.repo.convertCartTotal(payload)
   }
 
   async getRate(from: string, to: string): Promise<number> {
@@ -122,33 +99,10 @@ export class ExchangeRateService {
     return res.rate
   }
 
+  /** Kept for callers (e.g. CartView refresh) — just resets live state, no cache to clear. */
   clearCache(): void {
-    this.cache.clear()
     this.latestRates.value = new Map()
     this.lastUpdated.value = null
     this.lastUpdatedSource.value = null
-  }
-
-  async fetchSyncLogs(take = 20): Promise<ExchangeRateSyncLogDto[]> {
-    this.loadingLogs.value = true
-    try {
-      const logs = await this.repo.getSyncLogs(take)
-      this.syncLogs.value = logs
-      return logs
-    } finally {
-      this.loadingLogs.value = false
-    }
-  }
-
-  async triggerDirectSync(): Promise<{ success: boolean; ratesCount: number; baseCurrency: string }> {
-    this.syncing.value = true
-    try {
-      const res = await this.repo.sync()
-      this.cache.clear()
-      await Promise.all([this.fetchSyncLogs(), this.loadLatest('USD')])
-      return res
-    } finally {
-      this.syncing.value = false
-    }
   }
 }

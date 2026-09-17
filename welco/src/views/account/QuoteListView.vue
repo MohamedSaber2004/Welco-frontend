@@ -9,6 +9,7 @@ import DataState from '../../components/ui/DataState.vue'
 import BackButton from '../../components/ui/BackButton.vue'
 import AppPagination from '../../components/ui/AppPagination.vue'
 import { QUOTE_STATUSES } from '../../domain/models/sales'
+import { formatPrice } from '../../utils/format'
 
 const router = useRouter()
 const quotes = salesService.quotes
@@ -159,7 +160,7 @@ onMounted(() => {
                 <td class="mono text-xs text-slate-500">{{ new Date(q.validUntil).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</td>
                 <td>
                   <strong class="mono amount-text">
-                    {{ Math.ceil(q.amount).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ q.currency || 'USD' }}
+                    {{ formatPrice(q.amount, locale) }} {{ q.currency || 'USD' }}
                   </strong>
                 </td>
                 <td>
@@ -435,4 +436,8 @@ onMounted(() => {
 
 .clear-filters-btn:hover { background: rgba(242, 109, 109, 0.22); }
 </style>
+
+
+
+
 

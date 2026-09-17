@@ -470,8 +470,8 @@ const totalCompany = computed(() => company.addresses.value.length)
 .crumb-bar {
   display: flex;
   align-items: center;
-  gap: 0.45rem;
-  font-size: 11px;
+  gap: var(--space-2);
+  font-size: var(--step--1);
   color: var(--wl-muted);
 }
 
@@ -483,6 +483,11 @@ const totalCompany = computed(() => company.addresses.value.length)
 
 .crumb-bar a:hover {
   color: var(--wl-primary);
+}
+
+.crumb-bar a:focus-visible {
+  outline: 2px solid var(--wl-primary);
+  outline-offset: 2px;
 }
 
 .crumb-sep {
@@ -498,82 +503,95 @@ const totalCompany = computed(() => company.addresses.value.length)
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 1.5rem;
+  gap: var(--space-6);
   flex-wrap: wrap;
 }
 
 .head-chip {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
-  font-size: 10px;
+  gap: var(--space-2);
+  font-size: var(--step--1);
   font-weight: 700;
   color: var(--wl-primary);
   background: var(--wl-primary-soft);
   border: 1px solid rgba(var(--wl-primary-rgb), 0.3);
-  padding: 0.2rem 0.6rem;
-  border-radius: 9999px;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-pill);
   letter-spacing: 0.06em;
-  margin-bottom: 0.5rem;
+  margin-bottom: var(--space-2);
 }
 
 .pulse-dot {
   width: 6px;
   height: 6px;
-  border-radius: 50%;
+  border-radius: var(--radius-pill);
   background: var(--wl-primary);
 }
 
 .head-title {
   font-family: var(--wl-font-display, system-ui);
-  font-size: 1.68rem;
+  font-size: var(--step-2);
   font-weight: 800;
   letter-spacing: -0.025em;
   color: var(--wl-ink-strong);
   margin: 0;
   line-height: 1.1;
+  background: var(--wl-gradient-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
 }
 
 .head-subtitle {
-  font-size: 13.5px;
+  font-size: var(--step-0);
   color: var(--wl-muted);
-  margin: 0.25rem 0 0;
+  margin: var(--space-1) 0 0;
 }
 
 .btn-create-addr {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.45rem;
   height: 44px;
   padding: 0 1.25rem;
   background: var(--wl-primary);
   color: var(--wl-on-primary);
   border: none;
-  border-radius: 10px;
-  font-size: 13.5px;
+  border-radius: var(--radius-md);
+  font-size: var(--step-0);
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 4px 12px -2px rgba(105, 169, 255, 0.35);
+  box-shadow: var(--shadow-card);
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.btn-create-addr:hover {
+.btn-create-addr:hover:not(:disabled) {
   background: var(--wl-primary-hover);
   transform: translateY(-1px);
+}
+
+.btn-create-addr:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-create-addr:focus-visible {
+  outline: 2px solid var(--wl-primary);
+  outline-offset: 2px;
 }
 
 /* Tabs */
 .tab-ribbon {
   display: flex;
-  gap: 0.5rem;
+  gap: var(--space-2);
   border-bottom: 1.5px solid var(--wl-border, #E2E8F0);
 }
 
 .tab-btn {
-  padding: 0.75rem 1.25rem;
+  padding: var(--space-3) var(--space-5);
   border: none;
   background: transparent;
-  font-size: 13.5px;
+  font-size: var(--step-0);
   font-weight: 700;
   color: var(--wl-muted, #64748B);
   cursor: pointer;
@@ -589,39 +607,44 @@ const totalCompany = computed(() => company.addresses.value.length)
   color: var(--wl-ink-strong, #0F172A);
 }
 
+.tab-btn:focus-visible {
+  outline: 2px solid var(--wl-primary);
+  outline-offset: 2px;
+}
+
 .tab-btn.is-active {
   color: var(--wl-primary, #69a9ff);
   border-bottom-color: var(--wl-primary, #69a9ff);
 }
 
 .tab-chip {
-  font-size: 10px;
+  font-size: var(--step--1);
   font-weight: 700;
   background: var(--wl-surface-soft);
   color: var(--wl-ink-soft);
-  padding: 0.1rem 0.45rem;
-  border-radius: 9999px;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-pill);
 }
 
 /* Territory Info Banner */
 .territory-info-banner {
   background: var(--wl-surface-soft);
   border: 1px solid var(--wl-border);
-  border-radius: 12px;
-  padding: 0.85rem 1.15rem;
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--space-3);
 }
 
 .banner-icon {
-  font-size: 20px;
+  font-size: var(--step-1);
   color: var(--wl-primary);
   flex-shrink: 0;
 }
 
 .banner-text {
-  font-size: 13px;
+  font-size: var(--step-0);
   color: var(--wl-ink-soft);
   line-height: 1.5;
   margin: 0;
@@ -631,87 +654,92 @@ const totalCompany = computed(() => company.addresses.value.length)
 .address-groups-stack {
   display: flex;
   flex-direction: column;
-  gap: 1.75rem;
+  gap: var(--space-7);
 }
 
 .country-cluster {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--space-3);
 }
 
 .cluster-head {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 
 .cluster-title {
-  font-size: 14.5px;
+  font-size: var(--step-0);
   font-weight: 800;
   color: var(--wl-ink-strong);
   margin: 0;
 }
 
 .country-pill {
-  font-size: 10px;
+  font-size: var(--step--1);
   font-weight: 700;
   color: var(--wl-info);
   background: var(--wl-info-soft);
-  padding: 0.15rem 0.5rem;
-  border-radius: 6px;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
 }
 
 .currency-pill {
-  font-size: 10px;
+  font-size: var(--step--1);
   font-weight: 800;
   color: var(--wl-success);
   background: var(--wl-success-soft);
   border: 1px solid rgba(87, 242, 135, 0.35);
-  padding: 0.15rem 0.5rem;
-  border-radius: 6px;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
   letter-spacing: 0.04em;
 }
 
 .cluster-count {
-  font-size: 11px;
+  font-size: var(--step--1);
   color: var(--wl-muted-soft);
 }
 
 .address-cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
-  gap: 1rem;
+  gap: var(--space-4);
 }
 
 .address-card {
   background: var(--wl-surface);
   border: 1px solid var(--wl-border, #E2E8F0);
-  border-radius: var(--wl-radius-card, 16px);
+  border-radius: var(--radius-md);
   padding: var(--wl-card-padding, 1.25rem);
-  box-shadow: var(--wl-shadow-card, 0 1px 3px rgba(0, 10, 25, 0.05));
+  box-shadow: var(--shadow-card);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 1rem;
+  gap: var(--space-4);
   transition: all 0.2s ease;
 }
 
 .address-card:hover {
   border-color: var(--wl-border-strong);
-  box-shadow: 0 4px 12px rgba(0, 10, 25, 0.06);
+  box-shadow: var(--shadow-hover);
+}
+
+.address-card:focus-visible {
+  outline: 2px solid var(--wl-primary);
+  outline-offset: 2px;
 }
 
 .card-main {
   display: flex;
-  gap: 0.85rem;
+  gap: var(--space-3);
   align-items: flex-start;
 }
 
 .addr-icon-box {
   width: 40px;
   height: 40px;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   background: var(--wl-primary-soft);
   color: var(--wl-primary);
   display: grid;
@@ -727,7 +755,7 @@ const totalCompany = computed(() => company.addresses.value.length)
 .addr-details {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: var(--space-1);
   flex: 1;
   min-width: 0;
 }
@@ -735,11 +763,11 @@ const totalCompany = computed(() => company.addresses.value.length)
 .street-line {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 
 .street-name {
-  font-size: 14.5px;
+  font-size: var(--step-0);
   font-weight: 700;
   color: var(--wl-ink-strong);
   margin: 0;
@@ -749,16 +777,16 @@ const totalCompany = computed(() => company.addresses.value.length)
 }
 
 .default-badge {
-  font-size: 9px;
+  font-size: var(--step--1);
   font-weight: 800;
   color: var(--wl-success);
   background: var(--wl-success-soft);
-  padding: 0.1rem 0.4rem;
-  border-radius: 4px;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
 }
 
 .building-meta {
-  font-size: 12.5px;
+  font-size: var(--step-0);
   color: var(--wl-muted);
   margin: 0;
 }
@@ -766,18 +794,18 @@ const totalCompany = computed(() => company.addresses.value.length)
 .hierarchy-tags {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: var(--space-1);
   flex-wrap: wrap;
-  margin-top: 0.35rem;
+  margin-top: var(--space-1);
 }
 
 .geo-pill {
-  font-size: 10px;
+  font-size: var(--step--1);
   font-weight: 700;
   color: var(--wl-ink-soft);
   background: var(--wl-surface-soft);
-  padding: 0.15rem 0.5rem;
-  border-radius: 6px;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
 }
 
 .geo-pill--subtle {
@@ -792,8 +820,8 @@ const totalCompany = computed(() => company.addresses.value.length)
 
 .card-actions {
   display: flex;
-  gap: 0.5rem;
-  padding-top: 0.75rem;
+  gap: var(--space-2);
+  padding-top: var(--space-3);
   border-top: 1px solid var(--wl-border);
 }
 
@@ -806,18 +834,23 @@ const totalCompany = computed(() => company.addresses.value.length)
   gap: 0.3rem;
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  border-radius: 8px;
-  font-size: 12px;
+  border-radius: var(--radius-md);
+  font-size: var(--step-0);
   font-weight: 600;
   color: var(--wl-ink-soft);
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
-.btn-action-ghost:hover {
+.btn-action-ghost:hover:not(:disabled) {
   border-color: var(--wl-primary);
   color: var(--wl-primary);
   background: var(--wl-primary-soft);
+}
+
+.btn-action-ghost:focus-visible {
+  outline: 2px solid var(--wl-primary);
+  outline-offset: 2px;
 }
 
 .btn-action-danger {
@@ -829,33 +862,38 @@ const totalCompany = computed(() => company.addresses.value.length)
   gap: 0.3rem;
   background: var(--wl-surface);
   border: 1px solid rgba(237, 66, 69, 0.35);
-  border-radius: 8px;
-  font-size: 12px;
+  border-radius: var(--radius-md);
+  font-size: var(--step-0);
   font-weight: 600;
   color: var(--wl-danger);
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
-.btn-action-danger:hover {
+.btn-action-danger:hover:not(:disabled) {
   background: var(--wl-danger-soft);
+}
+
+.btn-action-danger:focus-visible {
+  outline: 2px solid var(--wl-danger);
+  outline-offset: 2px;
 }
 
 /* Modals */
 .modal-form-stack {
   display: flex;
   flex-direction: column;
-  gap: 1.15rem;
+  gap: var(--space-5);
 }
 
 .field-item {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: var(--space-1);
 }
 
 .vip-field-label {
-  font-size: 10.5px;
+  font-size: var(--step--1);
   font-weight: 700;
   color: var(--wl-ink-soft);
   letter-spacing: 0.05em;
@@ -869,8 +907,8 @@ const totalCompany = computed(() => company.addresses.value.length)
   padding: 0 14px;
   background: var(--wl-surface-soft);
   border: 1.5px solid var(--wl-border);
-  border-radius: 10px;
-  font-size: 13.5px;
+  border-radius: var(--radius-md);
+  font-size: var(--step-0);
   color: var(--wl-ink-strong);
   outline: none;
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
@@ -880,26 +918,26 @@ const totalCompany = computed(() => company.addresses.value.length)
 .vip-input:focus {
   background: var(--wl-surface);
   border-color: var(--wl-primary);
-  box-shadow: 0 0 0 3px rgba(105, 169, 255, 0.12);
+  box-shadow: var(--wl-focus-ring);
 }
 
 .fields-2col {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
+  gap: var(--space-3);
 }
 
 .fields-3col {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: 0.75rem;
+  gap: var(--space-3);
 }
 
 .default-checkbox-wrap {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 12.5px;
+  font-size: var(--step-0);
   color: var(--wl-ink-soft);
   cursor: pointer;
 }
@@ -914,16 +952,16 @@ const totalCompany = computed(() => company.addresses.value.length)
   background: var(--wl-danger-soft);
   border: 1px solid rgba(237, 66, 69, 0.35);
   color: var(--wl-danger);
-  padding: 0.65rem 0.85rem;
-  border-radius: 8px;
-  font-size: 12.5px;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--step-0);
 }
 
 .modal-btn-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
-  margin-top: 0.5rem;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
 }
 
 .btn-modal-save {
@@ -931,8 +969,8 @@ const totalCompany = computed(() => company.addresses.value.length)
   background: var(--wl-primary);
   color: var(--wl-on-primary);
   border: none;
-  border-radius: 10px;
-  font-size: 13.5px;
+  border-radius: var(--radius-md);
+  font-size: var(--step-0);
   font-weight: 700;
   cursor: pointer;
   transition: background 0.15s ease;
@@ -942,19 +980,28 @@ const totalCompany = computed(() => company.addresses.value.length)
   background: var(--wl-primary-hover);
 }
 
+.btn-modal-save:active:not(:disabled) {
+  transform: scale(0.985);
+}
+
+.btn-modal-save:focus-visible {
+  outline: 2px solid var(--wl-primary);
+  outline-offset: 2px;
+}
+
 .btn-modal-cancel {
   height: 48px;
   background: var(--wl-surface);
   border: 1.5px solid var(--wl-border);
   color: var(--wl-ink-strong);
-  border-radius: 10px;
-  font-size: 13.5px;
+  border-radius: var(--radius-md);
+  font-size: var(--step-0);
   font-weight: 700;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
-.btn-modal-cancel:hover {
+.btn-modal-cancel:hover:not(:disabled) {
   background: var(--wl-surface-soft);
 }
 </style>

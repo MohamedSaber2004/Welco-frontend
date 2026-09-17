@@ -2,6 +2,8 @@
 import { onMounted, ref, computed } from 'vue'
 import { t, locale } from '../../i18n'
 import { contentService } from '../../di/container'
+import { toUploadPlace } from '../../application/attachment.service'
+import FileUpload from '../../components/ui/FileUpload.vue'
 import DataState from '../../components/ui/DataState.vue'
 import SkeletonLoader from '../../components/ui/SkeletonLoader.vue'
 import BackButton from '../../components/ui/BackButton.vue'
@@ -9,6 +11,7 @@ import BackButton from '../../components/ui/BackButton.vue'
 const loading = ref(true)
 const subject = ref('')
 const message = ref('')
+const ticketAttachment = ref<string | null>(null)
 const submitting = ref(false)
 const myTickets = contentService.myTickets
 
@@ -52,9 +55,13 @@ async function create() {
   if (!subject.value.trim() || !message.value.trim()) return
   submitting.value = true
   try {
-    await contentService.createTicket(subject.value.trim(), message.value.trim())
+    const payloadMessage = ticketAttachment.value
+      ? `${message.value.trim()}\n[attachment: ${ticketAttachment.value}]`
+      : message.value.trim()
+    await contentService.createTicket(subject.value.trim(), payloadMessage)
     subject.value = ''
     message.value = ''
+    ticketAttachment.value = null
   } finally {
     submitting.value = false
   }
@@ -120,6 +127,11 @@ async function closeTicket(id: string) {
               :placeholder="t('help.message')"
               required
             ></textarea>
+          </div>
+
+          <div class="field-item">
+            <span class="vip-field-label mono">{{ t('attachment.uploadFile') }}</span>
+            <FileUpload v-model="ticketAttachment" :place="toUploadPlace('ticket')" />
           </div>
 
           <button

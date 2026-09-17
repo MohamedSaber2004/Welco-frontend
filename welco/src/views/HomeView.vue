@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { authService, services, contentRepository, companyRepository } from '../di/container'
 import { t, locale } from '../i18n'
 import type { CategoryDto, ProductDto } from '../domain/models/marketplace'
-import type { CountryDto } from '../domain/models/location'
 import type { CertificationDto } from '../domain/models/certification'
 import type { LandingPageDto } from '../domain/models/content'
 import type { CompanyDto } from '../domain/models/company'
@@ -15,6 +14,7 @@ import BaseModal from '../components/ui/BaseModal.vue'
 import BaseButton from '../components/ui/BaseButton.vue'
 import AppImage from '../components/ui/AppImage.vue'
 import { productMediaUrl } from '../utils/file-url'
+import { formatPrice } from '../utils/format'
 
 const router = useRouter()
 const { add } = useCart()
@@ -26,7 +26,6 @@ const goSearch = () => {
 
 const featured = ref<ProductDto[]>([])
 const cats = ref<CategoryDto[]>([])
-const countries = ref<CountryDto[]>([])
 const certifications = ref<CertificationDto[]>([])
 const landingPages = ref<LandingPageDto[]>([])
 const aboutPage = ref<LandingPageDto | null>(null)
@@ -42,7 +41,6 @@ onMounted(async () => {
     await Promise.allSettled([
       svc.loadCategories(),
       svc.loadFeatured(),
-      services.locationService.loadCountries().then(() => (countries.value = [...services.locationService.countries.value])).catch(() => []),
       services.certificationService.load(),
       services.contentService.loadSupport(),
       contentRepository.getLandingPages({ pageNumber: 1, pageSize: 20 }).then((p) => (landingPages.value = p.data)).catch(() => []),
@@ -73,23 +71,6 @@ onMounted(async () => {
   }
 })
 
-const yearsOfExperience = computed(() => `${new Date().getFullYear() - FOUNDING_YEAR}+`)
-const activeCerts = computed(() => certifications.value.filter((c) => !c.expiryDate || new Date(c.expiryDate) > new Date()))
-const whyItems = computed(() => {
-  const items: Array<{ b: string; label: string; badge: string; tone: string }> = [
-    { b: `${yearsOfExperience.value}`, label: t('home.whyYears'), badge: 'EST. 1994', tone: 'indigo' },
-  ]
-  const isoCert = activeCerts.value.find((c) => c.certificateNumber?.toUpperCase().includes('ISO') || c.title?.toUpperCase().includes('ISO'))
-  const certBadge = isoCert ? isoCert.certificateNumber || isoCert.title : activeCerts.value[0]?.certificateNumber || activeCerts.value[0]?.title
-  if (certBadge) {
-    items.push({ b: certBadge, label: t('home.whyCertified'), badge: 'AUDITED', tone: 'emerald' })
-  }
-  if (countries.value.length > 0) {
-    items.push({ b: `${countries.value.length}+`, label: t('home.whyCountries'), badge: 'GLOBAL', tone: 'teal' })
-  }
-  items.push({ b: 'OEM / ODM', label: t('home.whyOem'), badge: 'DIRECT', tone: 'amber' })
-  return items
-})
 const localized = (en?: string | null, ar?: string | null) => locale.value === 'ar' ? (ar || en || '') : (en || ar || '')
 const handleAdd = (id: string) => {
   const p = (featured.value.find(x => x.id === id) ?? services.marketplaceService.products.value.find((x) => x.id === id))
@@ -188,72 +169,57 @@ const navigateToOemFromModal = () => {
       </div>
     </header>
 
-    <!-- Our Providers Section -->
-    <section class="section section--providers" aria-labelledby="providers-heading">
-      <div class="section__inner">
-        <div class="section-head">
-          <div>
-            <div class="mono section__eyebrow">{{ t('home.ourProvidersEyebrow') }}</div>
-            <h2 id="providers-heading" class="section-title">{{ t('home.ourProviders') }}</h2>
-          </div>
-          <router-link to="/providers" class="btn btn-ghost btn-sm view-all-btn">
-            <span>{{ t('common.viewAll') }}</span>
-            <span class="icon--directional">→</span>
-          </router-link>
-        </div>
-        <p class="section-desc">{{ t('home.ourProvidersSubtitle') }}</p>
+<!-- Our Providers Section -->
+<section class="section section--providers" aria-labelledby="providers-heading">
+  <div class="section__inner">
+    <div class="section-head">
+      <div>
+        <div class="mono section__eyebrow">{{ t('home.ourProvidersEyebrow') }}</div>
+        <h2 id="providers-heading" class="section-title">{{ t('home.ourProviders') }}</h2>
+      </div>
+      <router-link to="/providers" class="btn btn-ghost btn-sm view-all-btn">
+        <span>{{ t('common.viewAll') }}</span>
+        <span class="icon--directional">→</span>
+      </router-link>
+    </div>
+    <p class="section-desc">{{ t('home.ourProvidersSubtitle') }}</p>
 
-        <DataState :loading="loading && !providers.length" :empty="!providers.length && !loading" skeleton-type="catalog-grid" :skeleton-count="4" min-height="160px">
-          <div class="providers-strip-grid">
-            <router-link
-              v-for="p in providers"
-              :key="p.id"
-              :to="{ name: 'marketplace', query: { search: p.name } }"
-              class="provider-tile"
-            >
-              <div class="provider-tile__logo">
-                <AppImage
-                  :src="p.imageName"
-                  placeholder-type="company"
-                  :placeholder-text="p.name"
-                  :alt="p.name"
-                  fit="contain"
-                  height="70px"
-                />
-              </div>
-              <div class="provider-tile__info">
-                <div class="provider-tile__top">
-                  <span class="provider-tile__badge mono">
-                    <span class="material-symbols-outlined text-[12px]">verified</span>
-                    {{ t('home.verifiedSupplier') }}
-                  </span>
-                </div>
-                <h3 class="provider-tile__name" dir="auto">{{ p.name }}</h3>
-                <div v-if="p.countryNameEn || p.countryNameAr" class="provider-tile__country mono">
-                  <span class="material-symbols-outlined text-[13px] text-teal-600">public</span>
-                  <span>{{ localized(p.countryNameEn, p.countryNameAr) }}</span>
-                </div>
-              </div>
-            </router-link>
+    <DataState :loading="loading && !providers.length" :empty="!providers.length && !loading" skeleton-type="provider-grid" :skeleton-count="4" min-height="250px">
+      <div class="providers-strip-grid">
+        <router-link
+          v-for="p in providers"
+          :key="p.id"
+          :to="{ name: 'marketplace', query: { search: p.name } }"
+          class="provider-tile"
+        >
+          <div class="provider-tile__logo">
+            <AppImage
+              :src="p.imageName"
+              placeholder-type="company"
+              :placeholder-text="p.name"
+              :alt="p.name"
+              fit="contain"
+              height="70px"
+            />
           </div>
-        </DataState>
-      </div>
-    </section>
-    <section class="section" aria-labelledby="metrics-heading">
-      <div class="section__inner">
-        <h2 id="metrics-heading" class="visually-hidden">{{ t('home.metricsHeading') }}</h2>
-        <div class="metrics-grid">
-          <div v-for="item in whyItems" :key="item.b" class="metric-card" :class="`metric-card--${item.tone}`">
-            <div class="metric-card__top">
-              <span class="mono metric-card__label">{{ item.label }}</span>
-              <span class="metric-card__badge mono" :class="`badge--${item.tone}`">{{ item.badge }}</span>
+          <div class="provider-tile__info">
+            <div class="provider-tile__top">
+              <span class="provider-tile__badge mono">
+                {{ t('home.verifiedSupplier') }}
+              </span>
             </div>
-            <div class="metric-card__value mono-num">{{ item.b }}</div>
-            <div class="metric-card__bar" :class="`bar--${item.tone}`"></div>
+            <h3 class="provider-tile__name" dir="auto">{{ p.name }}</h3>
+            <div v-if="p.countryNameEn || p.countryNameAr" class="provider-tile__country mono">
+              <span class="material-symbols-outlined text-[13px] text-teal-600">public</span>
+              <span>{{ localized(p.countryNameEn, p.countryNameAr) }}</span>
+            </div>
           </div>
-        </div>
+        </router-link>
       </div>
-    </section>
+    </DataState>
+  </div>
+</section>
+
     <section class="section section--soft" aria-labelledby="cat-heading">
       <div class="section__inner">
         <div class="section-head">
@@ -327,7 +293,7 @@ const navigateToOemFromModal = () => {
                 <div class="mono product-card__meta-alt" dir="auto">{{ locale === 'en' ? p.nameAr : p.nameEn }}</div>
                 <div class="mono product-card__meta">{{ p.manufacturerEn || 'Welco Surgical' }} · CE Class IIa</div>
                 <div class="product-card__foot">
-                  <strong class="mono-num">{{ Math.ceil(p.price).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ p.currencySymbol || '$' }}</strong>
+                  <strong class="mono-num">{{ formatPrice(p.price, locale) }} {{ p.currencySymbol || '$' }}</strong>
                   <button class="btn btn-primary btn-sm" type="button" @click.stop="handleAdd(p.id)">
                     <span class="material-symbols-outlined text-[15px]">add_shopping_cart</span>
                     <span>{{ t('marketplace.addToQuote') }}</span>
@@ -341,7 +307,7 @@ const navigateToOemFromModal = () => {
     </section>
 
     <!-- Audited Quality Standards Section -->
-    <section v-if="certifications.length" class="section section--soft" aria-labelledby="home-certs-heading">
+    <section class="section section--soft" aria-labelledby="home-certs-heading">
       <div class="section__inner">
         <div class="section-head">
           <div>
@@ -353,30 +319,32 @@ const navigateToOemFromModal = () => {
             <span class="icon--directional">→</span>
           </router-link>
         </div>
-        <div class="home-certs-grid">
-          <article
-            v-for="c in certifications.slice(0, 3)"
-            :key="c.id"
-            class="home-cert-card"
-            @click="router.push('/certifications')"
-          >
-            <div class="home-cert-card__media">
-              <AppImage
-                :src="c.certificationImageName"
-                placeholder-type="document"
-                :placeholder-text="c.certificateNumber || c.title"
-                :alt="c.title"
-                aspect-ratio="16/10"
-                fit="contain"
-              />
-            </div>
-            <div class="home-cert-card__body">
-              <div class="home-cert-card__badge mono">{{ c.certificateNumber || 'ISO / CE' }}</div>
-              <h3 class="home-cert-card__title">{{ c.title }}</h3>
-              <div class="home-cert-card__meta mono">{{ c.issuer }}</div>
-            </div>
-          </article>
-        </div>
+        <DataState :loading="loading && !certifications.length" :empty="!certifications.length && !loading" skeleton-type="cert-grid" :skeleton-count="4" min-height="300px">
+          <div class="home-certs-grid">
+            <article
+              v-for="c in certifications.slice(0, 3)"
+              :key="c.id"
+              class="home-cert-card"
+              @click="router.push('/certifications')"
+            >
+              <div class="home-cert-card__media">
+                <AppImage
+                  :src="c.certificationImageName"
+                  placeholder-type="document"
+                  :placeholder-text="c.certificateNumber || c.title"
+                  :alt="c.title"
+                  aspect-ratio="16/10"
+                  fit="contain"
+                />
+              </div>
+              <div class="home-cert-card__body">
+                <div class="home-cert-card__badge mono">{{ c.certificateNumber || 'ISO / CE' }}</div>
+                <h3 class="home-cert-card__title">{{ c.title }}</h3>
+                <div class="home-cert-card__meta mono">{{ c.issuer }}</div>
+              </div>
+            </article>
+          </div>
+        </DataState>
       </div>
     </section>
     <section class="section section--soft" aria-labelledby="about-heading">
@@ -399,19 +367,15 @@ const navigateToOemFromModal = () => {
             </router-link>
           </div>
         </div>
-        <div class="about-media">
+<div class="about-media">
           <img src="/logo.jpeg" alt="Welco" class="about-media__img" loading="lazy" />
-          <div class="mono about-media__badge">{{ yearsOfExperience }} · EST. 1994</div>
         </div>
       </div>
     </section>
 
-    <!-- Request Institutional Price Quote Modal -->
+<!-- Request Institutional Price Quote Modal -->
     <BaseModal v-model="priceModalOpen" :title="t('home.quoteModalTitle')" max-width="580px">
       <div v-if="priceSubmitted" class="quote-modal-success">
-        <div class="success-icon-badge">
-          <span class="material-symbols-outlined text-[36px] text-emerald-600">verified</span>
-        </div>
         <h3 class="success-head">{{ t('home.quoteSubmittedTitle') }}</h3>
         <p class="success-body">{{ t('home.quoteSubmittedDesc') }}</p>
 
@@ -422,7 +386,7 @@ const navigateToOemFromModal = () => {
 
         <div class="modal-success-actions">
           <BaseButton variant="primary" block @click="priceModalOpen = false">
-            {{ t('common.ok') }}
+            {{ t('common.close') }}
           </BaseButton>
           <button type="button" class="btn-link-oem mono" @click="navigateToOemFromModal">
             <span>{{ t('home.quoteOemLink') }}</span>
@@ -585,8 +549,8 @@ const navigateToOemFromModal = () => {
   justify-content: center;
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  border-radius: var(--radius-xl);
-  padding: 1.75rem;
+  border-radius: var(--radius-md);
+  padding: var(--space-8);
   box-shadow: var(--wl-shadow-card);
   position: relative;
   overflow: hidden;
@@ -605,7 +569,7 @@ const navigateToOemFromModal = () => {
   height: auto;
   max-height: 220px;
   object-fit: contain;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 
 .hero__dot {
@@ -632,12 +596,12 @@ const navigateToOemFromModal = () => {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  filter: drop-shadow(0 2px 10px rgba(233, 168, 37, 0.28)) drop-shadow(0 1px 0 rgba(6, 19, 40, 0.9));
+  filter: var(--wl-gold-text-filter);
 }
 
 .hero p {
   color: var(--wl-ink-soft);
-  font-size: 15.5px;
+  font-size: var(--step-0);
   line-height: 1.6;
   max-width: 540px;
 }
@@ -651,12 +615,12 @@ const navigateToOemFromModal = () => {
 .hero__search-bar {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
+  gap: var(--space-2);
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  border-radius: 12px;
-  padding: 0.35rem 0.35rem 0.35rem 0.95rem;
-  box-shadow: var(--shadow-sm);
+  border-radius: var(--radius-md);
+  padding: var(--space-1) var(--space-1) var(--space-1) var(--space-3);
+  box-shadow: var(--shadow-card);
   transition: border-color 0.22s var(--wl-ease-spring), box-shadow 0.22s var(--wl-ease-spring), transform 0.16s ease;
   height: 48px;
 }
@@ -677,7 +641,7 @@ const navigateToOemFromModal = () => {
   border: none;
   background: transparent;
   outline: none;
-  font-size: 14px;
+  font-size: var(--step-0);
   font-family: var(--wl-font-body);
   color: var(--wl-ink-strong);
 }
@@ -691,7 +655,7 @@ const navigateToOemFromModal = () => {
   border: 1px solid var(--wl-border);
   border-bottom-width: 2px;
   padding: 0.15rem 0.4rem;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 10px;
   color: var(--wl-muted);
 }
@@ -700,13 +664,13 @@ const navigateToOemFromModal = () => {
   background: var(--wl-primary);
   color: var(--wl-on-primary);
   border: none;
-  padding: 0 1.25rem;
+  padding: 0 var(--space-5);
   height: 38px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   font-weight: 700;
   font-size: 13px;
   cursor: pointer;
-  box-shadow: 0 2px 8px -2px rgba(105, 169, 255, 0.35);
+  box-shadow: var(--shadow-hover);
   transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
 }
 
@@ -715,19 +679,38 @@ const navigateToOemFromModal = () => {
   transform: translateY(-0.5px);
 }
 
+.hero__search-btn:active:not(:disabled) {
+  transform: scale(0.985);
+}
+
+.hero__search-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--wl-focus-ring);
+}
+
+.hero__search-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.hero__search-btn[aria-busy="true"] {
+  pointer-events: none;
+}
+
 .hero__ctas {
   display: flex;
-  gap: 0.85rem;
-  margin-top: 1.5rem;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
   flex-wrap: wrap;
 }
 
 .hero__trust {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
-  margin-top: 1.5rem;
-  font-size: 11.5px;
+  gap: var(--space-2);
+  margin-top: var(--space-6);
+  font-size: var(--step-0);
   color: var(--wl-muted);
   flex-wrap: wrap;
 }
@@ -744,14 +727,14 @@ const navigateToOemFromModal = () => {
 .hero__spec-hud {
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  border-radius: 16px;
-  padding: 1.6rem;
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
   box-shadow: var(--wl-shadow-card);
   position: relative;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 1.15rem;
+  gap: var(--space-4);
 }
 
 .hero__spec-hud::before {
@@ -802,7 +785,7 @@ const navigateToOemFromModal = () => {
 .hud-brand-logo {
   height: 48px;
   width: auto;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   margin-bottom: 0.5rem;
 }
 
@@ -823,8 +806,8 @@ const navigateToOemFromModal = () => {
   flex-direction: column;
   gap: 0.15rem;
   background: var(--wl-surface-soft);
-  padding: 0.55rem 0.75rem;
-  border-radius: 8px;
+  padding: var(--space-2) var(--space-2);
+  border-radius: var(--radius-sm);
   border: 1px solid var(--wl-border);
 }
 
@@ -849,7 +832,7 @@ const navigateToOemFromModal = () => {
 
 /* Sections */
 .section {
-  padding: 3.5rem 0;
+  padding: var(--space-10) 0;
 }
 
 .section--soft {
@@ -868,7 +851,7 @@ const navigateToOemFromModal = () => {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--space-6);
   gap: 1rem;
   flex-wrap: wrap;
 }
@@ -876,13 +859,13 @@ const navigateToOemFromModal = () => {
 .view-all-btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-2);
   padding: 0.45rem 0.95rem;
-  border-radius: var(--wl-radius-md, 8px);
+  border-radius: var(--radius-md);
   border: 1px solid var(--wl-border);
   background: var(--wl-surface);
   color: var(--wl-primary);
-  font-size: 0.8125rem;
+  font-size: var(--step--1);
   font-weight: 700;
   text-decoration: none;
   transition: all 0.2s ease;
@@ -898,30 +881,86 @@ const navigateToOemFromModal = () => {
   transform: translateX(-2px);
 }
 
+.view-all-btn:active:not(:disabled) {
+  transform: translateX(0);
+}
+
+.view-all-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--wl-focus-ring);
+}
+
+.view-all-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.view-all-btn[aria-busy="true"] {
+  pointer-events: none;
+}
+
 /* Our Providers Section */
 .section--providers {
-  background: var(--wl-surface-soft, #0B274F);
-  border-bottom: 1px solid var(--wl-border, #e2e8f0);
-  padding: 3rem 0;
+  background: var(--wl-surface-soft);
+  border-bottom: 1px solid var(--wl-border);
+  padding: var(--space-8) 0;
 }
 
 .section-desc {
-  font-size: 0.95rem;
+  font-size: var(--step-0);
   color: var(--wl-muted, #64748b);
-  margin: -0.5rem 0 1.75rem;
+  margin: calc(var(--space-2) * -1) 0 var(--space-6);
+  max-width: 680px;
+}
+
+/* Home Cards Grid - Fixed 4-column grid on desktop/laptop, centered in container */
+.home-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+  max-width: var(--wl-max-width);
+  margin-inline: auto;
+}
+
+/* Our Providers Section */
+.section--providers {
+  background: var(--wl-surface-soft);
+  border-bottom: 1px solid var(--wl-border);
+  padding: var(--space-8) 0;
+}
+
+.section-desc {
+  font-size: var(--step-0);
+  color: var(--wl-muted, #64748b);
+  margin: calc(var(--space-2) * -1) 0 var(--space-6);
   max-width: 680px;
 }
 
 .providers-strip-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1.25rem;
+  gap: var(--space-4);
+  max-width: var(--wl-max-width);
+  margin-inline: auto;
+}
+
+@media (max-width: 1024px) {
+  .providers-strip-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .providers-strip-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .provider-tile {
-  background: var(--wl-surface, #071A38);
-  border: 1px solid var(--wl-border, #e2e8f0);
-  border-radius: var(--wl-radius-lg, 12px);
+  background: var(--wl-surface);
+  border: 1px solid var(--wl-border);
+  border-radius: var(--radius-md);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -932,25 +971,44 @@ const navigateToOemFromModal = () => {
 .provider-tile:hover {
   transform: translateY(-3px);
   border-color: var(--wl-primary, #0d9488);
-  box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-hover);
+}
+
+.provider-tile:active:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.provider-tile:focus-visible {
+  outline: none;
+  box-shadow: var(--wl-focus-ring);
+}
+
+.provider-tile:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.provider-tile[aria-busy="true"] {
+  pointer-events: none;
 }
 
 .provider-tile__logo {
   height: 110px;
-  background: linear-gradient(180deg, var(--wl-surface-soft, #0B274F) 0%, var(--wl-surface, #071A38) 100%);
+  background: linear-gradient(180deg, var(--wl-surface-soft) 0%, var(--wl-surface) 100%);
   border-bottom: 1px solid var(--wl-border);
-  padding: 0.85rem;
+  padding: var(--space-3);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .provider-tile__info {
-  padding: 1rem 1.1rem;
+  padding: var(--space-3) var(--space-3);
   display: flex;
   flex-direction: column;
   flex: 1;
-  gap: 0.4rem;
+  gap: var(--space-1);
 }
 
 .provider-tile__top {
@@ -962,13 +1020,13 @@ const navigateToOemFromModal = () => {
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  font-size: 0.65rem;
+  font-size: var(--step--1);
   font-weight: 700;
   color: var(--wl-success);
   background: var(--wl-success-soft);
   border: 1px solid rgba(87, 242, 135, 0.35);
-  padding: 0.15rem 0.45rem;
-  border-radius: 9999px;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-pill);
   letter-spacing: 0.02em;
 }
 
@@ -988,35 +1046,37 @@ const navigateToOemFromModal = () => {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  font-size: 0.78rem;
+  font-size: var(--step--1);
   color: var(--wl-muted, #64748b);
   margin-top: auto;
   padding-top: 0.25rem;
 }
 
+/* Home Certs Grid - Fixed 4-column grid on desktop, centered */
+.home-certs-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+  max-width: var(--wl-max-width);
+  margin-inline: auto;
+}
+
 @media (max-width: 1024px) {
-  .providers-strip-grid {
+  .home-certs-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 640px) {
-  .providers-strip-grid {
+  .home-certs-grid {
     grid-template-columns: 1fr;
   }
-}
-
-/* Home Certs Grid */
-.home-certs-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.25rem;
 }
 
 .home-cert-card {
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  border-radius: var(--wl-radius-xl, 14px);
+  border-radius: var(--radius-md);
   overflow: hidden;
   cursor: pointer;
   display: flex;
@@ -1027,7 +1087,26 @@ const navigateToOemFromModal = () => {
 .home-cert-card:hover {
   transform: translateY(-3px);
   border-color: var(--wl-primary);
-  box-shadow: 0 8px 20px rgba(0, 10, 25, 0.06);
+  box-shadow: var(--shadow-hover);
+}
+
+.home-cert-card:active:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.home-cert-card:focus-visible {
+  outline: none;
+  box-shadow: var(--wl-focus-ring);
+}
+
+.home-cert-card:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.home-cert-card[aria-busy="true"] {
+  pointer-events: none;
 }
 
 .home-cert-card__media {
@@ -1037,7 +1116,7 @@ const navigateToOemFromModal = () => {
 }
 
 .home-cert-card__body {
-  padding: 1.15rem;
+  padding: var(--space-4);
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
@@ -1060,30 +1139,24 @@ const navigateToOemFromModal = () => {
 }
 
 .home-cert-card__issuer {
-  font-size: 0.8125rem;
+  font-size: var(--step--1);
   color: var(--wl-muted);
   margin-top: auto;
 }
 
-@media (max-width: 768px) {
-  .home-certs-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
 .section__eyebrow {
-  font-size: 10.5px;
+  font-size: var(--step--1);
   color: var(--wl-gold);
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  margin-bottom: 0.25rem;
+  margin-bottom: var(--space-1);
   text-shadow: var(--wl-gold-text-shadow);
 }
 
 .section-title {
   font-family: var(--wl-font-display);
-  font-size: 1.6rem;
+  font-size: var(--step-2);
   font-weight: 800;
   letter-spacing: -0.02em;
   color: var(--wl-gold-text);
@@ -1091,100 +1164,69 @@ const navigateToOemFromModal = () => {
   margin: 0;
 }
 
-/* Metrics Grid */
-.metrics-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
-}
-
-.metric-card {
-  background: var(--wl-surface);
-  border: 1px solid var(--wl-border);
-  border-radius: 12px;
-  padding: 1.25rem 1.4rem;
-  box-shadow: var(--shadow-xs);
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
-  position: relative;
-  overflow: hidden;
-}
-
-.metric-card__top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.metric-card__label {
-  font-size: 11px;
-  color: var(--wl-muted);
-  font-weight: 600;
-}
-
-.metric-card__badge {
-  font-size: 9.5px;
-  font-weight: 700;
-  padding: 0.15rem 0.45rem;
-  border-radius: 9999px;
-}
-
-.metric-card__value {
-  font-size: 1.85rem;
-  font-weight: 800;
-  color: var(--wl-ink-strong);
-  letter-spacing: -0.02em;
-}
-
-.metric-card__bar {
-  height: 3px;
-  border-radius: 9999px;
-  width: 100%;
-}
-
-.badge--indigo { background: var(--wl-primary-soft); color: var(--wl-primary); }
-.bar--indigo { background: var(--wl-primary); }
-
-.badge--emerald { background: var(--wl-success-soft); color: var(--wl-success); }
-.bar--emerald { background: #10B981; }
-
-.badge--teal { background: var(--wl-primary-soft); color: var(--wl-primary); }
-.bar--teal { background: var(--wl-primary); }
-
-.badge--amber { background: var(--wl-warning-soft); color: var(--wl-warning); }
-.bar--amber { background: var(--wl-warning); }
-
 /* Categories Grid */
 .cat-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1.15rem;
+  gap: var(--space-4);
+  max-width: var(--wl-max-width);
+  margin-inline: auto;
+}
+
+@media (max-width: 1024px) {
+  .cat-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .cat-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .cat-card {
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  border-radius: 12px;
-  padding: 1.25rem;
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
   text-decoration: none;
-  box-shadow: var(--shadow-xs);
+  box-shadow: var(--shadow-card);
   transition: transform 0.2s var(--wl-ease-spring), border-color 0.2s ease, box-shadow 0.2s ease;
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
+  gap: var(--space-3);
 }
 
 .cat-card:hover {
   transform: translateY(-2px);
-  border-color: rgba(105, 169, 255, 0.3);
-  box-shadow: var(--shadow-sm);
+  border-color: var(--wl-primary-soft);
+  box-shadow: var(--shadow-hover);
+}
+
+.cat-card:active:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.cat-card:focus-visible {
+  outline: none;
+  box-shadow: var(--wl-focus-ring);
+}
+
+.cat-card:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.cat-card[aria-busy="true"] {
+  pointer-events: none;
 }
 
 .cat-media {
   width: 100%;
   height: 100px;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   background: var(--wl-surface-soft);
   overflow: hidden;
   display: grid;
@@ -1195,7 +1237,7 @@ const navigateToOemFromModal = () => {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  padding: 6px;
+  padding: var(--space-2);
 }
 
 .cat-media__icon {
@@ -1206,38 +1248,52 @@ const navigateToOemFromModal = () => {
 .cat-body {
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: var(--space-1);
 }
 
 .cat-name {
-  font-size: 0.95rem;
+  font-size: var(--step-0);
   font-weight: 700;
   color: var(--wl-ink-strong);
 }
 
 .cat-name-alt {
-  font-size: 11px;
+  font-size: var(--step--1);
   color: var(--wl-muted);
 }
 
 .cat-count {
-  font-size: 10.5px;
+  font-size: var(--step--1);
   color: var(--wl-primary);
   font-weight: 600;
-  margin-top: 0.2rem;
+  margin-top: var(--space-1);
 }
 
 /* Products Grid */
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.25rem;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+  max-width: var(--wl-max-width);
+  margin-inline: auto;
+}
+
+@media (max-width: 1024px) {
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .product-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .product-card {
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   overflow: hidden;
   box-shadow: var(--wl-shadow-card);
   cursor: pointer;
@@ -1246,8 +1302,27 @@ const navigateToOemFromModal = () => {
 
 .product-card:hover {
   transform: translateY(-2px);
-  border-color: rgba(105, 169, 255, 0.3);
-  box-shadow: var(--shadow-md);
+  border-color: var(--wl-primary-soft);
+  box-shadow: var(--shadow-hover);
+}
+
+.product-card:active:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.product-card:focus-visible {
+  outline: none;
+  box-shadow: var(--wl-focus-ring);
+}
+
+.product-card:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.product-card[aria-busy="true"] {
+  pointer-events: none;
 }
 
 .product-card__media {
@@ -1262,11 +1337,11 @@ const navigateToOemFromModal = () => {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  padding: 1rem;
+  padding: var(--space-3);
 }
 
 .product-card__sku {
-  font-size: 12px;
+  font-size: var(--step--1);
   color: var(--wl-muted);
 }
 
@@ -1278,8 +1353,8 @@ const navigateToOemFromModal = () => {
   font-weight: 800;
   background: var(--wl-primary);
   color: var(--wl-on-primary);
-  padding: 0.15rem 0.5rem;
-  border-radius: 9999px;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-pill);
 }
 
 .product-card__stock {
@@ -1291,10 +1366,10 @@ const navigateToOemFromModal = () => {
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--wl-on-primary);
-  padding: 0.2rem 0.6rem;
-  border-radius: 9999px;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-pill);
   border: 1px solid rgba(255, 255, 255, 0.65);
-  box-shadow: 0 2px 8px rgba(0, 10, 25, 0.25);
+  box-shadow: var(--shadow-card);
 }
 
 .product-card__stock--in {
@@ -1306,20 +1381,20 @@ const navigateToOemFromModal = () => {
 }
 
 .product-card__body {
-  padding: 1.25rem 1.4rem;
+  padding: var(--space-4);
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
 }
 
 .product-card__category {
-  font-size: 10.5px;
+  font-size: var(--step--1);
   color: var(--wl-muted);
   font-weight: 600;
 }
 
 .product-card__title {
-  font-size: 1.05rem;
+  font-size: var(--step-1);
   font-weight: 700;
   color: var(--wl-ink-strong);
   margin: 0;
@@ -1327,15 +1402,15 @@ const navigateToOemFromModal = () => {
 }
 
 .product-card__meta-alt {
-  font-size: 11px;
+  font-size: var(--step--1);
   color: var(--wl-muted);
 }
 
 .product-card__meta {
-  font-size: 11px;
+  font-size: var(--step--1);
   color: var(--wl-success);
   font-weight: 600;
-  margin: 0.2rem 0 0.85rem;
+  margin: var(--space-1) 0 var(--space-3);
 }
 
 .product-card__foot {
@@ -1343,57 +1418,53 @@ const navigateToOemFromModal = () => {
   justify-content: space-between;
   align-items: center;
   border-top: 1px solid var(--wl-surface-soft);
-  padding-top: 0.85rem;
+  padding-top: var(--space-3);
+}
+
+@media (max-width: 640px) {
+  .product-card__foot {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-2);
+  }
 }
 
 @media (max-width: 1024px) {
   .hero__inner {
-    padding: 2.75rem var(--wl-gutter) 2.25rem;
-    gap: 2rem;
+    padding: var(--space-8) var(--wl-gutter) var(--space-6);
+    gap: var(--space-8);
   }
   .section {
-    padding: 2.75rem 0;
+    padding: var(--space-8) 0;
   }
 }
 
 @media (max-width: 900px) {
   .hero__inner {
     grid-template-columns: 1fr;
-    gap: 2rem;
-    padding: 2.5rem var(--wl-gutter) 2rem;
+    gap: var(--space-8);
+    padding: var(--space-7) var(--wl-gutter) var(--space-6);
   }
   .hero__logo-box {
     max-width: 380px;
     margin: 0 auto;
     width: 100%;
   }
-  .metrics-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.85rem;
-  }
-  .cat-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.85rem;
-  }
-  .product-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-  }
 }
 
 @media (max-width: 640px) {
   .section {
-    padding: 2rem 0;
+    padding: var(--space-6) 0;
   }
   .section-head {
-    margin-bottom: 1.15rem;
+    margin-bottom: var(--space-4);
   }
   .section-title {
     font-size: clamp(1.25rem, 4.5vw, 1.5rem);
   }
   .hero__inner {
-    padding: 1.75rem var(--wl-gutter) 1.5rem;
-    gap: 1.5rem;
+    padding: var(--space-6) var(--wl-gutter) var(--space-5);
+    gap: var(--space-6);
   }
   .hero h1 {
     font-size: clamp(1.7rem, 6.5vw, 2.3rem);
@@ -1412,7 +1483,7 @@ const navigateToOemFromModal = () => {
     flex-direction: column;
     width: 100%;
     gap: 0.6rem;
-    margin-top: 1.15rem;
+    margin-top: var(--space-4);
   }
   .hero__ctas > * {
     width: 100%;
@@ -1424,28 +1495,6 @@ const navigateToOemFromModal = () => {
   }
   .hero__logo-box img {
     max-height: 150px;
-  }
-  .metrics-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.6rem;
-  }
-  .metric-card {
-    padding: 0.95rem 1rem;
-    gap: 0.45rem;
-  }
-  .metric-card__value {
-    font-size: 1.35rem;
-  }
-  .cat-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.6rem;
-  }
-  .cat-card {
-    padding: 0.75rem 0.85rem;
-  }
-  .product-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
   }
 }
 
@@ -1459,38 +1508,33 @@ const navigateToOemFromModal = () => {
     padding: 0 0.85rem;
     font-size: 12px;
   }
-  .metrics-grid {
-    grid-template-columns: 1fr;
-  }
-  .cat-grid {
-    grid-template-columns: 1fr;
-  }
 }
+
 
 /* Institutional Quote Modal Styles */
 .quote-modal-desc {
-  font-size: 13.5px;
+  font-size: var(--step-0);
   color: var(--wl-muted);
   line-height: 1.5;
-  margin: 0 0 1.25rem;
+  margin: 0 0 var(--space-4);
 }
 
 .modal-2col {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.85rem;
-  margin-bottom: 0.85rem;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
 }
 
 .modal-field {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
-  margin-bottom: 0.85rem;
+  margin-bottom: var(--space-3);
 }
 
 .modal-lbl {
-  font-size: 11.5px;
+  font-size: var(--step--1);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -1502,11 +1546,11 @@ const navigateToOemFromModal = () => {
 .modal-sel,
 .modal-txt {
   width: 100%;
-  background: var(--wl-surface-soft, #0B274F);
-  border: 1.5px solid var(--wl-border, #E2E8F0);
-  border-radius: 9px;
+  background: var(--wl-surface-soft);
+  border: 1.5px solid var(--wl-border);
+  border-radius: var(--radius-md);
   color: var(--wl-ink-strong, #0F172A);
-  font-size: 13.5px;
+  font-size: var(--step-0);
   padding: 0.65rem 0.85rem;
   outline: none;
   transition: all 0.18s ease;
@@ -1532,10 +1576,10 @@ const navigateToOemFromModal = () => {
   justify-content: space-between;
   background: var(--wl-primary-soft);
   border: 1px dashed rgba(105, 169, 255, 0.3);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   padding: 0.6rem 0.85rem;
-  font-size: 11.5px;
-  margin-bottom: 1.1rem;
+  font-size: var(--step--1);
+  margin-bottom: var(--space-4);
   gap: 0.5rem;
   flex-wrap: wrap;
 }
@@ -1549,7 +1593,7 @@ const navigateToOemFromModal = () => {
 
 .modal-actions-row {
   display: flex;
-  gap: 0.75rem;
+  gap: var(--space-3);
   margin-top: 0.5rem;
 }
 
@@ -1558,33 +1602,22 @@ const navigateToOemFromModal = () => {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 1.5rem 0.5rem;
-}
-
-.success-icon-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: var(--wl-success-soft);
-  margin-bottom: 1rem;
+  padding: var(--space-6) var(--space-2);
 }
 
 .success-head {
-  font-size: 1.25rem;
+  font-size: var(--step-2);
   font-weight: 800;
   color: var(--wl-ink-strong);
-  margin: 0 0 0.5rem;
+  margin: 0 0 var(--space-2);
 }
 
 .success-body {
-  font-size: 13.5px;
+  font-size: var(--step-0);
   color: var(--wl-ink-soft);
   line-height: 1.55;
   max-width: 440px;
-  margin: 0 auto 1.25rem;
+  margin: 0 auto var(--space-4);
 }
 
 .ref-ticket-box {
@@ -1593,18 +1626,18 @@ const navigateToOemFromModal = () => {
   gap: 0.6rem;
   background: var(--wl-surface-soft);
   border: 1px solid var(--wl-border);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   padding: 0.5rem 1rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--space-6);
 }
 
 .ref-label {
-  font-size: 11.5px;
+  font-size: var(--step--1);
   color: var(--wl-muted);
 }
 
 .ref-code {
-  font-size: 14px;
+  font-size: var(--step-0);
   font-weight: 800;
   color: var(--wl-primary);
   letter-spacing: 0.05em;
@@ -1613,7 +1646,7 @@ const navigateToOemFromModal = () => {
 .modal-success-actions {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--space-3);
   width: 100%;
   max-width: 320px;
 }
@@ -1622,7 +1655,7 @@ const navigateToOemFromModal = () => {
   background: transparent;
   border: none;
   color: var(--wl-primary);
-  font-size: 12px;
+  font-size: var(--step--1);
   font-weight: 700;
   cursor: pointer;
   display: inline-flex;
@@ -1636,6 +1669,25 @@ const navigateToOemFromModal = () => {
   text-decoration: underline;
 }
 
+.btn-link-oem:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.btn-link-oem:focus-visible {
+  outline: none;
+  box-shadow: var(--wl-focus-ring);
+}
+
+.btn-link-oem:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.btn-link-oem[aria-busy="true"] {
+  pointer-events: none;
+}
+
 @media (max-width: 580px) {
   .modal-2col {
     grid-template-columns: 1fr;
@@ -1646,57 +1698,44 @@ const navigateToOemFromModal = () => {
 .about-grid {
   display: grid;
   grid-template-columns: 1.15fr 0.85fr;
-  gap: 2.5rem;
+  gap: var(--space-8);
   align-items: center;
 }
 
 .about-body {
   color: var(--wl-ink-soft, #334155);
   line-height: 1.75;
-  font-size: 1rem;
-  margin: 1rem 0 0;
+  font-size: var(--step-0);
+  margin: var(--space-3) 0 0;
   white-space: pre-wrap;
 }
 
 .about-ctas {
   display: flex;
-  gap: 0.75rem;
+  gap: var(--space-3);
   flex-wrap: wrap;
-  margin-top: 1.5rem;
+  margin-top: var(--space-6);
 }
 
 .about-media {
   position: relative;
-  border-radius: var(--wl-radius-lg, 16px);
+  border-radius: var(--radius-md);
   overflow: hidden;
-  border: 1px solid var(--wl-line, #e2e8f0);
+  border: 1px solid var(--wl-border);
   background: var(--wl-surface, #fff);
 }
 
 .about-media__img {
-  width: 100%;
-  height: 100%;
-  min-height: 260px;
-  object-fit: cover;
+  width: 85%;
+  max-width: 600px;
+  height: auto;
+  min-height: 180px;
+  object-fit: contain;
   display: block;
-}
-
-.about-media__badge {
-  position: absolute;
-  inset-inline-start: 1rem;
-  bottom: 1rem;
-  background: rgba(11, 29, 42, 0.85);
-  color: var(--wl-ink-strong);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  padding: 0.4rem 0.8rem;
-  border-radius: 999px;
-}
-
-@media (max-width: 860px) {
-  .about-grid {
-    grid-template-columns: 1fr;
-  }
+  margin: 0 auto;
 }
 </style>
+
+
+
+

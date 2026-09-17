@@ -23,6 +23,7 @@ const companyEmail = ref('')
 const distributorCountryId = ref('')
 const salesVolumeBand = ref('')
 const website = ref('')
+const accountType = ref<'customer' | 'organization'>('customer')
 const loading = ref(false)
 const error = ref('')
 const showPassword = ref(false)
@@ -72,21 +73,31 @@ const handleRegister = async () => {
     error.value = t('auth.errEmailInvalid')
     return
   }
-  if (!companyName.value.trim()) {
-    error.value = t('auth.errCompanyRequired')
-    return
-  }
-  if (companyType.value === '') {
-    error.value = t('auth.errCompanyTypeRequired')
-    return
-  }
-  if (!distributorCountryId.value) {
-    error.value = t('auth.errCountryRequired')
-    return
-  }
-  if (!salesVolumeBand.value) {
-    error.value = t('auth.errVolumeRequired')
-    return
+  if (accountType.value === 'organization') {
+    if (!companyName.value.trim()) {
+      error.value = t('auth.errCompanyRequired')
+      return
+    }
+    if (companyType.value === '') {
+      error.value = t('auth.errCompanyTypeRequired')
+      return
+    }
+    if (!distributorCountryId.value) {
+      error.value = t('auth.errCountryRequired')
+      return
+    }
+    if (!salesVolumeBand.value) {
+      error.value = t('auth.errVolumeRequired')
+      return
+    }
+    if (companyEmail.value && !companyEmailValid.value) {
+      error.value = t('auth.errEmailInvalid')
+      return
+    }
+    if (website.value && website.value.trim() && !/^https?:\/\/.+/i.test(website.value.trim())) {
+      error.value = t('auth.errWebsiteInvalid')
+      return
+    }
   }
   if (password.value !== confirmPassword.value) {
     error.value = t('auth.errPasswordMismatch')
@@ -96,17 +107,10 @@ const handleRegister = async () => {
     error.value = t('auth.errPasswordMin')
     return
   }
-  if (companyEmail.value && !companyEmailValid.value) {
-    error.value = t('auth.errEmailInvalid')
-    return
-  }
-  if (website.value && website.value.trim() && !/^https?:\/\/.+/i.test(website.value.trim())) {
-    error.value = t('auth.errWebsiteInvalid')
-    return
-  }
 
   loading.value = true
   const phoneCountryId = phoneCountry.value?.id
+  const userType = accountType.value === 'customer' ? UserType.Client : UserType.OrganizationUser
   const payload = {
     fullName: fullName.value.trim(),
     email: email.value.trim(),
@@ -115,14 +119,16 @@ const handleRegister = async () => {
     phoneNumber: phoneNumber.value.trim() || undefined,
     phoneCountryId: phoneCountryId ?? undefined,
     phoneCountryCode: phoneCountry.value?.code ?? undefined,
-    userType: UserType.OrganizationUser,
+    userType,
     language: locale.value === 'ar' ? AppLanguage.Ar : AppLanguage.En,
-    companyType: companyType.value,
-    companyName: companyName.value.trim(),
-    companyEmail: companyEmail.value.trim() || undefined,
-    distributorCountryId: distributorCountryId.value,
-    salesVolumeBand: salesVolumeBand.value,
-    website: website.value.trim() || undefined,
+    ...(accountType.value === 'organization' && {
+      companyType: companyType.value,
+      companyName: companyName.value.trim(),
+      companyEmail: companyEmail.value.trim() || undefined,
+      distributorCountryId: distributorCountryId.value,
+      salesVolumeBand: salesVolumeBand.value,
+      website: website.value.trim() || undefined,
+    }),
   } as Parameters<typeof authService.register>[0]
 
   const res = await authService.register(payload)
@@ -133,7 +139,9 @@ const handleRegister = async () => {
       sessionStorage.setItem('welco-pending-email', payload.email)
       sessionStorage.setItem('welco-pending-register', JSON.stringify(payload))
     } catch {}
-    setPendingOrg(payload.email)
+    if (userType === UserType.OrganizationUser) {
+      setPendingOrg(payload.email)
+    }
     toastService.success(t('auth.registrationSuccess'))
     await router.push({ name: 'verify-email', query: { email: payload.email } })
   } else {
@@ -143,7 +151,7 @@ const handleRegister = async () => {
 </script>
 
 <template>
-  <AuthShell :title="t('auth.registerTitle')" :subtitle="t('auth.registerSubtitle')" :wide="true">
+  <AuthShell :title="t('auth.registerTitle')" :subtitle="accountType === 'organization' ? t('auth.registerSubtitle') : t('auth.registerAsCustomerSubtitle')" :wide="true">
     <form class="reg-form" @submit.prevent="handleRegister" novalidate>
       <section class="reg-card">
         <header class="reg-card-head">
@@ -276,6 +284,39 @@ const handleRegister = async () => {
           </div>
         </header>
 
+        <div class="reg-choice-grid">
+          <button
+            type="button"
+            class="reg-choice-card"
+            :class="{ 'reg-choice-card--active': accountType === 'customer' }"
+            @click="accountType = 'customer'"
+          >
+            <span class="material-symbols-outlined reg-choice-icon">person</span>
+            <span class="reg-choice-title">{{ t('auth.registerAsCustomer') }}</span>
+            <span class="reg-choice-desc">{{ t('auth.registerAsCustomerDesc') }}</span>
+          </button>
+          <button
+            type="button"
+            class="reg-choice-card"
+            :class="{ 'reg-choice-card--active': accountType === 'organization' }"
+            @click="accountType = 'organization'"
+          >
+            <span class="material-symbols-outlined reg-choice-icon">business</span>
+            <span class="reg-choice-title">{{ t('auth.registerAsOrganization') }}</span>
+            <span class="reg-choice-desc">{{ t('auth.registerAsOrganizationDesc') }}</span>
+          </button>
+        </div>
+      </section>
+
+      <section v-if="accountType === 'organization'" class="reg-card">
+        <header class="reg-card-head">
+          <span class="reg-card-step mono">2</span>
+          <div>
+            <h3 class="reg-card-title">{{ t('auth.registerStep2Title') }}</h3>
+            <p class="reg-card-subtitle">{{ t('auth.registerStep2Subtitle') }}</p>
+          </div>
+        </header>
+
         <div class="reg-grid">
           <div class="form-group col-span-2">
             <label class="form-label mono" for="reg-company">
@@ -356,9 +397,13 @@ const handleRegister = async () => {
               :placeholder="t('distributor.websitePlaceholder')"
               class="vip-input"
             />
-          </div>
+</div>
         </div>
       </section>
+
+      <p v-if="accountType === 'organization'" class="reg-provider-note mono">
+        {{ t('auth.providerApprovalNote') }}
+      </p>
 
       <div v-if="error" class="form-error-banner" role="alert">
         <span class="material-symbols-outlined text-[18px]">error</span>
@@ -391,7 +436,7 @@ const handleRegister = async () => {
 .reg-card {
   background: var(--wl-surface-soft);
   border: 1px solid var(--wl-border);
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   padding: 1.25rem 1.4rem;
   display: flex;
   flex-direction: column;
@@ -431,6 +476,68 @@ const handleRegister = async () => {
   font-size: 12px;
   color: var(--wl-muted);
   margin: 0;
+}
+
+.reg-choice-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+}
+
+.reg-choice-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.45rem;
+  padding: 1rem;
+  background: var(--wl-surface);
+  border: 1.5px solid var(--wl-border);
+  border-radius: var(--radius-md);
+  color: var(--wl-ink-soft);
+  text-align: start;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: var(--wl-font-body, system-ui);
+}
+
+.reg-choice-card:hover {
+  border-color: var(--wl-primary);
+  box-shadow: var(--shadow-xs);
+  transform: translateY(-1px);
+}
+
+.reg-choice-card--active {
+  border-color: var(--wl-primary);
+  background: color-mix(in srgb, var(--wl-primary) 8%, var(--wl-surface));
+  color: var(--wl-ink-strong);
+}
+
+.reg-choice-icon {
+  font-size: 22px;
+  color: var(--wl-primary);
+}
+
+.reg-choice-title {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.reg-choice-desc {
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--wl-muted);
+}
+
+.reg-provider-note {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: color-mix(in srgb, var(--wl-primary) 8%, var(--wl-surface));
+  border: 1px solid color-mix(in srgb, var(--wl-primary) 30%, var(--wl-border));
+  border-radius: var(--radius-md);
+  color: var(--wl-ink-soft);
+  font-size: 12px;
 }
 
 .reg-grid {
@@ -556,7 +663,7 @@ const handleRegister = async () => {
 .seg {
   flex: 1;
   height: 4px;
-  border-radius: 9999px;
+  border-radius: var(--radius-pill);
   background: var(--wl-surface-hover);
   transition: background 0.2s ease;
 }
@@ -591,7 +698,7 @@ const handleRegister = async () => {
   padding: 0.75rem 1rem;
   background: var(--wl-danger-soft);
   border: 1px solid var(--wl-border);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   color: var(--wl-danger);
   font-size: 13px;
   font-weight: 500;
@@ -612,14 +719,14 @@ const handleRegister = async () => {
   justify-content: center;
   gap: 0.55rem;
   cursor: pointer;
-  box-shadow: 0 4px 12px -2px rgba(105, 169, 255, 0.35);
+  box-shadow: var(--shadow-card);
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .vip-submit-btn:hover:not(:disabled) {
   background: var(--wl-primary-hover);
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px -2px rgba(105, 169, 255, 0.45);
+  box-shadow: var(--shadow-hover);
 }
 
 .vip-submit-btn:active:not(:disabled) {
@@ -664,7 +771,7 @@ const handleRegister = async () => {
   padding: 0.9rem 1rem;
   background: var(--wl-surface);
   border: 1.5px solid var(--wl-border);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   cursor: pointer;
   text-align: start;
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
@@ -678,7 +785,7 @@ const handleRegister = async () => {
 .acct-type-opt.is-active {
   border-color: var(--wl-primary);
   background: rgba(105, 169, 255, 0.05);
-  box-shadow: 0 0 0 3.5px rgba(105, 169, 255, 0.12);
+  box-shadow: var(--shadow-card);
 }
 
 .acct-type-icon {

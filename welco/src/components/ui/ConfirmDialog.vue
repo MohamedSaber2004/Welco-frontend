@@ -112,13 +112,10 @@ const variantClass = computed(() => `confirm__icon--${opts.value?.variant ?? 'da
   display: grid;
   place-items: center;
   padding: 1rem;
-  z-index: 10000;
-}
-:root.dark .confirm-backdrop,
-:root[data-theme='dark'] .confirm-backdrop {
-  background: rgba(0, 0, 0, 0.72);
-}
-.confirm-card {
+z-index: 10000;
+  }
+
+  .confirm-card {
   width: 100%;
   max-width: 460px;
   background: var(--wl-surface);

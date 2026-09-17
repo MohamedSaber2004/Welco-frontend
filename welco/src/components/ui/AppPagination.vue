@@ -262,8 +262,8 @@ const goTo = (p: number | string) => {
 .page-nav-btn:hover:not(:disabled),
 .page-num-btn:hover:not(:disabled):not(.is-active) {
   background: var(--wl-surface-soft);
-  border-color: rgba(105, 169, 255, 0.35);
-  color: var(--wl-ink-strong);
+  border-color: var(--wl-primary);
+  color: var(--wl-primary);
 }
 
 .page-num-btn.is-active {
@@ -271,15 +271,21 @@ const goTo = (p: number | string) => {
   border-color: var(--wl-accent) !important;
   color: var(--wl-on-accent) !important;
   font-weight: 700;
-  box-shadow: 0 1px 3px rgba(105, 169, 255, 0.3);
 }
 
-.page-nav-btn:disabled {
-  opacity: 0.35;
+.page-nav-btn:focus-visible,
+.page-num-btn:focus-visible {
+  outline: 2px solid var(--wl-primary);
+  outline-offset: 2px;
+  box-shadow: var(--wl-focus-ring);
+  z-index: 1;
+}
+
+.page-nav-btn:disabled,
+.page-num-btn:disabled {
+  opacity: 0.38;
   cursor: not-allowed;
-  border-color: var(--wl-border);
-  background: var(--wl-surface);
-  box-shadow: none;
+  pointer-events: none;
 }
 
 .page-ellipsis {

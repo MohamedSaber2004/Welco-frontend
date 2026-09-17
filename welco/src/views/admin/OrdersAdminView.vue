@@ -11,6 +11,7 @@ import { toastService } from '../../infrastructure/feedback/toast.service'
 import { t, locale } from '../../i18n'
 import type { OrderDto } from '../../domain/models/commerce'
 import { ORDER_STATUSES } from '../../domain/models/commerce'
+import { formatPrice } from '../../utils/format'
 
 const orders = commerceService.orders
 const loading = ref(false)
@@ -212,7 +213,7 @@ function goPage(p: number) {
                   <td class="mono text-xs text-slate-500">{{ new Date(o.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</td>
                   <td>
                     <strong class="mono amount-num">
-                      {{ Math.ceil(o.totalAmount).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }} {{ o.currencyCode }}
+                      {{ formatPrice(o.totalAmount, locale) }} {{ o.currencyCode }}
                     </strong>
                   </td>
                   <td>
@@ -298,7 +299,7 @@ function goPage(p: number) {
             <div class="detail-item">
               <span class="detail-k mono">{{ t('commerce.total') }}</span>
               <strong class="detail-v mono"
-                >{{ Math.ceil(selectedOrder.totalAmount).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}
+                >{{ formatPrice(selectedOrder.totalAmount, locale) }}
                 {{ selectedOrder.currencyCode }}</strong
               >
             </div>
@@ -318,7 +319,7 @@ function goPage(p: number) {
                 <tr v-for="it in selectedOrder.items ?? []" :key="it?.id || it?.productId">
                   <td>{{ locale === 'ar' ? (it?.productNameAr || it?.productNameEn) : (it?.productNameEn || it?.productNameAr) }}</td>
                   <td class="text-end mono">{{ it?.quantity ?? 0 }}</td>
-                  <td class="text-end mono">{{ Math.ceil(it?.unitPrice ?? 0).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</td>
+                  <td class="text-end mono">{{ formatPrice(it?.unitPrice ?? 0, locale) }}</td>
                   <td class="text-end mono">{{ Math.ceil((it?.quantity ?? 0) * (it?.unitPrice ?? 0)).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</td>
                 </tr>
               </tbody>
@@ -800,4 +801,8 @@ function goPage(p: number) {
 }
 
 </style>
+
+
+
+
 

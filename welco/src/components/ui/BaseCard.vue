@@ -41,13 +41,9 @@ withDefaults(
   inset: 0;
   border-radius: inherit;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
-  pointer-events: none;
-}
-:root.dark .card::after,
-:root[data-theme='dark'] .card::after {
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
-}
-.card::before {
+pointer-events: none;
+  }
+  .card::before {
   content: '';
   position: absolute;
   inset-inline: 0;

@@ -19,6 +19,7 @@ import { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE, SESSION_COOKIE } from '../in
 import type { AuthBridge } from '../infrastructure/http/auth-bridge'
 import type { AttachmentService } from './attachment.service'
 import {
+  isStaffRole,
   resolveBusinessRole as resolveBusinessRoleFn,
   resolveBusinessRoleKey as resolveBusinessRoleKeyFn,
 } from '../domain/models/business-role'
@@ -205,13 +206,16 @@ export class AuthService {
   private startSessionWatcher(): void {
     if (typeof window === 'undefined') return
     if (this.sessionTimer) clearInterval(this.sessionTimer)
-    // Expired access token → force logout; the user must sign in again.
-    // There is intentionally no silent refresh.
+    // Expired access token → try silent refresh first; force logout only when refresh fails.
     this.sessionTimer = setInterval(() => {
-      if (!this.isAuthenticated) return
-      if (this.tokenStore.isAccessTokenExpired()) {
-        this.handleSessionExpired()
-      }
+      void (async () => {
+        if (!this.isAuthenticated) return
+        if (this.redirectingToLogin) return
+        if (this.tokenStore.isAccessTokenExpired()) {
+          const refreshed = await this.trySilentRefresh()
+          if (!refreshed) this.handleSessionExpired()
+        }
+      })()
     }, 30_000)
   }
 
@@ -232,11 +236,11 @@ export class AuthService {
     return u.roles.map((r) => r.toLowerCase()).includes('organizationuser') || u.userType === 2
   })
 
-  /** WelcoStaff — internal operations role (UserType 3). */
+  /** WelcoStaff/SnulStaff — internal operations roles (UserType 3), treated identically. */
   readonly isWelcoStaff = computed(() => {
     const u = this.user.value
     if (!u) return false
-    return u.roles.map((r) => r.toLowerCase()).includes('welcostaff') || u.userType === 3
+    return u.roles.some((r) => isStaffRole(r)) || u.userType === 3
   })
 
   /**
@@ -316,12 +320,48 @@ export class AuthService {
 
   async ensureValidSession(): Promise<boolean> {
     if (!this.user.value) return false
+    // Proactive silent rotation when the access token is expiring soon
+    // (5 min window); falls back to force logout when refresh fails.
+    const accessToken = this.tokenStore.getAccessToken()
+    if (accessToken) {
+      const expSec = Math.floor(decodeJwtExp(accessToken) / 1000)
+      if (this.tokenStore.isExpiringSoon(expSec)) {
+        const refreshed = await this.trySilentRefresh()
+        if (refreshed) return true
+      }
+    }
     // Expired access token → force logout; the user must sign in again.
     if (this.tokenStore.isAccessTokenExpired()) {
       this.handleSessionExpired()
       return false
     }
     return true
+  }
+
+  private async trySilentRefresh(): Promise<boolean> {
+    try {
+      const refreshToken = this.tokenStore.getRefreshToken()
+      if (!refreshToken || this.tokenStore.isRefreshTokenExpired()) return false
+      const data = await this.authRepository.refreshToken({ refreshToken })
+      if (!data?.accessToken) return false
+      this.tokenStore.setTokens({
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken || refreshToken,
+        refreshTokenExpiryTime:
+          data.refreshTokenExpiryTime || this.tokenStore.getRefreshTokenExpiryTime(),
+      })
+      if (this.session) {
+        this.session.accessToken = data.accessToken
+        this.session.refreshToken = data.refreshToken || refreshToken
+        this.session.refreshTokenExpiryTime =
+          data.refreshTokenExpiryTime || this.session.refreshTokenExpiryTime
+        this.session.accessTokenExpiresAt = new Date(decodeJwtExp(data.accessToken)).toISOString()
+        this.tokenStore.saveSession(this.session)
+      }
+      return true
+    } catch {
+      return false
+    }
   }
 
   private restore(): void {

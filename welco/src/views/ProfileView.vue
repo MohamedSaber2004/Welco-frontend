@@ -688,16 +688,16 @@ const setLang = async (v: AppLanguage) => {
 .profile-top-bar {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--space-3);
   flex-wrap: wrap;
-  margin-bottom: -0.25rem;
+  margin-bottom: var(--space-1);
 }
 
 .crumb-bar {
   display: flex;
   align-items: center;
-  gap: 0.45rem;
-  font-size: 11.5px;
+  gap: var(--space-2);
+  font-size: var(--step--1);
   color: var(--wl-muted);
 }
 
@@ -737,16 +737,16 @@ const setLang = async (v: AppLanguage) => {
   background: var(--wl-primary-soft);
   border: 1px solid rgba(105, 169, 255, 0.2);
   padding: 0.2rem 0.6rem;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-pill);
   letter-spacing: 0.06em;
   width: fit-content;
-  margin-bottom: 0.25rem;
+  margin-bottom: var(--space-1);
 }
 
 .pulse-dot {
   width: 6px;
   height: 6px;
-  border-radius: 50%;
+  border-radius: var(--radius-pill);
   background: var(--wl-primary);
 }
 
@@ -769,6 +769,9 @@ const setLang = async (v: AppLanguage) => {
   color: var(--wl-ink-strong);
   margin: 0;
   line-height: 1.15;
+  background: var(--wl-gradient-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
 }
 
 .head-title--gold {
@@ -779,7 +782,7 @@ const setLang = async (v: AppLanguage) => {
 }
 
 .head-subtitle {
-  font-size: 13.5px;
+  font-size: var(--step-0);
   color: var(--wl-text-secondary);
   margin: 0;
   line-height: 1.5;
@@ -828,10 +831,10 @@ const setLang = async (v: AppLanguage) => {
 .avatar-img {
   width: 100%;
   height: 100%;
-  border-radius: 50%;
+  border-radius: var(--radius-pill);
   object-fit: cover;
   border: 3px solid var(--wl-primary-soft);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-card);
 }
 
 .btn-camera {
@@ -840,20 +843,24 @@ const setLang = async (v: AppLanguage) => {
   inset-inline-end: 0;
   width: 32px;
   height: 32px;
-  border-radius: 50%;
+  border-radius: var(--radius-pill);
   background: var(--wl-primary);
   color: var(--wl-on-primary);
   border: 2px solid var(--wl-surface);
   display: grid;
   place-items: center;
   cursor: pointer;
-  box-shadow: 0 2px 6px rgba(105, 169, 255, 0.35);
+  box-shadow: var(--shadow-card);
   transition: background 0.15s ease, transform 0.15s ease;
 }
 
-.btn-camera:hover {
+.btn-camera:hover:not(:disabled) {
   background: var(--wl-primary-hover);
   transform: scale(1.05);
+}
+
+.btn-camera:active:not(:disabled) {
+  transform: scale(0.95);
 }
 
 .user-display-name {
@@ -909,19 +916,19 @@ const setLang = async (v: AppLanguage) => {
   background: var(--wl-success-soft);
   border: 1px solid rgba(16, 185, 129, 0.25);
   padding: 0.2rem 0.65rem;
-  border-radius: var(--radius-full);
-  margin-top: 0.35rem;
+  border-radius: var(--radius-pill);
+  margin-top: var(--space-1);
 }
 
 .user-role-pill {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  font-size: 11px;
+  font-size: var(--step--1);
   font-weight: 700;
-  padding: 0.25rem 0.65rem;
-  border-radius: var(--radius-full);
-  margin-top: 0.35rem;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-pill);
+  margin-top: var(--space-1);
   letter-spacing: 0.03em;
 }
 
@@ -929,7 +936,7 @@ const setLang = async (v: AppLanguage) => {
   background: var(--wl-gold-soft);
   color: var(--wl-gold);
   border: 1px solid rgba(255, 209, 102, 0.4);
-  box-shadow: 0 0 0 3px rgba(255, 209, 102, 0.12), 0 2px 10px rgba(233, 168, 37, 0.18);
+  box-shadow: 0 0 0 3px rgba(255, 209, 102, 0.12), var(--shadow-card);
   text-shadow: 0 1px 8px rgba(233, 168, 37, 0.25);
 }
 
@@ -950,19 +957,19 @@ const setLang = async (v: AppLanguage) => {
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
-  font-size: 12px;
+  font-size: var(--step-0);
   color: var(--wl-ink-soft);
   background: var(--wl-surface-soft);
   border: 1px solid var(--wl-border);
-  padding: 0.35rem 0.75rem;
-  border-radius: var(--radius-sm, 10px);
-  margin-top: 0.35rem;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  margin-top: var(--space-1);
   max-width: 100%;
 }
 
 .user-phone-badge.is-set {
-  background: rgba(105, 169, 255, 0.05);
-  border-color: rgba(105, 169, 255, 0.2);
+  background: var(--wl-primary-soft);
+  border-color: var(--wl-primary-soft);
 }
 
 .user-phone-badge .phone-icon {
@@ -989,23 +996,23 @@ const setLang = async (v: AppLanguage) => {
 }
 
 .user-phone-country-sub {
-  font-size: 11px;
+  font-size: var(--step--1);
   color: var(--wl-text-secondary);
-  margin-top: 0.15rem;
+  margin-top: var(--space-1);
 }
 
 .org-name-pill {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  font-size: 11px;
+  font-size: var(--step--1);
   font-weight: 700;
   color: var(--wl-primary);
   background: var(--wl-primary-soft);
   border: 1px solid rgba(105, 169, 255, 0.25);
-  padding: 0.25rem 0.65rem;
-  border-radius: var(--radius-xs, 6px);
-  margin-top: 0.25rem;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  margin-top: var(--space-1);
   max-width: 100%;
 }
 
@@ -1013,21 +1020,21 @@ const setLang = async (v: AppLanguage) => {
 .card-mini-head {
   display: flex;
   align-items: center;
-  gap: 0.45rem;
-  margin-bottom: 0.35rem;
+  gap: var(--space-2);
+  margin-bottom: var(--space-1);
 }
 
 .card-mini-title {
-  font-size: 13.5px;
+  font-size: var(--step-0);
   font-weight: 700;
   color: var(--wl-ink-strong);
   margin: 0;
 }
 
 .card-mini-desc {
-  font-size: 12px;
+  font-size: var(--step-0);
   color: var(--wl-text-secondary);
-  margin: 0 0 0.85rem;
+  margin: 0 0 var(--space-3);
   line-height: 1.45;
 }
 
@@ -1035,7 +1042,7 @@ const setLang = async (v: AppLanguage) => {
   display: flex;
   background: var(--wl-surface-soft);
   border: 1px solid var(--wl-border);
-  border-radius: var(--radius-sm, 10px);
+  border-radius: var(--radius-sm);
   padding: 3px;
   gap: 3px;
 }
@@ -1049,10 +1056,10 @@ const setLang = async (v: AppLanguage) => {
   gap: 0.35rem;
   border: none;
   background: transparent;
-  font-size: 12.5px;
+  font-size: var(--step-0);
   font-weight: 700;
   color: var(--wl-ink-soft);
-  border-radius: 7px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   transition: all 0.15s ease;
 }
@@ -1060,7 +1067,7 @@ const setLang = async (v: AppLanguage) => {
 .lang-btn.is-active {
   background: var(--wl-surface);
   color: var(--wl-primary);
-  box-shadow: var(--shadow-xs);
+  box-shadow: var(--shadow-card);
 }
 
 .btn-manage-addr {
@@ -1073,14 +1080,14 @@ const setLang = async (v: AppLanguage) => {
   background: var(--wl-primary-soft);
   border: 1px solid rgba(105, 169, 255, 0.25);
   color: var(--wl-primary);
-  border-radius: var(--radius-sm, 10px);
-  font-size: 12.5px;
+  border-radius: var(--radius-md);
+  font-size: var(--step-0);
   font-weight: 700;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
-.btn-manage-addr:hover {
+.btn-manage-addr:hover:not(:disabled) {
   background: var(--wl-primary);
   color: var(--wl-on-primary);
 }
@@ -1088,9 +1095,9 @@ const setLang = async (v: AppLanguage) => {
 .addr-count-hint {
   display: block;
   text-align: center;
-  font-size: 11px;
+  font-size: var(--step--1);
   color: var(--wl-muted);
-  margin-top: 0.5rem;
+  margin-top: var(--space-2);
 }
 
 /* Main Form Stack */
@@ -1104,12 +1111,12 @@ const setLang = async (v: AppLanguage) => {
 .account-specs-bar {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
-  padding: 1.1rem 1.25rem;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
   background: linear-gradient(135deg, var(--wl-surface) 0%, var(--wl-surface-soft) 100%);
   border: 1px solid var(--wl-border);
-  border-radius: var(--radius-lg, 16px);
-  box-shadow: var(--wl-shadow-card);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
 }
 
 .account-specs-bar--admin {
@@ -1130,8 +1137,8 @@ const setLang = async (v: AppLanguage) => {
 .specs-bar-cell {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
-  padding: 0.2rem 0.5rem;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
   border-inline-end: 1px solid var(--wl-border);
 }
 
@@ -1140,7 +1147,7 @@ const setLang = async (v: AppLanguage) => {
 }
 
 .specs-bar-lbl {
-  font-size: 10.5px;
+  font-size: var(--step--1);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -1150,8 +1157,8 @@ const setLang = async (v: AppLanguage) => {
 .specs-bar-val {
   display: flex;
   align-items: center;
-  gap: 0.45rem;
-  font-size: 13.5px;
+  gap: var(--space-2);
+  font-size: var(--step-0);
   color: var(--wl-ink-strong);
   flex-wrap: wrap;
 }
@@ -1159,7 +1166,7 @@ const setLang = async (v: AppLanguage) => {
 .status-pulse-dot {
   width: 7px;
   height: 7px;
-  border-radius: 50%;
+  border-radius: var(--radius-pill);
   background: #10B981;
   box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
   flex-shrink: 0;
@@ -1170,13 +1177,13 @@ const setLang = async (v: AppLanguage) => {
   justify-content: space-between;
   align-items: flex-start;
   border-bottom: 1px solid var(--wl-border);
-  padding-bottom: 0.85rem;
-  margin-bottom: 1.25rem;
-  gap: 1rem;
+  padding-bottom: var(--space-3);
+  margin-bottom: var(--space-5);
+  gap: var(--space-4);
 }
 
 .form-card-title {
-  font-size: 1.15rem;
+  font-size: var(--step-1);
   font-weight: 800;
   color: var(--wl-ink-strong);
   margin: 0;
@@ -1184,13 +1191,13 @@ const setLang = async (v: AppLanguage) => {
 }
 
 .card-badge {
-  font-size: 10px;
+  font-size: var(--step--1);
   font-weight: 800;
   color: var(--wl-primary);
   background: var(--wl-primary-soft);
   border: 1px solid rgba(105, 169, 255, 0.2);
-  padding: 0.15rem 0.5rem;
-  border-radius: var(--radius-xs, 6px);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
   letter-spacing: 0.05em;
   white-space: nowrap;
 }
@@ -1204,13 +1211,13 @@ const setLang = async (v: AppLanguage) => {
 .card-badge--indigo {
   color: var(--wl-primary);
   background: var(--wl-primary-soft);
-  border-color: rgba(105, 169, 255, 0.25);
+  border-color: var(--wl-primary-soft);
 }
 
 .form-card-subtitle {
-  font-size: 12.5px;
+  font-size: var(--step-0);
   color: var(--wl-text-secondary);
-  margin: 0.25rem 0 0;
+  margin: var(--space-1) 0 0;
   line-height: 1.45;
 }
 
@@ -1228,7 +1235,7 @@ const setLang = async (v: AppLanguage) => {
 
 .vip-field-label {
   font-family: var(--wl-font-body);
-  font-size: 12px;
+  font-size: var(--step-0);
   font-weight: 600;
   color: var(--wl-ink-soft);
   letter-spacing: 0.015em;
@@ -1244,13 +1251,13 @@ const setLang = async (v: AppLanguage) => {
   padding: 0 1rem;
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  border-radius: var(--radius-sm, 10px);
-  font-size: 14px;
+  border-radius: var(--radius-md);
+  font-size: var(--step-0);
   font-family: var(--wl-font-body);
   font-weight: 500;
   color: var(--wl-ink-strong);
   outline: none;
-  box-shadow: var(--shadow-xs);
+  box-shadow: var(--shadow-card);
   transition: border-color 0.22s var(--wl-ease-spring), box-shadow 0.22s var(--wl-ease-spring), background-color 0.2s ease;
 }
 
@@ -1258,6 +1265,11 @@ const setLang = async (v: AppLanguage) => {
   background: var(--wl-surface);
   border-color: var(--wl-primary);
   box-shadow: var(--wl-focus-ring);
+}
+
+.vip-48-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .disabled-email-wrap {
@@ -1283,7 +1295,7 @@ const setLang = async (v: AppLanguage) => {
 }
 
 .field-caption {
-  font-size: 11px;
+  font-size: var(--step--1);
   color: var(--wl-muted);
 }
 
@@ -1291,48 +1303,43 @@ const setLang = async (v: AppLanguage) => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.5rem;
-  margin-bottom: 0.35rem;
+  gap: var(--space-2);
+  margin-bottom: var(--space-1);
 }
 
 .phone-code-live-pill {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  font-size: 11px;
+  font-size: var(--step--1);
   background: var(--wl-primary-soft);
   color: var(--wl-primary);
   border: 1px solid rgba(105, 169, 255, 0.25);
-  border-radius: var(--radius-full);
-  padding: 0.15rem 0.55rem;
+  border-radius: var(--radius-pill);
+  padding: var(--space-1) var(--space-2);
 }
 
 .phone-code-live-pill .flag {
-  font-size: 12px;
+  font-size: var(--step-0);
   line-height: 1;
 }
 
 .phone-code-live-pill .lbl {
   color: var(--wl-muted);
-  font-size: 10px;
-}
-
-.phone-code-live-pill .code {
-  font-weight: 700;
-  color: var(--wl-primary);
+  font-size: var(--step--1);
 }
 
 .phone-meta-banner {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  padding: 0.45rem 0.75rem;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
   background: var(--wl-surface-soft);
   border: 1px solid var(--wl-border);
-  border-radius: var(--radius-sm, 8px);
-  margin-top: 0.4rem;
-  font-size: 11px;
+  border-radius: var(--radius-md);
+  margin-top: var(--space-1);
+  font-size: var(--step--1);
   color: var(--wl-ink-soft);
 }
 
@@ -1401,7 +1408,7 @@ const setLang = async (v: AppLanguage) => {
   font-weight: 700;
   cursor: pointer;
   width: fit-content;
-  box-shadow: var(--shadow-xs);
+  box-shadow: var(--shadow-card);
   transition: all 0.18s ease;
 }
 
@@ -1411,22 +1418,26 @@ const setLang = async (v: AppLanguage) => {
   background: var(--wl-primary-soft);
 }
 
+.btn-vip-outline:active:not(:disabled) {
+  transform: scale(0.985);
+}
+
 .modal-error-banner {
   background: var(--wl-danger-soft);
   border: 1px solid rgba(244, 63, 94, 0.25);
   color: var(--wl-danger);
-  padding: 0.65rem 0.85rem;
-  border-radius: var(--radius-sm, 8px);
-  font-size: 12.5px;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--step-0);
 }
 
 .modal-success-banner {
   background: var(--wl-success-soft);
   border: 1px solid rgba(16, 185, 129, 0.25);
   color: var(--wl-success);
-  padding: 0.65rem 0.85rem;
-  border-radius: var(--radius-sm, 8px);
-  font-size: 12.5px;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--step-0);
 }
 
 .spin-glyph {
@@ -1461,20 +1472,20 @@ const setLang = async (v: AppLanguage) => {
 .company-headline {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 1rem 1.15rem;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
   background: var(--wl-surface-soft);
   border: 1px solid var(--wl-border);
-  border-radius: var(--radius-md, 12px);
+  border-radius: var(--radius-md);
 }
 
 .company-icon-box {
   width: 48px;
   height: 48px;
-  border-radius: var(--radius-sm, 10px);
+  border-radius: var(--radius-md);
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  box-shadow: var(--shadow-xs);
+  box-shadow: var(--shadow-card);
   display: grid;
   place-items: center;
   flex-shrink: 0;
@@ -1483,7 +1494,7 @@ const setLang = async (v: AppLanguage) => {
 .company-name-meta {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: var(--space-1);
   flex: 1;
   min-width: 0;
 }
@@ -1492,12 +1503,12 @@ const setLang = async (v: AppLanguage) => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.75rem;
+  gap: var(--space-3);
   flex-wrap: wrap;
 }
 
 .company-display-name {
-  font-size: 1.15rem;
+  font-size: var(--step-1);
   font-weight: 800;
   color: var(--wl-ink-strong);
   margin: 0;
@@ -1508,7 +1519,7 @@ const setLang = async (v: AppLanguage) => {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  font-size: 12px;
+  font-size: var(--step-0);
   color: var(--wl-text-secondary);
   margin: 0;
   word-break: break-all;
@@ -1519,10 +1530,10 @@ const setLang = async (v: AppLanguage) => {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  font-size: 10.5px;
+  font-size: var(--step--1);
   font-weight: 700;
-  padding: 0.2rem 0.65rem;
-  border-radius: var(--radius-full);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-pill);
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -1530,7 +1541,7 @@ const setLang = async (v: AppLanguage) => {
 .pill-dot {
   width: 6px;
   height: 6px;
-  border-radius: 50%;
+  border-radius: var(--radius-pill);
   background: currentColor;
 }
 
@@ -1556,17 +1567,17 @@ const setLang = async (v: AppLanguage) => {
 .company-specs-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0.75rem;
+  gap: var(--space-3);
 }
 
 .spec-cell {
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
-  padding: 0.75rem 1rem;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
   background: var(--wl-surface-soft);
   border: 1px solid var(--wl-border);
-  border-radius: var(--radius-sm, 10px);
+  border-radius: var(--radius-md);
   transition: border-color 0.15s ease;
 }
 
@@ -1575,7 +1586,7 @@ const setLang = async (v: AppLanguage) => {
 }
 
 .spec-label {
-  font-size: 10.5px;
+  font-size: var(--step--1);
   font-weight: 700;
   color: var(--wl-muted);
   text-transform: uppercase;
@@ -1586,7 +1597,7 @@ const setLang = async (v: AppLanguage) => {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  font-size: 13px;
+  font-size: var(--step-0);
   font-weight: 700;
   color: var(--wl-ink-strong);
 }
@@ -1596,34 +1607,34 @@ const setLang = async (v: AppLanguage) => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-top: 0.85rem;
+  padding-top: var(--space-3);
   border-top: 1px solid var(--wl-border);
-  gap: 1rem;
+  gap: var(--space-4);
   flex-wrap: wrap;
 }
 
 .foot-info {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: var(--space-1);
 }
 
 .btn-company-addr {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  font-size: 12px;
+  font-size: var(--step-0);
   font-weight: 700;
   color: var(--wl-primary);
   background: var(--wl-primary-soft);
   border: 1px solid rgba(105, 169, 255, 0.2);
-  padding: 0.45rem 0.85rem;
-  border-radius: var(--radius-sm, 8px);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
   text-decoration: none;
   transition: all 0.15s ease;
 }
 
-.btn-company-addr:hover {
+.btn-company-addr:hover:not(:disabled) {
   background: var(--wl-primary);
   color: var(--wl-on-primary);
 }
@@ -1632,18 +1643,18 @@ const setLang = async (v: AppLanguage) => {
 .empty-company-box {
   display: flex;
   align-items: center;
-  gap: 1.25rem;
-  padding: 1.5rem;
+  gap: var(--space-5);
+  padding: var(--space-6);
   background: var(--wl-surface-soft);
   border: 1.5px dashed var(--wl-border-strong);
-  border-radius: var(--radius-md, 12px);
+  border-radius: var(--radius-md);
   flex-wrap: wrap;
 }
 
 .empty-company-icon {
   width: 48px;
   height: 48px;
-  border-radius: var(--radius-sm, 10px);
+  border-radius: var(--radius-md);
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
   display: grid;
@@ -1658,14 +1669,14 @@ const setLang = async (v: AppLanguage) => {
 
 .empty-title {
   display: block;
-  font-size: 13.5px;
+  font-size: var(--step-0);
   font-weight: 700;
   color: var(--wl-ink-strong);
-  margin-bottom: 0.2rem;
+  margin-bottom: var(--space-1);
 }
 
 .empty-desc {
-  font-size: 12px;
+  font-size: var(--step-0);
   color: var(--wl-text-secondary);
   margin: 0;
   line-height: 1.45;
@@ -1675,26 +1686,26 @@ const setLang = async (v: AppLanguage) => {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  font-size: 12px;
+  font-size: var(--step-0);
   font-weight: 700;
   color: var(--wl-on-primary);
   background: var(--wl-primary);
-  padding: 0.55rem 1rem;
-  border-radius: var(--radius-sm, 8px);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
   text-decoration: none;
   white-space: nowrap;
   box-shadow: var(--wl-primary-shadow);
   transition: background 0.15s ease;
 }
 
-.btn-apply-dist:hover {
+.btn-apply-dist:hover:not(:disabled) {
   background: var(--wl-primary-hover);
 }
 
 @media (max-width: 900px) {
   .account-specs-bar {
     grid-template-columns: repeat(2, 1fr);
-    gap: 0.85rem;
+    gap: var(--space-3);
   }
   .specs-bar-cell:nth-child(2) {
     border-inline-end: none;
@@ -1712,7 +1723,7 @@ const setLang = async (v: AppLanguage) => {
 @media (max-width: 768px) {
   .company-specs-grid {
     grid-template-columns: 1fr;
-    gap: 0.5rem;
+    gap: var(--space-2);
   }
   .company-headline {
     flex-direction: column;

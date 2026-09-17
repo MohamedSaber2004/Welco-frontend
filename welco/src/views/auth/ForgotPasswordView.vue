@@ -129,7 +129,7 @@ const handleSubmit = async () => {
   gap: 0.5rem;
   background: var(--wl-surface-soft);
   border: 1px solid var(--wl-border);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   padding: 0.6rem 0.85rem;
   font-size: 11px;
 }
@@ -150,7 +150,7 @@ const handleSubmit = async () => {
 .step-num {
   width: 20px;
   height: 20px;
-  border-radius: 50%;
+  border-radius: var(--radius-pill);
   background: var(--wl-surface-hover);
   color: var(--wl-muted);
   display: grid;
@@ -243,7 +243,7 @@ const handleSubmit = async () => {
   padding: 0.75rem 1rem;
   background: var(--wl-danger-soft);
   border: 1px solid var(--wl-border);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   color: var(--wl-danger);
   font-size: 13px;
   font-weight: 500;
@@ -256,7 +256,7 @@ const handleSubmit = async () => {
   padding: 0.75rem 1rem;
   background: var(--wl-success-soft);
   border: 1px solid var(--wl-border);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   color: var(--wl-success);
   font-size: 13px;
   font-weight: 600;
@@ -277,14 +277,14 @@ const handleSubmit = async () => {
   justify-content: center;
   gap: 0.55rem;
   cursor: pointer;
-  box-shadow: 0 4px 12px -2px rgba(105, 169, 255, 0.35);
+  box-shadow: var(--shadow-card);
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .vip-submit-btn:hover:not(:disabled) {
   background: var(--wl-primary-hover);
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px -2px rgba(105, 169, 255, 0.45);
+  box-shadow: var(--shadow-hover);
 }
 
 .vip-submit-btn:active:not(:disabled) {

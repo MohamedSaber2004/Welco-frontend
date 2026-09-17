@@ -82,10 +82,7 @@ export type Messages = {
     userMenu: string
     toggleMenu: string
     closeMenu: string
-    toggleTheme: string
     toggleLanguage: string
-    darkMode: string
-    lightMode: string
     dashboard: string
     admin: string
     catalog: string
@@ -161,9 +158,6 @@ export type Messages = {
     aboutBody: string
     learnMoreAbout: string
     moreCount: string
-    tradeShowsEyebrow: string
-    tradeShowsTitle: string
-    noTradeShows: string
     mfgEyebrow: string
     mfgTitle: string
     beyondEyebrow: string
@@ -230,6 +224,7 @@ export type Messages = {
     loginSubtitle: string
     registerTitle: string
     registerSubtitle: string
+    registerAsCustomerSubtitle: string
     email: string
     password: string
     confirmPassword: string
@@ -344,6 +339,10 @@ export type Messages = {
     registerAsCustomerDesc: string
     registerAsOrganization: string
     registerAsOrganizationDesc: string
+    roleCustomerLabel: string
+    roleProviderLabel: string
+    providerApprovalNote: string
+    selectAccountType: string
     verifyNoticeTitle: string
     verifyNoticeDesc: string
     verifyFallbackEmail: string
@@ -568,6 +567,7 @@ export type Messages = {
     newProduct: string
     newCategory: string
     editProduct: string
+    editImage: string
     editCategory: string
     productNameEn: string
     productNameAr: string
@@ -1167,7 +1167,6 @@ export type Messages = {
     isoDossier: string
     verifiedBuyer: string
     verifiedPartner: string
-    tierLevel: string
     pipelineEyebrow: string
     pipelineTitle: string
     activeLifecycle: string

@@ -270,14 +270,14 @@ const handleLogin = async () => {
   justify-content: center;
   gap: 0.55rem;
   cursor: pointer;
-  box-shadow: 0 4px 12px -2px rgba(105, 169, 255, 0.35);
+  box-shadow: var(--shadow-card);
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .vip-submit-btn:hover:not(:disabled) {
   background: var(--wl-primary-hover);
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px -2px rgba(105, 169, 255, 0.45);
+  box-shadow: var(--shadow-hover);
 }
 
 .vip-submit-btn:active:not(:disabled) {

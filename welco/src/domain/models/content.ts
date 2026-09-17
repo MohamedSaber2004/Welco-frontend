@@ -78,17 +78,6 @@ export interface FaqItemDto {
   isActive?: boolean
 }
 
-export interface TradeShowEventDto {
-  id: string
-  name: string
-  location: string
-  country?: string
-  startDate: string
-  endDate: string
-  isUpcoming: boolean
-  booth?: string
-}
-
 export interface SupportTicketDto {
   id: string
   userId: string

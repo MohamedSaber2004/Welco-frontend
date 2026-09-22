@@ -231,15 +231,42 @@
   --z-modal: 500;
   --z-toast: 600;
   --z-tooltip: 700;
+
+  /* Premium product surfaces */
+  --surface-tint: #f2f7f8;
+  --surface-strong: #e8f1f2;
+  --ink-display: #082f49;
+  --accent-lime: #c4f05b;
+  --hero-gradient: linear-gradient(125deg, #062c43 0%, #0b4d63 58%, #137f8b 100%);
 }
 
 /* --------------------------------------------------------------------------
-   11. Light-only mode — Sterile clinical white environment
+   11. Light and dark theme surfaces
    -------------------------------------------------------------------------- */
 :root,
-:root[data-theme="dark"],
 :root[data-theme="light"] {
   color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg-app: #071923;
+  --bg-surface: #0c2330;
+  --bg-sidebar: #0a1e2a;
+  --bg-subtle: #102d3a;
+  --bg-hover: #163d4a;
+  --fg-heading: #ecf7f6;
+  --fg-body: #c8dcdd;
+  --fg-muted: #91b2b5;
+  --fg-subtle: #729397;
+  --fg-placeholder: #5f8085;
+  --border: #214552;
+  --border-strong: #32606a;
+  --brand-soft: #153e4a;
+  --secondary-soft: #123d43;
+  --surface-tint: #102d3a;
+  --surface-strong: #173b47;
+  --ink-display: #f2fbfa;
 }
 
 /* --------------------------------------------------------------------------

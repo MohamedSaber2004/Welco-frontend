@@ -639,6 +639,56 @@ code, kbd, samp,
   box-shadow: var(--shadow-xs) !important;
 }
 
+/* ── Welco premium refresh ── */
+:root {
+  --gutter: clamp(1rem, 3vw, 2.75rem);
+  --content-max: 1480px;
+}
+
+body {
+  background:
+    radial-gradient(circle at 8% 0%, rgba(20, 125, 146, 0.07), transparent 28rem),
+    var(--bg-app);
+}
+
+button, input, select, textarea { font: inherit; }
+button { transition: transform var(--duration-fast) var(--ease-out), box-shadow var(--duration-base) var(--ease-out), background-color var(--duration-base) ease, border-color var(--duration-base) ease; }
+button:not(:disabled):hover { transform: translateY(-1px); }
+
+.card, .panel, .toolbar {
+  border-color: color-mix(in srgb, var(--border) 82%, transparent);
+  box-shadow: 0 10px 30px rgba(8, 47, 73, 0.055);
+}
+.card:hover, .panel:hover { box-shadow: 0 16px 38px rgba(8, 47, 73, 0.10); }
+
+.page-shell { gap: clamp(1.5rem, 3vw, 2.75rem); }
+.page-hero { padding-block: clamp(1.25rem, 3vw, 2.5rem); }
+.page-head__info h1 { color: var(--ink-display); font-size: clamp(1.75rem, 3vw, 2.6rem); }
+
+/* Give public hero sections a distinct, editorial first impression without
+   changing component templates or data contracts. */
+.hero {
+  background: var(--hero-gradient) !important;
+  border-radius: 0 0 var(--radius-2xl) var(--radius-2xl);
+  box-shadow: 0 20px 50px rgba(6, 44, 67, 0.18);
+}
+.hero h1, .hero h2, .hero p, .hero .hero__subtitle { color: #f3fbfa !important; }
+.hero em { color: var(--accent-lime) !important; }
+
+.section { padding-block: clamp(2.5rem, 6vw, 5rem); }
+.section__inner { max-width: var(--content-max); padding-inline: var(--gutter); margin-inline: auto; }
+.section-title { font-size: clamp(1.6rem, 2.5vw, 2.35rem); }
+.section__eyebrow, .eyebrow { color: var(--secondary) !important; letter-spacing: .12em; }
+
+@media (max-width: 760px) {
+  .page-shell { padding-inline: 1rem; }
+  .hero { border-radius: 0 0 var(--radius-xl) var(--radius-xl); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button:not(:disabled):hover { transform: none; }
+}
+
 .account-nav,
 .account-card,
 .account-specs-bar,

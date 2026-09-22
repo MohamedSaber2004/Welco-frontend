@@ -1398,6 +1398,26 @@ const navigateToOemFromModal = () => {
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: var(--space-3);
 }
+/* Light surface keeps the explorer aligned with the rest of the landing page. */
+.cat-explorer {
+  background: #fff;
+  color: var(--platform-ink);
+  border-color: rgba(9, 47, 67, .12);
+  box-shadow: 0 22px 55px rgba(9, 47, 67, .12);
+}
+.cat-explorer__eyebrow { color: var(--platform-teal); }
+.cat-explorer__heading, .cat-explorer__title, .cat-explorer__subtitle { color: var(--platform-ink) !important; }
+.cat-explorer__pills { border-bottom-color: rgba(9, 47, 67, .1); }
+.cat-explorer__pill { border-color: rgba(9, 47, 67, .14); background: #f3f8f7; color: var(--platform-ink-soft); }
+.cat-explorer__pill:hover { border-color: var(--platform-teal); background: #e8f5f3; color: var(--platform-ink); }
+.cat-explorer__pill.pill--active { background: var(--platform-teal); border-color: var(--platform-teal); color: #fff; }
+.cat-explorer__head .provider-viewall { color: var(--platform-teal); }
+.cat-provider { background: #fff; border-color: rgba(9, 47, 67, .12); box-shadow: 0 9px 22px rgba(9,47,67,.07); }
+.cat-provider:hover { background: linear-gradient(145deg, #fff, #eef8f6); border-color: var(--platform-teal); box-shadow: 0 18px 34px rgba(9,47,67,.14); }
+.cat-provider__name { color: var(--platform-ink); }
+.cat-provider__country { color: var(--platform-ink-soft); }
+.cat-provider__cta { color: var(--platform-teal); }
+
 @media (max-width: 640px) {
   .cat-explorer { padding: var(--space-4); border-radius: 1.1rem; }
   .cat-explorer__intro { align-items: start; flex-direction: column; }

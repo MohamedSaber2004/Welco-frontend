@@ -12,43 +12,60 @@ import { requestTracker } from '../../application/request.tracker'
 </template>
 
 <style scoped>
-/* Floating status spinner for route and API transitions. */
+/* Centered loading overlay for route and API transitions. It remains mounted for
+   the full requestTracker loading window, so the animation does not disappear
+   while page data is still arriving. */
 .loading-spinner {
   position: fixed;
-  top: max(1rem, env(safe-area-inset-top));
-  inset-inline-end: max(1rem, env(safe-area-inset-right));
+  inset: 0;
   z-index: 9999;
-  display: inline-flex;
-  align-items: center;
-  gap: .65rem;
-  min-height: 44px;
-  padding: .55rem .8rem .55rem .6rem;
-  border: 1px solid rgba(255,255,255,.42);
-  border-radius: 999px;
-  background: rgba(7, 31, 45, .88);
-  color: #f7fffe;
-  box-shadow: 0 12px 30px rgba(2, 25, 39, .24), 0 0 0 4px rgba(214,243,106,.12);
-  backdrop-filter: blur(14px) saturate(1.2);
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background: rgba(4, 25, 38, .24);
+  backdrop-filter: blur(3px);
   pointer-events: none;
 }
+.loading-spinner::before {
+  content: '';
+  position: absolute;
+  width: min(16rem, 58vw);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(214,243,106,.16), transparent 68%);
+  animation: spinner-pulse 1.8s ease-in-out infinite;
+}
 .loading-spinner__ring {
-  width: 25px;
-  height: 25px;
-  border: 3px solid rgba(255,255,255,.26);
+  position: relative;
+  width: 58px;
+  height: 58px;
+  border: 5px solid rgba(255,255,255,.28);
   border-top-color: #d6f36a;
   border-right-color: #2dd4bf;
+  border-bottom-color: rgba(45,212,191,.4);
   border-radius: 50%;
+  box-shadow: 0 0 0 8px rgba(214,243,106,.1), 0 10px 28px rgba(2,25,39,.25);
   animation: spinner-rotate .78s linear infinite;
 }
 .loading-spinner__label {
+  position: absolute;
+  margin-top: 6.2rem;
+  color: #f7fffe;
   font-size: .75rem;
   font-weight: 700;
-  letter-spacing: .08em;
+  letter-spacing: .12em;
   text-transform: uppercase;
+  text-shadow: 0 1px 10px rgba(2,25,39,.55);
 }
 @keyframes spinner-rotate { to { transform: rotate(360deg); } }
-.loading-spinner-enter-active, .loading-spinner-leave-active { transition: opacity .18s ease, transform .18s ease; }
-.loading-spinner-enter-from, .loading-spinner-leave-to { opacity: 0; transform: translateY(-8px) scale(.96); }
-@media (prefers-reduced-motion: reduce) { .loading-spinner__ring { animation: none; } }
-@media (max-width: 520px) { .loading-spinner__label { display: none; } .loading-spinner { padding: .55rem; } }
+@keyframes spinner-pulse { 0%, 100% { transform: scale(.86); opacity: .55; } 50% { transform: scale(1.08); opacity: 1; } }
+.loading-spinner-enter-active, .loading-spinner-leave-active { transition: opacity .18s ease; }
+.loading-spinner-enter-from, .loading-spinner-leave-to { opacity: 0; }
+@media (prefers-reduced-motion: reduce) {
+  .loading-spinner__ring, .loading-spinner::before { animation: none; }
+}
+@media (max-width: 520px) {
+  .loading-spinner { padding: 1rem; }
+  .loading-spinner__ring { width: 50px; height: 50px; }
+}
 </style>

@@ -36,7 +36,23 @@
 }
 
 @keyframes welco-skeleton {
+  from { background-position-x: 220%; }
   to { background-position-x: -220%; }
+}
+
+/* Shared skeleton geometry keeps every route stable while data arrives. */
+.skeleton-wrapper, .sk-grid, .sk-list, .sk-table, .sk-form, .sk-hero, .sk-provider-grid { min-height: 96px; }
+.sk { display: block; min-width: 0; border-radius: .55rem; }
+.sk--text { min-height: 12px; }
+.sk--circle { border-radius: 50%; }
+.sk-card { min-width: 0; overflow: hidden; border: 1px solid color-mix(in srgb, var(--border) 70%, transparent); border-radius: 1rem; background: var(--bg-surface); }
+.sk-card__media { min-height: 150px; border-radius: 0; }
+.sk-card__body { min-width: 0; padding: 1rem; }
+.sk-row { min-height: 58px; border-radius: .7rem; }
+.sk-grid { align-items: stretch; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sk, .sk-card, .sk-card__media, .sk-row, [class*="skeleton"] .sk { animation: none; background-position: 0 0; }
 }
 
 .data-state__empty {

@@ -3,62 +3,52 @@ import { requestTracker } from '../../application/request.tracker'
 </script>
 
 <template>
-  <Transition name="loading-bar">
-    <div v-if="requestTracker.isLoading.value" class="loading-bar" aria-hidden="true">
-      <div class="loading-bar__track">
-        <div class="loading-bar__fill" />
-      </div>
+  <Transition name="loading-spinner">
+    <div v-if="requestTracker.isLoading.value" class="loading-spinner" role="status" aria-live="polite" aria-label="Loading">
+      <span class="loading-spinner__ring" aria-hidden="true" />
+      <span class="loading-spinner__label">Loading</span>
     </div>
   </Transition>
 </template>
 
 <style scoped>
-/* ── Top loading bar — Clinical Precision brand gradient ── */
-.loading-bar {
+/* Floating status spinner for route and API transitions. */
+.loading-spinner {
   position: fixed;
-  top: 0;
-  inset-inline: 0;
-  height: 5px;
+  top: max(1rem, env(safe-area-inset-top));
+  inset-inline-end: max(1rem, env(safe-area-inset-right));
   z-index: 9999;
-  filter: drop-shadow(0 2px 8px rgba(11, 127, 134, .35));
-  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: .65rem;
+  min-height: 44px;
+  padding: .55rem .8rem .55rem .6rem;
+  border: 1px solid rgba(255,255,255,.42);
+  border-radius: 999px;
+  background: rgba(7, 31, 45, .88);
+  color: #f7fffe;
+  box-shadow: 0 12px 30px rgba(2, 25, 39, .24), 0 0 0 4px rgba(214,243,106,.12);
+  backdrop-filter: blur(14px) saturate(1.2);
   pointer-events: none;
 }
-
-.loading-bar__track {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, rgba(11, 127, 134, .08), rgba(214, 243, 106, .22), rgba(11, 127, 134, .08));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.35);
-  overflow: hidden;
+.loading-spinner__ring {
+  width: 25px;
+  height: 25px;
+  border: 3px solid rgba(255,255,255,.26);
+  border-top-color: #d6f36a;
+  border-right-color: #2dd4bf;
+  border-radius: 50%;
+  animation: spinner-rotate .78s linear infinite;
 }
-
-.loading-bar__fill {
-  position: absolute;
-  inset-block: 0;
-  inset-inline-start: 0;
-  width: 34%;
-  background: linear-gradient(90deg, #07545f 0%, #0b7f86 48%, #d6f36a 100%);
-  border-radius: 999px;
-  box-shadow: 0 0 12px rgba(214, 243, 106, .7), 0 0 4px rgba(11, 127, 134, .8);
-  will-change: transform;
-  animation: lb-sweep 1.15s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+.loading-spinner__label {
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
 }
-
-@keyframes lb-sweep {
-  0%   { transform: translateX(-130%); opacity: 0.7; }
-  50%  { opacity: 1; }
-  100% { transform: translateX(280%); opacity: 0.7; }
-}
-
-/* Fade the bar in/out on mount/unmount */
-.loading-bar-enter-active { transition: opacity 0.15s ease; }
-.loading-bar-leave-active { transition: opacity 0.3s ease; }
-.loading-bar-enter-from,
-.loading-bar-leave-to   { opacity: 0; }
-
-@media (prefers-reduced-motion: reduce) {
-  .loading-bar__fill { animation: none; width: 100%; opacity: 0.6; }
-}
+@keyframes spinner-rotate { to { transform: rotate(360deg); } }
+.loading-spinner-enter-active, .loading-spinner-leave-active { transition: opacity .18s ease, transform .18s ease; }
+.loading-spinner-enter-from, .loading-spinner-leave-to { opacity: 0; transform: translateY(-8px) scale(.96); }
+@media (prefers-reduced-motion: reduce) { .loading-spinner__ring { animation: none; } }
+@media (max-width: 520px) { .loading-spinner__label { display: none; } .loading-spinner { padding: .55rem; } }
 </style>

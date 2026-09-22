@@ -151,6 +151,28 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Shared surface and type contract for every HTML view, including dashboards,
+   auth pages, catalog routes, and backend-driven empty/loading states. */
+:where(#app, main, .page-shell, .admin-shell, .auth-wrap) {
+  color: var(--fg-body);
+  background-color: var(--bg-app);
+}
+:where(.card, .panel, .toolbar, .modal, .dropdown, .popover, .data-state__empty, .table-wrap) {
+  color: var(--fg-body);
+  background-color: var(--bg-surface);
+  border-color: var(--border);
+}
+:where(h1, h2, h3, h4, h5, h6, .page-head__info h1, .section-title) {
+  color: var(--fg-heading);
+  font-family: var(--font-display);
+}
+:where(label, .field__label, .form-label, .table th) { color: var(--fg-heading); }
+:where(.muted, .text-muted, .page-head__desc, .section-desc, .helper-text, .field__help) { color: var(--fg-muted); }
+:where(.btn, button, input, select, textarea) { font-family: var(--font-sans); }
+:where(input, select, textarea) { color: var(--fg-heading); background-color: var(--bg-surface); border-color: var(--border); }
+:where(input, select, textarea)::placeholder { color: var(--fg-placeholder); }
+:where(input, select, textarea):focus-visible { border-color: var(--border-focus); box-shadow: var(--ring-focus); }
+
 #app { min-height: 100vh; display: flex; flex-direction: column; background-color: var(--bg-app); overflow-x: clip; }
 main { flex: 1; min-width: 0; overflow-x: clip; }
 @media (max-width: 768px) {

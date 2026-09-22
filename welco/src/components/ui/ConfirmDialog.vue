@@ -106,53 +106,57 @@ const variantClass = computed(() => `confirm__icon--${opts.value?.variant ?? 'da
 .confirm-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 10, 25, 0.6);
-  backdrop-filter: blur(14px) saturate(1.15);
-  -webkit-backdrop-filter: blur(14px) saturate(1.15);
+  background: var(--bg-overlay);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: grid;
   place-items: center;
-  padding: 1rem;
-z-index: 10000;
+  padding: var(--space-4);
+  z-index: var(--z-overlay);
   }
 
   .confirm-card {
-  width: 100%;
+  width: min(520px, 100%);
   max-width: 460px;
-  background: var(--wl-surface);
-  border: 1px solid var(--wl-border);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-xl);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg, 8px);
+  box-shadow: var(--shadow-lg);
   position: relative;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  z-index: var(--z-modal);
 }
 .confirm-accent {
   height: 2px;
-  background: var(--wl-laser-sweep);
-  opacity: 0.95;
+  background: var(--border);
+  opacity: 1;
 }
-.confirm-card--danger .confirm-accent { background: var(--wl-danger); }
-.confirm-card--warning .confirm-accent { background: var(--wl-warning); }
-.confirm-card--primary .confirm-accent { background: var(--wl-primary); }
+.confirm-card--danger .confirm-accent { background: var(--fg-danger); }
+.confirm-card--warning .confirm-accent { background: var(--fg-warning); }
+.confirm-card--primary .confirm-accent { background: var(--brand); }
 
 .confirm-close {
   position: absolute;
-  top: 12px;
-  inset-inline-end: 12px;
+  top: 1rem;
+  inset-inline-end: 1rem;
   width: 32px;
   height: 32px;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--fg-muted);
+  cursor: pointer;
   display: grid;
   place-items: center;
-  background: var(--wl-surface-soft);
-  border: 1px solid var(--wl-border);
-  border-radius: var(--radius-full);
-  color: var(--wl-muted);
-  cursor: pointer;
-  font-size: 12px;
-  transition: all 0.18s var(--wl-ease-spring);
+  font-size: 13px;
+  transition: all var(--duration-fast) ease;
 }
-.confirm-close:hover { background: var(--wl-surface); color: var(--wl-ink-strong); border-color: var(--wl-border-strong); transform: rotate(90deg); }
+.confirm-close:hover {
+  background: var(--bg-subtle);
+  color: var(--fg-heading);
+}
 
 .confirm-body {
   display: flex;
@@ -163,39 +167,39 @@ z-index: 10000;
 .confirm-icon-wrap {
   width: 44px;
   height: 44px;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm, 4px);
   display: grid;
   place-items: center;
   flex-shrink: 0;
   border: 1px solid transparent;
 }
 .confirm-icon-wrap .material-symbols-outlined { font-size: 22px; }
-.confirm__icon--danger { background: var(--wl-danger-soft); color: var(--wl-danger); border-color: rgba(var(--wl-danger-rgb), 0.2); }
-.confirm__icon--warning { background: var(--wl-warning-soft); color: var(--wl-warning); border-color: rgba(var(--wl-warning-rgb), 0.2); }
-.confirm__icon--primary { background: var(--wl-primary-soft); color: var(--wl-primary); border-color: rgba(var(--wl-primary-rgb), 0.2); }
-.confirm__icon--neutral { background: var(--wl-surface-soft); color: var(--wl-ink-soft); border-color: var(--wl-border); }
+.confirm__icon--danger { background: var(--color-danger-100); color: var(--fg-danger); border-color: var(--color-danger-100); }
+.confirm__icon--warning { background: var(--color-warning-100); color: var(--fg-warning); border-color: var(--color-warning-100); }
+.confirm__icon--primary { background: var(--brand-soft); color: var(--brand); border-color: var(--brand-soft); }
+.confirm__icon--neutral { background: var(--bg-subtle); color: var(--fg-muted); border-color: var(--border); }
 
 .confirm-copy { flex: 1; min-width: 0; }
 .confirm-title {
-  font-family: var(--wl-font-display);
-  font-size: 1.05rem;
-  font-weight: 700;
-  letter-spacing: -0.018em;
-  color: var(--wl-ink-strong);
-  line-height: 1.25;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-tight);
+  color: var(--fg-heading);
+  line-height: var(--leading-tight);
   margin: 0 0 0.45rem;
 }
 .confirm-message {
-  font-size: 0.92rem;
-  line-height: 1.55;
-  color: var(--wl-ink-soft);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  color: var(--fg-muted);
   margin: 0;
   word-break: break-word;
 }
 
 .confirm-verify { margin-top: 1rem; }
-.confirm-verify-hint { font-size: 11px; color: var(--wl-muted); margin-bottom: 0.45rem; }
-.confirm-verify-hint strong { color: var(--wl-ink-strong); }
+.confirm-verify-hint { font-size: var(--text-xs); color: var(--fg-subtle); margin-bottom: 0.45rem; }
+.confirm-verify-hint strong { color: var(--fg-heading); }
 .confirm-verify-input { width: 100%; }
 
 .confirm-actions {
@@ -210,15 +214,14 @@ z-index: 10000;
   align-items: flex-end;
   justify-content: center;
   padding: 0.7rem 1rem 0.9rem;
-  border-top: 1px solid var(--wl-line);
-  background: linear-gradient(180deg, var(--wl-surface-soft), var(--wl-surface));
-  opacity: 0.9;
+  border-top: 1px solid var(--border);
+  background: var(--bg-subtle);
 }
-.confirm-tick { width: 1px; height: 6px; background: var(--wl-line-strong); opacity: 0.45; }
-.confirm-tick--major { height: 10px; background: var(--wl-ink-strong); opacity: 0.18; }
+.confirm-tick { width: 1px; height: 6px; background: var(--border-strong); opacity: 0.45; }
+.confirm-tick--major { height: 10px; background: var(--fg-heading); opacity: 0.18; }
 
 /* transition */
-.confirm-fade-enter-active, .confirm-fade-leave-active { transition: opacity 0.22s var(--wl-ease-spring), transform 0.22s var(--wl-ease-spring); }
+.confirm-fade-enter-active, .confirm-fade-leave-active { transition: opacity var(--duration-base) var(--ease-out), transform var(--duration-base) var(--ease-out); }
 .confirm-fade-enter-from, .confirm-fade-leave-to { opacity: 0; }
 .confirm-fade-enter-from .confirm-card, .confirm-fade-leave-to .confirm-card { transform: scale(0.96) translateY(8px); }
 

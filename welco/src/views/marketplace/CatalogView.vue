@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { t, locale } from '../../i18n'
 import { useMarketplace } from '../../composables/useMarketplace'
@@ -38,7 +38,11 @@ const {
   load,
   clearFilters,
   goPage,
-} = useMarketplace()
+} = useMarketplace({
+  search: route.query.search ? String(route.query.search) : undefined,
+  categoryId: route.query.categoryId ? String(route.query.categoryId) : undefined,
+  sortBy: route.query.sortBy ? (String(route.query.sortBy) as 'price-asc' | 'price-desc' | 'newest') : undefined,
+})
 const { add } = useCart()
 const { isSaved, toggleSave, canEditWishlist } = useWishlist()
 
@@ -47,13 +51,6 @@ const handleWishlist = async (id: string) => {
 }
 
 const showMobileFilters = ref(false)
-
-onMounted(() => {
-  const q = route.query
-  if (q.search) search.value = String(q.search)
-  if (q.categoryId) categoryId.value = String(q.categoryId)
-  if (q.sortBy) sortBy.value = String(q.sortBy) as typeof sortBy.value
-})
 
 watch(
   () => route.query.search,
@@ -962,26 +959,26 @@ const filteredSidebarCategories = computed(() => {
 
 .stock-pill {
   padding: var(--space-1) var(--space-2);
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-xs, 3px);
   font-size: var(--step--1);
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0.03em;
   text-transform: uppercase;
-  color: var(--wl-on-primary);
+  color: #ffffff;
   border: 1px solid rgba(255, 255, 255, 0.65);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-sm);
 }
 
 .stock-pill--in {
-  background: #059669;
+  background: var(--color-success-500, #198754);
 }
 
 .stock-pill--low {
-  background: #D97706;
+  background: var(--color-warning-500, #E67E22);
 }
 
 .stock-pill--out {
-  background: #DC2626;
+  background: var(--color-danger-500, #DC3545);
 }
 
 .catalog-card__body {

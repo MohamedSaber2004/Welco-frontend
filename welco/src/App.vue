@@ -61,26 +61,41 @@ const showFooter = computed(() => {
 const showWhatsApp = computed(() => route.name === 'home' || route.path === '/')
 
 const whatsAppOffset = computed(() => '')
+
+/* Dashboard routes (admin / staff / provider) use the unified dashboard
+ * shell and never show the public landing chrome. Client-facing pages
+ * always keep the landing layout (navbar + footer + mobile nav). */
+const isDashboardRoute = computed(() => {
+  const path = route.path || ''
+  // NOTE: '/provider' prefix must not swallow public '/providers/*' —
+  // match the exact dashboard roots only.
+  return (
+    path === '/admin' ||
+    path.startsWith('/admin/') ||
+    path === '/provider' ||
+    path.startsWith('/provider/')
+  )
+})
 </script>
 
 <template>
   <a href="#main-content" class="visually-hidden">{{ t('common.skipToMain') }}</a>
   <LoadingBar />
-  <AppHeader />
+  <AppHeader v-if="!isDashboardRoute" />
   <ToastContainer />
   <ResultModal />
   <ConfirmDialog />
   <main id="main-content" tabindex="-1">
     <RouterView v-slot="{ Component }">
       <Transition name="page" mode="out-in">
-        <component :is="Component" />
+        <component :is="Component" :key="route.fullPath" />
       </Transition>
     </RouterView>
   </main>
-  <AppFooter v-if="showFooter" />
-  <AppMobileNav />
+  <AppFooter v-if="showFooter && !isDashboardRoute" />
+  <AppMobileNav v-if="!isDashboardRoute" />
   <WhatsAppFab
-    v-if="showWhatsApp"
+    v-if="showWhatsApp && !isDashboardRoute"
     :phone="services.contentService.supportContact.value.whatsAppNumber"
     :bottom-offset="whatsAppOffset"
   />

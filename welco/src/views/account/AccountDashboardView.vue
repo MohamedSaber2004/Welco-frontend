@@ -489,8 +489,8 @@ onMounted(loadDashboard)
   width: 6px;
   height: 6px;
   border-radius: var(--radius-pill);
-  background: #10B981;
-  box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+  background: var(--fg-success, #198754);
+  box-shadow: 0 0 8px rgba(25, 135, 84, 0.6);
 }
 
 .org-title {
@@ -531,7 +531,7 @@ onMounted(loadDashboard)
   flex-direction: column;
   gap: var(--space-3);
   min-width: 280px;
-  border-inline-start: 3px solid #6366F1;
+  border-inline-start: 3px solid var(--secondary, #147D92);
 }
 
 .company-card__top {
@@ -544,8 +544,8 @@ onMounted(loadDashboard)
   width: 38px;
   height: 38px;
   border-radius: var(--radius-md);
-  background: rgba(99, 102, 241, 0.1);
-  color: #4F46E5;
+  background: rgba(20, 125, 146, 0.1);
+  color: var(--secondary, #147D92);
   display: grid;
   place-items: center;
   font-size: var(--step-1);
@@ -561,7 +561,7 @@ onMounted(loadDashboard)
   font-size: var(--step--1);
   font-weight: 700;
   letter-spacing: 0.08em;
-  color: #4F46E5;
+  color: var(--secondary, #147D92);
 }
 
 .company-card__name {
@@ -589,9 +589,9 @@ onMounted(loadDashboard)
 }
 
 .company-pill--verified {
-  background: rgba(16, 185, 129, 0.08);
-  border-color: rgba(16, 185, 129, 0.25);
-  color: #059669;
+  background: rgba(25, 135, 84, 0.08);
+  border-color: rgba(25, 135, 84, 0.25);
+  color: var(--fg-success, #198754);
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
@@ -601,7 +601,7 @@ onMounted(loadDashboard)
   width: var(--space-1);
   height: var(--space-1);
   border-radius: var(--radius-pill);
-  background: #10B981;
+  background: var(--fg-success, #198754);
 }
 
 .company-country {
@@ -612,38 +612,22 @@ onMounted(loadDashboard)
 
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: var(--space-5);
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: var(--space-4);
       margin-bottom: var(--space-6);
-    }
-
-    /* Gold text treatment for stat card values */
-    :deep(.stat-card__value) {
-      background: var(--wl-gradient-gold);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
     }
     .pipeline-card {
       padding: var(--space-6) var(--space-6);
-      background: var(--wl-surface);
-      border: 1px solid var(--wl-border);
-      border-radius: var(--radius-md);
-      box-shadow: var(--shadow-card);
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
       margin-bottom: var(--space-6);
       position: relative;
       overflow: hidden;
     }
 
-      .pipeline-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        inset-inline: 0;
-        height: 2px;
-        background: linear-gradient(90deg, #F59E0B, #10B981, #4F46E5, #6366F1);
-        opacity: 0.85;
-      }
+      .pipeline-card::before { display: none; }
 
     .pipeline-head {
       display: flex;
@@ -784,16 +768,16 @@ onMounted(loadDashboard)
     .dash-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: var(--space-5);
-      margin-bottom: var(--space-8);
+      gap: var(--space-4);
+      margin-bottom: var(--space-6);
     }
 
     .workbench-card {
-      background: var(--wl-surface);
-      border: 1px solid var(--wl-border);
-      border-radius: var(--radius-md);
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
       padding: var(--space-6);
-      box-shadow: var(--shadow-card);
+      box-shadow: var(--shadow-sm);
       display: flex;
       flex-direction: column;
     }
@@ -969,7 +953,7 @@ onMounted(loadDashboard)
       font-size: var(--step--1);
       font-weight: 700;
       letter-spacing: 0.08em;
-      color: #4F46E5;
+      color: var(--secondary, #147D92);
       display: block;
       margin-bottom: var(--space-1);
     }
@@ -1032,23 +1016,23 @@ onMounted(loadDashboard)
     }
 
     .bento-icon--indigo {
-      background: rgba(99, 102, 241, 0.1);
-      color: #4F46E5;
+      background: rgba(20, 125, 146, 0.1);
+      color: var(--secondary, #147D92);
     }
 
     .bento-icon--emerald {
-      background: rgba(16, 185, 129, 0.1);
-      color: #059669;
+      background: rgba(25, 135, 84, 0.1);
+      color: var(--fg-success, #198754);
     }
 
     .bento-icon--amber {
-      background: rgba(245, 158, 11, 0.1);
-      color: #D97706;
+      background: rgba(230, 126, 34, 0.1);
+      color: var(--fg-warning, #E67E22);
     }
 
     .bento-icon--slate {
-      background: rgba(100, 116, 139, 0.1);
-      color: #475569;
+      background: var(--bg-subtle);
+      color: var(--fg-muted, #627D98);
     }
 
     .bento-content {

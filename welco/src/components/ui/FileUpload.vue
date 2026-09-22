@@ -486,11 +486,11 @@ function onZoomWheel(e: WheelEvent) {
 .fup__preview:hover .fup__overlay { opacity: 1; }
 .fup__action { display: inline-flex; align-items: center; gap: 0.3rem; background: rgba(0, 0, 0, 0.75); color: var(--wl-ink-strong); border: 1px solid rgba(255, 255, 255, 0.25); padding: 0.35rem 0.7rem; font-size: 0.75rem; font-weight: 600; cursor: pointer; border-radius: 6px; text-decoration: none; transition: all 0.15s ease; }
 .fup__action:hover { background: var(--wl-ink-strong); color: var(--wl-ink-strong); border-color: rgba(255, 255, 255, 0.5); }
-.fup__action--view { background: rgba(14, 165, 233, 0.85); }
-.fup__action--view:hover { background: #0284c7; }
+.fup__action--view { background: rgba(20, 125, 146, 0.85); }
+.fup__action--view:hover { background: var(--secondary, #147D92); }
 .fup__action--secondary { background: rgba(255, 255, 255, 0.9); }
 .fup__action--secondary:hover { background: var(--wl-primary); color: var(--wl-on-primary); }
-.fup__action--danger:hover { background: #dc2626; }
+.fup__action--danger:hover { background: var(--color-danger-600, #BA1A1A); }
 .fup__action .material-symbols-outlined { font-size: 15px; }
 
 /* Document & PDF Card */
@@ -499,7 +499,7 @@ function onZoomWheel(e: WheelEvent) {
   flex-direction: column;
   border: 1px solid var(--wl-border);
   background: var(--wl-surface);
-  border-radius: 10px;
+  border-radius: var(--radius-lg, 8px);
   color: var(--wl-ink-strong);
   box-shadow: var(--shadow-xs);
   overflow: hidden;
@@ -521,14 +521,14 @@ function onZoomWheel(e: WheelEvent) {
   justify-content: center;
   width: 38px;
   height: 38px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm, 4px);
   background: var(--wl-primary-faint);
   color: var(--wl-primary);
   flex-shrink: 0;
 }
 .fup__file-icon-wrap--pdf {
-  background: rgba(225, 29, 72, 0.1);
-  color: #e11d48;
+  background: var(--color-danger-100, #FFDAD6);
+  color: var(--color-danger-600, #BA1A1A);
 }
 .fup__file-icon-wrap .material-symbols-outlined {
   font-size: 22px;

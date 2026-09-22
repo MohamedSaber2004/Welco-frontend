@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { computed, ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { authService, services, contentRepository, companyRepository } from '../di/container'
 import { t, locale } from '../i18n'
@@ -7,30 +7,112 @@ import type { CategoryDto, ProductDto } from '../domain/models/marketplace'
 import type { CertificationDto } from '../domain/models/certification'
 import type { LandingPageDto } from '../domain/models/content'
 import type { CompanyDto } from '../domain/models/company'
-import { useCart } from '../composables/useCart'
 import { toastService } from '../infrastructure/feedback/toast.service'
 import DataState from '../components/ui/DataState.vue'
+import SkeletonLoader from '../components/ui/SkeletonLoader.vue'
 import BaseModal from '../components/ui/BaseModal.vue'
 import BaseButton from '../components/ui/BaseButton.vue'
 import AppImage from '../components/ui/AppImage.vue'
-import { productMediaUrl } from '../utils/file-url'
 import { formatPrice } from '../utils/format'
 
 const router = useRouter()
-const { add } = useCart()
-
 const heroSearch = ref('')
 const goSearch = () => {
   void router.push({ name: 'marketplace', query: heroSearch.value ? { search: heroSearch.value } : {} })
 }
 
-const featured = ref<ProductDto[]>([])
 const cats = ref<CategoryDto[]>([])
 const certifications = ref<CertificationDto[]>([])
 const landingPages = ref<LandingPageDto[]>([])
 const aboutPage = ref<LandingPageDto | null>(null)
 const providers = ref<CompanyDto[]>([])
 const loading = ref(true)
+
+/* ── Category → providers → products, served by backend endpoints ── */
+const expandedProviderId = ref<string | null>(null)
+const tileProductPage = ref(1)
+const tileProducts = ref<ProductDto[]>([])
+const tileTotal = ref(0)
+const tileLoading = ref(false)
+const TILE_PAGE_SIZE = 4
+const tileTotalPages = computed(() => Math.max(1, Math.ceil(tileTotal.value / TILE_PAGE_SIZE)))
+
+const fetchTilePage = async () => {
+  const id = expandedProviderId.value
+  if (!id) return
+  tileLoading.value = true
+  try {
+    const res = await companyRepository.getCompanyProducts(id, { page: tileProductPage.value, pageSize: TILE_PAGE_SIZE })
+    tileProducts.value = Array.isArray(res?.data) ? res.data : []
+    tileTotal.value = res?.totalCount ?? tileProducts.value.length
+  } catch {
+    tileProducts.value = []
+    tileTotal.value = 0
+  } finally {
+    tileLoading.value = false
+  }
+}
+const toggleProvider = (id: string) => {
+  if (expandedProviderId.value === id) {
+    expandedProviderId.value = null
+    return
+  }
+  expandedProviderId.value = id
+  tileProductPage.value = 1
+  void fetchTilePage()
+}
+watch(tileProductPage, () => { void fetchTilePage() })
+
+const explorerCatId = ref<string | null>(null)
+const explorerProviderPage = ref(1)
+const EXPLORER_PROVIDER_PAGE_SIZE = 4
+
+const explorerProviders = ref<CompanyDto[]>([])
+const explorerProviderTotal = ref(0)
+const explorerProvidersLoading = ref(false)
+const explorerProviderTotalPages = computed(() =>
+  Math.max(1, Math.ceil(explorerProviderTotal.value / EXPLORER_PROVIDER_PAGE_SIZE)),
+)
+
+watch(cats, (list) => {
+  const first = list[0]
+  if (!explorerCatId.value && first) void selectExplorerCat(first.id)
+})
+
+const fetchExplorerProviders = async () => {
+  if (!explorerCatId.value) return
+  explorerProvidersLoading.value = true
+  try {
+    const res = await services.marketplaceRepository.getCategoryProviders(explorerCatId.value, {
+      page: explorerProviderPage.value,
+      pageSize: EXPLORER_PROVIDER_PAGE_SIZE,
+    })
+    explorerProviders.value = Array.isArray(res?.data) ? res.data : []
+    explorerProviderTotal.value = res?.totalCount ?? explorerProviders.value.length
+  } catch {
+    explorerProviders.value = []
+    explorerProviderTotal.value = 0
+  } finally {
+    explorerProvidersLoading.value = false
+  }
+}
+
+const openCategoryProviders = (catId: string) => {
+  void router.push({ name: 'category-providers', params: { id: catId } })
+}
+const selectExplorerCat = (id: string) => {
+  explorerCatId.value = id
+  explorerProviderPage.value = 1
+  void fetchExplorerProviders()
+}
+const openProviderStorefront = (id: string) => {
+  void router.push({
+    name: 'provider-storefront',
+    params: { id },
+    query: explorerCatId.value ? { category: explorerCatId.value } : undefined,
+  })
+}
+watch(explorerProviderPage, () => { void fetchExplorerProviders() })
 
 const FOUNDING_YEAR = 1994
 
@@ -40,7 +122,6 @@ onMounted(async () => {
   try {
     await Promise.allSettled([
       svc.loadCategories(),
-      svc.loadFeatured(),
       services.certificationService.load(),
       services.contentService.loadSupport(),
       contentRepository.getLandingPages({ pageNumber: 1, pageSize: 20 }).then((p) => (landingPages.value = p.data)).catch(() => []),
@@ -51,12 +132,13 @@ onMounted(async () => {
         })
         .catch(() => null),
       companyRepository
-        .getCompanies({ pageNumber: 1, pageSize: 8 })
+        .getProvidersDirectory({ pageNumber: 1, pageSize: 8 })
         .then((p) => {
-          if (p?.data?.length) {
-            providers.value = p.data.filter((c) => c.isActive !== false).slice(0, 8)
-          } else {
+          // Handle 401 in guest mode - backend doesn't allow public access
+          if (p?.statusCode === 401 || !p?.data?.length) {
             providers.value = []
+          } else {
+            providers.value = p.data.filter((c) => c.isActive !== false).slice(0, 8)
           }
         })
         .catch(() => {
@@ -64,7 +146,6 @@ onMounted(async () => {
         }),
     ])
     if (svc.categories.value.length) cats.value = svc.categories.value.slice(0, 8)
-    if (svc.featured.value.length) featured.value = svc.featured.value.slice(0, 3)
     certifications.value = services.certificationService.certifications.value
   } finally {
     loading.value = false
@@ -72,12 +153,6 @@ onMounted(async () => {
 })
 
 const localized = (en?: string | null, ar?: string | null) => locale.value === 'ar' ? (ar || en || '') : (en || ar || '')
-const handleAdd = (id: string) => {
-  const p = (featured.value.find(x => x.id === id) ?? services.marketplaceService.products.value.find((x) => x.id === id))
-  if (!p) return
-  add(p, 1)
-  toastService.success(t('catalog.quoteSuccess', { product: localized(p.nameEn, p.nameAr) }))
-}
 
 const priceModalOpen = ref(false)
 const priceSubmitting = ref(false)
@@ -186,35 +261,79 @@ const navigateToOemFromModal = () => {
 
     <DataState :loading="loading && !providers.length" :empty="!providers.length && !loading" skeleton-type="provider-grid" :skeleton-count="4" min-height="250px">
       <div class="providers-strip-grid">
-        <router-link
+        <article
           v-for="p in providers"
           :key="p.id"
-          :to="{ name: 'marketplace', query: { search: p.name } }"
           class="provider-tile"
+          :class="{ 'is-expanded': expandedProviderId === p.id }"
         >
-          <div class="provider-tile__logo">
-            <AppImage
-              :src="p.imageName"
-              placeholder-type="company"
-              :placeholder-text="p.name"
-              :alt="p.name"
-              fit="contain"
-              height="70px"
-            />
-          </div>
-          <div class="provider-tile__info">
-            <div class="provider-tile__top">
-              <span class="provider-tile__badge mono">
-                {{ t('home.verifiedSupplier') }}
-              </span>
+          <button
+            type="button"
+            class="provider-tile__main"
+            :aria-expanded="expandedProviderId === p.id"
+            @click="toggleProvider(p.id)"
+          >
+            <div class="provider-tile__logo">
+              <AppImage
+                :src="p.imageName"
+                placeholder-type="company"
+                :placeholder-text="p.name"
+                :alt="p.name"
+                fit="contain"
+                height="70px"
+              />
             </div>
-            <h3 class="provider-tile__name" dir="auto">{{ p.name }}</h3>
-            <div v-if="p.countryNameEn || p.countryNameAr" class="provider-tile__country mono">
-              <span class="material-symbols-outlined text-[13px] text-teal-600">public</span>
-              <span>{{ localized(p.countryNameEn, p.countryNameAr) }}</span>
+            <div class="provider-tile__info">
+              <div class="provider-tile__top">
+                <span class="provider-tile__badge mono">
+                  {{ t('home.verifiedSupplier') }}
+                </span>
+              </div>
+              <h3 class="provider-tile__name" dir="auto">{{ p.name }}</h3>
+              <div v-if="p.countryNameEn || p.countryNameAr" class="provider-tile__country mono">
+                <span class="material-symbols-outlined text-[13px] text-teal-600">public</span>
+                <span>{{ localized(p.countryNameEn, p.countryNameAr) }}</span>
+              </div>
             </div>
+          </button>
+          <div class="provider-tile__foot">
+            <span class="mono provider-tile__count">{{ t('provider.providerProducts') }}</span>
+            <span class="material-symbols-outlined provider-tile__chev" :class="{ 'is-open': expandedProviderId === p.id }" aria-hidden="true">expand_more</span>
           </div>
-        </router-link>
+          <div v-if="expandedProviderId === p.id" class="provider-tile__products">
+            <div v-if="tileLoading" role="status"><SkeletonLoader type="provider-cards" :count="2" /></div>
+            <div v-else-if="!tileProducts.length" class="mono provider-tile__empty">{{ t('provider.noProviderProducts') }}</div>
+            <div v-else class="provider-mini-grid">
+              <button
+                v-for="prod in tileProducts"
+                :key="prod.id"
+                type="button"
+                class="provider-mini"
+                @click="router.push({ name: 'marketplace-product', params: { id: prod.id } })"
+              >
+                <AppImage
+                  :src="prod.imageName"
+                  placeholder-type="product"
+                  :placeholder-text="prod.sku"
+                  :alt="localized(prod.nameEn, prod.nameAr)"
+                  fit="contain"
+                  class="provider-mini__img"
+                />
+                <span class="provider-mini__name" dir="auto">{{ localized(prod.nameEn, prod.nameAr) }}</span>
+                <span class="provider-mini__price mono-num">{{ formatPrice(prod.price, locale) }} {{ prod.currencySymbol || '$' }}</span>
+              </button>
+            </div>
+            <div v-if="tileTotalPages > 1" class="provider-pager">
+              <button type="button" class="page-btn" :disabled="tileProductPage <= 1" @click="tileProductPage--">‹</button>
+              <span class="mono provider-pager__num">{{ tileProductPage }} / {{ tileTotalPages }}</span>
+              <button type="button" class="page-btn" :disabled="tileProductPage >= tileTotalPages" @click="tileProductPage++">›</button>
+            </div>
+            <router-link :to="{ name: 'provider-storefront', params: { id: p.id } }" class="provider-viewall mono">
+              <span>{{ t('provider.viewCatalog') }}</span>
+              <span class="icon--directional">→</span>
+            </router-link>
+          </div>
+        </article>
       </div>
     </DataState>
   </div>
@@ -234,7 +353,7 @@ const navigateToOemFromModal = () => {
         </div>
         <DataState :loading="loading && !cats.length" :empty="!cats.length && !loading" skeleton-type="category-grid" :skeleton-count="8" min-height="160px">
           <div class="cat-grid">
-            <router-link v-for="c in cats" :key="c.id" :to="{ name: 'marketplace', query: { categoryId: c.id } }" class="cat-card">
+            <router-link v-for="c in cats" :key="c.id" :to="{ name: 'category-providers', params: { id: c.id } }" class="cat-card">
               <div class="cat-media">
                 <AppImage
                   :src="c.imageName"
@@ -252,60 +371,69 @@ const navigateToOemFromModal = () => {
             </router-link>
           </div>
         </DataState>
-      </div>
-    </section>
-    <section class="section" aria-labelledby="featured-heading">
-      <div class="section__inner">
-        <div class="section-head">
-          <div>
-            <div class="mono section__eyebrow">{{ t('home.clinicalHighlights') }}</div>
-            <h2 id="featured-heading" class="section-title">{{ t('marketplace.featuredSubtitle') }}</h2>
-          </div>
-          <router-link to="/marketplace" class="btn btn-ghost btn-sm view-all-btn">
-            <span>{{ t('common.viewAll') }}</span>
-            <span class="icon--directional">→</span>
-          </router-link>
-        </div>
-        <DataState :loading="loading && !featured.length" :empty="!featured.length && !loading" skeleton-type="catalog-grid" :skeleton-count="3" min-height="220px">
-          <div class="product-grid">
-            <article
-              v-for="p in featured"
-              :key="p.id"
-              class="card product-card"
-              @click="router.push({ name: 'marketplace-product', params: { id: p.id } })"
-            >
-              <div class="product-card__media" :style="{ background: productMediaUrl(p.imageName, p.imageGradient).background }">
-                <AppImage
-                  :src="p.imageName"
-                  placeholder-type="product"
-                  :placeholder-text="p.sku"
-                  :alt="localized(p.nameEn, p.nameAr)"
-                  fit="contain"
-                  class="product-card__img"
-                />
-                <span v-if="p.isNew" class="mono product-card__badge">{{ t('home.newBadge') }}</span>
-                <span v-if="p.stock > 0" class="mono product-card__stock product-card__stock--in">{{ t('catalog.inStock') }}</span>
-                <span v-else class="mono product-card__stock product-card__stock--out">{{ t('catalog.madeToOrder') }}</span>
-              </div>
-              <div class="product-card__body">
-                <div class="mono product-card__category" dir="auto">{{ localized(p.categoryNameEn, p.categoryNameAr) }}</div>
-                <h3 class="product-card__title" dir="auto">{{ localized(p.nameEn, p.nameAr) }}</h3>
-                <div class="mono product-card__meta-alt" dir="auto">{{ locale === 'en' ? p.nameAr : p.nameEn }}</div>
-                <div class="mono product-card__meta">{{ p.manufacturerEn || 'Welco Surgical' }} · CE Class IIa</div>
-                <div class="product-card__foot">
-                  <strong class="mono-num">{{ formatPrice(p.price, locale) }} {{ p.currencySymbol || '$' }}</strong>
-                  <button class="btn btn-primary btn-sm" type="button" @click.stop="handleAdd(p.id)">
-                    <span class="material-symbols-outlined text-[15px]">add_shopping_cart</span>
-                    <span>{{ t('marketplace.addToQuote') }}</span>
-                  </button>
-                </div>
-              </div>
-            </article>
-          </div>
-        </DataState>
-      </div>
-    </section>
 
+        <div v-if="cats.length" class="cat-explorer card">
+          <div class="cat-explorer__pills" role="tablist" :aria-label="t('marketplace.categoriesTitle')">
+            <button
+              v-for="c in cats"
+              :key="c.id"
+              type="button"
+              role="tab"
+              class="pill"
+              :class="{ 'pill--active': explorerCatId === c.id }"
+              :aria-selected="explorerCatId === c.id"
+              @click="selectExplorerCat(c.id)"
+            >
+              {{ localized(c.nameEn, c.nameAr) }}
+            </button>
+          </div>
+
+          <div v-if="explorerCatId" class="cat-explorer__body">
+            <div class="cat-explorer__head">
+              <h3 class="cat-explorer__title">{{ t('provider.providersInCategory') }}</h3>
+              <router-link :to="{ name: 'category-providers', params: { id: explorerCatId } }" class="provider-viewall mono">
+                <span>{{ t('common.viewAll') }}</span>
+                <span class="icon--directional">→</span>
+              </router-link>
+            </div>
+            <div v-if="explorerProvidersLoading" role="status"><SkeletonLoader type="provider-cards" :count="4" /></div>
+            <div v-else-if="!explorerProviders.length" class="mono cat-explorer__empty">
+              {{ t('provider.noProvidersHere') }}
+            </div>
+            <div v-else>
+              <div class="cat-explorer__providers">
+                <button
+                  v-for="prov in explorerProviders"
+                  :key="prov.id"
+                  type="button"
+                  class="cat-provider"
+                  @click="openProviderStorefront(prov.id)"
+                >
+                  <AppImage
+                    :src="prov.imageName"
+                    placeholder-type="company"
+                    :placeholder-text="prov.name"
+                    :alt="prov.name"
+                    fit="contain"
+                    class="cat-provider__img"
+                  />
+                  <span class="cat-provider__name" dir="auto">{{ prov.name }}</span>
+                  <span v-if="prov.countryNameEn || prov.countryNameAr" class="cat-provider__country mono">
+                    {{ localized(prov.countryNameEn, prov.countryNameAr) }}
+                  </span>
+                  <span class="cat-provider__cta mono">{{ t('provider.viewCatalog') }} <span class="icon--directional">→</span></span>
+                </button>
+              </div>
+              <div v-if="explorerProviderTotalPages > 1" class="provider-pager">
+                <button type="button" class="page-btn" :disabled="explorerProviderPage <= 1" @click="explorerProviderPage--">‹</button>
+                <span class="mono provider-pager__num">{{ explorerProviderPage }} / {{ explorerProviderTotalPages }}</span>
+                <button type="button" class="page-btn" :disabled="explorerProviderPage >= explorerProviderTotalPages" @click="explorerProviderPage++">›</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
     <!-- Audited Quality Standards Section -->
     <section class="section section--soft" aria-labelledby="home-certs-heading">
       <div class="section__inner">
@@ -322,7 +450,7 @@ const navigateToOemFromModal = () => {
         <DataState :loading="loading && !certifications.length" :empty="!certifications.length && !loading" skeleton-type="cert-grid" :skeleton-count="4" min-height="300px">
           <div class="home-certs-grid">
             <article
-              v-for="c in certifications.slice(0, 3)"
+              v-for="c in certifications.filter(c => c.isActive).slice(0, 3)"
               :key="c.id"
               class="home-cert-card"
               @click="router.push('/certifications')"
@@ -349,7 +477,7 @@ const navigateToOemFromModal = () => {
     </section>
     <section class="section section--soft" aria-labelledby="about-heading">
       <div class="section__inner about-grid">
-        <div>
+        <div class="about-content">
           <div class="mono section__eyebrow">{{ t('home.aboutEyebrow') }}</div>
           <h2 id="about-heading" class="section-title">{{ aboutPage?.heroTitle || t('home.aboutTitle') }}</h2>
           <p class="about-body">{{ aboutPage?.heroBody || t('home.aboutBody') }}</p>
@@ -576,8 +704,8 @@ const navigateToOemFromModal = () => {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #10B981;
-  box-shadow: 0 0 0 3px rgba(16,185,129,0.2);
+  background: var(--fg-success, #198754);
+  box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.2);
 }
 
 .hero h1 {
@@ -591,12 +719,12 @@ const navigateToOemFromModal = () => {
 }
 
 .hero h1 em {
-  font-style: normal;
-  background: var(--wl-gradient-gold);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  filter: var(--wl-gold-text-filter);
+   font-style: normal;
+   background: var(--brand-gradient);
+   -webkit-background-clip: text;
+   background-clip: text;
+   color: transparent;
+   filter: none;
 }
 
 .hero p {
@@ -909,7 +1037,7 @@ const navigateToOemFromModal = () => {
 
 .section-desc {
   font-size: var(--step-0);
-  color: var(--wl-muted, #64748b);
+  color: var(--fg-muted, #627D98);
   margin: calc(var(--space-2) * -1) 0 var(--space-6);
   max-width: 680px;
 }
@@ -928,13 +1056,6 @@ const navigateToOemFromModal = () => {
   background: var(--wl-surface-soft);
   border-bottom: 1px solid var(--wl-border);
   padding: var(--space-8) 0;
-}
-
-.section-desc {
-  font-size: var(--step-0);
-  color: var(--wl-muted, #64748b);
-  margin: calc(var(--space-2) * -1) 0 var(--space-6);
-  max-width: 680px;
 }
 
 .providers-strip-grid {
@@ -970,7 +1091,7 @@ const navigateToOemFromModal = () => {
 
 .provider-tile:hover {
   transform: translateY(-3px);
-  border-color: var(--wl-primary, #0d9488);
+  border-color: var(--brand, #0F3D56);
   box-shadow: var(--shadow-hover);
 }
 
@@ -1024,7 +1145,7 @@ const navigateToOemFromModal = () => {
   font-weight: 700;
   color: var(--wl-success);
   background: var(--wl-success-soft);
-  border: 1px solid rgba(87, 242, 135, 0.35);
+  border: 1px solid var(--color-success-100);
   padding: var(--space-1) var(--space-2);
   border-radius: var(--radius-pill);
   letter-spacing: 0.02em;
@@ -1047,9 +1168,198 @@ const navigateToOemFromModal = () => {
   align-items: center;
   gap: 0.35rem;
   font-size: var(--step--1);
-  color: var(--wl-muted, #64748b);
+  color: var(--fg-muted, #627D98);
   margin-top: auto;
   padding-top: 0.25rem;
+}
+
+/* Provider tile expansion (products per provider, paginated) */
+.provider-tile__main {
+  display: block;
+  width: 100%;
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  text-align: start;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+}
+.provider-tile__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-top: 1px solid var(--border);
+  background: var(--bg-subtle);
+}
+.provider-tile__count {
+  font-size: var(--text-xs);
+  color: var(--fg-muted);
+}
+.provider-tile__chev {
+  font-size: 20px;
+  color: var(--fg-subtle);
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+.provider-tile__chev.is-open { transform: rotate(180deg); color: var(--brand); }
+.provider-tile__products {
+  padding: var(--space-3);
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.provider-tile__empty {
+  font-size: var(--text-xs);
+  color: var(--fg-subtle);
+  text-align: center;
+  padding: var(--space-3) 0;
+}
+.provider-mini-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+.provider-mini {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-2);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  text-align: start;
+  min-width: 0;
+  transition: border-color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
+}
+.provider-mini:hover { border-color: var(--border-focus); box-shadow: var(--ring-focus); }
+.provider-mini__img { width: 100%; height: 64px; border-radius: var(--radius-sm); }
+.provider-mini__name {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--fg-heading);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.provider-mini__price { font-size: var(--text-sm); color: var(--fg-body); }
+.provider-pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+}
+.provider-pager__num { font-size: var(--text-xs); color: var(--fg-muted); }
+.provider-viewall {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  font-size: var(--text-xs);
+  color: var(--brand);
+  text-decoration: none;
+  padding: var(--space-1) 0;
+}
+.provider-viewall:hover { text-decoration: underline; }
+
+/* Category → providers → products explorer */
+.cat-explorer {
+  margin-top: var(--space-6);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.cat-explorer__pills {
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+  padding-bottom: var(--space-1);
+  scrollbar-width: none;
+}
+.cat-explorer__pills::-webkit-scrollbar { display: none; }
+.cat-explorer__pills .pill { flex-shrink: 0; }
+.cat-explorer__body { display: flex; flex-direction: column; gap: var(--space-4); }
+.cat-explorer__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.cat-explorer__title {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  color: var(--fg-heading);
+  margin: 0;
+}
+.cat-explorer__subtitle {
+  font-size: var(--text-base);
+  font-weight: var(--weight-medium);
+  color: var(--fg-heading);
+  margin: 0;
+}
+.cat-explorer__empty {
+  font-size: var(--text-sm);
+  color: var(--fg-subtle);
+  padding: var(--space-4) 0;
+  text-align: center;
+}
+.cat-explorer__providers {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--space-3);
+}
+.cat-provider {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: border-color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
+  min-width: 0;
+}
+.cat-provider:hover { border-color: var(--border-strong); }
+.cat-provider.is-selected {
+  border-color: var(--brand);
+  box-shadow: var(--ring-focus);
+}
+.cat-provider__img { width: 100%; height: 56px; border-radius: var(--radius-sm); }
+.cat-provider__name {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--fg-heading);
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+.cat-provider__country { font-size: var(--text-xs); color: var(--fg-subtle); }
+.cat-provider__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-xs);
+  color: var(--brand);
+  margin-top: var(--space-1);
+}
+.cat-explorer__products { display: flex; flex-direction: column; gap: var(--space-3); }
+.cat-explorer__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--space-3);
+}
+@media (max-width: 640px) {
+  .cat-explorer { padding: var(--space-4); }
+  .provider-mini-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 /* Home Certs Grid - Fixed 4-column grid on desktop, centered */
@@ -1133,7 +1443,7 @@ const navigateToOemFromModal = () => {
 .home-cert-card__title {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--wl-text);
+  color: var(--fg-heading);
   margin: 0;
   line-height: 1.4;
 }
@@ -1146,12 +1456,12 @@ const navigateToOemFromModal = () => {
 
 .section__eyebrow {
   font-size: var(--step--1);
-  color: var(--wl-gold);
+  color: var(--brand);
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   margin-bottom: var(--space-1);
-  text-shadow: var(--wl-gold-text-shadow);
+  text-shadow: none;
 }
 
 .section-title {
@@ -1159,8 +1469,7 @@ const navigateToOemFromModal = () => {
   font-size: var(--step-2);
   font-weight: 800;
   letter-spacing: -0.02em;
-  color: var(--wl-gold-text);
-  text-shadow: var(--wl-gold-text-shadow);
+  color: var(--fg-heading);
   margin: 0;
 }
 
@@ -1373,11 +1682,11 @@ const navigateToOemFromModal = () => {
 }
 
 .product-card__stock--in {
-  background: #059669;
+  background: var(--fg-success, #198754);
 }
 
 .product-card__stock--out {
-  background: #DC2626;
+  background: var(--fg-danger, #DC3545);
 }
 
 .product-card__body {
@@ -1549,7 +1858,7 @@ const navigateToOemFromModal = () => {
   background: var(--wl-surface-soft);
   border: 1.5px solid var(--wl-border);
   border-radius: var(--radius-md);
-  color: var(--wl-ink-strong, #0F172A);
+  color: var(--fg-heading, #102A43);
   font-size: var(--step-0);
   padding: 0.65rem 0.85rem;
   outline: none;
@@ -1702,8 +2011,13 @@ const navigateToOemFromModal = () => {
   align-items: center;
 }
 
+.about-content {
+  display: flex;
+  flex-direction: column;
+}
+
 .about-body {
-  color: var(--wl-ink-soft, #334155);
+  color: var(--fg-body, #42474D);
   line-height: 1.75;
   font-size: var(--step-0);
   margin: var(--space-3) 0 0;
@@ -1722,7 +2036,7 @@ const navigateToOemFromModal = () => {
   border-radius: var(--radius-md);
   overflow: hidden;
   border: 1px solid var(--wl-border);
-  background: var(--wl-surface, #fff);
+  background: var(--bg-surface, #FFFFFF);
 }
 
 .about-media__img {
@@ -1733,6 +2047,53 @@ const navigateToOemFromModal = () => {
   object-fit: contain;
   display: block;
   margin: 0 auto;
+}
+
+@media (max-width: 960px) {
+  .about-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+    justify-items: center;
+  }
+
+  .about-content {
+    align-items: center;
+    text-align: center;
+  }
+
+  .about-content .section__eyebrow {
+    text-align: center;
+    margin-inline: auto;
+  }
+
+  .about-content .section-title {
+    text-align: center;
+  }
+
+  .about-body {
+    text-align: center;
+    max-width: 640px;
+    margin-inline: auto;
+  }
+
+  .about-ctas {
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  }
+
+  .about-media {
+    max-width: 480px;
+    width: 100%;
+    margin-inline: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .about-ctas .btn {
+    width: 100%;
+    justify-content: center;
+  }
 }
 </style>
 

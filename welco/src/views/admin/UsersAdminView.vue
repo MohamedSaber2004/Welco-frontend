@@ -133,17 +133,16 @@ const submitPassword = async () => {
 }
 
 const getAvatarColor = (name?: string): string => {
-  // High-visibility navy degrees: bright blue / mint / sky / gold-yellow / amber / rose
-  const colors = ['#4F95F5', '#0D9488', '#0284C7', '#E9A825', '#F8C15D', '#E11D48']
-  if (!name) return '#4F95F5'
+  // Clinical Precision series: deep medical navy, steel teal, precision cyan, amber, green, muted slate
+  const colors = ['#0F3D56', '#147D92', '#28A7A1', '#E67E22', '#198754', '#627D98']
+  if (!name) return '#0F3D56'
   let hash = 0
   for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash)
-  return colors[Math.abs(hash) % colors.length] ?? '#4F95F5'
+  return colors[Math.abs(hash) % colors.length] ?? '#0F3D56'
 }
 
 const getAvatarTextColor = (bg: string): string => {
-  // Yellow / gold degrees need dark navy ink for readability, others use white
-  return bg === '#E9A825' || bg === '#F8C15D' ? '#061328' : '#FFFFFF'
+  return bg === '#E67E22' ? '#102A43' : '#FFFFFF'
 }
 
 onMounted(() => {
@@ -267,7 +266,7 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
                       class="role-pill mono"
                       :class="{
                         'role-pill--admin': u.userType === UserType.Admin,
-                        'role-pill--staff': u.userType === UserType.WelcoStaff,
+                        'role-pill--sales': u.userType === UserType.WelcoStaff,
                         'role-pill--org': u.userType === UserType.OrganizationUser,
                       }"
                     >
@@ -396,8 +395,8 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
               <label class="field-label" for="user-role">{{ t('admin.userType') }} *</label>
               <select id="user-role" v-model="form.userType" class="field-select">
                 <option :value="UserType.Admin">{{ t('admin.roleAdmin') }}</option>
-                <option :value="UserType.WelcoStaff">{{ t('admin.roleWelcoStaff') }}</option>
-                <option :value="UserType.OrganizationUser">{{ t('admin.roleOrganizationUser') }}</option>
+                <option :value="UserType.WelcoStaff">{{ t('admin.roleSales') }}</option>
+                <option :value="UserType.OrganizationUser">{{ t('admin.roleProvider') }}</option>
               </select>
             </div>
           </div>
@@ -724,11 +723,11 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
 
 /* Executive Table */
 .table-card {
-  background: var(--wl-surface);
-  border: 1px solid var(--wl-border, #E2E8F0);
-  border-radius: var(--wl-radius-card, 16px);
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #D9E2EC);
+  border-radius: var(--radius-card, 8px);
   overflow: hidden;
-  box-shadow: var(--wl-shadow-card);
+  box-shadow: var(--shadow-sm);
 }
 
 .table-wrap {
@@ -853,7 +852,7 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
   box-shadow: 0 0 0 3px rgba(255, 209, 102, 0.1);
 }
 
-.role-pill--staff {
+.role-pill--sales {
   background: var(--wl-success-soft);
   color: var(--wl-success);
   border: 1px solid rgba(62, 215, 180, 0.32);
@@ -882,10 +881,10 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
 }
 
 .status-dot-badge--active {
-  background: var(--wl-success-soft);
-  color: var(--wl-success);
+  background: var(--color-success-50, #E8F5E9);
+  color: var(--fg-success, #198754);
 }
-.status-dot-badge--active .dot { background: #10B981; }
+.status-dot-badge--active .dot { background: var(--color-success-500, #198754); }
 
 .status-dot-badge--inactive {
   background: var(--wl-surface-soft);

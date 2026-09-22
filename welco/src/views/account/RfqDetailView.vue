@@ -64,7 +64,7 @@ onMounted(async () => {
       <span class="crumb-active">{{ rfq?.rfqNumber ?? '…' }}</span>
     </nav>
 
-    <SkeletonLoader v-if="loading" type="card" :lines="6" height="220px" />
+    <SkeletonLoader v-if="loading" type="order-detail" />
     <DataState
       v-else-if="!rfq"
       :empty="true"
@@ -303,11 +303,11 @@ onMounted(async () => {
 
 /* Stepper Card */
 .stepper-card {
-  background: var(--wl-surface);
-  border: 1px solid var(--wl-border, #E2E8F0);
-  border-radius: var(--wl-radius-card, 16px);
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #D9E2EC);
+  border-radius: var(--radius-card, 8px);
   padding: var(--wl-card-padding, 1.25rem 1.5rem);
-  box-shadow: var(--wl-shadow-card, 0 1px 3px rgba(0, 10, 25, 0.05));
+  box-shadow: var(--shadow-sm);
 }
 
 /* Detail 2-Column Grid */
@@ -319,11 +319,11 @@ onMounted(async () => {
 }
 
 .manifest-card {
-  background: var(--wl-surface);
-  border: 1px solid var(--wl-border, #E2E8F0);
-  border-radius: var(--wl-radius-card, 16px);
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #D9E2EC);
+  border-radius: var(--radius-card, 8px);
   padding: var(--wl-card-padding, 1.5rem);
-  box-shadow: var(--wl-shadow-card, 0 1px 3px rgba(0, 10, 25, 0.05));
+  box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -334,7 +334,7 @@ onMounted(async () => {
   justify-content: space-between;
   align-items: center;
   padding-bottom: 0.75rem;
-  border-bottom: 1px solid var(--wl-border);
+  border-bottom: 1px solid var(--border, #D9E2EC);
 }
 
 .manifest-title-group {
@@ -345,19 +345,19 @@ onMounted(async () => {
 
 .manifest-title {
   font-size: 14.5px;
-  font-weight: 800;
-  color: var(--wl-ink-strong, #0F172A);
+  font-weight: 700;
+  color: var(--fg-heading, #102A43);
   margin: 0;
 }
 
 .item-chip {
   font-size: 11px;
-  font-weight: 700;
-  color: var(--wl-ink-soft);
-  background: var(--wl-surface-soft);
-  border: 1px solid var(--wl-border);
+  font-weight: 600;
+  color: var(--fg-muted, #627D98);
+  background: var(--surface-subtle, #F7F9FB);
+  border: 1px solid var(--border, #D9E2EC);
   padding: 0.15rem 0.5rem;
-  border-radius: 6px;
+  border-radius: var(--radius-xs, 3px);
 }
 
 .items-stack {
@@ -371,20 +371,20 @@ onMounted(async () => {
   align-items: center;
   gap: 1rem;
   padding: 0.75rem;
-  background: var(--wl-surface-soft);
-  border: 1px solid var(--wl-border);
-  border-radius: 12px;
+  background: var(--surface-subtle, #F7F9FB);
+  border: 1px solid var(--border, #D9E2EC);
+  border-radius: var(--radius-card, 8px);
 }
 
 .thumb-box {
   width: 52px;
   height: 52px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm, 4px);
   overflow: hidden;
   display: grid;
   place-items: center;
   flex-shrink: 0;
-  border: 1px solid var(--wl-border);
+  border: 1px solid var(--border, #D9E2EC);
 }
 
 .thumb-img {
@@ -403,22 +403,22 @@ onMounted(async () => {
 .rfq-item-name {
   font-size: 13.5px;
   font-weight: 700;
-  color: var(--wl-ink-strong);
+  color: var(--fg-heading, #102A43);
   margin: 0;
 }
 
 .rfq-item-qty {
   font-size: 11.5px;
-  color: var(--wl-muted);
+  color: var(--fg-muted, #627D98);
 }
 
 .rfq-item-notes {
   font-size: 11px;
-  color: var(--wl-ink-soft);
-  background: var(--wl-surface);
-  border: 1px solid var(--wl-border);
+  color: var(--fg-muted, #627D98);
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #D9E2EC);
   padding: 0.2rem 0.5rem;
-  border-radius: 6px;
+  border-radius: var(--radius-xs, 3px);
   width: fit-content;
   margin-top: 0.25rem;
 }
@@ -428,11 +428,11 @@ onMounted(async () => {
   align-items: center;
   gap: 0.5rem;
   font-size: 12px;
-  color: var(--wl-ink-soft);
-  background: var(--wl-primary-soft);
-  border: 1px solid rgba(148, 156, 247, 0.35);
+  color: var(--primary, #0F3D56);
+  background: var(--brand-soft, #EDF4FF);
+  border: 1px solid var(--border, #D9E2EC);
   padding: 0.75rem 1rem;
-  border-radius: 10px;
+  border-radius: var(--radius-sm, 4px);
 }
 
 /* Sidebar */
@@ -443,17 +443,17 @@ onMounted(async () => {
 }
 
 .card {
-  background: var(--wl-surface);
-  border: 1px solid var(--wl-border, #E2E8F0);
-  border-radius: var(--wl-radius-card, 16px);
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #D9E2EC);
+  border-radius: var(--radius-card, 8px);
   padding: var(--wl-card-padding, 1.25rem);
-  box-shadow: var(--wl-shadow-card, 0 1px 3px rgba(0, 10, 25, 0.05));
+  box-shadow: var(--shadow-sm);
 }
 
 .side-title {
   font-size: 11px;
   font-weight: 800;
-  color: var(--wl-primary, #69a9ff);
+  color: var(--primary, #0F3D56);
   letter-spacing: 0.05em;
   text-transform: uppercase;
   margin: 0;
@@ -468,14 +468,14 @@ onMounted(async () => {
 
 .amount-label {
   font-size: 11px;
-  color: var(--wl-muted);
+  color: var(--fg-muted, #627D98);
   font-weight: 700;
 }
 
 .amount-big {
   font-size: 1.45rem;
   font-weight: 800;
-  color: var(--wl-ink-strong);
+  color: var(--fg-heading, #102A43);
 }
 
 .linked-head {
@@ -486,7 +486,7 @@ onMounted(async () => {
 
 .linked-desc {
   font-size: 12px;
-  color: var(--wl-muted);
+  color: var(--fg-muted, #627D98);
   margin: 0.5rem 0 1rem;
   line-height: 1.45;
 }
@@ -499,7 +499,7 @@ onMounted(async () => {
 
 .attach-link {
   font-size: 11.5px;
-  color: var(--wl-primary);
+  color: var(--secondary, #147D92);
   word-break: break-all;
 }
 
@@ -510,19 +510,19 @@ onMounted(async () => {
   gap: 0.45rem;
   height: 44px;
   width: 100%;
-  background: var(--wl-primary);
-  color: var(--wl-on-primary);
+  background: var(--primary, #0F3D56);
+  color: #ffffff;
   border: none;
-  border-radius: 10px;
+  border-radius: var(--radius-sm, 4px);
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 4px 12px -2px rgba(105, 169, 255, 0.35);
+  box-shadow: 0 2px 8px -1px rgba(15, 61, 86, 0.25);
   transition: all 0.18s ease;
 }
 
 .btn-view-quote:hover {
-  background: var(--wl-primary-hover);
+  background: var(--color-brand-800, #0B2B3D);
 }
 
 .side-actions-stack {
@@ -536,21 +536,21 @@ onMounted(async () => {
   align-items: center;
   justify-content: center;
   gap: 0.45rem;
-  height: 46px;
-  background: var(--wl-surface);
-  color: var(--wl-ink-soft);
-  border: 1.5px solid var(--wl-border);
-  border-radius: 10px;
+  height: 44px;
+  background: var(--surface, #ffffff);
+  color: var(--fg-muted, #627D98);
+  border: 1px solid var(--border, #D9E2EC);
+  border-radius: var(--radius-sm, 4px);
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .btn-back-rfqs:hover {
-  border-color: var(--wl-primary);
-  color: var(--wl-primary);
-  background: var(--wl-primary-soft);
+  border-color: var(--primary, #0F3D56);
+  color: var(--primary, #0F3D56);
+  background: var(--brand-soft, #EDF4FF);
 }
 
 .btn-create-rfq {
@@ -558,20 +558,20 @@ onMounted(async () => {
   align-items: center;
   justify-content: center;
   gap: 0.45rem;
-  height: 46px;
-  background: var(--wl-primary-soft);
-  color: var(--wl-primary);
-  border: 1.5px solid rgba(var(--wl-primary-rgb), 0.3);
-  border-radius: 10px;
+  height: 44px;
+  background: var(--brand-soft, #EDF4FF);
+  color: var(--primary, #0F3D56);
+  border: 1px solid var(--border, #D9E2EC);
+  border-radius: var(--radius-sm, 4px);
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .btn-create-rfq:hover {
-  background: var(--wl-primary);
-  color: var(--wl-on-primary);
+  background: var(--primary, #0F3D56);
+  color: #ffffff;
 }
 
 @media (max-width: 900px) {

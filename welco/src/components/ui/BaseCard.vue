@@ -27,38 +27,19 @@ withDefaults(
 
 <style scoped>
 .card {
-  background: var(--wl-surface);
-  border: 1px solid var(--wl-border);
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  box-shadow: var(--wl-shadow-card);
-  transition: border-color var(--wl-transition), box-shadow var(--wl-transition), transform 0.15s ease;
+  box-shadow: var(--shadow-sm);
+  transition: border-color var(--duration-base) var(--ease-out), box-shadow var(--duration-base) var(--ease-out);
   overflow: hidden;
   position: relative;
 }
-.card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
-pointer-events: none;
-  }
-  .card::before {
-  content: '';
-  position: absolute;
-  inset-inline: 0;
-  top: 0;
-  height: 1px;
-  background: var(--wl-laser-sweep);
-  opacity: 0;
-  transition: opacity 0.25s ease;
-  pointer-events: none;
-}
-.card--hover:hover::before { opacity: 1; }
 .card--hover:hover {
-  transform: translateY(-2px);
   box-shadow: var(--shadow-md);
-  border-color: rgba(var(--wl-primary-rgb), 0.28);
+  border-color: var(--border-strong);
 }
 .card--pad-none .card__body { padding: 0; }
 .card--pad-sm .card__body { padding: var(--space-4); }
@@ -66,18 +47,18 @@ pointer-events: none;
 .card--pad-lg .card__body { padding: var(--space-8); }
 .card__header {
   padding: var(--space-4) var(--space-6);
-  border-bottom: 1px solid var(--wl-border);
+  border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--wl-surface-soft);
+  gap: var(--space-4);
 }
 .card__footer {
   padding: var(--space-4) var(--space-6);
-  border-top: 1px solid var(--wl-border);
-  background: var(--wl-surface-soft);
+  border-top: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: var(--space-4);
 }
 </style>

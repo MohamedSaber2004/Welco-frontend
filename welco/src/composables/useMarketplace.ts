@@ -25,12 +25,16 @@ function orderedPair(a: number | null, b: number | null): [number | null, number
   return [a, b]
 }
 
-export function useMarketplace() {
+export function useMarketplace(init?: {
+  search?: string
+  categoryId?: string | null
+  sortBy?: MarketplaceQuery['sortBy']
+}) {
   const svc = services.marketplaceService
-  const search = ref('')
+  const search = ref(init?.search ?? '')
   const sku = ref('')
-  const categoryId = ref<string | null>(null)
-  const sortBy = ref<MarketplaceQuery['sortBy']>(undefined)
+  const categoryId = ref<string | null>(init?.categoryId ?? null)
+  const sortBy = ref<MarketplaceQuery['sortBy']>(init?.sortBy)
   const inStockOnly = ref(false)
   const material = ref<string | null>(null)
   const lengthMin = ref<number | null>(null)
@@ -87,7 +91,9 @@ export function useMarketplace() {
   watch(() => svc.page.value, () => void load())
 
   if (!svc.categories.value.length) void svc.loadCategories()
-  if (!svc.products.value.length && !svc.loading.value) void load()
+  // Always refresh on entry: a page transition must fetch + show the
+  // skeleton instead of rendering stale service-cached products.
+  void load()
 
   const clearFilters = () => {
     search.value = ''

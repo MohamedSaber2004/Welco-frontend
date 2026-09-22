@@ -38,7 +38,7 @@ onMounted(async () => {
       <span class="crumb-active">{{ t('commerce.orderConfirmationTitle') }}</span>
     </nav>
 
-    <SkeletonLoader v-if="loading" type="card" :lines="6" height="280px" />
+    <SkeletonLoader v-if="loading" type="order-confirm" />
 
     <template v-else-if="order">
       <div class="confirm-hero-card">

@@ -12,6 +12,19 @@ const router = useRouter()
 const mobileOpen = ref(false)
 const userMenuOpen = ref(false)
 const searchQuery = ref('')
+const mobileSearchOpen = ref(false)
+const mobileSearchInput = ref<HTMLInputElement | null>(null)
+
+const toggleMobileSearch = () => {
+  mobileSearchOpen.value = !mobileSearchOpen.value
+  if (mobileSearchOpen.value) {
+    mobileOpen.value = false
+    userMenuOpen.value = false
+    setTimeout(() => {
+      mobileSearchInput.value?.focus()
+    }, 80)
+  }
+}
 
 const toggleLang = async () => {
   const next = locale.value === 'ar' ? 'en' : 'ar'
@@ -31,9 +44,10 @@ const toggleLang = async () => {
 
 const isAuthed  = computed(() => authService.isAuthenticated)
 const isAdmin   = computed(() => authService.isAdmin.value)
-const isStaff   = computed(() => authService.isWelcoStaff.value)
+const isSales   = computed(() => authService.isSales.value)
 const isBuyer   = computed(() => authService.isOrganizationUser.value)
-const isSeller  = computed(() => isAdmin.value || isStaff.value)
+const isSeller  = computed(() => isAdmin.value || isSales.value)
+const isProvider = computed(() => authService.isProvider.value)
 const user      = computed(() => authService.user.value)
 const avatarSrc = computed(() => {
   const name = user.value?.profilePictureName
@@ -55,18 +69,23 @@ const userRoleLabel = computed(() =>
 const { count: cartCount } = useCart()
 const wishlistCount = computed(() => wishlistService.count.value)
 
-const handleLogout = async () => { userMenuOpen.value = false; mobileOpen.value = false; await authService.logout() }
-const closeMobile  = () => { mobileOpen.value = false }
-const navigate     = (name: string) => { void router.push({ name }); mobileOpen.value = false }
+const handleLogout = async () => { userMenuOpen.value = false; mobileOpen.value = false; mobileSearchOpen.value = false; await authService.logout() }
+const closeMobile  = () => { mobileOpen.value = false; mobileSearchOpen.value = false }
+const navigate     = (name: string) => { void router.push({ name }); mobileOpen.value = false; mobileSearchOpen.value = false }
 const onSearch = () => {
   if (!searchQuery.value.trim()) return
   void router.push({ name: 'marketplace', query: { search: searchQuery.value.trim() } })
   searchQuery.value = ''
+  mobileOpen.value = false
+  mobileSearchOpen.value = false
 }
 
 const onClickOutside = (e: MouseEvent) => {
   const target = e.target as HTMLElement
   if (!target.closest('.header__user-wrap')) userMenuOpen.value = false
+  if (!target.closest('.header__mobile-search-bar') && !target.closest('.header__search-mobile-btn')) {
+    mobileSearchOpen.value = false
+  }
 }
 watch(avatarSrc, () => { avatarFailed.value = false })
 watch(isAuthed, (v) => { if (v) void authService.loadProfile().catch(() => {}) })
@@ -87,31 +106,47 @@ watch(isAuthed, (v) => {
   <header class="header">
     <div class="header__sweep" aria-hidden="true"></div>
     <div class="header__inner">
-      <router-link :to="isSeller && isAuthed ? '/admin' : '/'" class="logo" @click="closeMobile" :aria-label="t('nav.home')">
-        <img src="/logo.jpeg" alt="Welco" class="logo__img" width="120" height="28" loading="eager" />
-        <span class="logo__word">Welco</span>
-      </router-link>
+      <div class="header__brand">
+        <button
+          v-if="!(isSeller && isAuthed)"
+          class="header__burger"
+          :aria-label="t('nav.toggleMenu')"
+          :aria-expanded="mobileOpen"
+          type="button"
+          @click="mobileOpen = !mobileOpen; mobileSearchOpen = false"
+        >
+          <span :class="{ open: mobileOpen }"></span>
+          <span :class="{ open: mobileOpen }"></span>
+          <span :class="{ open: mobileOpen }"></span>
+        </button>
 
-      <nav v-if="!(isSeller && isAuthed)" class="menu" :aria-label="t('nav.navigation')">
+        <router-link :to="isSeller && isAuthed ? '/admin' : '/'" class="logo" @click="closeMobile" :aria-label="t('nav.home')">
+          <img src="/logo.jpeg" alt="Welco" class="logo__img" width="120" height="28" loading="eager" />
+          <span class="logo__word">Welco</span>
+        </router-link>
+      </div>
+
+      <nav v-if="!(isSeller && isAuthed)" class="navbar-menu" :aria-label="t('nav.navigation')">
         <template v-if="isBuyer && isAuthed">
-          <router-link to="/" class="menu__link">{{ t('nav.home') }}</router-link>
-          <router-link to="/marketplace" class="menu__link">{{ t('nav.marketplace') }}</router-link>
-          <router-link to="/about" class="menu__link">{{ t('nav.about') }}</router-link>
-          <router-link to="/account" class="menu__link">{{ t('nav.account') }}</router-link>
-          <router-link to="/wishlist" class="menu__link">{{ t('nav.wishlist') }}</router-link>
-          <router-link to="/help/my-tickets" class="menu__link">{{ t('help.myTickets') }}</router-link>
-          <router-link to="/help" class="menu__link">{{ t('nav.help') }}</router-link>
+          <router-link to="/" class="navbar-menu__link">{{ t('nav.home') }}</router-link>
+          <router-link to="/marketplace" class="navbar-menu__link">{{ t('nav.marketplace') }}</router-link>
+          <router-link to="/about" class="navbar-menu__link">{{ t('nav.about') }}</router-link>
+          <router-link to="/account" class="navbar-menu__link">{{ t('nav.account') }}</router-link>
+          <router-link to="/wishlist" class="navbar-menu__link">{{ t('nav.wishlist') }}</router-link>
+          <router-link to="/help/my-tickets" class="navbar-menu__link">{{ t('help.myTickets') }}</router-link>
+          <router-link to="/help" class="navbar-menu__link">{{ t('nav.help') }}</router-link>
+          <router-link v-if="isProvider" to="/provider" class="navbar-menu__link">{{ t('provider.dashboard') }}</router-link>
         </template>
         <template v-else>
-          <router-link to="/" class="menu__link">{{ t('nav.home') }}</router-link>
-          <router-link to="/marketplace" class="menu__link">{{ t('nav.marketplace') }}</router-link>
-          <router-link to="/providers" class="menu__link">{{ t('nav.providers') }}</router-link>
-          <router-link to="/about" class="menu__link">{{ t('nav.about') }}</router-link>
-          <router-link to="/certifications" class="menu__link">{{ t('nav.certifications') }}</router-link>
-          <router-link to="/help" class="menu__link">{{ t('nav.help') }}</router-link>
+          <router-link to="/" class="navbar-menu__link">{{ t('nav.home') }}</router-link>
+          <router-link to="/marketplace" class="navbar-menu__link">{{ t('nav.marketplace') }}</router-link>
+          <router-link to="/providers" class="navbar-menu__link">{{ t('nav.providers') }}</router-link>
+          <router-link to="/about" class="navbar-menu__link">{{ t('nav.about') }}</router-link>
+          <router-link to="/certifications" class="navbar-menu__link">{{ t('nav.certifications') }}</router-link>
+          <router-link to="/help" class="navbar-menu__link">{{ t('nav.help') }}</router-link>
         </template>
       </nav>
-      <div v-else class="menu" style="flex:1"></div>
+      <div v-else class="navbar-menu navbar-menu--spacer"></div>
 
       <form v-if="!(isSeller && isAuthed)" class="header__search" @submit.prevent="onSearch" role="search">
         <span class="material-symbols-outlined header__search-icon" aria-hidden="true">search</span>
@@ -120,6 +155,16 @@ watch(isAuthed, (v) => {
       </form>
 
       <div class="header__actions">
+        <button
+          v-if="!(isSeller && isAuthed)"
+          class="icon-btn header__search-mobile-btn"
+          :aria-label="t('marketplace.searchPlaceholder')"
+          type="button"
+          @click="toggleMobileSearch"
+        >
+          <span class="material-symbols-outlined" style="font-size:18px">search</span>
+        </button>
+
         <router-link v-if="isAuthed && !isSeller" to="/wishlist" class="icon-btn" :aria-label="t('nav.wishlist')" :title="t('nav.wishlist')">
           <span class="material-symbols-outlined" style="font-size:18px">favorite</span>
           <span v-if="wishlistCount > 0" class="icon-btn__badge">{{ wishlistCount > 9 ? '9+' : wishlistCount }}</span>
@@ -130,19 +175,20 @@ watch(isAuthed, (v) => {
         </router-link>
 
         <button class="icon-btn lang-btn" :aria-label="locale === 'ar' ? 'English' : 'العربية'" :title="locale === 'ar' ? 'Switch to English' : 'التحويل إلى العربية'" @click="toggleLang">
-          <span class="lang-btn__text mono">{{ locale === 'ar' ? 'EN' : 'عربي' }}</span>
+          <span class="material-symbols-outlined" style="font-size:18px" aria-hidden="true">language</span>
+          <span class="lang-btn__text">{{ locale === 'ar' ? 'EN' : 'عربي' }}</span>
         </button>
 
         <template v-if="isAuthed">
           <div class="header__user-wrap">
             <button class="header__user" type="button" @click.stop="userMenuOpen = !userMenuOpen" :aria-expanded="userMenuOpen">
-              <span class="header__avatar" :style="{ background: user?.tint || '#69a9ff' }">
+              <span class="header__avatar" :style="{ background: user?.tint || '#0F3D56' }">
                 <img v-if="hasAvatar" :src="avatarSrc" :alt="user?.fullName ?? ''" class="header__avatar-img" @error="avatarFailed = true; markBrokenUrl(avatarSrc)" />
                 <span v-else class="header__avatar-fallback">{{ avatarInitials }}</span>
               </span>
               <span class="header__user-text">
                 <span class="header__user-name">{{ user?.fullName }}</span>
-                <span class="header__user-role mono">{{ isSeller ? (isAdmin ? t('admin.roleAdmin') : t('admin.welcoStaff')) : userRoleLabel }}</span>
+                <span class="header__user-role mono">{{ isSeller ? (isAdmin ? t('admin.roleAdmin') : t('admin.roleSales')) : userRoleLabel }}</span>
               </span>
             </button>
             <Transition name="drop">
@@ -189,12 +235,29 @@ watch(isAuthed, (v) => {
             <span class="material-symbols-outlined" style="font-size:18px">person</span>
           </button>
         </template>
-
-        <button v-if="!(isSeller && isAuthed)" class="header__burger" :aria-label="t('nav.toggleMenu')" :aria-expanded="mobileOpen" type="button" @click="mobileOpen = !mobileOpen">
-          <span :class="{ open: mobileOpen }"></span><span :class="{ open: mobileOpen }"></span><span :class="{ open: mobileOpen }"></span>
-        </button>
       </div>
     </div>
+
+    <!-- Mobile Expandable Search Bar -->
+    <Transition name="search-slide">
+      <div v-if="mobileSearchOpen" class="header__mobile-search-bar">
+        <form class="header__mobile-search-form" @submit.prevent="onSearch" role="search">
+          <span class="material-symbols-outlined" style="font-size:18px;color:var(--fg-muted)">search</span>
+          <input
+            ref="mobileSearchInput"
+            v-model="searchQuery"
+            :placeholder="t('marketplace.searchPlaceholder')"
+            :aria-label="t('marketplace.searchPlaceholder')"
+          />
+          <button v-if="searchQuery" type="button" class="search-clear-btn" @click="searchQuery = ''" aria-label="Clear">
+            <span class="material-symbols-outlined" style="font-size:16px">close</span>
+          </button>
+          <button type="submit" class="btn btn-primary btn-sm search-submit-btn">
+            {{ locale === 'ar' ? 'بحث' : 'Search' }}
+          </button>
+        </form>
+      </div>
+    </Transition>
 
     <Transition name="drawer">
       <nav v-if="mobileOpen" class="header__drawer" aria-label="Mobile">
@@ -208,6 +271,7 @@ watch(isAuthed, (v) => {
           <router-link to="/cart" class="header__drawer-link" @click="closeMobile">{{ t('nav.cart') }}</router-link>
           <router-link to="/help/my-tickets" class="header__drawer-link" @click="closeMobile">{{ t('help.myTickets') }}</router-link>
           <router-link to="/help" class="header__drawer-link" @click="closeMobile">{{ t('nav.help') }}</router-link>
+          <router-link v-if="isProvider" to="/provider" class="header__drawer-link" @click="closeMobile">{{ t('provider.dashboard') }}</router-link>
         </template>
         <template v-else>
           <router-link to="/" class="header__drawer-link" @click="closeMobile">{{ t('nav.home') }}</router-link>
@@ -234,24 +298,13 @@ watch(isAuthed, (v) => {
 .header {
   position: sticky;
   top: 0;
-  z-index: 100;
-  background-color: var(--wl-header-bg);
-  background-image: var(--wl-header-gradient);
-  backdrop-filter: blur(16px) saturate(1.4);
-  -webkit-backdrop-filter: blur(16px) saturate(1.4);
-  border-bottom: 1px solid var(--wl-header-border);
+  z-index: var(--z-sticky);
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
   padding-inline-start: env(safe-area-inset-left, 0px);
   padding-inline-end: env(safe-area-inset-right, 0px);
 }
-.header__sweep {
-  position: absolute;
-  bottom: 0;
-  inset-inline: 0;
-  height: 1px;
-  background: var(--wl-laser-sweep);
-  opacity: 0.35;
-  transition: opacity 0.3s ease;
-}
+.header__sweep { display: none; }
 .header__inner {
   max-width: var(--wl-max-width);
   margin: 0 auto;
@@ -268,6 +321,13 @@ watch(isAuthed, (v) => {
   width: 100%;
   direction: inherit;
 }
+.header__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+  min-width: 0;
+}
 .logo {
   display: inline-flex;
   align-items: center;
@@ -277,49 +337,65 @@ watch(isAuthed, (v) => {
 }
 .logo__img { height: 26px; width: auto; border-radius: 6px; max-width: none; }
 .logo__word {
-  font-family: var(--wl-font-display);
-  font-weight: 800;
-  font-size: 16px;
-  letter-spacing: -0.025em;
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-xl);
+  letter-spacing: var(--tracking-tight);
   white-space: nowrap;
-  background: var(--wl-gradient-gold);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  filter: drop-shadow(0 1px 6px rgba(233, 168, 37, 0.3)) var(--wl-gold-text-shadow);
+  color: var(--fg-heading);
 }
-.menu { display: flex; gap: 0.2rem; flex: 1; align-items: center; min-width: 0; overflow: hidden; }
-.menu__link {
-  padding: 0.4rem 0.7rem;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--wl-ink-soft);
+.navbar-menu {
+  display: flex;
+  gap: var(--space-1);
+  flex: 0 1 auto;
+  align-items: center;
+  justify-content: flex-start;
+  min-width: 0;
+  max-width: 100%;
+  margin-inline: auto;
+  padding: 3px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md, 6px);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.navbar-menu:empty, .navbar-menu--spacer:empty { display: none; }
+.navbar-menu::-webkit-scrollbar { display: none; }
+.navbar-menu__link {
+  flex-shrink: 0;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-md);
+  font-weight: var(--weight-medium);
+  color: var(--fg-muted);
   text-decoration: none;
-  border-radius: 8px;
-  transition: all 0.12s ease;
+  border-radius: var(--radius-sm, 4px);
+  transition: background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
   white-space: nowrap;
 }
-.menu__link:hover { color: var(--wl-ink-strong); background: var(--wl-surface-soft); }
-.menu__link.router-link-active { color: var(--wl-gold); background: var(--wl-gold-soft); font-weight: 600; text-shadow: var(--wl-gold-text-shadow); }
+.navbar-menu__link:hover { color: var(--brand); background: var(--bg-hover); text-decoration: none; }
+.navbar-menu__link.router-link-active { color: var(--fg-on-brand); background: var(--brand); font-weight: var(--weight-medium); box-shadow: var(--shadow-brand); }
 .header__search {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: var(--wl-surface-soft);
-  border: 1px solid var(--wl-border);
-  border-radius: 8px;
+  background: var(--bg-app);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm, 4px);
   padding: 0 0.6rem 0 0.7rem;
   height: 38px;
   max-height: 38px;
   min-width: var(--wl-header-search-min, 170px);
   max-width: var(--wl-header-search-max, 230px);
   flex-shrink: 1;
-  transition: border-color 0.12s, box-shadow 0.12s;
+  transition: border-color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
   overflow: hidden;
 }
-.header__search:focus-within { border-color: var(--wl-primary); box-shadow: var(--wl-focus-ring); background: var(--wl-surface); }
+.header__search:focus-within { border-color: var(--border-focus); box-shadow: var(--ring-focus); background: var(--bg-surface); }
 .header__search-icon { font-size: 18px; color: var(--wl-muted); flex-shrink: 0; }
-.header__search input { flex: 1; min-width: 0; min-height: 0; height: 100%; border: none; background: transparent; outline: none; font-size: 13px; color: var(--wl-ink); }
+.header__search input { flex: 1; min-width: 0; min-height: 0; height: 100%; border: none; background: transparent; outline: none; font-size: 13px; color: var(--wl-ink); font-family: var(--font-body); }
 .header__search input::placeholder { color: var(--wl-muted); }
 [dir="rtl"] .header__search input { direction: rtl; text-align: right; }
 .header__search-kbd {
@@ -327,7 +403,8 @@ watch(isAuthed, (v) => {
   border: 1px solid var(--wl-border);
   border-bottom-width: 2px;
   padding: 0.1rem 0.35rem;
-  border-radius: 6px;
+  border-radius: var(--radius-xs, 3px);
+  font-family: var(--font-mono, monospace);
   font-size: 10px;
   color: var(--wl-muted);
   flex-shrink: 0;
@@ -335,44 +412,62 @@ watch(isAuthed, (v) => {
 .header__actions {
   display: flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: var(--space-2);
   flex-shrink: 0;
+  margin: 0;
   margin-inline-start: auto;
-  direction: ltr;
+}
+.header__actions > * {
+  margin: 0;
+  flex-shrink: 0;
 }
 .header__auth-desktop {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: var(--space-2);
+  margin: 0;
+  flex-shrink: 0;
+}
+.header__auth-desktop .btn {
+  min-height: 40px;
+  margin: 0;
+  flex-shrink: 0;
 }
 /* NOTE: higher specificity than .icon-btn (which sets display:grid later in
- * this file) so the mobile-only person button stays hidden on desktop. */
-.icon-btn.header__auth-mobile {
+ * this file) so the mobile-only buttons stay hidden on desktop. */
+.icon-btn.header__auth-mobile,
+.icon-btn.header__search-mobile-btn {
   display: none;
 }
 .icon-btn {
-  width: 36px;
-  height: 36px;
-  min-width: 36px;
-  min-height: 36px;
-  border: 1px solid var(--wl-border);
-  background: var(--wl-surface);
-  color: var(--wl-ink-soft);
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+  border: 0;
+  background: transparent;
+  color: var(--fg-muted);
   display: grid;
   place-items: center;
-  border-radius: 8px;
+  border-radius: var(--radius-pill);
   cursor: pointer;
   position: relative;
-  transition: all 0.12s ease;
+  transition: background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
   flex-shrink: 0;
 }
-.icon-btn:hover { border-color: var(--wl-primary); color: var(--wl-primary); background: var(--wl-primary-soft); }
-.icon-btn:focus-visible { outline: none; box-shadow: var(--wl-focus-ring); border-color: var(--wl-primary); }
-.icon-btn:active { transform: scale(0.94); }
+.icon-btn:hover { background: var(--bg-subtle); color: var(--fg-heading); }
+.icon-btn:focus-visible { outline: none; box-shadow: var(--ring-focus); }
+.icon-btn:active { transform: translateY(1px); }
 .lang-btn {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: auto;
+  min-width: 40px;
+  padding-inline: var(--space-3);
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  font-weight: var(--weight-medium);
 }
 .lang-btn__text {
   display: inline-block;
@@ -404,7 +499,7 @@ watch(isAuthed, (v) => {
   font-weight: 600;
   font-size: 13px;
   padding: 8px 14px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm, 4px);
   border: 1px solid transparent;
   cursor: pointer;
   display: inline-flex;
@@ -414,8 +509,8 @@ watch(isAuthed, (v) => {
   white-space: nowrap;
   flex-shrink: 0;
 }
-.btn-primary { background-color: var(--wl-primary); background-image: var(--wl-gradient-primary); color: var(--wl-on-primary); border-color: var(--wl-primary-soft); }
-.btn-primary:hover { background: var(--wl-primary-hover); }
+.btn-primary { background: var(--brand); color: var(--fg-on-brand); border-color: var(--brand); box-shadow: var(--shadow-brand); }
+.btn-primary:hover { background: var(--brand-hover); color: var(--fg-on-brand); }
 .btn-ghost { background: var(--wl-surface); color: var(--wl-ink-strong); border-color: var(--wl-border); }
 .btn-ghost:hover { background: var(--wl-surface-soft); }
 .btn-sm { padding: 6px 12px; font-size: 12.5px; }
@@ -423,14 +518,16 @@ watch(isAuthed, (v) => {
 .header__user {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.25rem 0.6rem 0.25rem 0.25rem;
-  border: 1px solid var(--wl-border);
-  background: var(--wl-surface);
-  border-radius: var(--radius-full);
+  gap: var(--space-3);
+  padding: var(--space-1) var(--space-2);
+  border: 0;
+  background: transparent;
+  border-radius: var(--radius-pill);
   cursor: pointer;
   max-width: 180px;
+  text-align: start;
 }
+.header__user:hover { background: var(--bg-subtle); }
 .header__avatar {
   width: 28px;
   height: 28px;
@@ -446,21 +543,22 @@ watch(isAuthed, (v) => {
 .header__avatar-img { width: 100%; height: 100%; object-fit: cover; }
 .header__avatar-fallback { width: 100%; height: 100%; display: grid; place-items: center; font-size: 0.7rem; font-weight: 700; }
 .header__user-text { display: flex; flex-direction: column; align-items: flex-start; line-height: 1; min-width: 0; }
-.header__user-name { font-size: 0.8rem; font-weight: 600; color: var(--wl-ink-strong); max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.header__user-role { font-size: 10px; color: var(--wl-muted); }
+.header__user-name { font-size: var(--text-md); font-weight: var(--weight-semibold); color: var(--fg-heading); max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.3; }
+.header__user-role { font-size: var(--text-xs); color: var(--fg-muted); }
 .header__dropdown {
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + var(--space-2));
   right: 0;
   left: auto;
-  min-width: 220px;
+  min-width: 200px;
   max-width: calc(100vw - 1.5rem);
-  background: var(--wl-surface);
-  border: 1px solid var(--wl-border);
+  padding: var(--space-2);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-lg);
   overflow: hidden;
-  z-index: 120;
+  z-index: var(--z-dropdown);
 }
 [dir="rtl"] .header__dropdown {
   direction: rtl;
@@ -476,55 +574,76 @@ watch(isAuthed, (v) => {
 .header__dropdown-item {
   display: flex;
   align-items: center;
+  gap: var(--space-3);
   width: 100%;
-  padding: 0.65rem 1rem;
+  padding: var(--space-3);
   background: none;
-  border: none;
-  color: var(--wl-ink);
-  font-size: 0.85rem;
+  border: 0;
+  border-radius: var(--radius-sm);
+  color: var(--fg-body);
+  font-size: var(--text-md);
   cursor: pointer;
   text-decoration: none;
   min-height: 44px;
+  text-align: start;
 }
-[dir="rtl"] .header__dropdown-item { text-align: right; justify-content: flex-start; }
-[dir="ltr"] .header__dropdown-item { text-align: left; justify-content: flex-start; }
-.header__dropdown-item:hover { background: var(--wl-surface-soft); }
-.header__dropdown-item--danger { color: var(--wl-danger); border-top: 1px solid var(--wl-border); }
+.header__dropdown-item:hover { background: var(--bg-app); color: var(--fg-heading); text-decoration: none; }
+.header__dropdown-item--danger { color: var(--fg-danger); }
 .header__burger {
   display: none;
   flex-direction: column;
-  gap: 3px;
-  background: var(--wl-surface);
-  border: 1px solid var(--wl-border);
+  gap: 4px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
   cursor: pointer;
   padding: 8px;
-  border-radius: 8px;
-  min-width: 36px;
-  min-height: 36px;
+  border-radius: var(--radius-md);
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  transition: background var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out);
 }
-.header__burger span { width: 16px; height: 2px; background: var(--wl-ink-strong); border-radius: 999px; transition: all 0.15s ease; display: block; }
-.header__burger span.open:nth-child(1) { transform: translateY(5px) rotate(45deg); }
-.header__burger span.open:nth-child(2) { opacity: 0; }
-.header__burger span.open:nth-child(3) { transform: translateY(-5px) rotate(-45deg); }
+.header__burger:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-strong);
+}
+.header__burger span {
+  width: 18px;
+  height: 2px;
+  background: var(--fg-heading);
+  border-radius: 999px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: block;
+}
+.header__burger span.open:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.header__burger span.open:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.header__burger span.open:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
 .header__drawer { display: none; }
 @media (max-width: 1360px) {
   .header__inner { padding: 0 1.1rem; }
   .header__search { min-width: var(--wl-header-search-min, 170px); max-width: var(--wl-header-search-max, 230px); }
   .header__search-kbd { display: none; }
-  .menu__link { padding: 0.4rem 0.55rem; font-size: 12.5px; }
+  .navbar-menu__link { padding: var(--space-2) var(--space-2); font-size: var(--text-sm); }
 }
 @media (max-width: 1180px) {
   .header__search { min-width: 160px; max-width: 210px; }
-  .menu__link { padding: 0.4rem 0.5rem; font-size: 12.5px; }
+  .navbar-menu { gap: 0; }
+  .navbar-menu__link { padding: var(--space-2) var(--space-2); font-size: var(--text-sm); }
   .header__actions { gap: 0.35rem; }
 }
 @media (max-width: 1024px) {
   .header__search { display: none; }
-  .menu { display: none; }
-  .header__burger { display: flex; }
+  .navbar-menu { display: none; }
+  .header__burger { display: inline-flex; }
+  .icon-btn.header__search-mobile-btn { display: inline-grid; }
+  .header__actions {
+    gap: 0.35rem;
+    margin-inline-start: auto;
+  }
   .header__drawer {
     display: flex;
     flex-direction: column;
@@ -551,7 +670,8 @@ watch(isAuthed, (v) => {
     font-size: 14px;
     min-height: 44px;
   }
-  .header__drawer-link:hover, .header__drawer-link.router-link-active { background: var(--wl-surface-soft); color: var(--wl-ink-strong); }
+  .header__drawer-link:hover { background: var(--bg-hover); color: var(--brand); }
+  .header__drawer-link.router-link-active { background: var(--brand); color: var(--fg-on-brand); box-shadow: var(--shadow-brand); }
   .header__drawer-footer {
     display: flex;
     gap: 0.5rem;
@@ -581,6 +701,70 @@ watch(isAuthed, (v) => {
     color: var(--wl-primary);
   }
 }
+.header__mobile-search-bar {
+  padding: 0.55rem var(--wl-gutter, 1rem);
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+.header__mobile-search-form {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--bg-app);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.35rem 0.6rem;
+  transition: border-color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
+}
+.header__mobile-search-form:focus-within {
+  border-color: var(--border-focus);
+  box-shadow: var(--ring-focus);
+}
+.header__mobile-search-form input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 14px;
+  color: var(--fg-body);
+}
+.header__mobile-search-form input::placeholder {
+  color: var(--fg-muted);
+}
+[dir="rtl"] .header__mobile-search-form input {
+  direction: rtl;
+  text-align: right;
+}
+.search-clear-btn {
+  border: none;
+  background: transparent;
+  color: var(--fg-muted);
+  cursor: pointer;
+  padding: 4px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+}
+.search-clear-btn:hover {
+  color: var(--fg-heading);
+}
+.search-submit-btn {
+  flex-shrink: 0;
+  padding: 4px 12px;
+  font-size: 12px;
+  min-height: 32px;
+}
+.search-slide-enter-active, .search-slide-leave-active {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+.search-slide-enter-from, .search-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
 @media (max-width: 768px) {
   .header__auth-desktop { display: none; }
   .icon-btn.header__auth-mobile { display: inline-grid; }
@@ -589,30 +773,43 @@ watch(isAuthed, (v) => {
   .header__inner { gap: 0.5rem; }
   .header__user-text { display: none; }
   .header__user { padding: 0.2rem; border-radius: 50%; }
-  .header__dropdown { min-width: 200px; max-width: calc(100vw - 1rem); right: 0; left: auto; }
-  .header__actions { gap: 0.35rem; }
+  .header__dropdown { min-width: 200px; max-width: calc(100vw - 1rem); inset-inline-end: 0; inset-inline-start: auto; }
+  .header__actions { gap: 0.25rem; }
 }
 @media (max-width: 480px) {
-  .header__inner { gap: 0.35rem; }
+  .header__inner {
+    padding-inline: 0.65rem;
+    gap: 0.35rem;
+  }
+  .header__brand { gap: 0.35rem; }
   .logo__word { display: none; }
   .logo__img { height: 24px; }
-  .header__actions { gap: 0.25rem; }
-  /* Keep ≥40px touch targets (WCAG 2.5.8 + 44px ergonomic baseline). */
+  .header__actions { gap: 0.2rem; }
+  .lang-btn {
+    padding-inline: 0.4rem;
+    min-width: 36px;
+  }
+  .lang-btn .material-symbols-outlined { font-size: 16px; }
+  .lang-btn__text { font-size: 11px; }
   .icon-btn, .header__burger {
-    width: 40px;
-    height: 40px;
-    min-width: 40px;
-    min-height: 40px;
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    min-height: 38px;
   }
 }
 @media (max-width: 360px) {
-  .header__inner { gap: 0.25rem; }
-  .header__actions { gap: 0.2rem; }
+  .header__inner {
+    padding-inline: 0.45rem;
+    gap: 0.2rem;
+  }
+  .header__brand { gap: 0.25rem; }
+  .header__actions { gap: 0.15rem; }
   .icon-btn, .header__burger {
-    width: 40px;
-    height: 40px;
-    min-width: 40px;
-    min-height: 40px;
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    min-height: 34px;
   }
 }
 .drop-enter-active, .drop-leave-active { transition: all 0.15s ease; }

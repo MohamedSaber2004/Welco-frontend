@@ -1,13 +1,2 @@
-  - vite:vue transform (40%, 3.2s, 218 calls)
-Those rows are 40% of the build; the rest of the 84% is below.
-Not measurable — 1 hook whose calls overlap, so elapsed time covers work other calls were doing. Profile with `node --cpu-prof`:
-  - vite:css transform (72 calls)
-See https://rolldown.rs/reference/InputOptions.checks#plugintimings for more details.
-src/components/ui/FileUpload.vue(127,5): error TS2304: Cannot find name 'hasError'.
-src/components/ui/FileUpload.vue(128,5): error TS2304: Cannot find name 'isLoaded'.
-src/components/ui/FileUpload.vue(235,28): error TS2532: Object is possibly 'undefined'.
-src/components/ui/FileUpload.vue(235,53): error TS2532: Object is possibly 'undefined'.
-src/components/ui/FileUpload.vue(303,19): error TS2345: Argument of type '"attachment.edit"' is not assignable to parameter of type '"common.of" | "common.pcs" | "common.more" | "common.loading" | "common.success" | "common.error" | "common.notice" | "common.ok" | "common.operationDone" | "common.networkError" | ... 1574 more ... | "providers.clinic"'.
-src/components/ui/GlobalLoader.vue(173,70): error TS2345: Argument of type '"dismiss"' is not assignable to parameter of type '"complete"'.
-ERROR: "type-check" exited with 2.
-Error: Command "npm run build" exited with 1
+:56304/api/v1/user-management/companies/directory?pageNumber=1&pageSize=8:1  Failed to load resource: the server responded with a status of 401 (Unauthorized)
+:56304/api/v1/user-management/companies?pageNumber=1&pageSize=8:1  Failed to load resource: the server responded with a status of 401 (Unauthorized)

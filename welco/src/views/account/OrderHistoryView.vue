@@ -19,8 +19,13 @@ const statusFilter = ref('')
 const localPage = ref(1)
 const pageSize = 10
 
-const loadData = () => {
-  void commerceService.loadOrders({ page: 1, pageSize: 50 })
+const pageLoading = ref(true)
+const loadData = async () => {
+  try {
+    await commerceService.loadOrders({ page: 1, pageSize: 50 })
+  } finally {
+    pageLoading.value = false
+  }
 }
 
 const filteredOrders = computed(() => {
@@ -127,8 +132,8 @@ onMounted(() => {
 
     <!-- Table or DataState -->
     <DataState
-      :loading="commerceService.loading.value"
-      :empty="!filteredOrders.length && !commerceService.loading.value"
+      :loading="pageLoading || commerceService.loading.value"
+      :empty="!filteredOrders.length && !pageLoading && !commerceService.loading.value"
       :empty-title="searchQuery || statusFilter ? t('common.noResults') : t('commerce.noOrders')"
       :empty-description="searchQuery || statusFilter ? t('common.searchResults') : t('commerce.noOrdersDesc')"
       :empty-variant="searchQuery || statusFilter ? 'search' : 'default'"
@@ -411,9 +416,9 @@ onMounted(() => {
 }
 
 .search-input:focus {
-  border-color: #69a9ff;
-  box-shadow: 0 0 0 3px rgba(105, 169, 255, 0.12);
-  background: var(--wl-surface);
+  border-color: var(--border-focus);
+  box-shadow: var(--ring-focus);
+  background: var(--bg-surface);
 }
 
 .clear-btn {
@@ -444,7 +449,7 @@ onMounted(() => {
   transition: border-color 0.15s;
 }
 
-.filter-select:focus { border-color: #69a9ff; }
+.filter-select:focus { border-color: var(--border-focus); box-shadow: var(--ring-focus); }
 
 .clear-filters-btn {
   display: inline-flex;
@@ -452,8 +457,8 @@ onMounted(() => {
   gap: 0.3rem;
   height: 38px;
   padding: 0 0.85rem;
-  border: 1px solid #FCA5A5;
-  border-radius: 10px;
+  border: 1px solid var(--color-danger-100, #FFDAD6);
+  border-radius: var(--radius-sm, 4px);
   font-size: 12px;
   font-weight: 700;
   color: var(--wl-danger);

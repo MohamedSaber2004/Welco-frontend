@@ -4,7 +4,8 @@ import { CompanyStatus, type CompanyDto } from './company'
 export enum BusinessRole {
   Admin = 'Admin',
   Provider = 'Provider',
-  WelcoStaff = 'WelcoStaff',
+  Sales = 'Sales',
+  Client = 'Client',
 }
 
 export const DistributorBusinessRole = BusinessRole.Provider
@@ -26,15 +27,15 @@ export function isAdminContext(ctx: BusinessRoleContext): boolean {
   return roleList(ctx).includes('admin') || ctx.userType === UserType.Admin || ctx.userType === 1
 }
 
-export function isStaffRole(role: string | null | undefined): boolean {
+export function isSalesRole(role: string | null | undefined): boolean {
   if (typeof role !== 'string') return false
   const n = role.trim().toLowerCase()
-  return n === 'welcostaff' || n === 'snulstaff'
+  return n === 'welcostaff' || n === 'snulstaff' || n === 'sales'
 }
 
-export function isStaffContext(ctx: BusinessRoleContext): boolean {
+export function isSalesContext(ctx: BusinessRoleContext): boolean {
   return (
-    roleList(ctx).some((r) => isStaffRole(r)) ||
+    roleList(ctx).some((r) => isSalesRole(r)) ||
     ctx.userType === UserType.WelcoStaff ||
     ctx.userType === 3
   )
@@ -48,13 +49,15 @@ export function isOrganizationUserContext(ctx: BusinessRoleContext): boolean {
   )
 }
 
-export function isCustomerTypeContext(_ctx: BusinessRoleContext): boolean {
-  return false
+export function isClientContext(ctx: BusinessRoleContext): boolean {
+  if (!isOrganizationUserContext(ctx)) return false
+  return !ctx.companyId && !ctx.company
 }
 
 export function isProviderContext(ctx: BusinessRoleContext): boolean {
-  if (isAdminContext(ctx) || isStaffContext(ctx)) return false
-  return isOrganizationUserContext(ctx)
+  if (isAdminContext(ctx) || isSalesContext(ctx)) return false
+  if (!isOrganizationUserContext(ctx)) return false
+  return !!(ctx.companyId || ctx.company)
 }
 
 export const isDistributorContext = isProviderContext
@@ -65,21 +68,24 @@ export function isCustomerContext(_ctx: BusinessRoleContext): boolean {
 
 export function resolveBusinessRole(ctx: BusinessRoleContext): BusinessRole {
   if (isAdminContext(ctx)) return BusinessRole.Admin
-  if (isStaffContext(ctx)) return BusinessRole.WelcoStaff
-  return BusinessRole.Provider
+  if (isSalesContext(ctx)) return BusinessRole.Sales
+  if (isProviderContext(ctx)) return BusinessRole.Provider
+  return BusinessRole.Client
 }
 
-export type BusinessRoleKey = 'roleAdmin' | 'roleWelcoStaff' | 'roleProvider'
+export type BusinessRoleKey = 'roleAdmin' | 'roleSales' | 'roleProvider' | 'roleClient'
 
 export function businessRoleKey(role: BusinessRole): BusinessRoleKey {
   switch (role) {
     case BusinessRole.Admin:
       return 'roleAdmin'
-    case BusinessRole.WelcoStaff:
-      return 'roleWelcoStaff'
+    case BusinessRole.Sales:
+      return 'roleSales'
     case BusinessRole.Provider:
-    default:
       return 'roleProvider'
+    case BusinessRole.Client:
+    default:
+      return 'roleClient'
   }
 }
 
@@ -91,17 +97,15 @@ export function isProviderCompany(company?: CompanyDto | null): boolean {
   return !!company?.id
 }
 
-
 export function resolveProviderCompany(ctx: BusinessRoleContext): CompanyDto | null {
-  if (isAdminContext(ctx) || isStaffContext(ctx)) return null
+  if (isAdminContext(ctx) || isSalesContext(ctx)) return null
   if (!isOrganizationUserContext(ctx)) return null
   return ctx.company ?? null
 }
 
 export function canAccessB2B(ctx: BusinessRoleContext): boolean {
-  if (isAdminContext(ctx) || isStaffContext(ctx)) return true
+  if (isAdminContext(ctx) || isSalesContext(ctx)) return true
   if (!isProviderContext(ctx)) return false
   if (ctx.company) return isApprovedStatus(ctx.company.status)
-
   return true
 }

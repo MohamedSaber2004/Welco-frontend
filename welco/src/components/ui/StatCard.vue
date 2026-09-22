@@ -71,10 +71,10 @@ const sparkPath = computed(() => {
 })
 
 const strokeColor = computed(() => {
-  if (props.tone === 'emerald' || (props.trend && isPositive.value)) return 'var(--wl-success)'
-  if (props.tone === 'rose' || (props.trend && isNegative.value)) return 'var(--wl-danger)'
-  if (props.tone === 'amber') return 'var(--wl-warning)'
-  return 'var(--wl-primary)'
+  if (props.tone === 'emerald' || (props.trend && isPositive.value)) return 'var(--fg-success)'
+  if (props.tone === 'rose' || (props.trend && isNegative.value)) return 'var(--fg-danger)'
+  if (props.tone === 'amber') return 'var(--fg-warning)'
+  return 'var(--brand)'
 })
 </script>
 
@@ -134,40 +134,22 @@ const strokeColor = computed(() => {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 0.75rem;
-  padding: 1.15rem 1.25rem;
-  background: var(--wl-gradient-card, var(--wl-surface));
-  border: 1px solid var(--wl-border);
-  border-radius: 12px;
-  box-shadow: var(--wl-shadow-card);
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-4);
+  background: var(--stat-bg, var(--bg-subtle));
+  border: 1px solid transparent;
+  border-radius: var(--radius-lg);
+  box-shadow: none;
   text-decoration: none;
   color: inherit;
   position: relative;
   overflow: hidden;
-  transition: border-color 0.16s ease, transform 0.16s ease, box-shadow 0.16s ease;
-}
-
-/* Precision Hairline Laser Accent (Signature) */
-.stat-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  inset-inline: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--wl-primary), transparent);
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  pointer-events: none;
+  transition: border-color var(--duration-base) var(--ease-out), box-shadow var(--duration-base) var(--ease-out);
 }
 
 .stat-card.is-interactive:hover {
-  border-color: rgba(var(--wl-primary-rgb), 0.28);
+  border-color: var(--border-strong);
   box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
-}
-
-.stat-card.is-interactive:hover::before {
-  opacity: 1;
 }
 
 .stat-card__header {
@@ -178,11 +160,9 @@ const strokeColor = computed(() => {
 }
 
 .stat-card__label {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--wl-muted);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--fg-body);
 }
 
 .stat-card__top-right {
@@ -195,31 +175,31 @@ const strokeColor = computed(() => {
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  font-size: 10.5px;
-  font-weight: 600;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
   line-height: 1;
   padding: 0.2rem 0.48rem;
-  border-radius: 9999px;
+  border-radius: var(--radius-pill);
   font-variant-numeric: tabular-nums;
   border: 1px solid transparent;
 }
 
 .trend--positive {
-  background: var(--wl-success-soft);
-  color: var(--wl-success);
-  border-color: var(--wl-success-soft);
+  background: var(--color-success-100);
+  color: var(--fg-success);
+  border-color: var(--color-success-100);
 }
 
 .trend--negative {
-  background: var(--wl-danger-soft);
-  color: var(--wl-danger);
-  border-color: var(--wl-danger-soft);
+  background: var(--color-danger-100);
+  color: var(--fg-danger);
+  border-color: var(--color-danger-100);
 }
 
 .trend--neutral {
-  background: var(--wl-surface-soft);
-  color: var(--wl-muted);
-  border-color: var(--wl-border);
+  background: var(--bg-subtle);
+  color: var(--fg-muted);
+  border-color: var(--border);
 }
 
 .trend__icon {
@@ -230,8 +210,12 @@ const strokeColor = computed(() => {
 .stat-card__icon-wrap {
   display: grid;
   place-items: center;
-  color: var(--wl-muted);
-  font-size: 18px;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-pill);
+  background: var(--stat-fg, var(--brand));
+  color: #fff;
+  font-size: 16px;
 }
 
 .stat-card__main {
@@ -248,17 +232,17 @@ const strokeColor = computed(() => {
 }
 
 .stat-card__value {
-  font-family: var(--wl-font-display);
-  font-size: 1.65rem;
-  font-weight: 700;
-  letter-spacing: -0.025em;
-  line-height: 1.05;
-  color: var(--wl-ink-strong);
+  font-family: var(--font-sans);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-tight);
+  line-height: var(--leading-tight);
+  color: var(--fg-heading);
 }
 
 .stat-card__hint {
-  font-size: 0.75rem;
-  color: var(--wl-muted);
+  font-size: var(--text-sm);
+  color: var(--fg-muted);
 }
 
 .stat-card__spark-box {
@@ -280,20 +264,11 @@ const strokeColor = computed(() => {
   overflow: visible;
 }
 
-/* Tone customizations — yellow-degree value with shadow for dashboard metrics */
-.stat-card--emerald .stat-card__value { color: var(--wl-success); }
-.stat-card--rose .stat-card__value { color: var(--wl-danger); }
-.stat-card--amber .stat-card__value {
-  color: var(--wl-gold-text);
-  text-shadow: var(--wl-gold-text-shadow);
-}
-.stat-card--gold .stat-card__value {
-  color: var(--wl-gold-text);
-  text-shadow: var(--wl-gold-text-shadow);
-}
-.stat-card--gold {
-  border-color: var(--wl-gold-soft) !important;
-  box-shadow: var(--wl-gold-glow-soft), var(--wl-shadow-card) !important;
-}
-.stat-card--indigo .stat-card__value { color: var(--wl-ink-strong); }
+/* Tone tints — Clinical Precision stat tiles */
+.stat-card--rose { --stat-bg: var(--color-rose-100); --stat-fg: var(--color-rose-500); }
+.stat-card--orange, .stat-card--amber, .stat-card--gold { --stat-bg: var(--color-orange-100); --stat-fg: var(--color-orange-500); }
+.stat-card--emerald, .stat-card--teal { --stat-bg: var(--color-green-100); --stat-fg: var(--color-green-500); }
+.stat-card--violet { --stat-bg: var(--color-violet-100); --stat-fg: var(--color-violet-500); }
+.stat-card--indigo, .stat-card--brand { --stat-bg: var(--brand-soft); --stat-fg: var(--brand); }
+.stat-card--slate, .stat-card--obsidian { --stat-bg: var(--bg-subtle); --stat-fg: var(--fg-muted); }
 </style>

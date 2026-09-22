@@ -6,6 +6,7 @@ import { services } from '../../di/container'
 import type { ProductDto } from '../../domain/models/marketplace'
 import { useCart } from '../../composables/useCart'
 import { useWishlist } from '../../composables/useWishlist'
+import type { CompanyDto } from '../../domain/models/company'
 import { toastService } from '../../infrastructure/feedback/toast.service'
 import SkeletonLoader from '../../components/ui/SkeletonLoader.vue'
 import DataState from '../../components/ui/DataState.vue'
@@ -27,6 +28,31 @@ const inspectModalOpen = ref(false)
 const qty = ref(1)
 const related = ref<ProductDto[]>([])
 const activeTab = ref<'specs' | 'videos'>('specs')
+
+/* Providers offering this same SKU (any of their listings). */
+const offeredBy = ref<{ company: CompanyDto; listing: ProductDto }[]>([])
+const offeredLoading = ref(false)
+const isCurrentListing = (listingId: string): boolean => listingId === product.value?.id
+const loadOfferedBy = async () => {
+  const sku = product.value?.sku?.trim()
+  if (!sku) {
+    offeredBy.value = []
+    return
+  }
+  offeredLoading.value = true
+  try {
+    const list = await services.marketplaceRepository.getSkuProviders(sku)
+    const clean: { company: CompanyDto; listing: ProductDto }[] = []
+    for (const e of list || []) {
+      if (e && e.company && e.listing) clean.push({ company: e.company, listing: e.listing })
+    }
+    offeredBy.value = clean
+  } catch {
+    offeredBy.value = []
+  } finally {
+    offeredLoading.value = false
+  }
+}
 
 // Inquiry form state
 const inquiryName = ref('')
@@ -65,6 +91,7 @@ const loadProductData = async (id: string) => {
     if (p) {
       pushRecentlyViewed(p)
       qty.value = p.minOrderQty || 1
+      void loadOfferedBy()
 
       // 1. Related products
       if (p.categoryId) {
@@ -897,6 +924,33 @@ const resolvedDescription = computed(() => {
           </article>
         </div>
       </section>
+
+      <section v-if="offeredLoading || offeredBy.length > 1" class="offered-section" aria-labelledby="offered-heading">
+        <div class="offered-head">
+          <h3 id="offered-heading" class="offered-title">{{ t('provider.offeredBy') }}</h3>
+          <span class="mono offered-count">{{ offeredBy.length }}</span>
+        </div>
+        <div v-if="offeredLoading" role="status"><SkeletonLoader type="provider-cards" :count="3" /></div>
+        <div class="offered-grid">
+          <button
+            v-for="entry in offeredBy"
+            :key="entry.company.id"
+            type="button"
+            class="offer-card"
+            :class="{ 'is-current': isCurrentListing(entry.listing.id) }"
+            @click="router.push({ name: 'marketplace-product', params: { id: entry.listing.id } })"
+          >
+            <span class="offer-card__name" dir="auto">{{ entry.company.name }}</span>
+            <span v-if="entry.company.countryNameEn || entry.company.countryNameAr" class="offer-card__country mono">
+              {{ locale === 'ar' ? entry.company.countryNameAr || entry.company.countryNameEn : entry.company.countryNameEn || entry.company.countryNameAr }}
+            </span>
+            <span class="offer-card__foot">
+              <strong class="mono-num">{{ formatPrice(entry.listing.price, locale) }} {{ entry.listing.currencySymbol || entry.listing.currencyCode || '$' }}</strong>
+              <span v-if="isCurrentListing(entry.listing.id)" class="badge badge--solid badge--pill">{{ t('marketplace.current') }}</span>
+            </span>
+          </button>
+        </div>
+      </section>
     </div>
 
     <!-- ── Video Playback Modal ── -->
@@ -1420,24 +1474,24 @@ const resolvedDescription = computed(() => {
   align-items: center;
   gap: var(--space-1);
   padding: var(--space-1) var(--space-3);
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-xs, 3px);
   font-size: var(--step-0);
   font-weight: 700;
 }
 
 .stock-badge--in {
-  background: #059669;
-  color: var(--wl-on-primary);
+  background: var(--color-success-500, #198754);
+  color: #ffffff;
 }
 
 .stock-badge--low {
-  background: #D97706;
-  color: var(--wl-on-primary);
+  background: var(--color-warning-500, #E67E22);
+  color: #ffffff;
 }
 
 .stock-badge--out {
-  background: #DC2626;
-  color: var(--wl-on-primary);
+  background: var(--color-danger-500, #DC3545);
+  color: #ffffff;
 }
 
 .live-dot {
@@ -2032,6 +2086,68 @@ const resolvedDescription = computed(() => {
   cursor: not-allowed;
 }
 
+/* Offered-by providers (same SKU across companies) */
+.offered-section {
+  margin-top: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.offered-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.offered-title {
+  font-size: var(--text-xl);
+  font-weight: var(--weight-semibold);
+  color: var(--fg-heading);
+  margin: 0;
+}
+.offered-count {
+  font-size: var(--text-xs);
+  color: var(--fg-muted);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  padding: var(--space-1) var(--space-3);
+}
+.offered-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--space-3);
+}
+.offer-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  text-align: start;
+  transition: border-color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
+}
+.offer-card:hover { border-color: var(--border-focus); box-shadow: var(--ring-focus); }
+.offer-card.is-current { border-color: var(--brand); }
+.offer-card__name {
+  font-size: var(--text-base);
+  font-weight: var(--weight-medium);
+  color: var(--fg-heading);
+}
+.offer-card__country { font-size: var(--text-xs); color: var(--fg-subtle); }
+.offer-card__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  width: 100%;
+  margin-top: var(--space-1);
+  font-size: var(--text-base);
+  color: var(--fg-body);
+}
 .inquiry-foot {
   font-size: var(--step--1);
   color: var(--wl-muted);

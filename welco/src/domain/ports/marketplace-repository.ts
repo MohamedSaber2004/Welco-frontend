@@ -7,7 +7,9 @@ import type {
   UpdateProductPayload,
   CreateCategoryPayload,
   UpdateCategoryPayload,
+  SkuProviderDto,
 } from '../models/marketplace'
+import type { CompanyDto } from '../models/company'
 import type { PaginatedResult } from '../models/location'
 
 export interface MarketplaceQuery {
@@ -34,9 +36,14 @@ export interface MarketplaceRepository {
   createProduct(payload: CreateProductPayload): Promise<ProductDto>
   updateProduct(id: string, payload: UpdateProductPayload): Promise<ProductDto>
   deleteProduct(id: string): Promise<void>
+  /** Provider's own catalog. Uses GET products/mine when the backend
+   *  ships it, otherwise filters the shared list by supplierId. */
+  getMyProducts(companyId: string, query?: MarketplaceQuery): Promise<PaginatedResult<ProductDto>>
 
   getCategories(): Promise<CategoryDto[]>
   getCategoryById(id: string): Promise<CategoryDto | null>
+  getCategoryProviders(categoryId: string, query?: { page?: number; pageSize?: number }): Promise<PaginatedResult<CompanyDto>>
+  getSkuProviders(sku: string): Promise<SkuProviderDto[]>
   createCategory(payload: CreateCategoryPayload): Promise<CategoryDto>
   updateCategory(id: string, payload: UpdateCategoryPayload): Promise<CategoryDto>
   deleteCategory(id: string): Promise<void>

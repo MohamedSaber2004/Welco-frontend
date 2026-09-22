@@ -220,6 +220,14 @@ const navigateToCategory = (catId: string) => {
                 <span>{{ t('marketplace.exploreCategory') }}</span>
                 <span class="icon--directional">→</span>
               </button>
+              <button
+                type="button"
+                class="btn-explore mono btn-explore--providers"
+                @click.stop="router.push({ name: 'category-providers', params: { id: c.id } })"
+              >
+                <span>{{ t('provider.providersInCategory') }}</span>
+                <span class="icon--directional">→</span>
+              </button>
             </div>
           </div>
         </article>
@@ -602,7 +610,13 @@ const navigateToCategory = (catId: string) => {
   margin-top: auto;
   padding-top: 0.75rem;
   border-top: 1px solid var(--wl-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
+.btn-explore--providers { color: var(--fg-warning); }
 
 .btn-explore {
   display: inline-flex;

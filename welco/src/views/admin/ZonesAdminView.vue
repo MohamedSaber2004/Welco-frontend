@@ -13,7 +13,7 @@ import type { ZoneDto, CityDto } from '../../domain/models/location'
 
 const zones = ref<ZoneDto[]>([])
 const cities = ref<CityDto[]>([])
-const loading = ref(false)
+const loading = ref(true)
 const search = ref('')
 const filterCity = ref('')
 const fetchError = ref('')

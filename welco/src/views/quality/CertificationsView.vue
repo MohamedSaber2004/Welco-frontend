@@ -168,7 +168,7 @@ const goPage = (p: number) => {
         </div>
       </div>
 
-      <SkeletonLoader v-if="loading" type="category-grid" :count="4" />
+      <SkeletonLoader v-if="loading" type="cert-grid" :count="4" />
       <DataState
         v-else
         :empty="!filteredCerts.length"

@@ -19,7 +19,7 @@ const router = useRouter()
 
 /* Certifications State */
 const certifications = ref<CertificationDto[]>([])
-const loadingCerts = ref(false)
+const loadingCerts = ref(true)
 const certsError = ref('')
 const certSearch = ref('')
 const certPage = ref(1)
@@ -305,6 +305,8 @@ onMounted(async () => {
         <DataState
           :loading="loadingCerts"
           :error="certsError"
+          skeleton-type="table"
+          :skeleton-count="5"
           :empty="!filteredCerts.length && !loadingCerts"
           :empty-title="t('admin.noCertificationsFound')"
           :empty-description="t('admin.noCertificationsFoundDesc')"

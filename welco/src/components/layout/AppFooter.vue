@@ -87,9 +87,9 @@ const isAuthed = computed(() => authService.isAuthenticated)
   position: absolute;
   top: 0;
   inset-inline: 0;
-  height: 2px;
-  background: var(--wl-laser-sweep);
-  opacity: 0.85;
+  height: 1px;
+  background: var(--border);
+  opacity: 1;
 }
 .footer__inner {
   max-width: var(--wl-max-width);
@@ -137,24 +137,23 @@ const isAuthed = computed(() => authService.isAuthenticated)
 }
 
 .footer-badge {
-  font-size: 9.5px;
-  font-weight: 700;
-  color: var(--wl-primary);
-  background: var(--wl-primary-soft);
-  border: 1px solid rgba(105, 169, 255, 0.2);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-medium);
+  color: var(--brand);
+  background: var(--brand-soft);
+  border: 1px solid var(--brand-soft);
   padding: 0.2rem 0.5rem;
   border-radius: var(--radius-xs);
 }
 
-.footer__col h4 {
-  font-family: var(--wl-font-mono);
-  font-size: 11px;
-  letter-spacing: 0.08em;
+.footer__title {
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
-  color: var(--wl-gold-text);
-  text-shadow: var(--wl-gold-text-shadow);
+  color: var(--fg-heading);
   margin-bottom: 0.95rem;
-  font-weight: 700;
+  font-weight: var(--weight-semibold);
 }
 
 .footer__link {
@@ -215,13 +214,16 @@ const isAuthed = computed(() => authService.isAuthenticated)
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
+  font-family: var(--font-mono, monospace);
   font-size: 10px;
-  font-weight: 700;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   color: var(--wl-success);
   background: var(--wl-success-soft);
-  border: 1px solid rgba(16, 185, 129, 0.18);
-  padding: 0.25rem 0.65rem;
-  border-radius: 9999px;
+  border: 1px solid rgba(25, 135, 84, 0.2);
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-xs, 3px);
 }
 .status-dot {
   width: 6px;

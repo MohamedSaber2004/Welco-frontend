@@ -122,7 +122,7 @@ async function placeOrderFromQuote() {
       <span class="crumb-active">{{ quote?.quoteNumber ?? '…' }}</span>
     </nav>
 
-    <SkeletonLoader v-if="loading" type="card" :lines="6" height="220px" />
+    <SkeletonLoader v-if="loading" type="order-detail" />
     <DataState
       v-else-if="!quote"
       :empty="true"
@@ -372,10 +372,10 @@ async function placeOrderFromQuote() {
 
 .manifest-card {
   background: var(--wl-surface);
-  border: 1px solid var(--wl-border, #E2E8F0);
-  border-radius: var(--wl-radius-card, 16px);
+  border: 1px solid var(--border, #D9E2EC);
+  border-radius: var(--radius-lg, 8px);
   padding: var(--wl-card-padding, 1.5rem);
-  box-shadow: var(--wl-shadow-card, 0 1px 3px rgba(0, 10, 25, 0.05));
+  box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -398,7 +398,7 @@ async function placeOrderFromQuote() {
 .manifest-title {
   font-size: 14.5px;
   font-weight: 800;
-  color: var(--wl-ink-strong, #0F172A);
+  color: var(--fg-heading, #102A43);
   margin: 0;
 }
 
@@ -407,9 +407,9 @@ async function placeOrderFromQuote() {
   font-weight: 700;
   color: var(--wl-ink-soft);
   background: var(--wl-surface-soft);
-  border: 1px solid var(--wl-border, var(--wl-border));
+  border: 1px solid var(--border, #D9E2EC);
   padding: 0.15rem 0.5rem;
-  border-radius: 6px;
+  border-radius: var(--radius-xs, 3px);
 }
 
 .items-stack {
@@ -436,7 +436,7 @@ async function placeOrderFromQuote() {
 .item-title {
   font-size: 13.5px;
   font-weight: 600;
-  color: var(--wl-ink-strong, #0F172A);
+  color: var(--fg-heading, #102A43);
   margin: 0;
 }
 
@@ -445,13 +445,13 @@ async function placeOrderFromQuote() {
   align-items: center;
   gap: 0.45rem;
   font-size: 11.5px;
-  color: var(--wl-muted, #64748B);
+  color: var(--fg-muted, #627D98);
 }
 
 .item-subtotal {
   font-size: 13.5px;
   font-weight: 700;
-  color: var(--wl-ink-strong, #0F172A);
+  color: var(--fg-heading, #102A43);
 }
 
 /* Sidebar */
@@ -463,16 +463,16 @@ async function placeOrderFromQuote() {
 
 .card {
   background: var(--wl-surface);
-  border: 1px solid var(--wl-border, #E2E8F0);
-  border-radius: var(--wl-radius-card, 16px);
+  border: 1px solid var(--border, #D9E2EC);
+  border-radius: var(--radius-lg, 8px);
   padding: var(--wl-card-padding, 1.25rem);
-  box-shadow: var(--wl-shadow-card, 0 1px 3px rgba(0, 10, 25, 0.05));
+  box-shadow: var(--shadow-sm);
 }
 
 .side-title {
   font-size: 11px;
   font-weight: 800;
-  color: var(--wl-primary, #69a9ff);
+  color: var(--brand);
   letter-spacing: 0.05em;
   text-transform: uppercase;
   margin: 0 0 0.75rem;
@@ -525,20 +525,20 @@ async function placeOrderFromQuote() {
   align-items: center;
   justify-content: center;
   gap: 0.45rem;
-  height: 48px;
-  background: var(--wl-success);
-  color: var(--wl-on-primary);
+  height: 44px;
+  background: var(--color-success-500, #198754);
+  color: #ffffff;
   border: none;
-  border-radius: 10px;
+  border-radius: var(--radius-sm, 4px);
   font-size: 13.5px;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 4px 12px -2px rgba(5, 150, 105, 0.35);
+  box-shadow: 0 2px 8px -1px rgba(25, 135, 84, 0.25);
   transition: all 0.18s ease;
 }
 
 .btn-approve:hover:not(:disabled) {
-  background: #047857;
+  background: var(--color-success-600, #157347);
 }
 
 .btn-decline {
@@ -547,18 +547,18 @@ async function placeOrderFromQuote() {
   justify-content: center;
   gap: 0.45rem;
   height: 44px;
-  background: var(--wl-surface);
-  color: var(--wl-danger);
-  border: 1.5px solid rgba(237, 66, 69, 0.35);
-  border-radius: 10px;
+  background: var(--surface, #ffffff);
+  color: var(--fg-danger, #DC3545);
+  border: 1px solid var(--border-danger, #FFDAD6);
+  border-radius: var(--radius-sm, 4px);
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .btn-decline:hover:not(:disabled) {
-  background: var(--wl-danger-soft);
+  background: var(--color-danger-50, #FFF8F7);
 }
 
 .approved-head {
@@ -566,8 +566,8 @@ async function placeOrderFromQuote() {
   align-items: center;
   gap: 0.45rem;
   font-size: 12px;
-  font-weight: 800;
-  color: var(--wl-success);
+  font-weight: 700;
+  color: var(--fg-success, #198754);
   margin-bottom: 0.4rem;
 }
 
@@ -576,14 +576,14 @@ async function placeOrderFromQuote() {
   align-items: center;
   justify-content: center;
   gap: 0.45rem;
-  height: 46px;
+  height: 44px;
   width: 100%;
-  background: var(--wl-primary);
-  color: var(--wl-on-primary);
+  background: var(--primary, #0F3D56);
+  color: #ffffff;
   border: none;
-  border-radius: 10px;
+  border-radius: var(--radius-sm, 4px);
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
 }
 
@@ -592,22 +592,22 @@ async function placeOrderFromQuote() {
   align-items: center;
   justify-content: center;
   gap: 0.45rem;
-  height: 48px;
+  height: 44px;
   width: 100%;
-  background: var(--wl-success);
-  color: var(--wl-on-primary);
+  background: var(--color-success-500, #198754);
+  color: #ffffff;
   border: none;
-  border-radius: 10px;
+  border-radius: var(--radius-sm, 4px);
   font-size: 13.5px;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 4px 12px -2px rgba(5, 150, 105, 0.35);
+  box-shadow: 0 2px 8px -1px rgba(25, 135, 84, 0.25);
   transition: all 0.18s ease;
   margin-bottom: 0.65rem;
 }
 
 .btn-place-order:hover:not(:disabled) {
-  background: #047857;
+  background: var(--color-success-600, #157347);
 }
 
 .btn-place-order:disabled {
@@ -617,9 +617,9 @@ async function placeOrderFromQuote() {
 }
 
 .btn-view-order--secondary {
-  background: var(--wl-surface);
-  color: var(--wl-primary);
-  border: 1.5px solid rgba(var(--wl-primary-rgb), 0.3);
+  background: var(--surface, #ffffff);
+  color: var(--primary, #0F3D56);
+  border: 1px solid var(--border, #D9E2EC);
 }
 
 .side-actions-stack {
@@ -633,21 +633,21 @@ async function placeOrderFromQuote() {
   align-items: center;
   justify-content: center;
   gap: 0.45rem;
-  height: 46px;
-  background: var(--wl-surface);
-  color: var(--wl-ink-soft);
-  border: 1.5px solid var(--wl-border);
-  border-radius: 10px;
+  height: 44px;
+  background: var(--surface, #ffffff);
+  color: var(--fg-muted, #627D98);
+  border: 1px solid var(--border, #D9E2EC);
+  border-radius: var(--radius-sm, 4px);
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .btn-back-quotes:hover {
-  border-color: var(--wl-primary);
-  color: var(--wl-primary);
-  background: var(--wl-primary-soft);
+  border-color: var(--primary, #0F3D56);
+  color: var(--primary, #0F3D56);
+  background: var(--brand-soft, #EDF4FF);
 }
 
 @media (max-width: 900px) {

@@ -19,8 +19,13 @@ const statusFilter = ref('')
 const localPage = ref(1)
 const pageSize = 10
 
-const loadData = () => {
-  void salesService.loadRfqs({ pageNumber: 1, pageSize: 50 })
+const pageLoading = ref(true)
+const loadData = async () => {
+  try {
+    await salesService.loadRfqs({ pageNumber: 1, pageSize: 50 })
+  } finally {
+    pageLoading.value = false
+  }
 }
 
 const filteredRfqs = computed(() => {
@@ -133,8 +138,8 @@ onMounted(() => {
 
     <!-- Table or DataState -->
     <DataState
-      :loading="salesService.loading.value"
-      :empty="!filteredRfqs.length && !salesService.loading.value"
+      :loading="pageLoading || salesService.loading.value"
+      :empty="!filteredRfqs.length && !pageLoading && !salesService.loading.value"
       :empty-title="searchQuery || statusFilter ? t('common.noResults') : t('sales.noRfqs')"
       :empty-description="searchQuery || statusFilter ? t('common.searchResults') : t('sales.noRfqsDesc')"
       :empty-variant="searchQuery || statusFilter ? 'search' : 'default'"

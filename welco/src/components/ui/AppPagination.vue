@@ -192,9 +192,9 @@ const goTo = (p: number | string) => {
 
 .custom-pagination--table {
   padding: 0.75rem 1.15rem;
-  background: var(--wl-surface-soft);
-  border-top: 1px solid var(--wl-border);
-  border-radius: 0 0 12px 12px;
+  background: var(--bg-subtle);
+  border-top: 1px solid var(--border);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
 }
 
 .custom-pagination--compact {
@@ -211,13 +211,13 @@ const goTo = (p: number | string) => {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  font-size: 12px;
-  color: var(--wl-muted);
+  font-size: var(--text-sm);
+  color: var(--fg-muted);
 }
 
 .pagination__info strong {
-  color: var(--wl-ink-strong);
-  font-weight: 600;
+  color: var(--fg-heading);
+  font-weight: var(--weight-semibold);
 }
 
 .pagination__controls {
@@ -237,16 +237,18 @@ const goTo = (p: number | string) => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  min-width: 34px;
   height: 34px;
-  background: var(--wl-surface);
-  border: 1px solid var(--wl-border);
-  border-radius: 8px;
-  color: var(--wl-ink-soft);
-  font-size: 13px;
-  font-weight: 500;
+  padding: 0 var(--space-2);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--fg-muted);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-regular);
+  font-family: var(--font-sans);
   cursor: pointer;
-  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: var(--shadow-xs);
+  transition: border-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
 }
 
 .page-nav-btn {
@@ -261,23 +263,21 @@ const goTo = (p: number | string) => {
 
 .page-nav-btn:hover:not(:disabled),
 .page-num-btn:hover:not(:disabled):not(.is-active) {
-  background: var(--wl-surface-soft);
-  border-color: var(--wl-primary);
-  color: var(--wl-primary);
+  border-color: var(--border-strong);
+  color: var(--fg-heading);
 }
 
 .page-num-btn.is-active {
-  background: var(--wl-accent) !important;
-  border-color: var(--wl-accent) !important;
-  color: var(--wl-on-accent) !important;
-  font-weight: 700;
+  background: var(--brand) !important;
+  border-color: var(--brand) !important;
+  color: #fff !important;
+  font-weight: var(--weight-semibold);
 }
 
 .page-nav-btn:focus-visible,
 .page-num-btn:focus-visible {
-  outline: 2px solid var(--wl-primary);
-  outline-offset: 2px;
-  box-shadow: var(--wl-focus-ring);
+  outline: none;
+  box-shadow: var(--ring-focus);
   z-index: 1;
 }
 
@@ -293,8 +293,8 @@ const goTo = (p: number | string) => {
   align-items: center;
   justify-content: center;
   width: 24px;
-  color: var(--wl-muted);
-  font-size: 13px;
+  color: var(--fg-subtle);
+  font-size: var(--text-sm);
 }
 
 .page-indicator {
@@ -302,12 +302,12 @@ const goTo = (p: number | string) => {
   align-items: center;
   gap: 0.3rem;
   padding: 0 0.5rem;
-  font-size: 12px;
-  color: var(--wl-muted);
+  font-size: var(--text-sm);
+  color: var(--fg-muted);
 }
 
 .page-indicator strong {
-  color: var(--wl-ink-strong);
+  color: var(--fg-heading);
 }
 
 .nav-icon {

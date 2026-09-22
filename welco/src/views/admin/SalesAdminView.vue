@@ -21,7 +21,7 @@ const router = useRouter()
 const rfqs = salesService.rfqs
 const quotes = salesService.quotes
 const rfqTotalCount = salesService.rfqTotalCount
-const loading = ref(false)
+const loading = ref(true)
 const fetchError = ref('')
 
 // Tab Switcher state
@@ -932,9 +932,9 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 }
 
 .search-input:focus {
-  border-color: #69a9ff;
-  box-shadow: 0 0 0 3px rgba(105, 169, 255, 0.12);
-  background: var(--wl-surface);
+  border-color: var(--border-focus);
+  box-shadow: var(--ring-focus);
+  background: var(--bg-surface);
 }
 
 .clear-btn {
@@ -965,7 +965,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
   transition: border-color 0.15s;
 }
 
-.filter-select:focus { border-color: #69a9ff; }
+.filter-select:focus { border-color: var(--border-focus); box-shadow: var(--ring-focus); }
 
 .clear-filters-btn {
   display: inline-flex;
@@ -973,17 +973,17 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
   gap: 0.3rem;
   height: 38px;
   padding: 0 0.85rem;
-  border: 1px solid #FCA5A5;
-  border-radius: 10px;
+  border: 1px solid var(--border-danger, #FFDAD6);
+  border-radius: var(--radius-sm, 4px);
   font-size: 12px;
-  font-weight: 700;
-  color: var(--wl-danger);
-  background: var(--wl-danger-soft);
+  font-weight: 600;
+  color: var(--fg-danger, #DC3545);
+  background: var(--color-danger-50, #FFF8F7);
   cursor: pointer;
   transition: all 0.15s;
 }
 
-.clear-filters-btn:hover { background: rgba(242, 109, 109, 0.22); }
+.clear-filters-btn:hover { background: var(--color-danger-100, #FFDAD6); }
 
 /* ── Product Names Cell ── */
 .product-names-cell {

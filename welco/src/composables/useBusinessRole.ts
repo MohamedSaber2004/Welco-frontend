@@ -26,13 +26,13 @@ export function useBusinessRole() {
   const roleLabel = computed(() => t(`admin.${businessRoleKey(role.value)}`))
 
   const isAdmin = computed(() => role.value === BusinessRole.Admin)
-  const isStaff = computed(() => role.value === BusinessRole.WelcoStaff)
+  const isSales = computed(() => role.value === BusinessRole.Sales)
   const isProvider = computed(() => role.value === BusinessRole.Provider)
-  const isCustomer = computed(() => false)
+  const isClient = computed(() => role.value === BusinessRole.Client)
   const isBuyer = computed(
-    () => isProvider.value || authService.isOrganizationUser.value,
+    () => isProvider.value || isClient.value || authService.isOrganizationUser.value,
   )
-  const isSeller = computed(() => isAdmin.value || isStaff.value)
+  const isSeller = computed(() => isAdmin.value || isSales.value)
   const isProviderCompanyLinked = computed(() => isProviderCompany(providerCompany.value))
 
   return {
@@ -40,9 +40,9 @@ export function useBusinessRole() {
     roleLabel,
     providerCompany,
     isAdmin,
-    isStaff,
+    isSales,
     isProvider,
-    isCustomer,
+    isClient,
     isBuyer,
     isSeller,
     isProviderCompanyLinked,

@@ -1,0 +1,253 @@
+/* ==========================================================================
+   Welco — Clinical Precision Design Tokens
+   Tailored for enterprise B2B surgical instrument manufacturing & digital procurement.
+   Single source of truth for color, type, space, radius, elevation, motion.
+   Load this file BEFORE components.css and tokens.css.
+
+   Naming:
+     --color-*     raw palette
+     --bg / --fg / --border / --brand ...   semantic tokens (preferred)
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Typography Imports (Plus Jakarta Sans, Inter, JetBrains Mono)
+   -------------------------------------------------------------------------- */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap");
+
+:root {
+  /* ------------------------------------------------------------------
+     2. Raw palette — Clinical Precision System
+     ------------------------------------------------------------------ */
+
+  /* Brand — Deep Medical Navy (#0F3D56) & Steel Teal (#147D92) */
+  --color-brand-50:  #EDF4FF;
+  --color-brand-100: #E3EFFF;
+  --color-brand-200: #C8E6FF;
+  --color-brand-300: #A3CBEA;
+  --color-brand-400: #80A8C5;
+  --color-brand-500: #147D92;  /* Steel Teal interactive */
+  --color-brand-600: #0F3D56;  /* Deep Medical Navy (base primary brand) */
+  --color-brand-700: #0C3145;
+  --color-brand-800: #082434;
+  --color-brand-900: #001D32;  /* Deep slate ink */
+
+  /* Neutrals — Clinical slate canvas, sterile white, precision borders */
+  --color-neutral-0:   #FFFFFF;  /* Sterile clean white */
+  --color-neutral-25:  #FCFDFE;
+  --color-neutral-50:  #F7F9FB;  /* Clinical canvas base */
+  --color-neutral-100: #EDF4FF;  /* Surface container low / subtle fill */
+  --color-neutral-200: #D9E2EC;  /* Border clinical hairline */
+  --color-neutral-300: #C2C7CD;  /* Outline variant / strong divide */
+  --color-neutral-400: #80A8C5;  /* Placeholder / subdued */
+  --color-neutral-500: #72787D;  /* Structural outline */
+  --color-neutral-600: #627D98;  /* Muted steel grey / metadata */
+  --color-neutral-700: #42474D;  /* Body typography / on-surface-variant */
+  --color-neutral-800: #16334A;  /* Inverse surface */
+  --color-neutral-900: #102A43;  /* High-legibility ink primary / headings */
+
+  /* Surgical & Specialty Accents */
+  --color-teal-500:   #147D92;
+  --color-teal-100:   #EDF4FF;
+  --color-cyan-500:   #28A7A1;
+  --color-cyan-100:   #E6FAF8;
+  --color-amber-500:  #E67E22;
+  --color-amber-100:  #FEF3C7;
+  --color-rose-500:   #DC3545;
+  --color-rose-100:   #FFDAD6;
+  --color-orange-500: #E67E22;
+  --color-orange-100: #FEF3C7;
+  --color-green-500:  #198754;
+  --color-green-100:  #DCFCE7;
+  --color-violet-500: #147D92;
+  --color-violet-100: #EDF4FF;
+
+  /* Regulatory & Status */
+  --color-success-500: #198754;  /* Verified ISO/CE compliance */
+  --color-success-600: #157347;
+  --color-success-100: #DCFCE7;
+  --color-warning-500: #F59E0B;  /* Regulatory Amber / lot-tracing alert */
+  --color-warning-600: #E67E22;
+  --color-warning-100: #FEF3C7;
+  --color-danger-500:  #DC3545;  /* Out-of-spec tolerance / critical warning */
+  --color-danger-600:  #BA1A1A;
+  --color-danger-100:  #FFDAD6;
+  --color-info-500:    #147D92;  /* Steel Teal metric & info callout */
+  --color-info-600:    #0F3D56;
+  --color-info-100:    #EDF4FF;
+
+  /* Data visualization — Clinical precision series */
+  --chart-1: #0F3D56;  /* Deep medical navy — primary metric */
+  --chart-2: #147D92;  /* Steel teal — secondary series */
+  --chart-3: #28A7A1;  /* Precision surgical cyan — target */
+  --chart-teal-soft: #E6FAF8;
+  --chart-4: #E67E22;  /* Regulatory amber alert — deviations */
+  --chart-5: #198754;  /* Verified green — compliance rate */
+  --chart-6: #627D98;  /* Muted steel grey — baseline */
+  --chart-track: #EDF4FF;      /* Gridlines, empty bar track */
+  --chart-map-idle: #D9E2EC;   /* Unhighlighted territories */
+
+  /* ------------------------------------------------------------------
+     3. Semantic tokens — what components actually reference
+     ------------------------------------------------------------------ */
+
+  /* Surfaces */
+  --bg-app:        var(--color-neutral-50);   /* #F7F9FB Canvas */
+  --bg-surface:    var(--color-neutral-0);    /* #FFFFFF Clean white */
+  --bg-sidebar:    var(--color-neutral-0);
+  --bg-subtle:     var(--color-neutral-100);  /* #EDF4FF Surface container */
+  --bg-hover:      var(--color-brand-100);    /* #E3EFFF Soft highlight */
+  --bg-overlay:    rgba(16, 42, 67, 0.45);
+
+  /* Text & Inks */
+  --fg-heading:    var(--color-neutral-900);  /* #102A43 High-legibility ink primary */
+  --fg-body:       var(--color-neutral-700);  /* #42474D High-clarity body */
+  --fg-muted:      var(--color-neutral-600);  /* #627D98 Muted steel grey */
+  --fg-subtle:     var(--color-neutral-500);  /* #72787D Structural outline text */
+  --fg-placeholder:var(--color-neutral-400);  /* #80A8C5 Placeholder */
+  --fg-on-brand:   var(--color-neutral-0);    /* #FFFFFF Contrast text on navy/teal */
+  --fg-link:       #147D92;                   /* Steel Teal interactive links */
+
+  /* Brand Hierarchy */
+  --brand:         #0F3D56;  /* Deep Medical Navy */
+  --brand-hover:   #147D92;  /* Steel Teal on hover */
+  --brand-soft:    #E3EFFF;  /* Container tint */
+  --brand-gradient: linear-gradient(135deg, #0F3D56 0%, #147D92 100%);
+
+  /* Secondary & Tertiary */
+  --secondary:       #147D92;  /* Steel Teal */
+  --secondary-hover: #00687A;
+  --secondary-soft:  #EDF4FF;
+  --tertiary:        #28A7A1;  /* Precision Surgical Cyan */
+  --tertiary-hover:  #00413E;
+  --tertiary-soft:   #D8EAFF;
+
+  /* Borders */
+  --border:        #D9E2EC;  /* Border clinical hairline 1px */
+  --border-strong: #C2C7CD;  /* Outline variant */
+  --border-focus:  #147D92;  /* Surgical steel teal focus boundary */
+
+  /* Feedback */
+  --fg-success: #198754;
+  --fg-warning: #E67E22;
+  --fg-danger:  #DC3545;
+  --fg-info:    #147D92;
+
+  /* ------------------------------------------------------------------
+     4. Typography Scale & Families
+     ------------------------------------------------------------------ */
+  --font-display: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-body:    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-sans:    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono:    "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+
+  --text-2xs: 0.625rem;  /* 10px — technical micro tags, DIN stamps */
+  --text-xs:  0.6875rem; /* 11px — lot-traceable badges, micro legends */
+  --text-sm:  0.75rem;   /* 12px — high-density table cells, SKU info */
+  --text-md:  0.8125rem; /* 13px — form controls, navigation labels */
+  --text-base:0.875rem;  /* 14px — default technical body */
+  --text-lg:  1rem;      /* 16px — card titles, subheadings */
+  --text-xl:  1.125rem;  /* 18px — headline-sm, modal titles */
+  --text-2xl: 1.375rem;  /* 22px — headline-md, metric stat values */
+  --text-3xl: 1.875rem;  /* 30px — headline-lg */
+  --text-4xl: 2.5rem;    /* 40px — headline-xl display */
+
+  --weight-light: 300;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  --leading-tight: 1.2;
+  --leading-snug: 1.4;
+  --leading-normal: 1.6;
+
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.03em;
+
+  /* ------------------------------------------------------------------
+     5. Spacing — 4px baseline subdivision on 8pt architectural rhythm
+     ------------------------------------------------------------------ */
+  --space-0: 0;
+  --space-1: 0.25rem;  /* 4px  */
+  --space-2: 0.5rem;   /* 8px  */
+  --space-3: 0.75rem;  /* 12px */
+  --space-4: 1rem;     /* 16px */
+  --space-5: 1.25rem;  /* 20px */
+  --space-6: 1.5rem;   /* 24px */
+  --space-7: 1.75rem;  /* 28px */
+  --space-8: 2rem;     /* 32px */
+  --space-10: 2.5rem;  /* 40px */
+  --space-12: 3rem;    /* 48px */
+  --space-16: 4rem;    /* 64px */
+
+  /* ------------------------------------------------------------------
+     6. Radius — Level 1 Soft Precision (Avoid bulbous consumer radii)
+     ------------------------------------------------------------------ */
+  --radius-xs: 3px;    /* Micro-badges, inline certification tags */
+  --radius-sm: 4px;    /* Base radius: buttons, inputs, dropdown triggers */
+  --radius-md: 6px;    /* Intermediate inputs and toolbar buttons */
+  --radius-lg: 8px;    /* Container radius: instrument cards, tables, modal trays */
+  --radius-xl: 12px;   /* Outer container shell, hero sections */
+  --radius-2xl: 16px;  /* Max structural radius */
+  --radius-pill: 9999px; /* Round avatar & icon button only */
+
+  /* ------------------------------------------------------------------
+     7. Elevation — Level 1 Static Hairline & Level 2 Ambient Hover
+     ------------------------------------------------------------------ */
+  --shadow-xs: 0 1px 2px rgba(16, 42, 67, 0.04);
+  --shadow-sm: 0 1px 3px rgba(16, 42, 67, 0.05);
+  --shadow-md: 0 4px 14px -2px rgba(16, 42, 67, 0.06), 0 2px 6px -1px rgba(16, 42, 67, 0.04);
+  --shadow-lg: 0 12px 28px -4px rgba(16, 42, 67, 0.12), 0 4px 12px -2px rgba(16, 42, 67, 0.06);
+  --shadow-brand: 0 6px 18px rgba(15, 61, 86, 0.18);
+  --ring-focus: 0 0 0 2px #FFFFFF, 0 0 0 4px #147D92;
+
+  /* ------------------------------------------------------------------
+     8. Layout
+     ------------------------------------------------------------------ */
+  --sidebar-width: 248px;
+  --sidebar-width-collapsed: 76px;
+  --topbar-height: 74px;
+  --content-max: 1440px;
+  --gutter: 1.75rem; /* 28px desktop gutter */
+
+  /* ------------------------------------------------------------------
+     9. Motion — Calibrated 150ms-200ms surgical transitions
+     ------------------------------------------------------------------ */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast: 120ms;
+  --duration-base: 180ms;
+  --duration-slow: 280ms;
+
+  /* ------------------------------------------------------------------
+     10. Z-index
+     ------------------------------------------------------------------ */
+  --z-base: 0;
+  --z-sticky: 100;
+  --z-sidebar: 200;
+  --z-dropdown: 300;
+  --z-overlay: 400;
+  --z-modal: 500;
+  --z-toast: 600;
+  --z-tooltip: 700;
+}
+
+/* --------------------------------------------------------------------------
+   11. Light-only mode — Sterile clinical white environment
+   -------------------------------------------------------------------------- */
+:root,
+:root[data-theme="dark"],
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+/* --------------------------------------------------------------------------
+   12. Right-to-left support (Arabic layouts)
+   -------------------------------------------------------------------------- */
+[dir="rtl"] {
+  --flip: -1;
+}
+:root {
+  --flip: 1;
+}

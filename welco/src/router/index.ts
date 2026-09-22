@@ -3,6 +3,7 @@ import { t, type MessageKey } from '../i18n'
 import { services } from '../di/container'
 import { isPendingOrg } from '../utils/pending-org-marker'
 import { toastService } from '../infrastructure/feedback/toast.service'
+import { requestTracker } from '../application/request.tracker'
 
 declare module 'vue-router' {
   interface RouteMeta {
@@ -10,6 +11,7 @@ declare module 'vue-router' {
     requiresAuth?: boolean
     guestOnly?: boolean
     requiresAdmin?: boolean
+    requiresProvider?: boolean
     isLandingPage?: boolean
     hideFooter?: boolean
   }
@@ -88,6 +90,12 @@ const router = createRouter({
       name: 'categories',
       component: () => import('../views/catalog/CategoriesView.vue'),
       meta: { titleKey: 'marketplace.categoriesTitle' },
+    },
+    {
+      path: '/categories/:id/providers',
+      name: 'category-providers',
+      component: () => import('../views/catalog/CategoryProvidersView.vue'),
+      meta: { titleKey: 'provider.categoryProviders' },
     },
     {
       path: '/marketplace',
@@ -186,6 +194,12 @@ const router = createRouter({
       meta: { titleKey: 'nav.providers', isLandingPage: true },
     },
     {
+      path: '/providers/:id',
+      name: 'provider-storefront',
+      component: () => import('../views/trade/ProviderStorefrontView.vue'),
+      meta: { titleKey: 'provider.storefront' },
+    },
+    {
       path: '/certifications',
       name: 'certifications',
       component: () => import('../views/quality/CertificationsView.vue'),
@@ -264,18 +278,34 @@ const router = createRouter({
       meta: { titleKey: 'admin.users', requiresAuth: true, requiresAdmin: true },
     },
     {
-      path: '/admin/catalog',
-      name: 'admin-catalog',
-      component: () => import('../views/admin/CatalogAdminView.vue'),
-      meta: { titleKey: 'nav.catalog', requiresAuth: true, requiresAdmin: true },
-    },
-    {
       path: '/admin/products',
-      redirect: '/admin/catalog?tab=products',
+      redirect: '/admin',
     },
     {
       path: '/admin/categories',
-      redirect: '/admin/catalog?tab=categories',
+      name: 'admin-categories',
+      component: () => import('../views/admin/CategoriesAdminView.vue'),
+      meta: { titleKey: 'admin.categoriesTitle', requiresAuth: true, requiresAdmin: true },
+    },
+    {
+      path: '/admin/catalog',
+      redirect: '/admin',
+    },
+    {
+      path: '/provider',
+      redirect: '/provider/catalog',
+    },
+    {
+      path: '/provider/catalog',
+      name: 'provider-catalog',
+      component: () => import('../views/provider/ProviderCatalogView.vue'),
+      meta: { titleKey: 'provider.myCatalog', requiresAuth: true, requiresProvider: true },
+    },
+    {
+      path: '/provider/categories',
+      name: 'provider-categories',
+      component: () => import('../views/provider/ProviderCategoriesView.vue'),
+      meta: { titleKey: 'provider.categories', requiresAuth: true, requiresProvider: true },
     },
     {
       path: '/admin/certifications',
@@ -319,6 +349,7 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to) => {
+  requestTracker.begin()
   const auth = services.authService
   let isAuthenticated = auth.isAuthenticated
 
@@ -327,7 +358,7 @@ router.beforeEach(async (to) => {
     isAuthenticated = auth.isAuthenticated
   }
 
-  const isSeller = auth.isAdmin.value || auth.isWelcoStaff.value
+  const isSeller = auth.isAdmin.value || auth.isSales.value
 
   if (isAuthenticated && isSeller && (to.name === 'home' || to.path === '/')) {
     return { name: 'admin-dashboard' }
@@ -335,8 +366,20 @@ router.beforeEach(async (to) => {
   if (isAuthenticated && isSeller && (to.path.startsWith('/account') || to.name === 'help-my-tickets')) {
     return { name: 'admin-dashboard' }
   }
+  // Sellers don't see the buyer-facing catalog / marketplace
+  const marketplacePaths = ['/marketplace', '/cart', '/checkout', '/wishlist', '/catalog']
+  if (isAuthenticated && isSeller && marketplacePaths.some((p) => to.path === p || to.path.startsWith(p + '/'))) {
+    return { name: 'admin-dashboard' }
+  }
+  // Sales don't see provider catalog
+  if (isAuthenticated && auth.isSales.value && to.path.startsWith('/provider')) {
+    return { name: 'admin-dashboard' }
+  }
   if (isAuthenticated && !isSeller && to.path.startsWith('/admin')) {
     return { name: 'home' }
+  }
+  if (isAuthenticated && auth.isClient.value && to.path.startsWith('/provider')) {
+    return { name: 'account' }
   }
   if (isAuthenticated && auth.isOrganizationUser.value) {
     const user = auth.user.value
@@ -352,6 +395,9 @@ router.beforeEach(async (to) => {
 
   if (to.meta.requiresAuth && !isAuthenticated) {
     return { name: 'login', query: { redirect: to.fullPath } }
+  }
+  if (to.meta.requiresProvider && !auth.isProvider.value) {
+    return { name: 'home' }
   }
   if (to.meta.guestOnly && isAuthenticated) {
     return { name: auth.getDashboardRouteName() }
@@ -374,6 +420,7 @@ router.beforeEach(async (to) => {
 })
 
 router.afterEach((to) => {
+  requestTracker.settle()
   const key = to.meta.titleKey
   if (key) {
     document.title = `${t(key)} · Welco`
@@ -394,6 +441,10 @@ router.afterEach((to) => {
   setTimeout(() => {
     if (announcer) announcer.textContent = text
   }, 100)
+})
+
+router.onError(() => {
+  requestTracker.settle()
 })
 
 export default router

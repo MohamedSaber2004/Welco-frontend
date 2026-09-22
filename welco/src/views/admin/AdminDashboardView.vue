@@ -6,15 +6,18 @@ import BaseButton from '../../components/ui/BaseButton.vue'
 import BaseModal from '../../components/ui/BaseModal.vue'
 import BaseInput from '../../components/ui/BaseInput.vue'
 import StatCard from '../../components/ui/StatCard.vue'
+import FileUpload from '../../components/ui/FileUpload.vue'
+import { ATTACHMENT_PLACE, MEDIA_TYPE } from '../../config/api.config'
 import { authService as authSvc, services, locationRepository, userRepository, locationService, companyRepository, marketplaceRepository } from '../../di/container'
 import { toastService } from '../../infrastructure/feedback/toast.service'
 import StatusPill from '../../components/ui/StatusPill.vue'
 import { useUserLookup } from '../../composables/useUserLookup'
 import type { AuditLogDto } from '../../domain/models/audit-log'
+import type { CategoryDto, CreateCategoryPayload } from '../../domain/models/marketplace'
 import { t, locale } from '../../i18n'
 import { formatPrice } from '../../utils/format'
 
-const isStaffOnly = computed(() => authSvc.isWelcoStaff.value && !authSvc.isAdmin.value)
+const isSalesOnly = computed(() => authSvc.isSales.value && !authSvc.isAdmin.value)
 
 const { getUserInfo, resolveLogsUsers, getRoleBadgeClass } = useUserLookup()
 
@@ -65,7 +68,7 @@ const dynamicThroughput = computed(() => {
   const allDates = [
     ...services.commerceService.orders.value.map((o) => o.createdAt),
     ...services.salesService.rfqs.value.map((r) => r.createdAt),
-    ...(!isStaffOnly.value ? recentAuditLogs.value.map((l) => l.createdAt) : []),
+    ...(!isSalesOnly.value ? recentAuditLogs.value.map((l) => l.createdAt) : []),
   ]
 
   for (const iso of allDates) {
@@ -157,8 +160,8 @@ const activeDonutSegment = ref<{ label: string; value: number; pct: number; colo
 
 const platformData = computed(() => {
   const items = [
-    { label: t('admin.products'), value: stats.value.products, color: 'var(--wl-primary-light)', to: '/admin/catalog?tab=products' },
-    { label: t('admin.categoriesTitle'), value: stats.value.categories, color: 'var(--wl-primary-active)', to: '/admin/catalog?tab=categories' },
+    { label: t('admin.products'), value: stats.value.products, color: 'var(--wl-primary-light)', to: '/marketplace' },
+    { label: t('admin.categoriesTitle'), value: stats.value.categories, color: 'var(--wl-primary-active)', to: '/marketplace' },
     { label: t('admin.users'), value: stats.value.users, color: 'var(--wl-success)', to: '/admin/users' },
     { label: t('admin.distributorApps'), value: stats.value.pendingApps, color: 'var(--wl-warning)', to: '/admin/companies' },
   ]
@@ -219,10 +222,13 @@ function actionBadgeClass(action: string): string {
 }
 
 const load = async () => {
-  if (!services.authService.isAuthenticated) return
+  if (!services.authService.isAuthenticated) {
+    loading.value = false
+    return
+  }
   loading.value = true
   try {
-    const isStaff = isStaffOnly.value
+    const isStaff = isSalesOnly.value
     const [countries, cities, zones, usersPage, appsPage, productsPage, categoriesList] = await Promise.all([
       !isStaff ? locationRepository.getCountries().catch(() => []) : Promise.resolve([]),
       !isStaff ? locationRepository.getCities().catch(() => []) : Promise.resolve([]),
@@ -277,6 +283,60 @@ const load = async () => {
     }
   } finally {
     loading.value = false
+  }
+}
+
+/* Admin-only quick-add category (create-only; the shared tree is
+   otherwise provider-managed). */
+const showCategoryModal = ref(false)
+const categoryFormLoading = ref(false)
+const categoryFormError = ref('')
+const parentCategories = ref<CategoryDto[]>([])
+const categoryForm = ref({
+  nameEn: '',
+  nameAr: '',
+  description: '',
+  imageName: '',
+  parentCategoryId: '',
+})
+
+function openCategoryModal() {
+  categoryForm.value = { nameEn: '', nameAr: '', description: '', imageName: '', parentCategoryId: '' }
+  categoryFormError.value = ''
+  showCategoryModal.value = true
+  void marketplaceRepository.getCategories()
+    .then((list) => { parentCategories.value = Array.isArray(list) ? list : [] })
+    .catch(() => { parentCategories.value = [] })
+}
+
+function closeCategoryModal() {
+  showCategoryModal.value = false
+  categoryFormError.value = ''
+}
+
+async function submitCategoryModal() {
+  const f = categoryForm.value
+  if (!f.nameEn.trim() || !f.nameAr.trim()) {
+    categoryFormError.value = t('admin.errBothNames')
+    return
+  }
+  categoryFormLoading.value = true
+  categoryFormError.value = ''
+  try {
+    const payload: CreateCategoryPayload = {
+      nameEn: f.nameEn.trim(),
+      nameAr: f.nameAr.trim(),
+      description: f.description.trim() || undefined,
+      imageName: f.imageName.trim() || null,
+      parentCategoryId: f.parentCategoryId || null,
+    }
+    await marketplaceRepository.createCategory(payload)
+    toastService.success(t('admin.categoryCreated'))
+    closeCategoryModal()
+  } catch (e) {
+    categoryFormError.value = e instanceof Error ? e.message : t('common.error')
+  } finally {
+    categoryFormLoading.value = false
   }
 }
 
@@ -344,20 +404,20 @@ onUnmounted(_removeListeners)
       <div>
         <div class="dash-eyebrow mono">
           <span class="live-dot" aria-hidden="true"></span>
-          <span>{{ isStaffOnly ? t('admin.opsConsole') : t('admin.dashboard') }}</span>
+          <span>{{ isSalesOnly ? t('admin.salesConsole') : t('admin.dashboard') }}</span>
         </div>
-        <h1 class="dash-title">{{ isStaffOnly ? t('admin.fulfillmentHub') : t('admin.dashboard') }}</h1>
+        <h1 class="dash-title">{{ isSalesOnly ? t('admin.fulfillmentHub') : t('admin.dashboard') }}</h1>
         <p class="dash-head__desc">
-          {{ isStaffOnly ? t('admin.opsConsoleDesc') : t('admin.overviewDesc') }}
+          {{ isSalesOnly ? t('admin.salesConsoleDesc') : t('admin.overviewDesc') }}
         </p>
       </div>
 
       <div class="dash-head__actions">
-        <div v-if="!isStaffOnly" class="status-badge mono">
+        <div v-if="!isSalesOnly" class="status-badge mono">
           <span class="live-dot" aria-hidden="true"></span>
           <span>{{ t('admin.gatewayActive') }}</span>
         </div>
-        <template v-if="isStaffOnly">
+        <template v-if="isSalesOnly">
           <BaseButton variant="primary" size="sm" @click="$router.push('/admin/sales')">
             <span class="material-symbols-outlined text-[16px]">receipt_long</span>
             <span>{{ t('admin.issueQuotation') }}</span>
@@ -372,20 +432,18 @@ onUnmounted(_removeListeners)
             <span class="material-symbols-outlined text-[16px]">contact_support</span>
             <span>{{ t('admin.supportChannels') }}</span>
           </BaseButton>
-          <BaseButton variant="primary" size="sm" @click="$router.push('/admin/catalog')">
-            <span class="material-symbols-outlined text-[16px]">inventory_2</span>
-            <span>{{ t('nav.catalog') }}</span>
+          <BaseButton variant="primary" size="sm" @click="$router.push('/admin/categories')">
+            <span class="material-symbols-outlined text-[16px]">category</span>
+            <span>{{ t('admin.categoriesTitle') }}</span>
           </BaseButton>
         </template>
       </div>
     </header>
 
-    <div v-if="loading" class="stats-grid">
-      <SkeletonLoader type="stats-grid" :count="6" gap="1.25rem" />
-    </div>
+    <SkeletonLoader v-if="loading" type="stats-grid" :count="isSalesOnly ? 4 : 6" gap="1rem" />
 
     <!-- Staff Metrics Cards Grid (Focused, high-impact operational counters) -->
-    <div v-else-if="isStaffOnly" class="stats-grid stats-grid--staff">
+    <div v-else-if="isSalesOnly" class="stats-grid stats-grid--staff">
       <StatCard
         :label="t('admin.openRfqQueue')"
         :value="staffMetrics.rfqTotal"
@@ -419,7 +477,7 @@ onUnmounted(_removeListeners)
       <StatCard
         :label="t('admin.productsTitle')"
         :value="stats.products"
-        to="/admin/catalog?tab=products"
+        to="/marketplace"
         :trend="stats.products > 0 ? `${stats.products} ${t('admin.active')}` : undefined"
         tone="emerald"
       >
@@ -482,7 +540,7 @@ onUnmounted(_removeListeners)
       <StatCard
         :label="t('admin.productsTitle')"
         :value="stats.products"
-        to="/admin/catalog?tab=products"
+        to="/marketplace"
         :trend="stats.products > 0 ? `${stats.products} ${t('admin.active')}` : undefined"
         tone="emerald"
       >
@@ -492,10 +550,10 @@ onUnmounted(_removeListeners)
     </div>
 
     <!-- Staff Operational Triage Queues (Exclusive to Welco Staff) -->
-    <section v-if="isStaffOnly" class="staff-operations-section">
-      <div class="staff-queues-grid">
+    <section v-if="isSalesOnly" class="sales-operations-section">
+      <div class="sales-queues-grid">
         <!-- Queue 1: Urgent RFQ Queue -->
-        <div class="card staff-queue-card">
+        <div class="card sales-queue-card">
           <div class="queue-card__head">
             <div class="queue-card__title-group">
               <div class="queue-icon queue-icon--amber">
@@ -540,7 +598,7 @@ onUnmounted(_removeListeners)
         </div>
 
         <!-- Queue 2: Active Orders Fulfillment Queue -->
-        <div class="card staff-queue-card">
+        <div class="card sales-queue-card">
           <div class="queue-card__head">
             <div class="queue-card__title-group">
               <div class="queue-icon queue-icon--indigo">
@@ -585,7 +643,7 @@ onUnmounted(_removeListeners)
         </div>
 
         <!-- Queue 3: Support Inquiries Queue -->
-        <div class="card staff-queue-card">
+        <div class="card sales-queue-card">
           <div class="queue-card__head">
             <div class="queue-card__title-group">
               <div class="queue-icon queue-icon--emerald">
@@ -851,7 +909,7 @@ onUnmounted(_removeListeners)
     </section>
 
     <!-- Real-Time Audit Activity Trail in Overview (Admin Only - Live API Data) -->
-    <section v-if="!isStaffOnly" class="card audit-overview-card">
+    <section v-if="!isSalesOnly" class="card audit-overview-card">
       <div class="audit-overview-head">
         <div>
           <div class="dash-eyebrow mono">
@@ -909,12 +967,12 @@ onUnmounted(_removeListeners)
       <div class="bento-card__head">
         <div>
           <h3>{{ t('admin.quickActions') }}</h3>
-          <span class="mono text-xs text-muted">{{ isStaffOnly ? t('admin.opsShortcuts') : t('admin.adminShortcuts') }}</span>
+          <span class="mono text-xs text-muted">{{ isSalesOnly ? t('admin.salesShortcuts') : t('admin.adminShortcuts') }}</span>
         </div>
       </div>
 
       <!-- Staff Quick Actions -->
-      <div v-if="isStaffOnly" class="quick-actions-grid">
+      <div v-if="isSalesOnly" class="quick-actions-grid">
         <button type="button" class="quick-btn" @click="$router.push('/admin/sales')">
           <span class="material-symbols-outlined quick-btn__icon" style="color:var(--wl-warning)">receipt_long</span>
           <div class="quick-btn__text">
@@ -931,7 +989,7 @@ onUnmounted(_removeListeners)
           </div>
         </button>
 
-        <button type="button" class="quick-btn" @click="$router.push('/admin/catalog?tab=products')">
+        <button type="button" class="quick-btn" @click="$router.push('/marketplace')">
           <span class="material-symbols-outlined quick-btn__icon" style="color:var(--wl-success)">inventory_2</span>
           <div class="quick-btn__text">
             <strong>{{ t('admin.catalogProducts') }}</strong>
@@ -958,7 +1016,7 @@ onUnmounted(_removeListeners)
 
       <!-- Admin Quick Actions -->
       <div v-else class="quick-actions-grid">
-        <button type="button" class="quick-btn" @click="$router.push('/admin/catalog?tab=products')">
+        <button type="button" class="quick-btn" @click="$router.push('/marketplace')">
           <span class="material-symbols-outlined quick-btn__icon">add_circle</span>
           <div class="quick-btn__text">
             <strong>{{ t('admin.newProduct') }}</strong>
@@ -966,7 +1024,7 @@ onUnmounted(_removeListeners)
           </div>
         </button>
 
-        <button type="button" class="quick-btn" @click="$router.push('/admin/catalog?tab=categories')">
+          <button type="button" class="quick-btn" @click="openCategoryModal">
           <span class="material-symbols-outlined quick-btn__icon">category</span>
           <div class="quick-btn__text">
             <strong>{{ t('admin.newCategory') }}</strong>
@@ -1018,7 +1076,7 @@ onUnmounted(_removeListeners)
 
     <!-- Support Contact Channels Modal (Admin Only) -->
     <BaseModal
-      v-if="!isStaffOnly"
+      v-if="!isSalesOnly"
       v-model="showContactModal"
       :title="t('admin.supportChannelsModalTitle')"
       max-width="520px"
@@ -1066,6 +1124,83 @@ onUnmounted(_removeListeners)
         </div>
       </form>
     </BaseModal>
+
+    <!-- Admin quick-add Category (create-only) -->
+    <BaseModal
+      v-if="!isSalesOnly"
+      v-model="showCategoryModal"
+      :title="t('admin.newCategory')"
+      max-width="640px"
+      @close="closeCategoryModal"
+    >
+      <form class="admin-modal-form" @submit.prevent="submitCategoryModal">
+        <div class="form-row two-cols">
+          <div class="form-field">
+            <label class="field-label" for="dash-category-name-en">{{ t('admin.categoryNameEn') }} *</label>
+            <input
+              id="dash-category-name-en"
+              v-model="categoryForm.nameEn"
+              type="text"
+              class="field-input"
+              required
+            />
+          </div>
+          <div class="form-field">
+            <label class="field-label" for="dash-category-name-ar">{{ t('admin.categoryNameAr') }} *</label>
+            <input
+              id="dash-category-name-ar"
+              v-model="categoryForm.nameAr"
+              type="text"
+              class="field-input"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label class="field-label" for="dash-category-description">{{ t('admin.description') }}</label>
+          <textarea
+            id="dash-category-description"
+            v-model="categoryForm.description"
+            class="field-textarea"
+            rows="3"
+          ></textarea>
+        </div>
+
+        <div class="form-field">
+          <FileUpload
+            :model-value="categoryForm.imageName || null"
+            :place="ATTACHMENT_PLACE.PROVIDERS"
+            :file-type="MEDIA_TYPE.IMAGE"
+            accept="image/*"
+            :label="t('admin.categoryImage')"
+            :hint="t('attachment.dropHint')"
+            @update:modelValue="categoryForm.imageName = $event ?? ''"
+          />
+        </div>
+
+        <div class="form-field">
+          <label class="field-label" for="dash-category-parent">{{ t('admin.parentCategory') }}</label>
+          <select id="dash-category-parent" v-model="categoryForm.parentCategoryId" class="field-select">
+            <option value="">{{ t('admin.noParentCategory') }}</option>
+            <option v-for="c in parentCategories" :key="c.id" :value="c.id">
+              {{ c.nameEn }} · {{ c.nameAr }}
+            </option>
+          </select>
+        </div>
+
+        <p v-if="categoryFormError" class="form-error" role="alert">{{ categoryFormError }}</p>
+
+        <div class="modal-foot">
+          <BaseButton variant="secondary" type="button" @click="closeCategoryModal">
+            {{ t('common.cancel') }}
+          </BaseButton>
+          <BaseButton variant="primary" type="submit" :loading="categoryFormLoading">
+            {{ t('common.save') }}
+          </BaseButton>
+        </div>
+      </form>
+    </BaseModal>
   </AdminLayout>
 </template>
 
@@ -1074,8 +1209,8 @@ onUnmounted(_removeListeners)
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  gap: 1.25rem;
-  margin-bottom: 1.5rem;
+  gap: var(--space-5);
+  margin-bottom: var(--space-6);
   flex-wrap: wrap;
 }
 
@@ -1084,12 +1219,12 @@ onUnmounted(_removeListeners)
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--wl-gold);
+  color: var(--brand);
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
   margin-bottom: 0.25rem;
-  text-shadow: var(--wl-gold-text-shadow);
+  text-shadow: none;
 }
 
 .dash-title {
@@ -1123,14 +1258,14 @@ onUnmounted(_removeListeners)
 .status-badge {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
-  background: var(--wl-surface);
-  border: 1px solid var(--wl-border);
-  padding: 0.42rem 0.85rem;
-  border-radius: 9999px;
-  font-size: 11.5px;
-  font-weight: 600;
-  color: var(--wl-ink-soft);
+  gap: var(--space-2);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  color: var(--fg-muted);
   box-shadow: var(--shadow-xs);
 }
 
@@ -1145,22 +1280,13 @@ onUnmounted(_removeListeners)
 
 .stats-grid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.25rem;
-  margin-bottom: 1.75rem;
-}
-
-/* Stat card laser sweep */
-.stats-grid .card::before {
-  opacity: 0;
-  transition: opacity 0.25s ease;
-}
-.stats-grid .card:hover::before {
-  opacity: 0.7;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
 }
 
 .chart-section {
-  margin-bottom: 1.75rem;
+  margin-bottom: var(--space-6);
 }
 
 .chart-grid {
@@ -1174,27 +1300,14 @@ onUnmounted(_removeListeners)
 }
 
 .chart-card {
-  padding: 1.35rem 1.6rem;
-  background: var(--wl-surface);
-  border: 1px solid var(--wl-border);
+  padding: var(--space-6);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  box-shadow: var(--wl-shadow-card);
+  box-shadow: var(--shadow-sm);
   position: relative;
   overflow: hidden;
 }
-
-/* Laser scalpel sweep accent */
-.chart-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  inset-inline: 0;
-  height: 2px;
-  background: var(--wl-laser-sweep);
-  opacity: 0;
-  transition: opacity 0.25s ease;
-}
-.chart-card:hover::before { opacity: 0.6; }
 
 .chart-card__head {
   display: flex;
@@ -1246,11 +1359,11 @@ onUnmounted(_removeListeners)
 .chart-telemetry-bar {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  background: var(--wl-surface-soft);
-  border: 1px solid var(--wl-border);
-  padding: 0.45rem 1rem;
-  border-radius: 10px;
+  gap: var(--space-4);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
   box-shadow: var(--shadow-xs);
   flex-wrap: wrap;
 }
@@ -1394,7 +1507,7 @@ onUnmounted(_removeListeners)
 }
 
 .tooltip-pct {
-  color: #818CF8;
+  color: var(--secondary, #147D92);
   font-weight: 700;
 }
 
@@ -1637,24 +1750,15 @@ onUnmounted(_removeListeners)
 }
 
 .bento-card {
-  padding: 1.25rem 1.4rem;
-  background: var(--wl-surface);
-  border: 1px solid var(--wl-border);
+  padding: var(--space-5) var(--space-5);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
   position: relative;
   overflow: hidden;
 }
-.bento-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  inset-inline: 0;
-  height: 2px;
-  background: var(--wl-laser-sweep);
-  opacity: 0;
-  transition: opacity 0.25s ease;
-}
-.bento-card:hover::before { opacity: 0.5; }
+.bento-card:hover { border-color: var(--border-strong); box-shadow: var(--shadow-md); }
 
 .bento-card__head {
   display: flex;
@@ -1719,17 +1823,17 @@ onUnmounted(_removeListeners)
 }
 
 /* Staff Operational Triage Section */
-.staff-operations-section {
+.sales-operations-section {
   margin-bottom: 1.5rem;
 }
 
-.staff-queues-grid {
+.sales-queues-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1.25rem;
 }
 
-.staff-queue-card {
+.sales-queue-card {
   padding: 1.25rem 1.4rem;
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
@@ -1742,7 +1846,7 @@ onUnmounted(_removeListeners)
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.staff-queue-card:hover {
+.sales-queue-card:hover {
   border-color: var(--wl-primary-soft);
   box-shadow: var(--shadow-md);
 }
@@ -1902,23 +2006,17 @@ onUnmounted(_removeListeners)
 
 /* Real-Time Audit Overview Card */
 .audit-overview-card {
-  padding: 1.25rem 1.5rem;
-  margin-bottom: 1.5rem;
-  background: var(--wl-surface);
-  border: 1px solid var(--wl-border);
+  padding: var(--space-5) var(--space-6);
+  margin-bottom: var(--space-6);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
   position: relative;
   overflow: hidden;
 }
 
-.audit-overview-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  inset-inline: 0;
-  height: 2px;
-  background: var(--wl-laser-sweep);
-}
+.audit-overview-card:hover { border-color: var(--border-strong); }
 
 .audit-overview-head {
   display: flex;
@@ -2038,9 +2136,9 @@ onUnmounted(_removeListeners)
 }
 
 .badge--teal {
-  background: rgba(20, 184, 166, 0.12);
-  color: #0D9488;
-  border: 1px solid rgba(20, 184, 166, 0.25);
+  background: var(--brand-soft, #EDF4FF);
+  color: var(--secondary, #147D92);
+  border: 1px solid var(--border, #D9E2EC);
 }
 
 .badge--slate {
@@ -2075,11 +2173,11 @@ onUnmounted(_removeListeners)
 
 @media (max-width: 980px) {
   .stats-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-    margin-bottom: 1.25rem;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: var(--space-4);
+    margin-bottom: var(--space-5);
   }
-  .staff-queues-grid {
+  .sales-queues-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
@@ -2166,13 +2264,10 @@ onUnmounted(_removeListeners)
 }
 
 @media (max-width: 480px) {
-  .stats-grid {
-    grid-template-columns: 1fr;
-    gap: 0.65rem;
-  }
+  .stats-grid,
   .stats-grid--staff {
-    grid-template-columns: 1fr;
-    gap: 0.65rem;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--space-3);
   }
   .chart-card,
   .audit-overview-card,

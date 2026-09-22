@@ -30,7 +30,7 @@ const activeTab = ref<'companies' | 'applications' | 'oem'>(
 )
 
 const companies = ref<CompanyDto[]>([])
-const loadingCompanies = ref(false)
+const loadingCompanies = ref(true)
 const fetchCompaniesError = ref('')
 const companySearch = ref('')
 const companyPage = ref(1)
@@ -252,7 +252,7 @@ const companyStatusLabel = (c: CompanyDto): string =>
       : t('common.pending')
 
 const applications = ref<DistributorApplicationDto[]>([])
-const loadingApplications = ref(false)
+const loadingApplications = ref(true)
 const fetchApplicationsError = ref('')
 const applicationSearch = ref('')
 const statusFilter = ref<'all' | 'Pending' | 'Approved' | 'Rejected'>('all')
@@ -1105,7 +1105,7 @@ watch([applicationSearch, statusFilter], () => {
 .tab-ribbon {
   display: flex;
   gap: 0.5rem;
-  border-bottom: 1.5px solid var(--wl-border, #E2E8F0);
+  border-bottom: 1px solid var(--border, #D9E2EC);
   padding-bottom: 0;
 }
 
@@ -1114,11 +1114,11 @@ watch([applicationSearch, statusFilter], () => {
   border: none;
   background: transparent;
   font-size: 13.5px;
-  font-weight: 700;
-  color: var(--wl-muted, #64748B);
+  font-weight: 600;
+  color: var(--fg-muted, #627D98);
   cursor: pointer;
   border-bottom: 2px solid transparent;
-  margin-bottom: -1.5px;
+  margin-bottom: -1px;
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
@@ -1126,26 +1126,26 @@ watch([applicationSearch, statusFilter], () => {
 }
 
 .tab-btn:hover {
-  color: var(--wl-ink-strong, #0F172A);
+  color: var(--fg-heading, #102A43);
 }
 
 .tab-btn.is-active {
-  color: var(--wl-primary, #69a9ff);
-  border-bottom-color: var(--wl-primary, #69a9ff);
+  color: var(--primary, #0F3D56);
+  border-bottom-color: var(--primary, #0F3D56);
 }
 
 .tab-chip {
   font-size: 10px;
   font-weight: 700;
-  background: var(--wl-surface-soft);
-  color: var(--wl-ink-soft);
+  background: var(--surface-subtle, #F7F9FB);
+  color: var(--fg-muted, #627D98);
   padding: 0.1rem 0.45rem;
-  border-radius: 9999px;
+  border-radius: var(--radius-xs, 3px);
 }
 
 .tab-chip--amber {
-  background: #FEF3C7;
-  color: var(--wl-warning);
+  background: var(--color-warning-50, #FFF8E1);
+  color: var(--fg-warning, #E67E22);
 }
 
 .tab-content {
@@ -1239,11 +1239,11 @@ watch([applicationSearch, statusFilter], () => {
 
 /* Executive Table */
 .table-card {
-  background: var(--wl-surface);
-  border: 1px solid var(--wl-border, #E2E8F0);
-  border-radius: var(--wl-radius-card, 16px);
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #D9E2EC);
+  border-radius: var(--radius-card, 8px);
   overflow: hidden;
-  box-shadow: var(--wl-shadow-card, 0 1px 3px rgba(0, 10, 25, 0.05));
+  box-shadow: var(--shadow-sm);
 }
 
 .table-wrap {
@@ -1257,25 +1257,25 @@ watch([applicationSearch, statusFilter], () => {
 }
 
 .exec-table thead th {
-  background: var(--wl-surface-soft);
-  border-bottom: 1px solid var(--wl-border);
+  background: var(--surface-subtle, #F7F9FB);
+  border-bottom: 1px solid var(--border, #D9E2EC);
   padding: 0.85rem 1.25rem;
-  font-family: var(--wl-font-mono, monospace);
+  font-family: var(--font-mono);
   font-size: 11px;
-  font-weight: 700;
-  color: var(--wl-muted);
+  font-weight: 600;
+  color: var(--fg-muted, #627D98);
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
 .exec-row {
   height: 52px;
-  border-bottom: 1px solid var(--wl-border);
+  border-bottom: 1px solid var(--border, #D9E2EC);
   transition: background 0.15s ease;
 }
 
 .exec-row:hover {
-  background: var(--wl-surface-soft);
+  background: var(--surface-subtle, #F7F9FB);
 }
 
 .exec-row td {
@@ -1285,12 +1285,12 @@ watch([applicationSearch, statusFilter], () => {
 
 .company-name {
   font-size: 13.5px;
-  color: var(--wl-ink-strong);
+  color: var(--fg-heading, #102A43);
 }
 
 .website-row {
   font-size: 11px;
-  color: var(--wl-primary);
+  color: var(--secondary, #147D92);
   margin-top: 2px;
 }
 
@@ -1301,11 +1301,11 @@ watch([applicationSearch, statusFilter], () => {
 
 .type-pill {
   font-size: 10.5px;
-  color: var(--wl-ink-soft);
-  background: var(--wl-surface-soft);
-  border: 1px solid var(--wl-border);
+  color: var(--fg-muted, #627D98);
+  background: var(--surface-subtle, #F7F9FB);
+  border: 1px solid var(--border, #D9E2EC);
   padding: 0.15rem 0.5rem;
-  border-radius: 6px;
+  border-radius: var(--radius-xs, 3px);
 }
 
 .applicant-cell {
@@ -1315,22 +1315,23 @@ watch([applicationSearch, statusFilter], () => {
 
 .applicant-name {
   font-size: 13px;
-  color: var(--wl-ink-strong);
+  color: var(--fg-heading, #102A43);
 }
 
 .applicant-email,
 .applicant-phone {
   font-size: 11px;
-  color: var(--wl-muted);
+  color: var(--fg-muted, #627D98);
 }
 
 .vol-pill {
   font-size: 10px;
   font-weight: 700;
-  color: #0D9488;
-  background: #CCFBF1;
+  color: var(--secondary, #147D92);
+  background: var(--brand-soft, #EDF4FF);
+  border: 1px solid var(--border, #D9E2EC);
   padding: 0.15rem 0.5rem;
-  border-radius: 9999px;
+  border-radius: var(--radius-xs, 3px);
 }
 
 .status-pill {
@@ -1340,7 +1341,7 @@ watch([applicationSearch, statusFilter], () => {
   font-size: 10.5px;
   font-weight: 700;
   padding: 0.18rem 0.55rem;
-  border-radius: 9999px;
+  border-radius: var(--radius-xs, 3px);
 }
 
 .pill-dot {
@@ -1350,22 +1351,22 @@ watch([applicationSearch, statusFilter], () => {
 }
 
 .status-pill--verified {
-  background: var(--wl-success-soft);
-  color: var(--wl-success);
+  background: var(--color-success-50, #E8F5E9);
+  color: var(--fg-success, #198754);
 }
-.status-pill--verified .pill-dot { background: #10B981; }
+.status-pill--verified .pill-dot { background: var(--color-success-500, #198754); }
 
 .status-pill--pending {
-  background: #FEF3C7;
-  color: var(--wl-warning);
+  background: var(--color-warning-50, #FFF8E1);
+  color: var(--fg-warning, #E67E22);
 }
-.status-pill--pending .pill-dot { background: #F59E0B; }
+.status-pill--pending .pill-dot { background: var(--color-warning-500, #E67E22); }
 
 .status-pill--declined {
-  background: var(--wl-danger-soft);
-  color: var(--wl-danger);
+  background: var(--color-danger-50, #FFF8F7);
+  color: var(--fg-danger, #DC3545);
 }
-.status-pill--declined .pill-dot { background: #EF4444; }
+.status-pill--declined .pill-dot { background: var(--color-danger-500, #DC3545); }
 
 .app-actions {
   display: flex;

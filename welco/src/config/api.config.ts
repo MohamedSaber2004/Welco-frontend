@@ -4,9 +4,7 @@ const RAW_API_BASE = ((import.meta.env.VITE_API_BASE_URL as string | undefined) 
 export const API_BASE_URL = RAW_API_BASE ? RAW_API_BASE.replace(/\/+$/, '') : ''
 
 const WELCO_GW = 'https://welco-gateway.runasp.net'
-const SNUL_GW = 'https://snul-gateway.runasp.net'
 export function resolveGateway(target: string | undefined): string {
-  if (target === 'snul') return SNUL_GW
   if (target === '') return WELCO_GW
   if (target === 'welco') return WELCO_GW
   return ((import.meta.env.VITE_API_BASE_URL as string | undefined) ?? '').trim() || WELCO_GW
@@ -59,11 +57,14 @@ export const USER_MANAGEMENT_ROUTES = {
 export const MARKETPLACE_ROUTES = {
   base: '/api/v1',
   products: '/api/v1/products',
+  myProducts: '/api/v1/products/mine',
   productById: (id: string) => `/api/v1/products/${id}`,
   featured: '/api/v1/products',
   categories: '/api/v1/categories',
   categoryById: (id: string) => `/api/v1/categories/${id}`,
   categoryProducts: (id: string) => `/api/v1/categories/${id}/products`,
+  categoryProviders: (id: string) => `/api/v1/categories/${id}/providers`,
+  skuProviders: (sku: string) => `/api/v1/products/by-sku/${encodeURIComponent(sku)}/providers`,
   currencies: '/api/v1/currencies',
   currencyById: (id: string) => `/api/v1/currencies/${id}`,
 } as const
@@ -148,7 +149,9 @@ export const SUPPORT_ROUTES = {
 export const COMPANY_ROUTES = {
   base: '/api/v1/user-management',
   companies: '/api/v1/user-management/companies',
+  companyDirectory: '/api/v1/user-management/companies/directory',
   companyById: (id: string) => `/api/v1/user-management/companies/${id}`,
+  companyProducts: (id: string) => `/api/v1/user-management/companies/${id}/products`,
   companyAddresses: (companyId: string) => `/api/v1/user-management/companies/${companyId}/addresses`,
   companyAddressById: (companyId: string, addressId: string) => `/api/v1/user-management/companies/${companyId}/addresses/${addressId}`,
   companyAddressDirect: (addressId: string) => `/api/v1/user-management/company-addresses/${addressId}`,

@@ -19,8 +19,13 @@ const statusFilter = ref('')
 const localPage = ref(1)
 const pageSize = 10
 
-const loadData = () => {
-  void salesService.loadQuotes({ pageNumber: 1, pageSize: 50 })
+const pageLoading = ref(true)
+const loadData = async () => {
+  try {
+    await salesService.loadQuotes({ pageNumber: 1, pageSize: 50 })
+  } finally {
+    pageLoading.value = false
+  }
 }
 
 const filteredQuotes = computed(() => {
@@ -120,8 +125,8 @@ onMounted(() => {
     </div>
 
     <DataState
-      :loading="salesService.loading.value"
-      :empty="!filteredQuotes.length && !salesService.loading.value"
+      :loading="pageLoading || salesService.loading.value"
+      :empty="!filteredQuotes.length && !pageLoading && !salesService.loading.value"
       :empty-title="searchQuery || statusFilter ? t('common.noResults') : t('sales.noQuotes')"
       :empty-description="searchQuery || statusFilter ? t('common.searchResults') : t('sales.noQuotesDesc')"
       :empty-variant="searchQuery || statusFilter ? 'search' : 'default'"
@@ -383,9 +388,9 @@ onMounted(() => {
 }
 
 .search-input:focus {
-  border-color: #69a9ff;
-  box-shadow: 0 0 0 3px rgba(105, 169, 255, 0.12);
-  background: var(--wl-surface);
+  border-color: var(--border-focus);
+  box-shadow: var(--ring-focus);
+  background: var(--bg-surface);
 }
 
 .clear-btn {
@@ -407,7 +412,7 @@ onMounted(() => {
   height: 38px;
   padding: 0 0.85rem;
   border: 1px solid var(--wl-border);
-  border-radius: 10px;
+  border-radius: var(--radius-sm, 4px);
   font-size: 12.5px;
   color: var(--wl-ink-soft);
   background: var(--wl-surface-soft);
@@ -416,7 +421,7 @@ onMounted(() => {
   transition: border-color 0.15s;
 }
 
-.filter-select:focus { border-color: #69a9ff; }
+.filter-select:focus { border-color: var(--border-focus); box-shadow: var(--ring-focus); }
 
 .clear-filters-btn {
   display: inline-flex;
@@ -424,17 +429,17 @@ onMounted(() => {
   gap: 0.3rem;
   height: 38px;
   padding: 0 0.85rem;
-  border: 1px solid #FCA5A5;
-  border-radius: 10px;
+  border: 1px solid var(--border-danger, #FFDAD6);
+  border-radius: var(--radius-sm, 4px);
   font-size: 12px;
-  font-weight: 700;
-  color: var(--wl-danger);
-  background: var(--wl-danger-soft);
+  font-weight: 600;
+  color: var(--fg-danger, #DC3545);
+  background: var(--color-danger-50, #FFF8F7);
   cursor: pointer;
   transition: all 0.15s;
 }
 
-.clear-filters-btn:hover { background: rgba(242, 109, 109, 0.22); }
+.clear-filters-btn:hover { background: var(--color-danger-100, #FFDAD6); }
 </style>
 
 

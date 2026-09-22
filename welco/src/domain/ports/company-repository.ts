@@ -13,6 +13,7 @@ import type {
   CreateCompanyAddressPayload,
   UpdateCompanyAddressPayload,
 } from '../models/address'
+import type { ProductDto } from '../models/marketplace'
 
 export interface CompanyQuery {
   pageNumber?: number
@@ -39,10 +40,20 @@ export interface OemInquiryDto {
 
 export type OemInquiryQuery = CompanyQuery
 
+export interface CompanyProductsQuery {
+  categoryId?: string
+  search?: string
+  sku?: string
+  page?: number
+  pageSize?: number
+}
+
 export interface CompanyRepository {
   getCompanies(query?: CompanyQuery): Promise<PaginatedResult<CompanyDto>>
+  getProvidersDirectory(query?: CompanyQuery): Promise<PaginatedResult<CompanyDto>>
   getCompanyById(id: string): Promise<CompanyDto>
   getMyCompany(): Promise<CompanyDto | null>
+  getCompanyProducts(companyId: string, query?: CompanyProductsQuery): Promise<PaginatedResult<ProductDto>>
   createCompany(payload: CreateCompanyPayload): Promise<CompanyDto>
   updateCompany(id: string, payload: UpdateCompanyPayload): Promise<CompanyDto>
   deleteCompany(id: string): Promise<void>

@@ -125,7 +125,7 @@ function clearFilters() {
       </div>
 
       <div v-if="loading">
-        <SkeletonLoader type="list" :count="4" />
+        <SkeletonLoader type="ticket" :count="4" />
       </div>
 
       <div v-else-if="!filteredTickets.length" class="empty-tray-card">
@@ -255,9 +255,9 @@ function clearFilters() {
 }
 
 .search-input:focus {
-  border-color: #69a9ff;
-  box-shadow: 0 0 0 3px rgba(105, 169, 255, 0.12);
-  background: var(--wl-surface);
+  border-color: var(--border-focus);
+  box-shadow: var(--ring-focus);
+  background: var(--bg-surface);
 }
 
 .clear-btn {
@@ -288,7 +288,7 @@ function clearFilters() {
   transition: border-color 0.15s;
 }
 
-.filter-select:focus { border-color: #69a9ff; }
+.filter-select:focus { border-color: var(--border-focus); box-shadow: var(--ring-focus); }
 
 .clear-filters-btn {
   display: inline-flex;
@@ -296,17 +296,17 @@ function clearFilters() {
   gap: 0.3rem;
   height: 38px;
   padding: 0 0.85rem;
-  border: 1px solid #FCA5A5;
-  border-radius: 10px;
+  border: 1px solid var(--border-danger, #FFDAD6);
+  border-radius: var(--radius-sm, 4px);
   font-size: 12px;
-  font-weight: 700;
-  color: var(--wl-danger);
-  background: var(--wl-danger-soft);
+  font-weight: 600;
+  color: var(--fg-danger, #DC3545);
+  background: var(--color-danger-50, #FFF8F7);
   cursor: pointer;
   transition: all 0.15s;
 }
 
-.clear-filters-btn:hover { background: rgba(242, 109, 109, 0.22); }
+.clear-filters-btn:hover { background: var(--color-danger-100, #FFDAD6); }
 
 .tickets-head {
   display: flex;
@@ -508,7 +508,7 @@ function clearFilters() {
   font-size: 11px;
   font-weight: 700;
   padding: 0.2rem 0.6rem;
-  border-radius: 9999px;
+  border-radius: var(--radius-xs, 3px);
 }
 
 .status-pill .dot {
@@ -518,16 +518,16 @@ function clearFilters() {
 }
 
 .status-pill--open {
-  background: #FEF3C7;
-  color: var(--wl-warning);
+  background: var(--color-warning-50, #FFF8E1);
+  color: var(--fg-warning, #E67E22);
 }
-.status-pill--open .dot { background: #F59E0B; }
+.status-pill--open .dot { background: var(--color-warning-500, #E67E22); }
 
 .status-pill--answered {
-  background: var(--wl-success-soft);
-  color: var(--wl-success);
+  background: var(--color-success-50, #E8F5E9);
+  color: var(--fg-success, #198754);
 }
-.status-pill--answered .dot { background: #10B981; }
+.status-pill--answered .dot { background: var(--color-success-500, #198754); }
 
 .status-pill--closed {
   background: var(--wl-surface-soft);

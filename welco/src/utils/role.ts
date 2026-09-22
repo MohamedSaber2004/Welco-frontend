@@ -3,7 +3,7 @@ import { authService } from '../di/container'
 
 export const applyRoleTheme = () => {
   const update = () => {
-    const role = authService.isAdmin.value ? 'admin' : authService.isOrganizationUser.value ? 'organization' : authService.isWelcoStaff.value ? 'staff' : 'guest'
+    const role = authService.isAdmin.value ? 'admin' : authService.isProvider.value ? 'provider' : authService.isSales.value ? 'sales' : authService.isClient.value ? 'client' : 'guest'
     document.documentElement.dataset.role = role
   }
   update()

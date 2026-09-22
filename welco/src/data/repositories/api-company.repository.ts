@@ -1,4 +1,4 @@
-import { COMPANY_ROUTES } from '../../config/api.config'
+import { COMPANY_ROUTES, MARKETPLACE_ROUTES } from '../../config/api.config'
 import type { PaginatedResult } from '../../domain/models/location'
 import {
   type CompanyDto,
@@ -9,7 +9,8 @@ import {
   type OemInquiryPayload,
   type OemService,
 } from '../../domain/models/company'
-import type { CompanyRepository, CompanyQuery, DistributorApplicationQuery, OemInquiryDto, OemInquiryQuery } from '../../domain/ports/company-repository'
+import type { CompanyRepository, CompanyQuery, CompanyProductsQuery, DistributorApplicationQuery, OemInquiryDto, OemInquiryQuery } from '../../domain/ports/company-repository'
+import type { ProductDto } from '../../domain/models/marketplace'
 import type { HttpClient } from '../../infrastructure/http/http-client'
 import type {
   CompanyAddressDto,
@@ -21,18 +22,94 @@ export class ApiCompanyRepository implements CompanyRepository {
   constructor(private readonly http: HttpClient) {}
 
   async getCompanies(query: CompanyQuery = {}): Promise<PaginatedResult<CompanyDto>> {
+    return this.fetchCompanyPage(COMPANY_ROUTES.companies, query)
+  }
+
+  /** Public provider directory — dedicated anonymous route (no auth).
+   *  Falls back gracefully to empty result if gateway doesn't ship the route.
+   *  NOTE: http.get resolves (not throws) 401 GETs as an empty page. */
+  async getProvidersDirectory(query: CompanyQuery = {}): Promise<PaginatedResult<CompanyDto>> {
+    try {
+      const res = await this.fetchCompanyPage(COMPANY_ROUTES.companyDirectory, query)
+      return res
+    } catch {
+      return {
+        isSuccess: false,
+        data: [],
+        totalCount: 0,
+        pageNumber: query.pageNumber ?? 1,
+        pageSize: query.pageSize ?? 10,
+        totalPages: 0,
+        hasPreviousPage: false,
+        hasNextPage: false,
+        message: 'Public directory not available',
+        statusCode: 401,
+      }
+    }
+  }
+
+  private async fetchCompanyPage(base: string, query: CompanyQuery = {}): Promise<PaginatedResult<CompanyDto>> {
     const params = new URLSearchParams()
     if (query.pageNumber) params.set('pageNumber', String(query.pageNumber))
     if (query.pageSize) params.set('pageSize', String(Math.min(50, Math.max(1, query.pageSize))))
     if (query.searchTerm) params.set('searchTerm', query.searchTerm)
     const qs = params.toString()
-    const raw = await this.http.get<unknown>(qs ? `${COMPANY_ROUTES.companies}?${qs}` : COMPANY_ROUTES.companies, { showFeedback: false })
+    const raw = await this.http.get<unknown>(qs ? `${base}?${qs}` : base, { showFeedback: false })
     if (Array.isArray(raw)) return { isSuccess: true, data: raw as CompanyDto[], totalCount: raw.length, pageNumber: query.pageNumber ?? 1, pageSize: query.pageSize ?? 10, totalPages: 1, hasPreviousPage: false, hasNextPage: false, message: 'OK', statusCode: 200 }
     return raw as PaginatedResult<CompanyDto>
   }
 
   async getCompanyById(id: string): Promise<CompanyDto> {
     return await this.http.get<CompanyDto>(COMPANY_ROUTES.companyById(id), { showFeedback: false })
+  }
+
+  async getCompanyProducts(companyId: string, query: CompanyProductsQuery = {}): Promise<PaginatedResult<ProductDto>> {
+    const page = query.page ?? 1
+    const pageSize = Math.min(50, Math.max(1, query.pageSize ?? 12))
+    const paginate = (items: ProductDto[]) => ({
+      isSuccess: true,
+      data: items.slice((page - 1) * pageSize, page * pageSize),
+      totalCount: items.length,
+      pageNumber: page,
+      pageSize,
+      totalPages: Math.max(1, Math.ceil(items.length / pageSize)),
+      hasPreviousPage: page > 1,
+      hasNextPage: page < Math.max(1, Math.ceil(items.length / pageSize)),
+      message: 'OK',
+      statusCode: 200,
+    })
+    try {
+      const params = new URLSearchParams()
+      if (query.categoryId) params.set('categoryId', query.categoryId)
+      if (query.search) params.set('SearchTerm', query.search)
+      if (query.sku) params.set('Sku', query.sku)
+      params.set('pageNumber', String(page))
+      params.set('pageSize', String(pageSize))
+      const qs = params.toString()
+      const raw = await this.http.get<unknown>(`${COMPANY_ROUTES.companyProducts(companyId)}?${qs}`, { showFeedback: false })
+      if (Array.isArray(raw)) return paginate(raw as ProductDto[])
+      return raw as PaginatedResult<ProductDto>
+    } catch {
+      const params = new URLSearchParams()
+      params.set('pageNumber', '1')
+      params.set('pageSize', '50')
+      const raw = await this.http
+        .get<unknown>(`${MARKETPLACE_ROUTES.products}?${params.toString()}`, { showFeedback: false })
+        .catch(() => null)
+      const arr = (Array.isArray(raw) ? raw : (raw as PaginatedResult<ProductDto> | null)?.data ?? []) as ProductDto[]
+      const q = (query.search || '').trim().toLowerCase()
+      const sku = (query.sku || '').trim().toLowerCase()
+      return paginate(
+        arr.filter((p) => {
+          if (!p) return false
+          if (!(p.companyId === companyId || (!p.companyId && p.supplierId === companyId))) return false
+          if (query.categoryId && p.categoryId !== query.categoryId) return false
+          if (q && ![p.nameEn, p.nameAr, p.sku, p.material].some((v) => (v ? String(v).toLowerCase().includes(q) : false))) return false
+          if (sku && !(p.sku ? String(p.sku).toLowerCase().includes(sku) : false)) return false
+          return true
+        }),
+      )
+    }
   }
 
   async createCompany(payload: CreateCompanyPayload): Promise<CompanyDto> {

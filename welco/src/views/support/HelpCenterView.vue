@@ -22,7 +22,7 @@ const loading = ref(true)
 const openFaq = ref<string | null>(null)
 const isAuthed = computed(() => authService.isAuthenticated)
 const isBuyer = computed(() => authService.isOrganizationUser.value)
-const isSeller = computed(() => authService.isAdmin.value || authService.isWelcoStaff.value)
+const isSeller = computed(() => authService.isAdmin.value || authService.isSales.value)
 
 const ticketSubject = ref('')
 const ticketMessage = ref('')
@@ -72,7 +72,7 @@ const filteredArticles = computed(() => {
   })
 })
 
-const COLOR_PALETTE = ['#69a9ff', '#0D9488', '#F43F5E', '#10B981', '#69a9ff', '#D97706', '#0284C7', '#69a9ff']
+const COLOR_PALETTE = ['#0F3D56', '#147D92', '#28A7A1', '#E67E22', '#198754', '#627D98', '#147D92', '#0F3D56']
 
 const visibleFaqs = computed(() => {
   const list = Array.isArray(faqs.value) ? faqs.value : []
@@ -275,8 +275,8 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
               <svg class="schematic-svg" viewBox="0 0 320 190" fill="none">
                 <defs>
                   <linearGradient id="laserGrad" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stop-color="#69a9ff" />
-                    <stop offset="100%" stop-color="#0D9488" />
+                    <stop offset="0%" stop-color="#0F3D56" />
+                    <stop offset="100%" stop-color="#147D92" />
                   </linearGradient>
                 </defs>
 
@@ -337,7 +337,7 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
       </div>
     </section>
 
-    <SkeletonLoader v-if="loading" type="category-grid" :count="6" />
+    <SkeletonLoader v-if="loading" type="help-grid" :count="6" />
 
     <template v-else>
       <section v-if="guideCards.length" class="guides-section">
@@ -1046,10 +1046,10 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
   letter-spacing: 0.05em;
 }
 
-.sat-node--teal .sat-circle { stroke: var(--wl-primary); }
-.sat-node--indigo .sat-circle { stroke: #69a9ff; }
-.sat-node--amber .sat-circle { stroke: #F59E0B; }
-.sat-node--emerald .sat-circle { stroke: #10B981; }
+.sat-node--teal .sat-circle { stroke: var(--chart-1); }
+.sat-node--indigo .sat-circle { stroke: var(--brand); }
+.sat-node--amber .sat-circle { stroke: var(--chart-5); }
+.sat-node--emerald .sat-circle { stroke: var(--chart-2); }
 
 .telemetry-metrics {
   display: flex;
@@ -1714,8 +1714,8 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
 }
 
 .channel-icon--whatsapp {
-  background: rgba(16, 185, 129, 0.12);
-  color: #10B981;
+  background: var(--color-success-50, #E8F5E9);
+  color: var(--color-success-500, #198754);
 }
 
 .channel-icon--phone {

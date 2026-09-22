@@ -33,63 +33,51 @@ const toasts = toastService.toasts
 <style scoped>
 .toast-stack {
   position: fixed;
-  top: calc(var(--wl-header-height, 56px) + 1rem);
-  inset-inline-end: 1rem;
-  z-index: 9999;
+  bottom: var(--space-6);
+  inset-inline-end: var(--space-6);
+  z-index: var(--z-toast);
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--space-3);
   max-width: 420px;
 }
 
 .toast {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.8rem 0.9rem 0.8rem 1rem;
-  border-radius: var(--wl-radius-md);
-  background: var(--wl-surface);
-  border: 1px solid var(--wl-border);
-  box-shadow: var(--wl-shadow);
-  font-size: 0.92rem;
-  color: var(--wl-ink);
-  border-inline-start: 2px solid var(--wl-line-strong);
+  gap: var(--space-3);
+  min-width: 280px;
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+  font-size: var(--text-md);
+  color: var(--fg-body);
   position: relative;
   overflow: hidden;
 }
 
-.toast::after {
-  content: '';
-  position: absolute;
-  inset-inline-end: 0;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: var(--wl-line);
-  opacity: 0.6;
-}
-
 .toast--success {
-  border-inline-start-color: var(--wl-gold);
-  background: var(--wl-surface);
-  border-color: var(--wl-border);
+  border-inline-start: 3px solid var(--fg-success);
 }
-.toast--success::after { background: var(--wl-gold); opacity: 1; }
-
 .toast--error {
-  border-inline-start-color: var(--wl-danger);
-  background: var(--wl-surface);
-  border-color: var(--wl-border);
+  border-inline-start: 3px solid var(--fg-danger);
 }
-.toast--error::after { background: var(--wl-danger); opacity: 1; }
+.toast--warning {
+  border-inline-start: 3px solid var(--fg-warning);
+}
+.toast--info {
+  border-inline-start: 3px solid var(--fg-info);
+}
 
 .toast__msg {
   flex: 1;
 }
 
 .toast__action {
-  font-weight: 700;
-  color: var(--wl-primary);
+  font-weight: var(--weight-medium);
+  color: var(--brand);
   background: none;
   border: none;
   cursor: pointer;
@@ -100,9 +88,10 @@ const toasts = toastService.toasts
   border: none;
   font-size: 1.1rem;
   cursor: pointer;
-  color: var(--wl-muted);
+  color: var(--fg-subtle);
   line-height: 1;
 }
+.toast__close:hover { color: var(--fg-heading); }
 
 .toast-enter-active,
 .toast-leave-active {

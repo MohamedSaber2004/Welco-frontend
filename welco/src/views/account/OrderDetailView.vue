@@ -47,7 +47,7 @@ function statusIndex(o: OrderDto): number {
       <span class="crumb-active">{{ order?.orderNumber ?? '…' }}</span>
     </nav>
 
-    <SkeletonLoader v-if="loading" type="card" :lines="6" height="220px" />
+    <SkeletonLoader v-if="loading" type="order-detail" />
     <DataState
       v-else-if="!order"
       :empty="true"
@@ -59,7 +59,6 @@ function statusIndex(o: OrderDto): number {
     />
 
     <template v-else-if="order">
-      <!-- Executive Manifest Header -->
       <header class="detail-header">
         <div class="header-main">
           <div class="head-chip mono">

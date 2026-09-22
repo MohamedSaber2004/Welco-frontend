@@ -16,15 +16,10 @@ export enum ThemeMode {
   Dark = 2,
 }
 
-/** Accepts backend variants (1/2, 'White'/'Dark', 'white'/'dark', 'light'/'dark'). */
-export function normalizeThemeMode(value: unknown): ThemeMode | null {
-  if (value === ThemeMode.White || value === ThemeMode.Dark) return value as ThemeMode
-  if (typeof value === 'string') {
-    const v = value.trim().toLowerCase()
-    if (v === 'white' || v === 'light') return ThemeMode.White
-    if (v === 'dark') return ThemeMode.Dark
-  }
-  return null
+/** Light-only mode: the site is always white. Backend enum is kept for
+ * API compatibility, but every value normalizes to White. */
+export function normalizeThemeMode(_value: unknown): ThemeMode | null {
+  return ThemeMode.White
 }
 
 export interface User {
@@ -122,9 +117,11 @@ export const USER_TINTS = ['#0ea5e9', '#8b5cf6', '#ec4899', '#10b981', '#f59e0b'
 
 export const USER_TYPE_ROLE_KEY = (
   userType: UserType,
-): 'roleAdmin' | 'roleOrganizationUser' | 'roleWelcoStaff' =>
+): 'roleAdmin' | 'roleSales' | 'roleProvider' | 'roleClient' =>
   userType === UserType.Admin
     ? 'roleAdmin'
     : userType === UserType.WelcoStaff
-      ? 'roleWelcoStaff'
-      : 'roleOrganizationUser'
+      ? 'roleSales'
+      : userType === UserType.OrganizationUser
+        ? 'roleProvider'
+        : 'roleClient'

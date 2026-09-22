@@ -12,7 +12,7 @@ import { t } from '../../i18n'
 import type { CountryDto } from '../../domain/models/location'
 
 const countries = ref<CountryDto[]>([])
-const loading = ref(false)
+const loading = ref(true)
 const search = ref('')
 const fetchError = ref('')
 

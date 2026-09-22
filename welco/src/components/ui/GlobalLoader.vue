@@ -348,7 +348,7 @@ const displayMessage = computed(() => {
 .global-loader__backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(15, 23, 42, 0.6);
+  background: var(--bg-overlay);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   animation: backdropFadeIn 0.3s ease-out;
@@ -696,8 +696,8 @@ const displayMessage = computed(() => {
 
 .progress-bar {
   width: 100%;
-  height: 4px;
-  background: var(--wl-surface-soft);
+  height: 6px;
+  background: var(--chart-track);
   border-radius: var(--radius-pill);
   overflow: hidden;
   position: relative;
@@ -705,9 +705,9 @@ const displayMessage = computed(() => {
 
 .progress-fill {
   height: 100%;
-  background: var(--wl-gradient-primary);
+  background: var(--brand);
   border-radius: var(--radius-pill);
-  transition: width 0.3s ease-out;
+  transition: width var(--duration-slow) var(--ease-out);
   position: relative;
 }
 

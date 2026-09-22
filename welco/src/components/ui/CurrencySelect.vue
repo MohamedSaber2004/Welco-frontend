@@ -434,9 +434,9 @@ watch(isOpen, (val) => {
   width: 320px;
   max-width: 90vw;
   background: var(--wl-surface);
-  border: 1px solid var(--wl-line-strong, #cbd5e1);
-  border-radius: var(--wl-radius-md, 10px);
-  box-shadow: 0 10px 28px -4px rgba(0, 10, 25, 0.18), 0 4px 12px -2px rgba(0, 10, 25, 0.08);
+  border: 1px solid var(--wl-line-strong, #C2C7CD);
+  border-radius: var(--radius-lg, 8px);
+  box-shadow: var(--shadow-lg);
   z-index: 10000;
   overflow: hidden;
   display: flex;

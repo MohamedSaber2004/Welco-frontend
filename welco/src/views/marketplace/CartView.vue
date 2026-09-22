@@ -807,8 +807,8 @@ const submitRfq = async () => {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #10B981;
-  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25);
+  background: var(--color-success-500, #198754);
+  box-shadow: 0 0 0 2px rgba(25, 135, 84, 0.2);
 }
 
 .address-curr-badge {
@@ -817,11 +817,11 @@ const submitRfq = async () => {
   gap: 0.3rem;
   font-size: 10.5px;
   font-weight: 700;
-  color: var(--wl-primary, #69a9ff);
-  background: var(--wl-primary-soft);
-  border: 1px solid rgba(var(--wl-primary-rgb), 0.3);
+  color: var(--primary, #0F3D56);
+  background: var(--brand-soft, #EDF4FF);
+  border: 1px solid var(--border, #D9E2EC);
   padding: 0.18rem 0.55rem;
-  border-radius: 9999px;
+  border-radius: var(--radius-xs, 3px);
 }
 
 .curr-hub__active-hero {
@@ -851,7 +851,7 @@ const submitRfq = async () => {
 .active-code {
   font-size: 1.28rem;
   font-weight: 800;
-  color: var(--wl-ink-strong, #0F172A);
+  color: var(--fg-heading, #102A43);
   letter-spacing: -0.01em;
   line-height: 1.1;
 }
@@ -859,11 +859,11 @@ const submitRfq = async () => {
 .active-symbol-badge {
   font-size: 12px;
   font-weight: 800;
-  color: var(--wl-primary, #69a9ff);
-  background: var(--wl-primary-soft);
-  border: 1px solid rgba(var(--wl-primary-rgb), 0.3);
+  color: var(--primary, #0F3D56);
+  background: var(--brand-soft, #EDF4FF);
+  border: 1px solid var(--border, #D9E2EC);
   padding: 0.1rem 0.45rem;
-  border-radius: 6px;
+  border-radius: var(--radius-xs, 3px);
   line-height: 1.2;
 }
 
@@ -873,7 +873,7 @@ const submitRfq = async () => {
   gap: 0.35rem;
   font-size: 12.5px;
   font-weight: 600;
-  color: var(--wl-muted, #64748B);
+  color: var(--fg-muted, #627D98);
 }
 
 .dot-sep {
@@ -882,7 +882,7 @@ const submitRfq = async () => {
 
 .curr-hub__hint {
   font-size: 11px;
-  color: var(--wl-muted, #64748B);
+  color: var(--fg-muted, #627D98);
   margin: 0;
   line-height: 1.4;
 }
@@ -907,7 +907,7 @@ const submitRfq = async () => {
 .chips-lbl {
   font-size: 11px;
   font-weight: 700;
-  color: var(--wl-muted, #64748B);
+  color: var(--fg-muted, #627D98);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -920,15 +920,15 @@ const submitRfq = async () => {
   border: none;
   font-size: 11px;
   font-weight: 600;
-  color: var(--wl-muted, #64748B);
+  color: var(--fg-muted, #627D98);
   cursor: pointer;
   padding: 0.2rem 0.4rem;
-  border-radius: 6px;
+  border-radius: var(--radius-xs, 3px);
   transition: all 0.15s ease;
 }
 
 .btn-refresh-rates:hover:not(:disabled) {
-  color: var(--wl-primary, #69a9ff);
+  color: var(--brand);
   background: var(--wl-primary-soft);
 }
 

@@ -26,8 +26,8 @@ const toggleLang = async () => {
 
 const isAuthed = computed(() => authService.isAuthenticated)
 const isAdmin = computed(() => authService.isAdmin.value)
-const isStaff = computed(() => authService.isWelcoStaff.value && !isAdmin.value)
-const isSeller = computed(() => authService.isAdmin.value || authService.isWelcoStaff.value)
+const isSales = computed(() => authService.isSales.value && !isAdmin.value)
+const isSeller = computed(() => authService.isAdmin.value || authService.isSales.value)
 const isBuyer = computed(() => authService.isOrganizationUser.value)
 const user = computed(() => authService.user.value)
 
@@ -68,7 +68,7 @@ const handleLogout = async () => {
 const userRoleLabel = computed(() => {
   if (!user.value) return ''
   if (isAdmin.value) return t('admin.roleAdmin')
-  if (isStaff.value) return t('admin.welcoStaff')
+  if (isSales.value) return t('admin.roleSales')
   return t(`admin.${authService.resolveBusinessRoleKey()}`)
 })
 
@@ -116,14 +116,14 @@ const isPathActive = (path: string, exact = false) => {
           <span class="tab-label">{{ t('admin.orders') }}</span>
         </router-link>
 
-        <router-link to="/admin/catalog" class="bar-tab" :class="{ 'is-active': isPathActive('/admin/catalog') }">
+        <router-link to="/marketplace" class="bar-tab" :class="{ 'is-active': isPathActive('/marketplace') }">
           <span class="material-symbols-outlined tab-icon">inventory_2</span>
           <span class="tab-label">{{ t('nav.catalog') }}</span>
         </router-link>
       </template>
 
-      <!-- Staff Mode Tabs -->
-      <template v-else-if="isStaff">
+      <!-- Sales Mode Tabs -->
+      <template v-else-if="isSales">
         <router-link to="/admin" class="bar-tab" :class="{ 'is-active': isPathActive('/admin', true) }">
           <span class="material-symbols-outlined tab-icon">dashboard</span>
           <span class="tab-label">{{ t('admin.dashboard') }}</span>
@@ -229,7 +229,7 @@ const isPathActive = (path: string, exact = false) => {
         <!-- Sheet Header: User Identity & Profile Quick-Access -->
         <header class="sheet-head">
           <div class="sheet-user">
-            <div class="sheet-avatar" :style="{ background: user?.tint || '#69a9ff' }">
+            <div class="sheet-avatar" :style="{ background: user?.tint || '#0F3D56' }">
               <img v-if="avatarSrc" :src="avatarSrc" :alt="user?.fullName ?? 'User'" class="sheet-avatar-img" @error="avatarFailed = true; markBrokenUrl(avatarSrc)" />
               <span v-else class="sheet-avatar-text">{{ avatarInitials }}</span>
             </div>
@@ -279,13 +279,13 @@ const isPathActive = (path: string, exact = false) => {
                 </span>
               </button>
 
-              <button type="button" class="sheet-item" @click="navigateTo('/admin/catalog')">
+              <button v-if="isAdmin" type="button" class="sheet-item" @click="navigateTo('/admin/categories')">
                 <span class="sheet-icon-box sheet-icon--teal">
-                  <span class="material-symbols-outlined">inventory_2</span>
+                  <span class="material-symbols-outlined">category</span>
                 </span>
                 <span class="sheet-item__text">
-                  <strong>{{ t('nav.catalog') }}</strong>
-                  <small>{{ locale === 'ar' ? 'المنتجات والأقسام' : 'Products & categories' }}</small>
+                  <strong>{{ t('admin.categoriesTitle') }}</strong>
+                  <small>{{ locale === 'ar' ? 'إدارة التصنيفات' : 'Manage categories' }}</small>
                 </span>
               </button>
 
@@ -602,9 +602,8 @@ const isPathActive = (path: string, exact = false) => {
     position: absolute;
     top: 0;
     inset-inline: 0;
-    height: 1.5px;
-    background: var(--wl-laser-sweep);
-    opacity: 0.35;
+    height: 1px;
+    background: var(--border);
     pointer-events: none;
   }
 

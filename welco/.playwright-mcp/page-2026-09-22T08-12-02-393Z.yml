@@ -1,0 +1,491 @@
+- generic [active] [ref=f3e1]:
+  - generic [ref=f3e2]:
+    - link "تخطي إلى المحتوى الرئيسي" [ref=f3e3] [cursor=pointer]:
+      - /url: "#main-content"
+    - main [ref=f3e4]:
+      - generic [ref=f3e5]:
+        - generic [ref=f3e7]:
+          - button "رجوع" [ref=f3e8] [cursor=pointer]:
+            - generic [aria-hidden] [ref=f3e9]: arrow_back
+          - generic [ref=f3e11]:
+            - generic [ref=f3e12]: شركاء إكلينيكيون عالميون
+            - heading "المزودون والشركاء الطبيون" [level=1] [ref=f3e13]
+            - paragraph [ref=f3e14]: استكشف المؤسسات الصحية المعتمدة، مصنعي المعدات الطبية الموثوقين، والموزعين الجراحيين على منصة ويلكو.
+        - main [ref=f3e15]:
+          - generic [ref=f3e16]:
+            - search "المزودون والشركاء الطبيون" [ref=f3e17]:
+              - generic [ref=f3e18]:
+                - generic [ref=f3e19]:
+                  - generic [aria-hidden] [ref=f3e20]: search
+                  - searchbox "ابحث عن المزودين بالاسم أو الدولة…" [ref=f3e21]
+                  - generic "Press / to search" [ref=f3e22] [cursor=pointer]: /
+                - generic [ref=f3e23]:
+                  - generic [ref=f3e24]:
+                    - generic [aria-hidden]: apartment
+                    - combobox "جميع الأنواع" [ref=f3e25] [cursor=pointer]:
+                      - option "جميع الأنواع" [selected]
+                      - option "مستشفى"
+                      - option "موزع"
+                      - option "عيادة"
+                      - option "مورّد"
+                    - generic [aria-hidden]: expand_more
+                  - generic [ref=f3e26]:
+                    - generic [aria-hidden]: public
+                    - combobox "جميع الدول" [ref=f3e27] [cursor=pointer]:
+                      - option "جميع الدول" [selected]
+                      - option "أفغانستان"
+                      - option "جزر أولاند"
+                      - option "ألبانيا"
+                      - option "الجزائر"
+                      - option "ساموا الأمريكية"
+                      - option "أندورا"
+                      - option "أنغولا"
+                      - option "أنغويلا"
+                      - option "أنتاركتيكا"
+                      - option "أنتيغوا وبربودا"
+                      - option "الأرجنتين"
+                      - option "أرمينيا"
+                      - option "أروبا"
+                      - option "أستراليا"
+                      - option "النمسا"
+                      - option "أذربيجان"
+                      - option "جزر البهاما"
+                      - option "البحرين"
+                      - option "بنغلاديش"
+                      - option "بربادوس"
+                      - option "بيلاروسيا"
+                      - option "بلجيكا"
+                      - option "بليز"
+                      - option "بنين"
+                      - option "برمودا"
+                      - option "بوتان"
+                      - option "بوليفيا"
+                      - option "بونير"
+                      - option "البوسنة والهرسك"
+                      - option "بوتسوانا"
+                      - option "جزيرة بوفيه"
+                      - option "البرازيل"
+                      - option "إقليم المحيط الهندي البريطاني"
+                      - option "جزر العذراء البريطانية"
+                      - option "بروناي"
+                      - option "بلغاريا"
+                      - option "بوركينا فاسو"
+                      - option "بوروندي"
+                      - option "الرأس الأخضر"
+                      - option "كاليفورنيا"
+                      - option "كمبوديا"
+                      - option "الكاميرون"
+                      - option "كندا"
+                      - option "جزر كايمان"
+                      - option "جمهورية أفريقيا الوسطى"
+                      - option "تشاد"
+                      - option "تشيلي"
+                      - option "الصين"
+                      - option "جزيرة الكريسماس"
+                      - option "جزر كوكوس"
+                      - option "كولومبيا"
+                      - option "جزر القمر"
+                      - option "الكونغو"
+                      - option "الكونغو الديمقراطية"
+                      - option "جزر كوك"
+                      - option "كوستاريكا"
+                      - option "ساحل العاج"
+                      - option "كرواتيا"
+                      - option "كوبا"
+                      - option "كوراساو"
+                      - option "قبرص"
+                      - option "التشيك"
+                      - option "الدنمارك"
+                      - option "جيبوتي"
+                      - option "دومينيكا"
+                      - option "الدومينيكان"
+                      - option "الإكوادور"
+                      - option "مصر"
+                      - option "السلفادور"
+                      - option "غينيا الاستوائية"
+                      - option "إريتريا"
+                      - option "إستونيا"
+                      - option "إسواتيني"
+                      - option "إثيوبيا"
+                      - option "جزر فوكلاند"
+                      - option "جزر فارو"
+                      - option "فيجي"
+                      - option "فنلندا"
+                      - option "فرنسا"
+                      - option "غويانا الفرنسية"
+                      - option "بولينيزيا الفرنسية"
+                      - option "المناطق الجنوبية الفرنسية"
+                      - option "الغابون"
+                      - option "غامبيا"
+                      - option "جورجيا"
+                      - option "ألمانيا"
+                      - option "غانا"
+                      - option "جبل طارق"
+                      - option "اليونان"
+                      - option "غرينلاند"
+                      - option "غرينادا"
+                      - option "غوادلوب"
+                      - option "غوام"
+                      - option "غواتيمالا"
+                      - option "غيرنسي"
+                      - option "غينيا"
+                      - option "غينيا بيساو"
+                      - option "غيانا"
+                      - option "هايتي"
+                      - option "جزيرة هيرد"
+                      - option "الفاتيكان"
+                      - option "هندوراس"
+                      - option "هونغ كونغ"
+                      - option "المجر"
+                      - option "آيسلندا"
+                      - option "الهند"
+                      - option "إندونيسيا"
+                      - option "إيران"
+                      - option "العراق"
+                      - option "أيرلندا"
+                      - option "جزيرة مان"
+                      - option "إسرائيل"
+                      - option "إيطاليا"
+                      - option "جامايكا"
+                      - option "اليابان"
+                      - option "جيرسي"
+                      - option "الأردن"
+                      - option "كازاخستان"
+                      - option "كينيا"
+                      - option "كيريباتي"
+                      - option "الكويت"
+                      - option "قيرغيزستان"
+                      - option "لاوس"
+                      - option "لاتفيا"
+                      - option "لبنان"
+                      - option "ليسوتو"
+                      - option "ليبيريا"
+                      - option "ليبيا"
+                      - option "ليختنشتاين"
+                      - option "ليتوانيا"
+                      - option "لوكسمبورغ"
+                      - option "ماكاو"
+                      - option "مدغشقر"
+                      - option "مالاوي"
+                      - option "ماليزيا"
+                      - option "المالديف"
+                      - option "مالي"
+                      - option "مالطا"
+                      - option "جزر مارشال"
+                      - option "مارتينيك"
+                      - option "موريتانيا"
+                      - option "موريشيوس"
+                      - option "مايوت"
+                      - option "المكسيك"
+                      - option "ميكرونيزيا"
+                      - option "مولدوفا"
+                      - option "موناكو"
+                      - option "منغوليا"
+                      - option "الجبل الأسود"
+                      - option "مونتسرات"
+                      - option "المغرب"
+                      - option "موزمبيق"
+                      - option "ميانمار"
+                      - option "ناميبيا"
+                      - option "ناورو"
+                      - option "نيبال"
+                      - option "هولندا"
+                      - option "كاليدونيا الجديدة"
+                      - option "نيويورك"
+                      - option "نيوزيلندا"
+                      - option "نيكاراغوا"
+                      - option "النيجر"
+                      - option "نيجيريا"
+                      - option "نيوي"
+                      - option "جزيرة نورفولك"
+                      - option "كوريا الشمالية"
+                      - option "مقدونيا الشمالية"
+                      - option "جزر ماريانا الشمالية"
+                      - option "النرويج"
+                      - option "عمان"
+                      - option "باكستان"
+                      - option "بالاو"
+                      - option "فلسطين"
+                      - option "بنما"
+                      - option "بابوا غينيا الجديدة"
+                      - option "باراغواي"
+                      - option "بيرو"
+                      - option "الفلبين"
+                      - option "جزر بيتكيرن"
+                      - option "بولندا"
+                      - option "البرتغال"
+                      - option "بورتوريكو"
+                      - option "البنجاب"
+                      - option "قطر"
+                      - option "ريونيون"
+                      - option "رومانيا"
+                      - option "روسيا"
+                      - option "رواندا"
+                      - option "سان بارتيلمي"
+                      - option "سانت هيلينا"
+                      - option "سانت كيتس ونيفيس"
+                      - option "سانت لوسيا"
+                      - option "سان مارتن"
+                      - option "سان بيير وميكلون"
+                      - option "سانت فنسنت"
+                      - option "ساموا"
+                      - option "سان مارينو"
+                      - option "ساو تومي"
+                      - option "السعودية"
+                      - option "السنغال"
+                      - option "صربيا"
+                      - option "سيشل"
+                      - option "سيراليون"
+                      - option "السند"
+                      - option "سنغافورة"
+                      - option "سانت مارتن"
+                      - option "سلوفاكيا"
+                      - option "سلوفينيا"
+                      - option "جزر سليمان"
+                      - option "الصومال"
+                      - option "جنوب أفريقيا"
+                      - option "جورجيا الجنوبية"
+                      - option "كوريا الجنوبية"
+                      - option "جنوب السودان"
+                      - option "إسبانيا"
+                      - option "سريلانكا"
+                      - option "السودان"
+                      - option "سورينام"
+                      - option "سفالبارد"
+                      - option "السويد"
+                      - option "سويسرا"
+                      - option "سوريا"
+                      - option "تايوان"
+                      - option "طاجيكستان"
+                      - option "تنزانيا"
+                      - option "تكساس"
+                      - option "تايلاند"
+                      - option "تيمور الشرقية"
+                      - option "توغو"
+                      - option "توكيلاو"
+                      - option "تونغا"
+                      - option "ترينيداد وتوباغو"
+                      - option "تونس"
+                      - option "تركيا"
+                      - option "تركمانستان"
+                      - option "جزر تركس وكايكوس"
+                      - option "توفالو"
+                      - option "جزر العذراء الأمريكية"
+                      - option "أوغندا"
+                      - option "أوكرانيا"
+                      - option "الإمارات"
+                      - option "المملكة المتحدة"
+                      - option "الولايات المتحدة"
+                      - option "جزر الولايات البعيدة"
+                      - option "أوروغواي"
+                      - option "أوزبكستان"
+                      - option "فانواتو"
+                      - option "فنزويلا"
+                      - option "فيتنام"
+                      - option "واليس وفوتونا"
+                      - option "الصحراء الغربية"
+                      - option "اليمن"
+                      - option "زامبيا"
+                      - option "زيمبابوي"
+                    - generic [aria-hidden]: expand_more
+                  - generic [ref=f3e28]:
+                    - generic [aria-hidden]: sort
+                    - combobox "الترتيب حسب" [ref=f3e29] [cursor=pointer]:
+                      - 'option "الترتيب حسب: A → Z" [selected]'
+                      - 'option "الترتيب حسب: Z → A"'
+                    - generic [aria-hidden]: expand_more
+              - generic [ref=f3e30]:
+                - generic [ref=f3e31]:
+                  - status [ref=f3e32]: 11 مزود مسجل
+                  - generic [ref=f3e33]: 11/11
+                - paragraph [ref=f3e34]: استكشف المؤسسات الصحية المعتمدة، مصنعي المعدات الطبية الموثوقين، والموزعين الجراحيين على منصة ويلكو.
+            - status [ref=f3e35]:
+              - generic [ref=f3e38]:
+                - article [ref=f3e39] [cursor=pointer]:
+                  - generic [ref=f3e40]:
+                    - img "Apex Surgical Supplies" [ref=f3e42]:
+                      - generic [ref=f3e43]: apartment
+                      - generic [ref=f3e45]: لا توجد صورة
+                    - generic [ref=f3e47]:
+                      - generic [ref=f3e48]: verified
+                      - generic [ref=f3e49]: مزود معتمد
+                  - generic [ref=f3e50]:
+                    - generic [ref=f3e51]: موزع
+                    - heading "Apex Surgical Supplies" [level=2] [ref=f3e53]
+                    - generic [ref=f3e54]:
+                      - generic [ref=f3e55]: public
+                      - generic [ref=f3e56]: الكويت
+                    - button "تصفح الكتالوج →" [ref=f3e58]:
+                      - generic [ref=f3e59]: تصفح الكتالوج
+                      - generic [ref=f3e60]: →
+                - article [ref=f3e61] [cursor=pointer]:
+                  - generic [ref=f3e62]:
+                    - img "CarePoint Clinics" [ref=f3e64]:
+                      - generic [ref=f3e65]: apartment
+                      - generic [ref=f3e67]: لا توجد صورة
+                    - generic [ref=f3e69]:
+                      - generic [ref=f3e70]: verified
+                      - generic [ref=f3e71]: مزود معتمد
+                  - generic [ref=f3e72]:
+                    - generic [ref=f3e73]: موزع
+                    - heading "CarePoint Clinics" [level=2] [ref=f3e75]
+                    - generic [ref=f3e76]:
+                      - generic [ref=f3e77]: public
+                      - generic [ref=f3e78]: سان مارتن
+                    - button "تصفح الكتالوج →" [ref=f3e80]:
+                      - generic [ref=f3e81]: تصفح الكتالوج
+                      - generic [ref=f3e82]: →
+                - article [ref=f3e83] [cursor=pointer]:
+                  - generic [ref=f3e84]:
+                    - img "CityCare Hospitals Group" [ref=f3e86]:
+                      - generic [ref=f3e87]: apartment
+                      - generic [ref=f3e89]: لا توجد صورة
+                    - generic [ref=f3e91]:
+                      - generic [ref=f3e92]: verified
+                      - generic [ref=f3e93]: مزود معتمد
+                  - generic [ref=f3e94]:
+                    - generic [ref=f3e95]: موزع
+                    - heading "CityCare Hospitals Group" [level=2] [ref=f3e97]
+                    - generic [ref=f3e98]:
+                      - generic [ref=f3e99]: public
+                      - generic [ref=f3e100]: فنزويلا
+                    - button "تصفح الكتالوج →" [ref=f3e102]:
+                      - generic [ref=f3e103]: تصفح الكتالوج
+                      - generic [ref=f3e104]: →
+                - article [ref=f3e105] [cursor=pointer]:
+                  - generic [ref=f3e106]:
+                    - img "Delta Surgical Co." [ref=f3e108]:
+                      - generic [ref=f3e109]: apartment
+                      - generic [ref=f3e111]: لا توجد صورة
+                    - generic [ref=f3e113]:
+                      - generic [ref=f3e114]: verified
+                      - generic [ref=f3e115]: مزود معتمد
+                  - generic [ref=f3e116]:
+                    - generic [ref=f3e117]: مستشفى
+                    - heading "Delta Surgical Co." [level=2] [ref=f3e119]
+                    - generic [ref=f3e120]:
+                      - generic [ref=f3e121]: public
+                      - generic [ref=f3e122]: إندونيسيا
+                    - button "تصفح الكتالوج →" [ref=f3e124]:
+                      - generic [ref=f3e125]: تصفح الكتالوج
+                      - generic [ref=f3e126]: →
+                - article [ref=f3e127] [cursor=pointer]:
+                  - generic [ref=f3e128]:
+                    - img "Gulf Medical Trading" [ref=f3e130]:
+                      - generic [ref=f3e131]: apartment
+                      - generic [ref=f3e133]: لا توجد صورة
+                    - generic [ref=f3e135]:
+                      - generic [ref=f3e136]: verified
+                      - generic [ref=f3e137]: مزود معتمد
+                  - generic [ref=f3e138]:
+                    - generic [ref=f3e139]: موزع
+                    - heading "Gulf Medical Trading" [level=2] [ref=f3e141]
+                    - generic [ref=f3e142]:
+                      - generic [ref=f3e143]: public
+                      - generic [ref=f3e144]: كازاخستان
+                    - button "تصفح الكتالوج →" [ref=f3e146]:
+                      - generic [ref=f3e147]: تصفح الكتالوج
+                      - generic [ref=f3e148]: →
+                - article [ref=f3e149] [cursor=pointer]:
+                  - generic [ref=f3e150]:
+                    - img "LifeLine Hospitals" [ref=f3e152]:
+                      - generic [ref=f3e153]: apartment
+                      - generic [ref=f3e155]: لا توجد صورة
+                    - generic [ref=f3e157]:
+                      - generic [ref=f3e158]: verified
+                      - generic [ref=f3e159]: مزود معتمد
+                  - generic [ref=f3e160]:
+                    - generic [ref=f3e161]: عيادة
+                    - heading "LifeLine Hospitals" [level=2] [ref=f3e163]
+                    - generic [ref=f3e164]:
+                      - generic [ref=f3e165]: public
+                      - generic [ref=f3e166]: جنوب السودان
+                    - button "تصفح الكتالوج →" [ref=f3e168]:
+                      - generic [ref=f3e169]: تصفح الكتالوج
+                      - generic [ref=f3e170]: →
+                - article [ref=f3e171] [cursor=pointer]:
+                  - generic [ref=f3e172]:
+                    - img "MedCore Distributors" [ref=f3e174]:
+                      - generic [ref=f3e175]: apartment
+                      - generic [ref=f3e177]: لا توجد صورة
+                    - generic [ref=f3e179]:
+                      - generic [ref=f3e180]: verified
+                      - generic [ref=f3e181]: مزود معتمد
+                  - generic [ref=f3e182]:
+                    - generic [ref=f3e183]: موزع
+                    - heading "MedCore Distributors" [level=2] [ref=f3e185]
+                    - generic [ref=f3e186]:
+                      - generic [ref=f3e187]: public
+                      - generic [ref=f3e188]: برمودا
+                    - button "تصفح الكتالوج →" [ref=f3e190]:
+                      - generic [ref=f3e191]: تصفح الكتالوج
+                      - generic [ref=f3e192]: →
+                - article [ref=f3e193] [cursor=pointer]:
+                  - generic [ref=f3e194]:
+                    - img "Nova Health Clinic" [ref=f3e196]:
+                      - generic [ref=f3e197]: apartment
+                      - generic [ref=f3e199]: لا توجد صورة
+                    - generic [ref=f3e201]:
+                      - generic [ref=f3e202]: verified
+                      - generic [ref=f3e203]: مزود معتمد
+                  - generic [ref=f3e204]:
+                    - generic [ref=f3e205]: مستشفى
+                    - heading "Nova Health Clinic" [level=2] [ref=f3e207]
+                    - generic [ref=f3e208]:
+                      - generic [ref=f3e209]: public
+                      - generic [ref=f3e210]: مدغشقر
+                    - button "تصفح الكتالوج →" [ref=f3e212]:
+                      - generic [ref=f3e213]: تصفح الكتالوج
+                      - generic [ref=f3e214]: →
+                - article [ref=f3e215] [cursor=pointer]:
+                  - generic [ref=f3e216]:
+                    - img "OrthoPlus Distributors" [ref=f3e218]:
+                      - generic [ref=f3e219]: apartment
+                      - generic [ref=f3e221]: لا توجد صورة
+                    - generic [ref=f3e223]:
+                      - generic [ref=f3e224]: verified
+                      - generic [ref=f3e225]: مزود معتمد
+                  - generic [ref=f3e226]:
+                    - generic [ref=f3e227]: عيادة
+                    - heading "OrthoPlus Distributors" [level=2] [ref=f3e229]
+                    - generic [ref=f3e230]:
+                      - generic [ref=f3e231]: public
+                      - generic [ref=f3e232]: باكستان
+                    - button "تصفح الكتالوج →" [ref=f3e234]:
+                      - generic [ref=f3e235]: تصفح الكتالوج
+                      - generic [ref=f3e236]: →
+                - article [ref=f3e237] [cursor=pointer]:
+                  - generic [ref=f3e238]:
+                    - img "PrimeCare Medical" [ref=f3e240]:
+                      - generic [ref=f3e241]: apartment
+                      - generic [ref=f3e243]: لا توجد صورة
+                    - generic [ref=f3e245]:
+                      - generic [ref=f3e246]: verified
+                      - generic [ref=f3e247]: مزود معتمد
+                  - generic [ref=f3e248]:
+                    - generic [ref=f3e249]: مستشفى
+                    - heading "PrimeCare Medical" [level=2] [ref=f3e251]
+                    - generic [ref=f3e252]:
+                      - generic [ref=f3e253]: public
+                      - generic [ref=f3e254]: بونير
+                    - button "تصفح الكتالوج →" [ref=f3e256]:
+                      - generic [ref=f3e257]: تصفح الكتالوج
+                      - generic [ref=f3e258]: →
+                - article [ref=f3e259] [cursor=pointer]:
+                  - generic [ref=f3e260]:
+                    - img "Sahara Med Import" [ref=f3e262]:
+                      - generic [ref=f3e263]: apartment
+                      - generic [ref=f3e265]: لا توجد صورة
+                    - generic [ref=f3e267]:
+                      - generic [ref=f3e268]: verified
+                      - generic [ref=f3e269]: مزود معتمد
+                  - generic [ref=f3e270]:
+                    - generic [ref=f3e271]: مستشفى
+                    - heading "Sahara Med Import" [level=2] [ref=f3e273]
+                    - generic [ref=f3e274]:
+                      - generic [ref=f3e275]: public
+                      - generic [ref=f3e276]: إسبانيا
+                    - button "تصفح الكتالوج →" [ref=f3e278]:
+                      - generic [ref=f3e279]: تصفح الكتالوج
+                      - generic [ref=f3e280]: →
+  - generic [ref=f3e281]: المزودون

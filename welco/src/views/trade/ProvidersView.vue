@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 import { t, locale } from '../../i18n'
 import { companyRepository, locationService } from '../../di/container'
 import type { CompanyDto } from '../../domain/models/company'
-import { CompanyType, COMPANY_TYPE_LABEL } from '../../domain/models/company'
+import { CompanyType, CompanyStatus, COMPANY_TYPE_LABEL } from '../../domain/models/company'
 import type { CountryDto } from '../../domain/models/location'
 import BackButton from '../../components/ui/BackButton.vue'
 import DataState from '../../components/ui/DataState.vue'
@@ -59,18 +59,31 @@ const pushRecent = (term: string) => {
   persistRecent()
 }
 
+/* Load the full company pool (bounded page loop) so client filters +
+   pagination always operate on the complete list. */
+const loadAllCompanies = async () => {
+  const all: CompanyDto[] = []
+  for (let p = 1; p <= 5; p++) {
+    const res = await companyRepository.getProvidersDirectory({ pageNumber: p, pageSize: 50 })
+    const batch = Array.isArray(res?.data) ? res.data : []
+    all.push(...batch)
+    if (!res || batch.length < 50 || p >= (res.totalPages || 1)) break
+  }
+  return all
+}
+
 onMounted(async () => {
   loading.value = true
   try {
     const [compRes] = await Promise.allSettled([
-      companyRepository.getCompanies({ pageNumber: 1, pageSize: 50 }),
+      loadAllCompanies(),
       locationService.loadCountries().then(() => {
         countries.value = [...locationService.countries.value]
       }).catch(() => []),
     ])
 
-    if (compRes.status === 'fulfilled' && compRes.value?.data?.length) {
-      companies.value = compRes.value.data
+    if (compRes.status === 'fulfilled' && compRes.value.length) {
+      companies.value = compRes.value
     } else {
       companies.value = []
     }
@@ -94,6 +107,8 @@ const getTypeLabel = (type: CompanyType): string => {
       return t('providers.distributor')
     case CompanyType.Clinic:
       return t('providers.clinic')
+    case CompanyType.Supplier:
+      return t('providers.supplier')
     default:
       return COMPANY_TYPE_LABEL[type] || 'Provider'
   }
@@ -102,8 +117,14 @@ const getTypeLabel = (type: CompanyType): string => {
 const filteredProviders = computed(() => {
   let list = [...companies.value]
 
-  // Filter only providers / active companies
-  list = list.filter((c) => c.isActive !== false && (c.isProvider !== false || c.isProvider === undefined))
+  // Public listing: approved + active provider companies only.
+  // Pending / rejected applications must never appear here.
+  list = list.filter(
+    (c) =>
+      c.isActive !== false &&
+      (c.isProvider !== false || c.isProvider === undefined) &&
+      (c.status === undefined || c.status === CompanyStatus.Approved),
+  )
 
   // Search filter (debounced for smooth typing)
   const q = activeQuery.value
@@ -266,9 +287,8 @@ const resultMeta = computed(() => {
   return { shown: paginatedProviders.value.length, total: totalCount.value, pool: total }
 })
 
-const browseProviderProducts = (providerName: string) => {
-  pushRecent(providerName)
-  void router.push({ name: 'marketplace', query: { search: providerName } })
+const browseProviderProducts = (providerId: string) => {
+  void router.push({ name: 'provider-storefront', params: { id: providerId } })
 }
 </script>
 
@@ -353,9 +373,10 @@ const browseProviderProducts = (providerName: string) => {
                 <span class="material-symbols-outlined select-wrap__icon" aria-hidden="true">apartment</span>
                 <select v-model="selectedType" class="toolbar__select" :aria-label="t('providers.allTypes')">
                   <option value="all">{{ t('providers.allTypes') }}</option>
-                  <option :value="CompanyType.Hospital">{{ t('providers.hospital') }}</option>
-                  <option :value="CompanyType.Distributor">{{ t('providers.distributor') }}</option>
-                  <option :value="CompanyType.Clinic">{{ t('providers.clinic') }}</option>
+<option :value="CompanyType.Hospital">{{ t('providers.hospital') }}</option>
+<option :value="CompanyType.Distributor">{{ t('providers.distributor') }}</option>
+<option :value="CompanyType.Clinic">{{ t('providers.clinic') }}</option>
+<option :value="CompanyType.Supplier">{{ t('providers.supplier') }}</option>
                 </select>
                 <span class="material-symbols-outlined select-wrap__chev" aria-hidden="true">expand_more</span>
               </label>
@@ -418,7 +439,7 @@ const browseProviderProducts = (providerName: string) => {
         <DataState
           :loading="loading && !paginatedProviders.length"
           :empty="!paginatedProviders.length && !loading"
-          skeleton-type="catalog-grid"
+          skeleton-type="provider-grid"
           :skeleton-count="8"
           min-height="300px"
           :empty-title="t('providers.noProvidersFound')"
@@ -433,7 +454,7 @@ const browseProviderProducts = (providerName: string) => {
               v-for="provider in paginatedProviders"
               :key="provider.id"
               class="provider-card"
-              @click="browseProviderProducts(provider.name)"
+              @click="browseProviderProducts(provider.id)"
             >
               <!-- Card Header / Logo Preview -->
               <div class="provider-card__logo-wrap">
@@ -472,7 +493,7 @@ const browseProviderProducts = (providerName: string) => {
                   <button
                     type="button"
                     class="btn-view-products"
-                    @click.stop="browseProviderProducts(provider.name)"
+                    @click.stop="browseProviderProducts(provider.id)"
                   >
                     <span>{{ t('providers.viewProducts') }}</span>
                     <span class="icon--directional">→</span>
@@ -570,7 +591,7 @@ const browseProviderProducts = (providerName: string) => {
   gap: 1.25rem;
 }
 
-/* ── Search panel (professional dashboard toolbar) ── */
+/* ── Search panel (scrolls with the page — never stuck) ── */
 .search-panel {
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
@@ -580,9 +601,7 @@ const browseProviderProducts = (providerName: string) => {
   display: flex;
   flex-direction: column;
   gap: 0.85rem;
-  position: sticky;
-  top: calc(var(--wl-header-height, 56px) + 0.65rem);
-  z-index: 15;
+  position: static;
 }
 
 .search-panel__main {
@@ -1009,9 +1028,9 @@ const browseProviderProducts = (providerName: string) => {
   transition: transform 0.2s ease;
 }
 
-:global([dir="rtl"]) .icon--directional {
-  transform: rotate(180deg);
-}
+/* NOTE: never use :global([dir="rtl"]) here — the SFC compiler emits it as
+   a bare global rule that matches <html> and rotates the entire page.
+   RTL icon mirroring is already handled globally in base.css. */
 
 .pagination-wrap {
   margin-top: 2rem;

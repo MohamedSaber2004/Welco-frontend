@@ -778,14 +778,14 @@ const handleRegister = async () => {
 }
 
 .acct-type-opt:hover {
-  border-color: #A5B4FC;
+  border-color: var(--secondary, #147D92);
   transform: translateY(-1px);
 }
 
 .acct-type-opt.is-active {
-  border-color: var(--wl-primary);
-  background: rgba(105, 169, 255, 0.05);
-  box-shadow: var(--shadow-card);
+  border-color: var(--primary, #0F3D56);
+  background: var(--brand-soft, #EDF4FF);
+  box-shadow: var(--shadow-sm);
 }
 
 .acct-type-icon {

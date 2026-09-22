@@ -1,0 +1,69 @@
+- generic [ref=e2]:
+  - link "Skip to main content" [ref=e3] [cursor=pointer]:
+    - /url: "#main-content"
+  - banner [ref=e6]:
+    - generic [ref=e7]:
+      - link "Home" [ref=e8] [cursor=pointer]:
+        - /url: /
+        - img "Welco" [ref=e9]
+        - generic [ref=e10]: Welco
+      - navigation "Navigation" [ref=e11]:
+        - link "Home" [ref=e12] [cursor=pointer]:
+          - /url: /
+        - link "Marketplace" [ref=e13] [cursor=pointer]:
+          - /url: /marketplace
+        - link "Providers" [ref=e14] [cursor=pointer]:
+          - /url: /providers
+        - link "About Us" [ref=e15] [cursor=pointer]:
+          - /url: /about
+        - link "Quality & Certs" [ref=e16] [cursor=pointer]:
+          - /url: /certifications
+        - link "Help Center" [ref=e17] [cursor=pointer]:
+          - /url: /help
+      - search [ref=e18]:
+        - generic [aria-hidden] [ref=e19]: search
+        - textbox "Search implants, SKU, manufacturer, supplier…" [ref=e20]
+        - generic [ref=e21]: ⌘K
+      - generic [ref=e22]:
+        - link "Quote Cart" [ref=e23] [cursor=pointer]:
+          - /url: /cart
+          - generic [ref=e24]: shopping_bag
+        - button "العربية" [ref=e25] [cursor=pointer]:
+          - generic [aria-hidden] [ref=e26]: language
+          - generic [ref=e27]: عربي
+        - generic [ref=e28]:
+          - button "Login" [ref=e29] [cursor=pointer]
+          - button "Register" [ref=e30] [cursor=pointer]
+  - main [ref=e31]
+  - contentinfo [ref=e32]:
+    - generic [ref=e33]:
+      - generic [ref=e34]:
+        - generic [ref=e35]:
+          - img "Welco" [ref=e36]
+          - generic [ref=e37]: Welco Surgical
+        - paragraph [ref=e38]: Precision surgical instrument manufacturer built for institutional operating rooms, hospital procurement desks, and private-label OEM partners worldwide.
+        - generic [ref=e39]:
+          - generic [ref=e40]: ISO 13485:2016
+          - generic [ref=e41]: CE MDR CLASS IIa
+          - generic [ref=e42]: UDI LOT-TRACEABLE
+      - generic [ref=e43]:
+        - heading "Product" [level=4] [ref=e44]
+        - link "Marketplace" [ref=e45] [cursor=pointer]:
+          - /url: /marketplace
+        - link "Providers" [ref=e46] [cursor=pointer]:
+          - /url: /providers
+        - link "Quality & Certs" [ref=e47] [cursor=pointer]:
+          - /url: /certifications
+        - link "OEM / Private Label" [ref=e48] [cursor=pointer]:
+          - /url: /oem
+      - generic [ref=e49]:
+        - heading "Support" [level=4] [ref=e50]
+        - link "About Us" [ref=e51] [cursor=pointer]:
+          - /url: /about
+        - link "Help Center" [ref=e52] [cursor=pointer]:
+          - /url: /help
+    - generic [ref=e53]:
+      - generic [ref=e54]:
+        - generic [ref=e55]: © 2026 Welco Surgical Instruments GmbH / FZ-LLC. All rights reserved.
+        - generic [ref=e56]: Passivated Stainless Steel DIN EN ISO 17664 · 134°C Autoclave Validated.
+      - generic [ref=e57]: PRODUCTION CELLS ONLINE

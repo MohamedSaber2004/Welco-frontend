@@ -26,79 +26,72 @@ const close = () => modalService.close()
 .modal-overlay {
   position: fixed;
   inset: 0;
-  z-index: 9998;
+  z-index: var(--z-overlay);
   display: grid;
   place-items: center;
-  background: rgba(0, 0, 0, 0.45);
+  background: var(--bg-overlay);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   padding: 1rem;
 }
 
 .modal {
-  background: var(--wl-surface);
-  border: 1px solid var(--wl-border);
-  border-radius: var(--wl-radius-xl);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
   padding: 1.75rem;
   max-width: 420px;
   width: 100%;
   text-align: center;
-  box-shadow: var(--wl-shadow-lg);
+  box-shadow: var(--shadow-lg);
   position: relative;
-}
-
-.modal::before {
-  content: '';
-  position: absolute;
-  top: -1px; inset-inline: 8px;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--wl-line-strong), transparent);
-  opacity: 0.6;
-  pointer-events: none;
 }
 
 .modal__icon {
   width: 48px;
   height: 48px;
-  border-radius: var(--wl-radius-md);
+  border-radius: var(--radius-sm, 4px);
   display: grid;
   place-items: center;
   margin: 0 auto 1rem;
   font-size: 1.4rem;
-  font-weight: 800;
-  border: 1px solid var(--wl-border);
+  font-weight: 700;
+  border: 1px solid var(--border);
+  font-family: var(--font-body);
 }
 
 .modal__icon--success {
-  background: var(--wl-success-soft);
-  color: var(--wl-success);
+  background: var(--color-success-100);
+  color: var(--fg-success);
 }
 
 .modal__icon--error {
-  background: var(--wl-danger-soft);
-  color: var(--wl-danger);
+  background: var(--color-danger-100);
+  color: var(--fg-danger);
 }
 
 .modal__icon--info {
-  background: var(--wl-primary-soft);
-  color: var(--wl-primary);
+  background: var(--brand-soft);
+  color: var(--brand);
 }
 
 .modal__msg {
-  color: var(--wl-ink);
+  color: var(--fg-body);
   margin-bottom: 1.25rem;
-  line-height: 1.5;
+  line-height: var(--leading-normal);
+  font-family: var(--font-body);
 }
 
 .modal__close {
-  background: var(--wl-primary);
-  color: var(--wl-on-primary);
+  background: var(--brand);
+  color: var(--fg-on-brand);
   border: none;
-  border-radius: var(--wl-radius-full);
+  border-radius: var(--radius-sm, 4px);
   padding: 0.62rem 1.5rem;
-  font-weight: 700;
+  font-weight: var(--weight-medium);
+  font-family: var(--font-body);
   cursor: pointer;
-  box-shadow: var(--wl-primary-shadow);
+  box-shadow: var(--shadow-brand);
 }
 
 .modal-enter-active,

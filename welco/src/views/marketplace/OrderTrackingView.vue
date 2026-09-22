@@ -5,6 +5,7 @@ import { t, locale } from '../../i18n'
 import { commerceService } from '../../di/container'
 import ChainSteps from '../../components/ui/ChainSteps.vue'
 import StatusPill from '../../components/ui/StatusPill.vue'
+import SkeletonLoader from '../../components/ui/SkeletonLoader.vue'
 import BackButton from '../../components/ui/BackButton.vue'
 import type { OrderDto } from '../../domain/models/commerce'
 import { formatPrice } from '../../utils/format'
@@ -79,6 +80,10 @@ async function track() {
           <span>{{ tracking ? t('commerce.locating') : t('commerce.track') }}</span>
         </button>
       </form>
+    </div>
+
+    <div v-if="tracking && !order" class="tracking-results-stack" role="status" aria-live="polite">
+      <SkeletonLoader type="track" :count="1" />
     </div>
 
     <div v-if="notFound" class="result-not-found-card">

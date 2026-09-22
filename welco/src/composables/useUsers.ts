@@ -8,7 +8,7 @@ import type { UserDto } from '../domain/models/user'
 
 export function useUsers() {
   const rawUsers = ref<UserDto[]>([])
-  const loading = ref(false)
+  const loading = ref(true)
   const search = ref('')
   const page = ref(1)
   const pageSize = 10

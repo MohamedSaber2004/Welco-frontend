@@ -143,9 +143,7 @@ const totalCompany = computed(() => company.addresses.value.length)
 
     <!-- TAB 1: Personal Addresses -->
     <template v-if="activeTab === 'personal'">
-      <div v-if="personal.loading.value && !personal.addresses.value.length" class="grid-skeletons">
-        <SkeletonLoader v-for="i in 2" :key="i" type="card" height="160px" />
-      </div>
+      <SkeletonLoader v-if="personal.loading.value && !personal.addresses.value.length" type="address-grid" :count="2" />
 
       <ErrorState
         v-else-if="personal.error.value && !personal.addresses.value.length"
@@ -298,9 +296,7 @@ const totalCompany = computed(() => company.addresses.value.length)
 
     <!-- TAB 2: Company Addresses -->
     <template v-else>
-      <div v-if="company.loading.value && !company.addresses.value.length" class="grid-skeletons">
-        <SkeletonLoader v-for="i in 2" :key="i" type="card" height="160px" />
-      </div>
+      <SkeletonLoader v-if="company.loading.value && !company.addresses.value.length" type="address-grid" :count="2" />
 
       <ErrorState
         v-else-if="company.error.value && !company.addresses.value.length"
@@ -584,7 +580,7 @@ const totalCompany = computed(() => company.addresses.value.length)
 .tab-ribbon {
   display: flex;
   gap: var(--space-2);
-  border-bottom: 1.5px solid var(--wl-border, #E2E8F0);
+  border-bottom: 1.5px solid var(--border, #D9E2EC);
 }
 
 .tab-btn {
@@ -593,7 +589,7 @@ const totalCompany = computed(() => company.addresses.value.length)
   background: transparent;
   font-size: var(--step-0);
   font-weight: 700;
-  color: var(--wl-muted, #64748B);
+  color: var(--fg-muted, #627D98);
   cursor: pointer;
   border-bottom: 2px solid transparent;
   margin-bottom: -1.5px;
@@ -604,7 +600,7 @@ const totalCompany = computed(() => company.addresses.value.length)
 }
 
 .tab-btn:hover {
-  color: var(--wl-ink-strong, #0F172A);
+  color: var(--fg-heading, #102A43);
 }
 
 .tab-btn:focus-visible {
@@ -613,8 +609,8 @@ const totalCompany = computed(() => company.addresses.value.length)
 }
 
 .tab-btn.is-active {
-  color: var(--wl-primary, #69a9ff);
-  border-bottom-color: var(--wl-primary, #69a9ff);
+  color: var(--brand);
+  border-bottom-color: var(--brand);
 }
 
 .tab-chip {
@@ -709,7 +705,7 @@ const totalCompany = computed(() => company.addresses.value.length)
 
 .address-card {
   background: var(--wl-surface);
-  border: 1px solid var(--wl-border, #E2E8F0);
+  border: 1px solid var(--border, #D9E2EC);
   border-radius: var(--radius-md);
   padding: var(--wl-card-padding, 1.25rem);
   box-shadow: var(--shadow-card);
@@ -814,8 +810,8 @@ const totalCompany = computed(() => company.addresses.value.length)
 }
 
 .geo-pill--teal {
-  color: #0D9488;
-  background: #CCFBF1;
+  color: var(--secondary, #147D92);
+  background: var(--secondary-soft, #EDF4FF);
 }
 
 .card-actions {

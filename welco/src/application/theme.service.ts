@@ -1,21 +1,47 @@
 import { ref } from 'vue'
 
+/* Light-only mode — dark theme removed per requirement.
+ * The whole site is always white/light (F7F8FC app, FFFFFF surfaces).
+ * This module keeps its public API (theme / applyTheme / initTheme /
+ * applyAuthGatedTheme) so existing callers keep working, but every path
+ * resolves to 'light' and purges any stale dark/system preference. */
+
 export type Theme = 'light'
 
 export const theme = ref<Theme>('light')
 
-export const applyTheme = () => {
+const META_LIGHT = '#F7F8FC'
+const STORAGE_KEY = 'welco-theme'
+
+const lockLightDom = () => {
   if (typeof document === 'undefined') return
-  document.documentElement.dataset.theme = 'light'
-  document.documentElement.classList.remove('dark')
-  document.documentElement.style.colorScheme = 'light'
+  const root = document.documentElement
+  root.dataset.theme = 'light'
+  root.classList.remove('dark')
+  root.style.colorScheme = 'light'
   const meta = document.querySelector('meta[name="theme-color"]:not([media])') as HTMLMetaElement | null
-  if (meta) meta.content = '#ffffff'
+  if (meta) meta.content = META_LIGHT
 }
 
-applyTheme()
+export const applyTheme = (_value?: unknown) => {
+  theme.value = 'light'
+  try {
+    localStorage.setItem(STORAGE_KEY, 'light')
+  } catch { /* ignore */ }
+  lockLightDom()
+}
+
+export const initTheme = () => {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (raw && raw !== 'light') localStorage.setItem(STORAGE_KEY, 'light')
+  } catch { /* ignore */ }
+  theme.value = 'light'
+  lockLightDom()
+}
+
+initTheme()
 
 export const applyAuthGatedTheme = () => {
-  theme.value = 'light'
-  applyTheme()
+  initTheme()
 }

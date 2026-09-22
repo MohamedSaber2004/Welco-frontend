@@ -42,17 +42,17 @@ const tone = computed(() => TONE[props.status] ?? 'slate')
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  font-family: var(--wl-font-mono);
-  font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.03em;
   text-transform: uppercase;
-  padding: 0.22rem 0.62rem;
-  border-radius: 9999px;
+  line-height: 1.4;
+  padding: 2px 8px;
+  border-radius: var(--radius-xs, 3px);
   border: 1px solid transparent;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
-  line-height: 1.2;
 }
 
 .status-pill__dot {
@@ -64,37 +64,37 @@ const tone = computed(() => TONE[props.status] ?? 'slate')
 }
 
 .status-pill--emerald {
-  color: var(--wl-success);
-  background: var(--wl-success-soft);
-  border-color: rgba(var(--wl-success-rgb), 0.25);
+  color: var(--color-success-600);
+  background: var(--color-success-100);
+  border-color: var(--color-success-600);
 }
 
 
 .status-pill--indigo {
-  color: var(--wl-primary);
-  background: var(--wl-primary-soft);
-  border-color: rgba(var(--wl-primary-rgb), 0.25);
+  color: var(--chart-1);
+  background: var(--color-info-100);
+  border-color: var(--chart-1);
 }
 
 
 .status-pill--amber {
-  color: var(--wl-warning);
-  background: var(--wl-warning-soft);
-  border-color: rgba(var(--wl-warning-rgb), 0.25);
+  color: var(--color-warning-600);
+  background: var(--color-warning-100);
+  border-color: var(--color-warning-600);
 }
 
 
 .status-pill--rose {
-  color: var(--wl-danger);
-  background: var(--wl-danger-soft);
-  border-color: rgba(var(--wl-danger-rgb), 0.25);
+  color: var(--color-danger-600);
+  background: var(--color-danger-100);
+  border-color: var(--color-danger-600);
 }
 
 
 .status-pill--slate {
-  color: var(--wl-ink-soft);
-  background: var(--wl-surface-soft);
-  border-color: var(--wl-border);
+  color: var(--fg-muted);
+  background: var(--bg-subtle);
+  border-color: var(--fg-muted);
 }
 
 </style>

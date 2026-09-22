@@ -38,7 +38,8 @@ const props = withDefaults(
     skeletonType?: 'text' | 'card' | 'circle' | 'table-row' | 'custom'
       | 'product-card' | 'catalog-grid' | 'category-grid' | 'stats-grid'
       | 'table' | 'pdp' | 'list' | 'form' | 'location-grid' | 'hero' | 'pills'
-      | 'provider-grid' | 'cert-grid'
+      | 'provider-grid' | 'provider-cards' | 'store-hero' | 'store-rows' | 'ticket' | 'track' | 'cert-grid'
+      | 'address-grid' | 'order-detail' | 'order-confirm' | 'help-grid' | 'profile' | 'about'
     skeletonLines?: number
     skeletonCount?: number
     skeletonWidth?: string
@@ -58,7 +59,7 @@ const props = withDefaults(
   }>(),
   {
     state: undefined,
-    loadingDelay: 200,
+    loadingDelay: 0,
     emptyVariant: 'first-use',
     errorRecoverable: true,
     icon: 'inventory_2',
@@ -124,8 +125,11 @@ const resolvedEmptyVariant = computed<'first-use' | 'no-results' | 'cleared'>(()
   return 'first-use' // covers 'first-use', 'default', 'catalog', 'neutral', and undefined
 })
 
-/* ── Loading delay ─────────────────────────────────────── */
-const showLoading = ref(false)
+/* ── Loading state ───────────────────────────────────────
+ * Show the skeleton immediately on route transitions and loading states
+ * so content never flashes empty or uninitialized.
+ */
+const showLoading = ref(true)
 const loadingTimer = ref<ReturnType<typeof setTimeout> | null>(null)
 
 watch(
@@ -136,10 +140,14 @@ watch(
       loadingTimer.value = null
     }
     if (newState === 'loading') {
-      showLoading.value = false
-      loadingTimer.value = setTimeout(() => {
+      if (props.loadingDelay > 0) {
+        showLoading.value = false
+        loadingTimer.value = setTimeout(() => {
+          showLoading.value = true
+        }, props.loadingDelay)
+      } else {
         showLoading.value = true
-      }, props.loadingDelay)
+      }
     } else {
       showLoading.value = true
     }
@@ -180,10 +188,17 @@ const gridCount = computed(() => {
   if (t === 'stats-grid') return props.skeletonCount ?? 4
   if (t === 'location-grid') return props.skeletonCount ?? 3
   if (t === 'pills') return props.skeletonCount ?? 6
+  if (t === 'provider-grid') return props.skeletonCount ?? 4
+  if (t === 'provider-cards') return props.skeletonCount ?? 6
+  if (t === 'cert-grid') return props.skeletonCount ?? 4
+  if (t === 'help-grid') return props.skeletonCount ?? 6
+  if (t === 'address-grid') return props.skeletonCount ?? 4
   return props.skeletonCount ?? 1
 })
 
-const delay = (i: number) => ({ animationDelay: `${i * 70}ms` })
+/* Negative phase offsets: every skeleton is already mid-sweep on first
+   paint instead of sitting static through a positive stagger. */
+const delay = (i: number) => ({ animationDelay: `${-((i % 16) * 90)}ms` })
 </script>
 
 <template>
@@ -220,90 +235,441 @@ const delay = (i: number) => ({ animationDelay: `${i * 70}ms` })
         <template v-else-if="skeletonType === 'custom'">
           <div class="sk" :style="{ width: skeletonWidth, height: skeletonHeight, ...delay(1) }" />
         </template>
-        <template v-else-if="skeletonType === 'product-card'">
-          <div class="sk-card" :style="delay(1)">
-            <div class="sk-card__media sk" :style="delay(1)"></div>
-            <div class="sk-card__body">
-              <div class="sk sk--text" style="width:42%;height:10px" :style="delay(2)"></div>
-              <div class="sk sk--text" style="width:96%;height:14px" :style="delay(3)"></div>
-              <div class="sk sk--text" style="width:78%;height:14px" :style="delay(4)"></div>
-              <div class="sk sk--text" style="width:52%;height:10px;margin-top:2px" :style="delay(5)"></div>
-              <div class="sk-card__foot">
-                <div style="display:flex;flex-direction:column;gap:6px;flex:1">
-                  <div class="sk" style="width:84px;height:16px;border-radius:var(--radius-sm)" :style="delay(6)"></div>
-                  <div class="sk" style="width:110px;height:10px;border-radius:var(--radius-sm)" :style="delay(7)"></div>
+        <template v-else-if="skeletonType === 'product-card' || skeletonType === 'catalog-grid'">
+          <div class="sk-grid sk-grid--catalog" :style="{ gap: skeletonGap }">
+            <div v-for="i in (skeletonType === 'product-card' ? 1 : gridCount)" :key="i" class="sk-card" :style="delay(i)">
+              <div class="sk-card__media sk" :style="delay(i)">
+                <div class="sk-card__media-badges">
+                  <div class="sk" style="width:68px;height:18px;border-radius:var(--radius-pill)" :style="delay(i+1)"></div>
+                  <div class="sk" style="width:60px;height:18px;border-radius:var(--radius-pill)" :style="delay(i+1)"></div>
                 </div>
-                <div class="sk" style="width:44px;height:16px;border-radius:var(--radius-pill)" :style="delay(8)"></div>
+                <div class="sk" style="width:28px;height:28px;border-radius:50%;position:absolute;top:10px;inset-inline-end:10px" :style="delay(i+2)"></div>
               </div>
-              <div class="sk-card__actions">
-                <div class="sk" style="height:34px;flex:1;border-radius:var(--radius-md)" :style="delay(9)"></div>
-                <div class="sk" style="height:34px;flex:1;border-radius:var(--radius-md)" :style="delay(10)"></div>
-              </div>
-            </div>
-          </div>
-        </template>
-        <template v-else-if="skeletonType === 'catalog-grid'">
-          <div class="sk-grid sk-grid--catalog" :style="{ gap: skeletonGap || '1.5rem' }">
-            <div v-for="i in gridCount" :key="i" class="sk-card" :style="delay(i)">
-              <div class="sk-card__media sk" :style="delay(i)"></div>
               <div class="sk-card__body">
-                <div class="sk sk--title" :style="delay(i+1)"></div>
-                <div class="sk sk--title sk--title-short" :style="delay(i+2)"></div>
-                <div class="sk sk--caption" :style="delay(i+3)"></div>
+                <div class="sk" style="width:42%;height:10px;border-radius:var(--radius-sm)" :style="delay(i+2)"></div>
+                <div class="sk" style="width:92%;height:15px;border-radius:var(--radius-sm);margin-top:2px" :style="delay(i+3)"></div>
+                <div class="sk" style="width:68%;height:12px;border-radius:var(--radius-sm)" :style="delay(i+4)"></div>
+                <div class="sk" style="width:78%;height:10px;border-radius:var(--radius-sm)" :style="delay(i+5)"></div>
                 <div class="sk-card__foot">
-                  <div style="display:flex;flex-direction:column;gap:6px">
-                    <div class="sk sk--price" :style="delay(i+4)"></div>
-                    <div class="sk sk--caption-sm" :style="delay(i+5)"></div>
+                  <div style="display:flex;align-items:baseline;gap:6px">
+                    <div class="sk" style="width:72px;height:18px;border-radius:var(--radius-sm)" :style="delay(i+6)"></div>
+                    <div class="sk" style="width:36px;height:10px;border-radius:var(--radius-sm)" :style="delay(i+6)"></div>
                   </div>
-                  <div class="sk-card__actions">
-                    <div class="sk sk--btn" :style="delay(i+6)"></div>
-                    <div class="sk sk--btn sk--btn-primary" :style="delay(i+7)"></div>
-                  </div>
+                  <div class="sk" style="width:42px;height:16px;border-radius:var(--radius-pill)" :style="delay(i+7)"></div>
+                </div>
+                <div class="sk-card__actions">
+                  <div class="sk" style="height:34px;flex:1;border-radius:var(--radius-md)" :style="delay(i+8)"></div>
+                  <div class="sk sk--btn-primary" style="height:34px;flex:1;border-radius:var(--radius-md)" :style="delay(i+9)"></div>
                 </div>
               </div>
             </div>
           </div>
         </template>
         <template v-else-if="skeletonType === 'category-grid'">
-          <div class="sk-grid sk-grid--category" :style="{ gap: skeletonGap || '1rem' }"><div v-for="i in gridCount" :key="i" class="sk-cat" :style="delay(i)"><div class="sk sk-cat__media" :style="delay(i)" /><div class="sk-cat__body"><div class="sk" style="width:72%;height:13px;border-radius:var(--radius-sm);margin:0 auto" :style="delay(i+2)" /><div class="sk" style="width:46%;height:9px;border-radius:var(--radius-pill);margin:6px auto 0" :style="delay(i+3)" /></div></div></div>
-        </template>
-        <template v-else-if="skeletonType === 'provider-grid'">
-          <div class="sk-grid sk-grid--provider" :style="{ gap: skeletonGap || '1rem' }">
-            <div v-for="i in gridCount" :key="i" class="sk-provider" :style="delay(i)">
-              <div class="sk-provider__logo sk" :style="delay(i)"></div>
-              <div class="sk-provider__body">
-                <div class="sk sk--pill" style="width:36%;height:12px;margin:0 auto" :style="delay(i+2)"></div>
-                <div class="sk sk--caption" style="width:60%;height:9px;margin:6px auto 0" :style="delay(i+3)"></div>
+          <div class="sk-grid sk-grid--category" :style="{ gap: skeletonGap }">
+            <div v-for="i in gridCount" :key="i" class="sk-cat" :style="delay(i)">
+              <div class="sk-cat__media sk" :style="delay(i)">
+                <div class="sk" style="position:absolute;top:10px;inset-inline-end:10px;width:82px;height:18px;border-radius:var(--radius-pill)" :style="delay(i+1)"></div>
+              </div>
+              <div class="sk-cat__body">
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+                  <div class="sk" style="width:62%;height:16px;border-radius:var(--radius-sm)" :style="delay(i+2)"></div>
+                  <div class="sk" style="width:42px;height:14px;border-radius:var(--radius-sm)" :style="delay(i+3)"></div>
+                </div>
+                <div class="sk" style="width:38%;height:11px;border-radius:var(--radius-sm);margin-top:6px" :style="delay(i+3)"></div>
+                <div style="display:flex;gap:8px;margin-top:14px;padding-top:10px;border-top:1px solid var(--border)">
+                  <div class="sk" style="height:32px;flex:1;border-radius:var(--radius-md)" :style="delay(i+4)"></div>
+                  <div class="sk" style="height:32px;flex:1;border-radius:var(--radius-md)" :style="delay(i+5)"></div>
+                </div>
               </div>
             </div>
           </div>
         </template>
+        <template v-else-if="skeletonType === 'provider-grid'">
+          <div class="sk-grid sk-grid--provider" :style="{ gap: skeletonGap }">
+            <div v-for="i in gridCount" :key="i" class="sk-provider" :style="delay(i)">
+              <div class="sk-provider__logo sk" :style="delay(i)">
+                <div class="sk" style="position:absolute;top:10px;inset-inline-end:10px;width:96px;height:20px;border-radius:var(--radius-pill)" :style="delay(i+1)"></div>
+              </div>
+              <div class="sk-provider__body">
+                <div class="sk" style="width:84px;height:14px;border-radius:var(--radius-pill)" :style="delay(i+2)"></div>
+                <div class="sk" style="width:86%;height:18px;border-radius:var(--radius-sm);margin-top:8px" :style="delay(i+3)"></div>
+                <div class="sk" style="width:52%;height:12px;border-radius:var(--radius-sm);margin-top:6px" :style="delay(i+4)"></div>
+                <div style="margin-top:14px;padding-top:10px;border-top:1px solid var(--border)">
+                  <div class="sk" style="width:100%;height:36px;border-radius:var(--radius-md)" :style="delay(i+5)"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
+        <template v-else-if="skeletonType === 'provider-cards'">
+          <div class="sk-grid sk-grid--prov-cards" :style="{ gap: skeletonGap }">
+            <div v-for="i in gridCount" :key="i" class="sk-prov-card" :style="delay(i)">
+              <div class="sk-prov-card__top">
+                <div class="sk" style="width:64px;height:64px;border-radius:var(--radius-md)" :style="delay(i)"></div>
+                <div class="sk" style="width:96px;height:22px;border-radius:var(--radius-pill)" :style="delay(i+1)"></div>
+              </div>
+              <div class="sk" style="width:76%;height:18px;border-radius:var(--radius-sm);margin-top:8px" :style="delay(i+2)"></div>
+              <div class="sk" style="width:46%;height:12px;border-radius:var(--radius-sm);margin-top:6px" :style="delay(i+3)"></div>
+              <div class="sk" style="width:100%;height:36px;border-radius:var(--radius-md);margin-top:auto" :style="delay(i+4)"></div>
+            </div>
+          </div>
+        </template>
         <template v-else-if="skeletonType === 'cert-grid'">
-          <div class="sk-grid sk-grid--cert" :style="{ gap: skeletonGap || '1rem' }">
+          <div class="sk-grid sk-grid--cert" :style="{ gap: skeletonGap }">
             <div v-for="i in gridCount" :key="i" class="sk-cert" :style="delay(i)">
-              <div class="sk-cert__media sk" :style="delay(i)"></div>
-              <div class="sk-cert__body">
-                <div class="sk sk--pill" style="width:30%;height:11px;margin:0 auto" :style="delay(i+2)"></div>
-                <div class="sk sk--title" style="width:76%;height:12px;margin:6px auto 0" :style="delay(i+3)"></div>
-                <div class="sk sk--caption" style="width:50%;height:9px;margin:4px auto 0" :style="delay(i+4)"></div>
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div class="sk" style="width:48px;height:48px;border-radius:12px" :style="delay(i)"></div>
+                <div class="sk" style="width:74px;height:22px;border-radius:var(--radius-pill)" :style="delay(i+1)"></div>
+              </div>
+              <div class="sk" style="width:82%;height:18px;border-radius:var(--radius-sm);margin-top:12px" :style="delay(i+2)"></div>
+              <div class="sk" style="width:58%;height:12px;border-radius:var(--radius-sm);margin-top:6px" :style="delay(i+3)"></div>
+              <div class="sk" style="width:68%;height:11px;border-radius:var(--radius-sm);margin-top:10px" :style="delay(i+4)"></div>
+              <div style="margin-top:auto;padding-top:12px;border-top:1px solid var(--border)">
+                <div class="sk" style="width:100%;height:34px;border-radius:var(--radius-md)" :style="delay(i+5)"></div>
               </div>
             </div>
           </div>
         </template>
         <template v-else-if="skeletonType === 'stats-grid'">
-          <div class="sk-grid sk-grid--stats" :style="{ gap: skeletonGap || '1rem' }"><div v-for="i in gridCount" :key="i" class="sk-stat" :style="delay(i)"><div class="sk sk-stat__icon" :style="delay(i)" /><div class="sk-stat__body"><div class="sk" style="width:68%;height:10px;border-radius:var(--radius-sm)" :style="delay(i+1)" /><div class="sk" style="width:44%;height:20px;border-radius:var(--radius-sm);margin-top:8px" :style="delay(i+2)" /><div class="sk" style="width:56%;height:9px;border-radius:var(--radius-sm);margin-top:8px" :style="delay(i+3)" /></div></div></div>
+          <div class="sk-grid sk-grid--stats" :style="{ gap: skeletonGap || '1rem' }">
+            <div v-for="i in gridCount" :key="i" class="sk-stat" :style="delay(i)">
+              <!-- header: label (left) + trend pill + icon circle (right) -->
+              <div class="sk-stat__head">
+                <div class="sk sk-stat__label" :style="delay(i+1)" />
+                <div class="sk-stat__head-right">
+                  <div class="sk sk-stat__trend" :style="delay(i+2)" />
+                  <div class="sk sk-stat__icon" :style="delay(i+3)" />
+                </div>
+              </div>
+              <!-- main: big value (left) + sparkline area (right) -->
+              <div class="sk-stat__foot">
+                <div class="sk sk-stat__value" :style="delay(i+4)" />
+              </div>
+            </div>
+          </div>
         </template>
         <template v-else-if="skeletonType === 'location-grid'">
-          <div class="sk-grid sk-grid--location" :style="{ gap: skeletonGap || '1rem' }"><div v-for="i in gridCount" :key="i" class="sk-loc" :style="delay(i)"><div class="sk-loc__head"><div class="sk" style="width:38%;height:16px;border-radius:var(--radius-sm)" :style="delay(i)" /><div class="sk" style="width:22px;height:18px;border-radius:var(--radius-pill)" :style="delay(i+1)" /></div><div class="sk" style="width:46%;height:10px;border-radius:var(--radius-sm)" :style="delay(i+1)" /><div class="sk-loc__list"><div v-for="r in 5" :key="r" class="sk sk--loc-row" :style="delay(i+r)" /></div></div></div>
+          <div class="sk-grid sk-grid--location" :style="{ gap: skeletonGap || '1rem' }">
+            <div v-for="i in 3" :key="i" class="sk-loc" :style="delay(i)">
+              <div class="sk-loc__head">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div class="sk" style="width:20px;height:20px;border-radius:50%"></div>
+                  <div class="sk" style="width:90px;height:16px;border-radius:var(--radius-sm)"></div>
+                </div>
+                <div class="sk" style="width:36px;height:18px;border-radius:var(--radius-pill)"></div>
+              </div>
+              <div class="sk-loc__list">
+                <div v-for="r in 5" :key="r" class="sk sk--loc-row" :style="delay(i+r)">
+                  <div style="display:flex;align-items:center;justify-content:space-between;padding:0 12px;height:100%">
+                    <div class="sk" style="width:50%;height:12px;border-radius:var(--radius-sm);background:rgba(255,255,255,0.7)"></div>
+                    <div class="sk" style="width:45px;height:16px;border-radius:var(--radius-pill);background:rgba(255,255,255,0.7)"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </template>
         <template v-else-if="skeletonType === 'pdp'">
-          <div class="sk-pdp"><div class="sk-pdp__gallery sk" :style="delay(1)"><div class="sk sk--badge sk--badge-left" style="position:absolute;top:16px;inset-inline-start:16px;width:68px;height:20px;border-radius:var(--radius-sm)" /><div class="sk" style="position:absolute;top:16px;inset-inline-end:16px;width:52px;height:20px;border-radius:var(--radius-pill)" :style="delay(2)" /><div class="sk-pdp__placeholder"><div class="sk" style="width:120px;height:120px;border-radius:var(--radius-md);opacity:.6" :style="delay(2)" /></div><div class="sk-pdp__foot"><div class="sk" style="width:34%;height:10px;border-radius:var(--radius-sm)" :style="delay(3)" /><div class="sk" style="width:26%;height:10px;border-radius:var(--radius-sm)" :style="delay(4)" /></div></div><div class="sk-pdp__order"><div style="display:flex;flex-direction:column;gap:10px"><div class="sk" style="width:28%;height:11px;border-radius:var(--radius-sm)" :style="delay(1)" /><div class="sk" style="width:88%;height:26px;border-radius:var(--radius-md)" :style="delay(2)" /><div class="sk" style="width:96%;height:26px;border-radius:var(--radius-md)" :style="delay(3)" /><div class="sk" style="width:64%;height:12px;border-radius:var(--radius-sm)" :style="delay(4)" /></div><div class="sk sk-pdp__price-card" :style="delay(3)"><div style="display:flex;justify-content:space-between;align-items:center"><div style="display:flex;flex-direction:column;gap:8px"><div class="sk" style="width:92px;height:24px;border-radius:var(--radius-sm)" :style="delay(5)" /><div class="sk" style="width:140px;height:11px;border-radius:var(--radius-sm)" :style="delay(6)" /></div><div class="sk" style="width:96px;height:22px;border-radius:var(--radius-pill)" :style="delay(6)" /></div><div style="display:flex;gap:12px;margin-top:16px"><div class="sk" style="width:108px;height:44px;border-radius:var(--radius-md)" :style="delay(7)" /><div class="sk" style="height:44px;flex:1;border-radius:var(--radius-md)" :style="delay(8)" /></div><div style="display:flex;gap:10px;margin-top:12px"><div class="sk" style="height:38px;flex:1;border-radius:var(--radius-pill)" :style="delay(9)" /><div class="sk" style="height:38px;width:128px;border-radius:var(--radius-pill)" :style="delay(10)" /></div></div></div></div>
+          <div class="sk-pdp">
+            <div class="sk-pdp__visual-stage">
+              <div class="sk-pdp__top-badges">
+                <div class="sk" style="width:72px;height:22px;border-radius:var(--radius-pill)" :style="delay(1)"></div>
+                <div style="display:flex;gap:6px">
+                  <div class="sk" style="width:52px;height:22px;border-radius:var(--radius-pill)" :style="delay(2)"></div>
+                  <div class="sk" style="width:78px;height:22px;border-radius:var(--radius-pill)" :style="delay(3)"></div>
+                </div>
+                <div class="sk" style="width:34px;height:34px;border-radius:50%;margin-inline-start:auto" :style="delay(4)"></div>
+              </div>
+              <div class="sk-pdp__viewport sk" :style="delay(2)">
+                <div class="sk" style="width:140px;height:140px;border-radius:var(--radius-md);opacity:.7" :style="delay(3)"></div>
+              </div>
+              <div class="sk-pdp__foot">
+                <div class="sk" style="width:40%;height:11px;border-radius:var(--radius-sm)" :style="delay(4)"></div>
+                <div class="sk" style="width:30%;height:11px;border-radius:var(--radius-sm)" :style="delay(5)"></div>
+              </div>
+            </div>
+            <div class="sk-pdp__order-col">
+              <div class="sk" style="width:120px;height:11px;border-radius:var(--radius-sm)" :style="delay(1)"></div>
+              <div class="sk" style="width:90%;height:28px;border-radius:var(--radius-md);margin-top:6px" :style="delay(2)"></div>
+              <div class="sk" style="width:65%;height:14px;border-radius:var(--radius-sm);margin-top:4px" :style="delay(3)"></div>
+              <div class="sk-pdp__price-card card">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <div style="display:flex;flex-direction:column;gap:6px">
+                    <div class="sk" style="width:110px;height:26px;border-radius:var(--radius-sm)" :style="delay(4)"></div>
+                    <div class="sk" style="width:130px;height:10px;border-radius:var(--radius-sm)" :style="delay(5)"></div>
+                  </div>
+                  <div class="sk" style="width:84px;height:22px;border-radius:var(--radius-pill)" :style="delay(5)"></div>
+                </div>
+                <div style="display:flex;gap:12px;margin-top:16px">
+                  <div class="sk" style="width:110px;height:42px;border-radius:var(--radius-md)" :style="delay(6)"></div>
+                  <div class="sk" style="height:42px;flex:1;border-radius:var(--radius-md)" :style="delay(7)"></div>
+                </div>
+                <div style="display:flex;gap:10px;margin-top:12px">
+                  <div class="sk" style="height:38px;flex:1;border-radius:var(--radius-pill)" :style="delay(8)"></div>
+                  <div class="sk" style="height:38px;width:130px;border-radius:var(--radius-pill)" :style="delay(9)"></div>
+                </div>
+              </div>
+              <div class="card" style="padding:var(--space-4);margin-top:14px;display:flex;flex-direction:column;gap:10px">
+                <div class="sk" style="width:40%;height:14px;border-radius:var(--radius-sm)" :style="delay(4)"></div>
+                <div v-for="r in 3" :key="r" style="display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid var(--border)">
+                  <div class="sk" style="width:30%;height:12px;border-radius:var(--radius-sm)" :style="delay(r+4)"></div>
+                  <div class="sk" style="width:45%;height:12px;border-radius:var(--radius-sm)" :style="delay(r+5)"></div>
+                </div>
+              </div>
+            </div>
+          </div>
         </template>
         <template v-else-if="skeletonType === 'table'">
-          <div class="sk-table" :style="delay(1)"><div class="sk-table__head"><div v-for="i in 5" :key="i" class="sk" style="height:12px;border-radius:var(--radius-sm)" :style="delay(i)" /></div><div v-for="r in (skeletonCount ?? 5)" :key="r" class="sk-table__row" :style="delay(r)"><div class="sk sk-table__cell sk-table__cell--avatar" :style="delay(r)" /><div style="flex:1;display:flex;flex-direction:column;gap:6px"><div class="sk" style="width:58%;height:12px;border-radius:var(--radius-sm)" :style="delay(r+1)" /><div class="sk" style="width:38%;height:10px;border-radius:var(--radius-sm)" :style="delay(r+2)" /></div><div class="sk" style="width:84px;height:20px;border-radius:var(--radius-pill)" :style="delay(r+1)" /><div class="sk" style="width:72px;height:12px;border-radius:var(--radius-sm)" :style="delay(r+2)" /><div style="display:flex;gap:8px"><div class="sk" style="width:64px;height:30px;border-radius:var(--radius-md)" :style="delay(r+3)" /><div class="sk" style="width:64px;height:30px;border-radius:var(--radius-md)" :style="delay(r+4)" /></div></div></div>
+          <div class="table-card sk-table-card" :style="delay(1)">
+            <div class="table-wrap">
+              <table class="exec-table sk-exec-table">
+                <thead>
+                  <tr>
+                    <th style="width:18%"><div class="sk" style="height:12px;width:65%;border-radius:var(--radius-sm)" :style="delay(1)"></div></th>
+                    <th style="width:24%"><div class="sk" style="height:12px;width:75%;border-radius:var(--radius-sm)" :style="delay(2)"></div></th>
+                    <th style="width:18%"><div class="sk" style="height:12px;width:55%;border-radius:var(--radius-sm)" :style="delay(3)"></div></th>
+                    <th style="width:14%"><div class="sk" style="height:12px;width:60%;border-radius:var(--radius-sm)" :style="delay(4)"></div></th>
+                    <th style="width:14%"><div class="sk" style="height:12px;width:50%;border-radius:var(--radius-pill)" :style="delay(5)"></div></th>
+                    <th style="width:12%;text-align:end"><div class="sk" style="height:12px;width:45px;border-radius:var(--radius-sm);margin-inline-start:auto" :style="delay(6)"></div></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="r in (skeletonCount ?? 6)" :key="r" class="exec-row">
+                    <td>
+                      <div class="sk" style="height:14px;width:75%;border-radius:var(--radius-sm)" :style="delay(r)"></div>
+                    </td>
+                    <td>
+                      <div style="display:flex;flex-direction:column;gap:4px">
+                        <div class="sk" style="height:14px;width:85%;border-radius:var(--radius-sm)" :style="delay(r+1)"></div>
+                        <div class="sk" style="height:10px;width:50%;border-radius:var(--radius-sm)" :style="delay(r+2)"></div>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="sk" style="height:12px;width:60%;border-radius:var(--radius-sm)" :style="delay(r+1)"></div>
+                    </td>
+                    <td>
+                      <div class="sk" style="height:14px;width:65%;border-radius:var(--radius-sm)" :style="delay(r+2)"></div>
+                    </td>
+                    <td>
+                      <div class="sk" style="height:22px;width:72px;border-radius:var(--radius-pill)" :style="delay(r+2)"></div>
+                    </td>
+                    <td style="text-align:end">
+                      <div class="sk" style="height:28px;width:64px;border-radius:var(--radius-md);margin-inline-start:auto" :style="delay(r+3)"></div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </template>
+        <template v-else-if="skeletonType === 'order-detail'">
+          <div class="sk-order-detail">
+            <div class="sk-order-detail__header card" :style="delay(1)">
+              <div class="sk" style="width:130px;height:20px;border-radius:var(--radius-pill)"></div>
+              <div class="sk" style="width:240px;height:32px;border-radius:var(--radius-md);margin-top:8px"></div>
+              <div class="sk" style="width:320px;height:12px;border-radius:var(--radius-sm);margin-top:6px"></div>
+            </div>
+            <div class="sk-order-detail__stepper card" :style="delay(2)">
+              <div v-for="s in 5" :key="s" style="display:flex;flex-direction:column;align-items:center;gap:8px;flex:1">
+                <div class="sk" style="width:32px;height:32px;border-radius:50%" :style="delay(s)"></div>
+                <div class="sk" style="width:64px;height:10px;border-radius:var(--radius-sm)" :style="delay(s+1)"></div>
+              </div>
+            </div>
+            <div class="sk-order-detail__grid">
+              <div class="table-card" :style="delay(3)">
+                <div class="table-wrap">
+                  <table class="exec-table">
+                    <thead>
+                      <tr>
+                        <th style="width:40%"><div class="sk" style="height:12px;width:70%;border-radius:var(--radius-sm)"></div></th>
+                        <th style="width:20%"><div class="sk" style="height:12px;width:60%;border-radius:var(--radius-sm)"></div></th>
+                        <th style="width:20%"><div class="sk" style="height:12px;width:60%;border-radius:var(--radius-sm)"></div></th>
+                        <th style="width:20%;text-align:end"><div class="sk" style="height:12px;width:50px;border-radius:var(--radius-sm);margin-inline-start:auto"></div></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="r in 3" :key="r" class="exec-row">
+                        <td><div class="sk" style="height:14px;width:80%;border-radius:var(--radius-sm)" :style="delay(r)"></div></td>
+                        <td><div class="sk" style="height:12px;width:50%;border-radius:var(--radius-sm)" :style="delay(r+1)"></div></td>
+                        <td><div class="sk" style="height:14px;width:60%;border-radius:var(--radius-sm)" :style="delay(r+2)"></div></td>
+                        <td style="text-align:end"><div class="sk" style="height:14px;width:65px;border-radius:var(--radius-sm);margin-inline-start:auto" :style="delay(r+3)"></div></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="card" style="padding:var(--space-5);display:flex;flex-direction:column;gap:12px" :style="delay(4)">
+                <div class="sk" style="width:50%;height:16px;border-radius:var(--radius-sm)"></div>
+                <div v-for="r in 4" :key="r" style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)">
+                  <div class="sk" style="width:35%;height:12px;border-radius:var(--radius-sm)" :style="delay(r)"></div>
+                  <div class="sk" style="width:25%;height:12px;border-radius:var(--radius-sm)" :style="delay(r+1)"></div>
+                </div>
+                <div style="display:flex;justify-content:space-between;padding-top:8px">
+                  <div class="sk" style="width:40%;height:18px;border-radius:var(--radius-sm)"></div>
+                  <div class="sk" style="width:30%;height:18px;border-radius:var(--radius-sm)"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
+        <template v-else-if="skeletonType === 'order-confirm'">
+          <div class="sk-order-confirm">
+            <div class="sk-order-confirm__hero card" :style="delay(1)">
+              <div class="sk" style="width:56px;height:56px;border-radius:50%;margin:0 auto"></div>
+              <div class="sk" style="width:140px;height:18px;border-radius:var(--radius-pill);margin:12px auto 0"></div>
+              <div class="sk" style="width:60%;height:28px;border-radius:var(--radius-md);margin:10px auto 0"></div>
+              <div class="sk" style="width:45%;height:13px;border-radius:var(--radius-sm);margin:8px auto 0"></div>
+              <div class="sk" style="width:200px;height:32px;border-radius:var(--radius-pill);margin:14px auto 0"></div>
+              <div style="display:flex;justify-content:center;gap:12px;margin-top:18px">
+                <div class="sk" style="width:150px;height:38px;border-radius:var(--radius-md)"></div>
+                <div class="sk" style="width:130px;height:38px;border-radius:var(--radius-md)"></div>
+              </div>
+            </div>
+          </div>
+        </template>
+        <template v-else-if="skeletonType === 'help-grid'">
+          <div class="sk-grid sk-grid--help" :style="{ gap: skeletonGap || '1.25rem' }">
+            <div v-for="i in gridCount" :key="i" class="sk-help-card" :style="delay(i)">
+              <div class="sk-help-card__top">
+                <div class="sk" style="width:38px;height:38px;border-radius:10px" :style="delay(i)"></div>
+                <div class="sk" style="width:54px;height:20px;border-radius:var(--radius-pill)" :style="delay(i+1)"></div>
+              </div>
+              <div class="sk" style="width:70%;height:16px;border-radius:var(--radius-sm);margin-top:12px" :style="delay(i+2)"></div>
+              <div class="sk" style="width:90%;height:11px;border-radius:var(--radius-sm);margin-top:8px" :style="delay(i+3)"></div>
+              <div class="sk" style="width:65%;height:11px;border-radius:var(--radius-sm);margin-top:4px" :style="delay(i+4)"></div>
+              <div style="margin-top:auto;padding-top:14px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+                <div class="sk" style="width:80px;height:12px;border-radius:var(--radius-sm)" :style="delay(i+5)"></div>
+                <div class="sk" style="width:16px;height:16px;border-radius:50%" :style="delay(i+6)"></div>
+              </div>
+            </div>
+          </div>
+        </template>
+        <template v-else-if="skeletonType === 'address-grid'">
+          <div class="sk-address-cluster">
+            <div class="sk-address-cluster__head" :style="delay(1)">
+              <div class="sk" style="width:24px;height:24px;border-radius:50%"></div>
+              <div class="sk" style="width:140px;height:18px;border-radius:var(--radius-sm)"></div>
+              <div class="sk" style="width:64px;height:18px;border-radius:var(--radius-pill)"></div>
+              <div class="sk" style="width:80px;height:14px;border-radius:var(--radius-pill);margin-inline-start:auto"></div>
+            </div>
+            <div class="sk-grid sk-grid--address" :style="{ gap: skeletonGap || '1rem' }">
+              <div v-for="i in gridCount" :key="i" class="sk-address-card" :style="delay(i)">
+                <div style="display:flex;gap:1rem;align-items:flex-start">
+                  <div class="sk" style="width:44px;height:44px;border-radius:12px;flex-shrink:0" :style="delay(i)"></div>
+                  <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+                    <div class="sk" style="width:70%;height:16px;border-radius:var(--radius-sm)" :style="delay(i+1)"></div>
+                    <div class="sk" style="width:45%;height:11px;border-radius:var(--radius-sm)" :style="delay(i+2)"></div>
+                    <div style="display:flex;gap:6px;margin-top:6px">
+                      <div class="sk" style="width:60px;height:18px;border-radius:var(--radius-pill)" :style="delay(i+3)"></div>
+                      <div class="sk" style="width:55px;height:18px;border-radius:var(--radius-pill)" :style="delay(i+4)"></div>
+                      <div class="sk" style="width:50px;height:18px;border-radius:var(--radius-pill)" :style="delay(i+5)"></div>
+                    </div>
+                  </div>
+                </div>
+                <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:14px;padding-top:10px;border-top:1px solid var(--border)">
+                  <div class="sk" style="width:64px;height:30px;border-radius:var(--radius-md)" :style="delay(i+6)"></div>
+                  <div class="sk" style="width:64px;height:30px;border-radius:var(--radius-md)" :style="delay(i+7)"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
+        <template v-else-if="skeletonType === 'profile'">
+          <div class="sk-profile-grid">
+            <div class="sk-profile-sidebar card" :style="delay(1)">
+              <div class="sk" style="width:72px;height:72px;border-radius:50%;margin:0 auto"></div>
+              <div class="sk" style="width:65%;height:18px;border-radius:var(--radius-sm);margin:14px auto 0"></div>
+              <div class="sk" style="width:45%;height:12px;border-radius:var(--radius-sm);margin:6px auto 0"></div>
+              <div class="sk" style="width:80px;height:22px;border-radius:var(--radius-pill);margin:10px auto 0"></div>
+              <div style="display:flex;flex-direction:column;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
+                <div v-for="r in 3" :key="r" class="sk" style="height:36px;border-radius:var(--radius-md)" :style="delay(r+2)"></div>
+              </div>
+            </div>
+            <div class="sk-profile-main card" :style="delay(2)">
+              <div class="sk" style="width:35%;height:18px;border-radius:var(--radius-sm)"></div>
+              <div class="sk" style="width:55%;height:12px;border-radius:var(--radius-sm);margin-top:4px"></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.5rem">
+                <div v-for="r in 4" :key="r" style="display:flex;flex-direction:column;gap:6px">
+                  <div class="sk" style="width:35%;height:11px;border-radius:var(--radius-sm)" :style="delay(r+2)"></div>
+                  <div class="sk" style="height:40px;border-radius:var(--radius-md)" :style="delay(r+3)"></div>
+                </div>
+              </div>
+              <div style="display:flex;justify-content:flex-end;margin-top:1.5rem">
+                <div class="sk" style="width:120px;height:38px;border-radius:var(--radius-md)"></div>
+              </div>
+            </div>
+          </div>
+        </template>
+        <template v-else-if="skeletonType === 'about'">
+          <div class="sk-about">
+            <div class="sk-about__hero card" :style="delay(1)">
+              <div class="sk-about__hero-copy">
+                <div class="sk" style="width:120px;height:20px;border-radius:var(--radius-pill)"></div>
+                <div class="sk" style="width:85%;height:32px;border-radius:var(--radius-md);margin-top:12px"></div>
+                <div class="sk" style="width:95%;height:14px;border-radius:var(--radius-sm);margin-top:10px"></div>
+                <div class="sk" style="width:90%;height:14px;border-radius:var(--radius-sm);margin-top:6px"></div>
+                <div style="display:flex;gap:8px;margin-top:16px">
+                  <div class="sk" style="width:110px;height:24px;border-radius:var(--radius-pill)"></div>
+                  <div class="sk" style="width:110px;height:24px;border-radius:var(--radius-pill)"></div>
+                </div>
+              </div>
+              <div class="sk-about__hero-hud sk" :style="delay(2)"></div>
+            </div>
+            <div class="sk-grid sk-grid--pillars" :style="{ gap: '1.25rem', marginTop: '2rem' }">
+              <div v-for="p in 4" :key="p" class="card" style="padding:var(--space-5);display:flex;flex-direction:column;gap:10px" :style="delay(p+2)">
+                <div class="sk" style="width:38px;height:38px;border-radius:10px"></div>
+                <div class="sk" style="width:65%;height:16px;border-radius:var(--radius-sm);margin-top:6px"></div>
+                <div class="sk" style="width:90%;height:12px;border-radius:var(--radius-sm)"></div>
+                <div class="sk" style="width:75%;height:12px;border-radius:var(--radius-sm)"></div>
+              </div>
+            </div>
+          </div>
         </template>
         <template v-else-if="skeletonType === 'list'">
           <div class="skeleton-wrapper" :style="{ gap: skeletonGap || '10px' }"><div v-for="i in (skeletonCount ?? 4)" :key="i" class="sk-list" :style="delay(i)"><div class="sk sk-list__avatar" :style="delay(i)" /><div style="flex:1;display:flex;flex-direction:column;gap:7px"><div class="sk" style="width:46%;height:13px;border-radius:var(--radius-sm)" :style="delay(i+1)" /><div class="sk" style="width:72%;height:11px;border-radius:var(--radius-sm)" :style="delay(i+2)" /></div><div class="sk" style="width:64px;height:22px;border-radius:var(--radius-pill)" :style="delay(i+2)" /></div></div>
+        </template>
+        <template v-else-if="skeletonType === 'ticket'">
+          <div class="sk-tickets" :style="{ gap: skeletonGap || '10px' }">
+            <div v-for="i in (skeletonCount ?? 4)" :key="i" class="sk-ticket" :style="delay(i)">
+              <div class="sk-ticket__head">
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px">
+                  <div class="sk" style="width:55%;height:16px;border-radius:var(--radius-sm)" :style="delay(i+1)"></div>
+                  <div class="sk" style="width:28%;height:11px;border-radius:var(--radius-sm)" :style="delay(i+2)"></div>
+                </div>
+                <div class="sk" style="width:76px;height:22px;border-radius:var(--radius-pill);flex-shrink:0" :style="delay(i+1)"></div>
+              </div>
+              <div class="sk" style="width:94%;height:12px;border-radius:var(--radius-sm)" :style="delay(i+2)"></div>
+              <div class="sk" style="width:75%;height:12px;border-radius:var(--radius-sm)" :style="delay(i+3)"></div>
+              <div class="sk-ticket__foot">
+                <div class="sk" style="width:96px;height:11px;border-radius:var(--radius-sm)" :style="delay(i+3)"></div>
+                <div class="sk" style="width:96px;height:30px;border-radius:var(--radius-md)" :style="delay(i+4)"></div>
+              </div>
+            </div>
+          </div>
+        </template>
+        <template v-else-if="skeletonType === 'track'">
+          <div class="sk-track" :style="delay(1)">
+            <div class="sk-track__card">
+              <div class="sk" style="width:34%;height:10px;border-radius:var(--radius-sm)" :style="delay(1)"></div>
+              <div class="sk" style="width:52%;height:24px;border-radius:var(--radius-md)" :style="delay(2)"></div>
+              <div class="sk" style="width:28%;height:10px;border-radius:var(--radius-sm)" :style="delay(3)"></div>
+              <div class="sk-track__steps">
+                <div v-for="s in 4" :key="s" class="sk" style="width:22px;height:22px;border-radius:50%" :style="delay(s + 2)"></div>
+              </div>
+              <div class="sk-track__total">
+                <div class="sk" style="width:88px;height:10px;border-radius:var(--radius-sm)" :style="delay(4)"></div>
+                <div class="sk" style="width:120px;height:18px;border-radius:var(--radius-sm)" :style="delay(5)"></div>
+              </div>
+            </div>
+            <div class="sk-track__card">
+              <div class="sk" style="width:40%;height:14px;border-radius:var(--radius-sm)" :style="delay(3)"></div>
+              <div v-for="r in 3" :key="r" class="sk-track__line">
+                <div class="sk" style="flex:1;height:12px;border-radius:var(--radius-sm)" :style="delay(r + 3)"></div>
+                <div class="sk" style="width:96px;height:12px;border-radius:var(--radius-sm)" :style="delay(r + 4)"></div>
+              </div>
+            </div>
+          </div>
         </template>
         <template v-else-if="skeletonType === 'form'">
           <div class="sk-form" :style="{ gap: skeletonGap || '14px' }"><div v-for="i in (skeletonCount ?? 4)" :key="i" style="display:flex;flex-direction:column;gap:7px" :style="delay(i)"><div class="sk" style="width:28%;height:10px;border-radius:var(--radius-sm)" :style="delay(i)" /><div class="sk" style="width:100%;height:42px;border-radius:var(--radius-md)" :style="delay(i+1)" /></div><div style="display:flex;gap:10px;margin-top:6px"><div class="sk" style="height:40px;flex:1;border-radius:var(--radius-pill)" :style="delay(6)" /><div class="sk" style="height:40px;flex:1;border-radius:var(--radius-pill)" :style="delay(7)" /></div></div>
@@ -315,6 +681,37 @@ const delay = (i: number) => ({ animationDelay: `${i * 70}ms` })
         </template>
         <template v-else-if="skeletonType === 'hero'">
           <div class="sk-hero" :style="delay(1)"><div style="flex:1;display:flex;flex-direction:column;gap:14px"><div class="sk" style="width:32%;height:12px;border-radius:var(--radius-pill)" :style="delay(1)" /><div class="sk" style="width:84%;height:32px;border-radius:var(--radius-md)" :style="delay(2)" /><div class="sk" style="width:76%;height:32px;border-radius:var(--radius-md)" :style="delay(3)" /><div class="sk" style="width:92%;height:14px;border-radius:var(--radius-sm)" :style="delay(4)" /><div class="sk" style="width:88%;height:14px;border-radius:var(--radius-sm)" :style="delay(5)" /><div style="display:flex;gap:12px;margin-top:8px"><div class="sk" style="width:128px;height:42px;border-radius:var(--radius-pill)" :style="delay(6)" /><div class="sk" style="width:128px;height:42px;border-radius:var(--radius-pill)" :style="delay(7)" /></div></div><div class="sk sk-hero__art" :style="delay(4)" /></div>
+        </template>
+        <template v-else-if="skeletonType === 'store-hero'">
+          <div class="sk-store-hero" :style="delay(1)">
+            <div class="sk-store-hero__id">
+              <div class="sk" style="width:120px;height:120px;border-radius:var(--radius-xl)" :style="delay(1)"></div>
+              <div class="sk" style="width:96px;height:20px;border-radius:var(--radius-pill)" :style="delay(2)"></div>
+            </div>
+            <div class="sk-store-hero__info">
+              <div class="sk" style="width:46%;height:28px;border-radius:var(--radius-md)" :style="delay(2)"></div>
+              <div class="sk" style="width:62%;height:12px;border-radius:var(--radius-sm)" :style="delay(3)"></div>
+              <div style="display:flex;gap:24px;margin-top:10px">
+                <div style="display:flex;flex-direction:column;gap:6px"><div class="sk" style="width:56px;height:22px;border-radius:var(--radius-sm)" :style="delay(4)" /><div class="sk" style="width:84px;height:10px;border-radius:var(--radius-sm)" :style="delay(5)" /></div>
+                <div style="display:flex;flex-direction:column;gap:6px"><div class="sk" style="width:40px;height:22px;border-radius:var(--radius-sm)" :style="delay(5)" /><div class="sk" style="width:72px;height:10px;border-radius:var(--radius-sm)" :style="delay(6)" /></div>
+              </div>
+            </div>
+          </div>
+        </template>
+        <template v-else-if="skeletonType === 'store-rows'">
+          <div class="sk-store-list">
+            <div v-for="i in (skeletonCount ?? 5)" :key="i" class="sk-store-row" :style="delay(i)">
+              <div class="sk" style="width:64px;height:64px;border-radius:var(--radius-md);flex-shrink:0" :style="delay(i)"></div>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:7px">
+                <div class="sk" style="width:64%;height:14px;border-radius:var(--radius-sm)" :style="delay(i+1)"></div>
+                <div class="sk" style="width:38%;height:10px;border-radius:var(--radius-sm)" :style="delay(i+2)"></div>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:7px">
+                <div class="sk" style="width:72px;height:16px;border-radius:var(--radius-pill)" :style="delay(i+1)"></div>
+                <div class="sk" style="width:88px;height:14px;border-radius:var(--radius-sm)" :style="delay(i+2)"></div>
+              </div>
+            </div>
+          </div>
         </template>
       </slot>
     </div>
@@ -399,10 +796,8 @@ const delay = (i: number) => ({ animationDelay: `${i * 70}ms` })
     </div>
 
     <!-- ══ Success ═══════════════════════════════════════════ -->
-    <div v-else-if="resolvedState === 'success'" class="data-state__success">
-      <div class="data-state__success__content">
-        <slot />
-      </div>
+    <div v-else-if="resolvedState === 'success'" class="data-state__content">
+      <slot />
     </div>
 
     <!-- ══ Default / custom content ════════════════════════ -->
@@ -411,12 +806,27 @@ const delay = (i: number) => ({ animationDelay: `${i * 70}ms` })
 </template>
 
 <style scoped>
-/* ── Root wrapper ──────────────────────────────────────── */
-.data-state { width: 100%; }
+/* ── Root wrapper — True neutral-gray skeleton tokens ── */
+.data-state {
+  width: 100%;
+  text-align: start;
+  /* Gray scale for skeletons: base F2F4F6 → highlight E2E6EA */
+  --sk-bg:        #F2F4F6;  /* neutral gray base   */
+  --sk-border:    #E2E6EA;  /* hairline separator   */
+  --sk-shimmer:   rgba(255,255,255,0.75); /* shimmer peak  */
+}
 
 /* ── Loading skeleton ─────────────────────────────────── */
 .data-state__loading {
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+}
+.data-state__loading .card,
+.data-state__loading .table-card {
+  animation: none !important;
 }
 
 .skeleton-wrapper {
@@ -426,69 +836,68 @@ const delay = (i: number) => ({ animationDelay: `${i * 70}ms` })
   width: 100%;
 }
 
+/* ── Core skeleton atom ───────────────────────────────── */
 .sk {
   border-radius: var(--radius-sm);
-  background: var(--skeleton-base);
+  background-color: var(--sk-bg, #F2F4F6);
+  border: 1px solid var(--sk-border, #E2E6EA);
   position: relative;
   overflow: hidden;
-  border: 1px solid var(--wl-line);
-  animation: sk-pulse 3.2s ease-in-out infinite;
+  animation: sk-pulse 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   will-change: opacity;
 }
 
-.sk--text {
-  margin-bottom: 0;
-  height: 12px;
+/* Traveling shimmer across each atom */
+.sk::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--sk-shimmer, rgba(255,255,255,0.75)) 50%,
+    transparent 100%
+  );
+  animation: sk-shimmer 1.8s ease-in-out infinite;
+  pointer-events: none;
 }
 
-.sk--card {
-  border-radius: var(--radius-md);
-  border: 1px solid var(--wl-line);
-  min-height: 120px;
+/* Stagger: each atom enters the shimmer at a different phase */
+.sk--text   { height: 12px; margin-bottom: 0; }
+.sk--card   { border-radius: var(--radius-md); min-height: 120px; }
+.sk--circle { border-radius: 50%; flex-shrink: 0; }
+.sk--row    { height: 44px; border-radius: var(--radius-md); }
+
+@media (prefers-reduced-motion: reduce) {
+  .sk           { animation: none !important; opacity: 0.7; }
+  .sk::after    { display: none !important; }
 }
 
-.sk--circle {
-  border-radius: var(--radius-pill);
-  flex-shrink: 0;
+@keyframes sk-shimmer {
+  0%   { transform: translateX(-130%); }
+  100% { transform: translateX(130%); }
 }
 
-.sk--row {
-  height: 44px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--wl-line);
+@keyframes sk-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
 }
 
-  @media (prefers-reduced-motion: no-preference) {
-    .sk {
-      animation: sk-pulse 3.2s ease-in-out infinite;
-      will-change: opacity;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .sk { animation: none; }
-  }
-
-  @keyframes sk-pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.94; }
-  }
-
+/* ── Legacy alias ─────────────────────────────────────── */
 .skeleton-root {
-  --skeleton-base: var(--wl-surface-soft);
-  --skeleton-highlight: rgba(255,255,255,0.58);
-  --skeleton-pulse-from: var(--wl-surface-soft);
-  --skeleton-pulse-to: #E6EEEE;
+  --sk-bg:     #F2F4F6;
+  --sk-border: #E2E6EA;
 }
 
 /* card */
 .sk-card {
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--wl-line);
-  border-radius: var(--radius-md);
-  background: var(--wl-surface);
-  box-shadow: var(--wl-shadow-card);
+  border: 1px solid var(--sk-border, #E2E6EA);
+  border-radius: var(--radius-card, 8px);
+  background: var(--sk-bg, #F2F4F6);
+  box-shadow: var(--shadow-sm);
   overflow: hidden;
 }
 
@@ -497,13 +906,13 @@ const delay = (i: number) => ({ animationDelay: `${i * 70}ms` })
   position: relative;
   display: grid;
   place-items: center;
-  border-bottom: 1px solid var(--wl-line);
+  border-bottom: 1px solid var(--sk-border, #E2E6EA);
   border-radius: 0;
-  background: var(--skeleton-base);
+  background: var(--sk-bg, #F2F4F6);
 }
 
 .sk-card__media-badge {
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-sm, 4px);
 }
 
 .sk-card__body {
@@ -512,16 +921,16 @@ const delay = (i: number) => ({ animationDelay: `${i * 70}ms` })
   flex-direction: column;
   gap: 0.45rem;
   flex: 1;
-  background: var(--wl-surface);
+  background: #FAFBFC;   /* slightly lighter than base for contrast */
 }
 
-.sk--eyebrow { width: 36%; height: 10px; border-radius: var(--radius-sm); }
-.sk--title { width: 94%; height: 13px; border-radius: var(--radius-sm); }
-.sk--title-short { width: 72%; height: 13px; border-radius: var(--radius-sm); }
-.sk--caption { width: 52%; height: 10px; border-radius: var(--radius-sm); opacity: .9; }
-.sk--caption-sm { width: 96px; height: 9px; border-radius: var(--radius-sm); }
-.sk--price { width: 78px; height: 16px; border-radius: var(--radius-sm); }
-.sk--rating { width: 42px; height: 16px; border-radius: var(--radius-pill); }
+.sk--eyebrow    { width: 36%; height: 10px; border-radius: var(--radius-sm); }
+.sk--title      { width: 94%; height: 13px; border-radius: var(--radius-sm); }
+.sk--title-short{ width: 72%; height: 13px; border-radius: var(--radius-sm); }
+.sk--caption    { width: 52%; height: 10px; border-radius: var(--radius-sm); opacity: .9; }
+.sk--caption-sm { width: 96px; height: 9px;  border-radius: var(--radius-sm); }
+.sk--price      { width: 78px; height: 16px; border-radius: var(--radius-sm); }
+.sk--rating     { width: 42px; height: 16px; border-radius: var(--radius-sm); }
 
 .sk-card__foot {
   display: flex;
@@ -537,56 +946,79 @@ const delay = (i: number) => ({ animationDelay: `${i * 70}ms` })
   gap: 0.5rem;
   margin-top: 0.6rem;
   padding-top: 0.7rem;
-  border-top: 1px solid var(--wl-line);
+  border-top: 1px solid var(--sk-border, #E2E6EA);
 }
 
-.sk--btn { flex: 1; height: 34px; border-radius: var(--radius-md); }
-.sk--btn-primary {
-  background: var(--wl-primary-soft);
-  border-color: rgba(var(--wl-primary-rgb), 0.12);
-}
+.sk--btn         { flex: 1; height: 34px; border-radius: var(--radius-sm); }
+.sk--btn-primary { background: #E8EBEE; border-color: #DDE1E6; }
 
-.sk--badge { width: 52px; height: 16px; border-radius: var(--radius-pill); position: absolute; top: 10px; }
-.sk--badge-left { inset-inline-start: 10px; }
+.sk--badge       { width: 52px; height: 16px; border-radius: var(--radius-sm); position: absolute; top: 10px; }
+.sk--badge-left  { inset-inline-start: 10px; }
 .sk--badge-right { inset-inline-end: 10px; }
 
 /* provider */
 .sk-provider {
-  background: var(--wl-surface);
-  border: 1px solid var(--wl-line);
-  border-radius: var(--radius-md);
+  background: #FAFBFC;
+  border: 1px solid var(--sk-border, #E2E6EA);
+  border-radius: var(--radius-card, 8px);
   overflow: hidden;
-  box-shadow: var(--wl-shadow-card);
+  box-shadow: var(--shadow-sm);
 }
 
 .sk-provider__logo {
   height: 110px;
-  border-bottom: 1px solid var(--wl-line);
-  background: linear-gradient(180deg, var(--wl-surface-soft) 0%, var(--wl-surface) 100%);
+  background: var(--sk-bg, #F2F4F6);
+  border-bottom: 1px solid var(--sk-border, #E2E6EA);
 }
 
 .sk-provider__body {
-  padding: 0.9rem;
+  padding: var(--space-3);
   display: flex;
   flex-direction: column;
+  gap: 0;
+  background: #FAFBFC;
+}
+.sk-provider__foot {
+  display: flex;
   align-items: center;
-  gap: 0.5rem;
-  background: var(--wl-surface);
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-top: 1px solid var(--sk-border, #E2E6EA);
+  background: var(--sk-bg, #F2F4F6);
+}
+
+/* provider cards (category-providers page mirror) */
+.sk-prov-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-5);
+  background: #FAFBFC;
+  border: 1px solid var(--sk-border, #E2E6EA);
+  border-radius: var(--radius-card, 8px);
+  box-shadow: var(--shadow-sm);
+}
+.sk-prov-card__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-2);
 }
 
 /* cert */
 .sk-cert {
-  background: var(--wl-surface);
-  border: 1px solid var(--wl-line);
-  border-radius: var(--radius-md);
+  background: #FAFBFC;
+  border: 1px solid var(--sk-border, #E2E6EA);
+  border-radius: var(--radius-card, 8px);
   overflow: hidden;
-  box-shadow: var(--wl-shadow-card);
+  box-shadow: var(--shadow-sm);
 }
 
 .sk-cert__media {
   height: 160px;
-  border-bottom: 1px solid var(--wl-line);
-  background: var(--wl-surface-soft);
+  background: var(--sk-bg, #F2F4F6);
+  border-bottom: 1px solid var(--sk-border, #E2E6EA);
 }
 
 .sk-cert__body {
@@ -595,74 +1027,207 @@ const delay = (i: number) => ({ animationDelay: `${i * 70}ms` })
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  background: var(--wl-surface);
+  background: #FAFBFC;
 }
 
-/* grids */
-.sk-grid { display: grid; width: 100%; }
-.sk-grid--catalog { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+/* grids — centered so partial last rows sit mid-container, not left */
+.sk-grid {
+  display: grid;
+  width: 100%;
+  justify-content: center;   /* ← partial rows centered */
+  justify-items: stretch;
+  gap: 1rem;
+}
+.sk-grid--catalog  { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
 .sk-grid--category { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
 .sk-grid--provider { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
-.sk-grid--cert { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
-.sk-grid--stats { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+.sk-grid--prov-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+/* ticket cards mirror */
+.sk-tickets { display: flex; flex-direction: column; width: 100%; gap: 0.75rem; }
+.sk-ticket {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--bg-surface);
+  border: 1px solid var(--sk-border, #E2E6EA);
+  border-radius: var(--radius-card, 8px);
+  box-shadow: var(--shadow-sm);
+}
+.sk-ticket__head { display: flex; align-items: center; gap: var(--space-3); }
+.sk-ticket__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--sk-border, #E2E6EA);
+}
+
+/* tracking result mirror */
+.sk-track { display: flex; flex-direction: column; gap: var(--space-4); width: 100%; }
+.sk-track__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5) var(--space-4);
+  background: var(--bg-surface);
+  border: 1px solid var(--sk-border, #E2E6EA);
+  border-radius: var(--radius-card, 8px);
+  box-shadow: var(--shadow-sm);
+}
+.sk-track__steps { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); padding: var(--space-2) 0; }
+.sk-track__total { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+.sk-track__line  { display: flex; align-items: center; gap: var(--space-3); }
+@media (max-width: 1024px) {
+  .sk-grid--prov-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+  .sk-grid--prov-cards { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* storefront rows + hero mirrors */
+.sk-store-list {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-surface);
+  border: 1px solid var(--sk-border, #E2E6EA);
+  border-radius: var(--radius-card, 8px);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-2);
+  gap: 0;
+}
+.sk-store-row {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--sk-border, #E2E6EA);
+}
+.sk-store-row:last-child { border-bottom: 0; }
+.sk-store-hero {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-6);
+  align-items: center;
+}
+.sk-store-hero__id {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+.sk-store-hero__info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+@media (max-width: 640px) {
+  .sk-store-hero { grid-template-columns: minmax(0, 1fr); }
+  .sk-store-hero__id { flex-direction: row; }
+  .sk-store-row { grid-template-columns: 52px minmax(0, 1fr); }
+}
+.sk-grid--cert     { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+.sk-grid--stats    { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
 .sk-grid--location { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); align-items: start; }
 
 /* category */
 .sk-cat {
-  background: var(--wl-surface);
-  border: 1px solid var(--wl-line);
-  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  border: 1px solid var(--sk-border, #E2E6EA);
+  border-radius: var(--radius-card, 8px);
   overflow: hidden;
-  box-shadow: var(--wl-shadow-card);
+  box-shadow: var(--shadow-sm);
 }
-
 .sk-cat__media {
   height: 172px;
   border-radius: 0;
   border: none;
-  border-bottom: 1px solid var(--wl-line);
-  background: var(--skeleton-base);
+  border-bottom: 1px solid var(--sk-border, #E2E6EA);
 }
-
 .sk-cat__body {
   padding: 0.95rem 0.9rem 1.05rem;
-  background: var(--wl-surface);
+  background: var(--bg-surface);
 }
 
-/* stats */
+/* ── Stats skeleton — mirrors StatCard exactly ─────────── */
 .sk-stat {
   display: flex;
-  gap: 1rem;
-  padding: 1.5rem;
-  background: var(--wl-surface);
-  border: 1px solid var(--wl-line);
-  border-radius: var(--radius-md);
-  box-shadow: var(--wl-shadow-card);
+  flex-direction: column;          /* ← matches StatCard: column */
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-4);
+  background: var(--sk-bg, #F2F4F6);
+  border: 1px solid var(--sk-border, #E2E6EA);
+  border-radius: var(--radius-card, 8px);
+  box-shadow: none;
+  min-height: 100px;
+  overflow: hidden;
 }
 
-.sk-stat__icon {
-  width: 48px;
-  height: 48px;
-  border-radius: var(--radius-sm);
+/* header row: label left, [trend pill + icon] right */
+.sk-stat__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.sk-stat__head-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   flex-shrink: 0;
 }
 
-.sk-stat__body {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
+/* label atom */
+.sk-stat__label {
+  width: 90px;
+  height: 12px;
+  border-radius: var(--radius-sm, 4px);
 }
+
+/* trend pill atom */
+.sk-stat__trend {
+  width: 52px;
+  height: 18px;
+  border-radius: 999px;
+}
+
+/* icon circle atom — matches .stat-card__icon-wrap 34×34 */
+.sk-stat__icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* footer: big value number */
+.sk-stat__foot {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.sk-stat__value {
+  width: 68px;
+  height: 28px;
+  border-radius: var(--radius-sm, 4px);
+}
+
 
 /* location */
 .sk-loc {
-  background: var(--wl-surface);
-  border: 1px solid var(--wl-line);
-  border-radius: var(--radius-md);
+  background: #FAFBFC;
+  border: 1px solid var(--sk-border, #E2E6EA);
+  border-radius: var(--radius-card, 8px);
   padding: 1rem;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  box-shadow: var(--wl-shadow-card);
+  box-shadow: var(--shadow-sm);
   min-height: 440px;
 }
 
@@ -671,7 +1236,7 @@ const delay = (i: number) => ({ animationDelay: `${i * 70}ms` })
   justify-content: space-between;
   align-items: center;
   padding-bottom: 12px;
-  border-bottom: 1px solid var(--wl-line);
+  border-bottom: 1px solid var(--sk-border, #E2E6EA);
 }
 
 .sk-loc__list {
@@ -683,8 +1248,8 @@ const delay = (i: number) => ({ animationDelay: `${i * 70}ms` })
 
 .sk--loc-row {
   height: 42px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--wl-line);
+  border-radius: var(--radius-sm, 4px);
+  border: 1px solid var(--sk-border, #E2E6EA);
 }
 
 /* pdp */
@@ -698,14 +1263,14 @@ const delay = (i: number) => ({ animationDelay: `${i * 70}ms` })
 
 .sk-pdp__gallery {
   min-height: 460px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--wl-line);
-  background: var(--skeleton-base);
+  border-radius: var(--radius-card, 8px);
+  border: 1px solid var(--sk-border, #E2E6EA);
+  background: var(--sk-bg, #F2F4F6);
   display: grid;
   place-items: center;
   position: relative;
   overflow: hidden;
-  box-shadow: var(--wl-shadow-card);
+  box-shadow: var(--shadow-sm);
 }
 
 .sk-pdp__placeholder {
@@ -723,8 +1288,8 @@ const delay = (i: number) => ({ animationDelay: `${i * 70}ms` })
   display: flex;
   justify-content: space-between;
   padding: 0.75rem 1.25rem;
-  border-top: 1px solid var(--wl-line);
-  background: var(--wl-paper);
+  border-top: 1px solid var(--sk-border, #E2E6EA);
+  background: var(--sk-bg, #F2F4F6);
 }
 
 .sk-pdp__order {
@@ -734,38 +1299,35 @@ const delay = (i: number) => ({ animationDelay: `${i * 70}ms` })
 }
 
 .sk-pdp__price-card {
-  background: var(--wl-surface);
-  border: 1px solid var(--wl-line);
-  border-radius: var(--radius-md);
+  background: #FAFBFC;
+  border: 1px solid var(--sk-border, #E2E6EA);
+  border-radius: var(--radius-card, 8px);
   padding: 1.35rem;
-  box-shadow: var(--wl-shadow-card);
+  box-shadow: var(--shadow-sm);
   height: auto;
 }
 
 .sk-pdp__tabs {
-  background: var(--wl-surface);
-  border: 1px solid var(--wl-line);
-  border-radius: var(--radius-md);
+  background: #FAFBFC;
+  border: 1px solid var(--sk-border, #E2E6EA);
+  border-radius: var(--radius-card, 8px);
   overflow: hidden;
   height: auto;
   min-height: 160px;
 }
 
 @media (max-width: 980px) {
-  .sk-pdp {
-    grid-template-columns: 1fr;
-    gap: 1.75rem;
-  }
+  .sk-pdp { grid-template-columns: 1fr; gap: 1.75rem; }
   .sk-pdp__gallery { min-height: 340px; }
 }
 
 /* table */
 .sk-table {
-  background: var(--wl-surface);
-  border: 1px solid var(--wl-line);
-  border-radius: var(--radius-md);
+  background: #FAFBFC;
+  border: 1px solid var(--sk-border, #E2E6EA);
+  border-radius: var(--radius-card, 8px);
   overflow: hidden;
-  box-shadow: var(--wl-shadow-card);
+  box-shadow: var(--shadow-sm);
 }
 
 .sk-table__head {
@@ -773,21 +1335,19 @@ const delay = (i: number) => ({ animationDelay: `${i * 70}ms` })
   grid-template-columns: 1.2fr 2fr 120px 120px 160px;
   gap: 1rem;
   padding: 0.85rem 1rem;
-  background: var(--wl-ink-strong);
+  background: var(--sk-bg, #F2F4F6);
+  border-bottom: 1px solid var(--sk-border, #E2E6EA);
   align-items: center;
 }
 
-.sk-table__head .sk {
-  background: rgba(0, 0, 0, 0.06);
-  border: none;
-}
+.sk-table__head .sk { border: none; }
 
 .sk-table__row {
   display: grid;
   grid-template-columns: 1.2fr 2fr 120px 120px 160px;
   gap: 1rem;
   padding: 0.95rem 1rem;
-  border-bottom: 1px solid var(--wl-line);
+  border-bottom: 1px solid var(--sk-border, #E2E6EA);
   align-items: center;
 }
 
@@ -796,17 +1356,14 @@ const delay = (i: number) => ({ animationDelay: `${i * 70}ms` })
 .sk-table__cell--avatar {
   width: 40px;
   height: 40px;
-  border-radius: var(--radius-pill);
+  border-radius: 50%;
   flex-shrink: 0;
 }
 
 @media (max-width: 760px) {
-  .sk-table__head, .sk-table__row {
-    grid-template-columns: 1fr;
-    gap: 0.6rem;
-  }
+  .sk-table__head, .sk-table__row { grid-template-columns: 1fr; gap: 0.6rem; }
   .sk-table__head { display: none; }
-  .sk-table__row { display: flex; flex-wrap: wrap; }
+  .sk-table__row  { display: flex; flex-wrap: wrap; }
 }
 
 /* list */
@@ -815,16 +1372,16 @@ const delay = (i: number) => ({ animationDelay: `${i * 70}ms` })
   align-items: center;
   gap: 0.9rem;
   padding: 0.85rem 1rem;
-  border: 1px solid var(--wl-line);
-  background: var(--wl-surface);
-  border-radius: var(--radius-md);
-  box-shadow: var(--wl-shadow-card);
+  border: 1px solid var(--sk-border, #E2E6EA);
+  background: #FAFBFC;
+  border-radius: var(--radius-card, 8px);
+  box-shadow: var(--shadow-sm);
 }
 
 .sk-list__avatar {
   width: 44px;
   height: 44px;
-  border-radius: var(--radius-pill);
+  border-radius: 50%;
   flex-shrink: 0;
 }
 
@@ -832,11 +1389,11 @@ const delay = (i: number) => ({ animationDelay: `${i * 70}ms` })
 .sk-form {
   display: flex;
   flex-direction: column;
-  background: var(--wl-surface);
-  border: 1px solid var(--wl-line);
-  border-radius: var(--radius-md);
+  background: #FAFBFC;
+  border: 1px solid var(--sk-border, #E2E6EA);
+  border-radius: var(--radius-card, 8px);
   padding: 1.5rem;
-  box-shadow: var(--wl-shadow-card);
+  box-shadow: var(--shadow-sm);
 }
 
 /* hero */
@@ -850,16 +1407,13 @@ const delay = (i: number) => ({ animationDelay: `${i * 70}ms` })
 
 .sk-hero__art {
   height: 320px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--wl-line);
-  background: var(--skeleton-base);
+  border-radius: var(--radius-card, 8px);
+  border: 1px solid var(--sk-border, #E2E6EA);
+  background: var(--sk-bg, #F2F4F6);
 }
 
 @media (max-width: 900px) {
-  .sk-hero {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
+  .sk-hero { grid-template-columns: 1fr; gap: 1.5rem; }
   .sk-hero__art { height: 220px; }
 }
 
@@ -875,8 +1429,56 @@ const delay = (i: number) => ({ animationDelay: `${i * 70}ms` })
 .sk--pill {
   height: 34px;
   width: 110px;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-sm, 4px);
   flex-shrink: 0;
+}
+
+/* help-grid */
+.sk-grid--help { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+
+.sk-help-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-5);
+  background: #FAFBFC;
+  border: 1px solid var(--sk-border, #E2E6EA);
+  border-radius: var(--radius-card, 8px);
+  box-shadow: var(--shadow-sm);
+  min-height: 160px;
+}
+
+.sk-help-card__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+/* address-grid */
+.sk-grid--address { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+
+.sk-address-cluster {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+.sk-address-cluster__head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--sk-border, #E2E6EA);
+}
+
+.sk-address-card {
+  background: #FAFBFC;
+  border: 1px solid var(--sk-border, #E2E6EA);
+  border-radius: var(--radius-card, 8px);
+  padding: 1rem;
+  box-shadow: var(--shadow-sm);
 }
 
 /* ── Empty state ──────────────────────────────────────── */
@@ -888,11 +1490,11 @@ const delay = (i: number) => ({ animationDelay: `${i * 70}ms` })
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: clamp(2.2rem, 5vw, 3.2rem) clamp(1.25rem, 4vw, 2.5rem) clamp(1.8rem, 3vw, 2.2rem);
-  background: var(--wl-surface);
-  border: 1px solid var(--wl-border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--wl-shadow-card);
+  padding: var(--space-10) var(--space-4);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
   overflow: hidden;
   isolation: isolate;
   min-height: 260px;
@@ -935,16 +1537,16 @@ const delay = (i: number) => ({ animationDelay: `${i * 70}ms` })
   font-size: 10px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--wl-muted);
+  color: var(--fg-subtle);
   margin-bottom: 1.1rem;
-  background: var(--wl-surface-soft);
-  border: 1px solid var(--wl-border);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
   border-radius: var(--radius-pill);
   padding: 0.28rem 0.7rem;
 }
 
-.empty__code-dot { width: 6px; height: 6px; border-radius: var(--radius-pill); background: var(--wl-primary); box-shadow: 0 0 0 3px var(--wl-primary-soft); }
-.empty__code-line { width: 14px; height: 1px; background: var(--wl-line-strong); margin-inline-start: 0.2rem; }
+.empty__code-dot { width: 6px; height: 6px; border-radius: var(--radius-pill); background: var(--brand); box-shadow: 0 0 0 3px var(--brand-soft); }
+.empty__code-line { width: 14px; height: 1px; background: var(--border-strong); margin-inline-start: 0.2rem; }
 
 /* halo */
 .empty__halo {
@@ -961,12 +1563,12 @@ const delay = (i: number) => ({ animationDelay: `${i * 70}ms` })
   height: 54px;
   display: grid;
   place-items: center;
-  background: var(--wl-surface);
-  border: 1px solid var(--wl-border);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  color: var(--wl-primary);
+  color: var(--brand);
   font-size: 1.5rem;
-  box-shadow: var(--wl-shadow-card);
+  box-shadow: var(--shadow-sm);
   position: relative;
   z-index: 2;
 }
@@ -982,20 +1584,20 @@ const delay = (i: number) => ({ animationDelay: `${i * 70}ms` })
 }
 
 .empty__halo-ring--1 { inset: 6px; border-color: rgba(var(--wl-primary-rgb), 0.08); }
-.empty__halo-ring--2 { inset: -6px; border-radius: 20px; border-style: dashed; border-color: var(--wl-border-strong); opacity: 0.7; }
+.empty__halo-ring--2 { inset: -6px; border-radius: 20px; border-style: dashed; border-color: var(--border-strong); opacity: 0.7; }
 
 .empty__title {
-  font-family: var(--wl-font-display);
+  font-family: var(--font-sans);
   font-size: 1.18rem;
   font-weight: 700;
   letter-spacing: -0.02em;
-  color: var(--wl-ink-strong);
+  color: var(--fg-heading);
   margin: 0 0 0.5rem;
   line-height: 1.3;
 }
 
 .empty__desc {
-  color: var(--wl-ink-soft);
+  color: var(--fg-muted);
   font-size: 0.92rem;
   line-height: 1.6;
   margin: 0 0 1.35rem;
@@ -1018,9 +1620,9 @@ const delay = (i: number) => ({ animationDelay: `${i * 70}ms` })
   font-size: 10px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--wl-muted);
-  background: var(--wl-surface-soft);
-  border: 1px solid var(--wl-border);
+  color: var(--fg-subtle);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
   border-radius: var(--radius-pill);
   padding: 0.32rem 0.65rem;
 }
@@ -1029,8 +1631,8 @@ const delay = (i: number) => ({ animationDelay: `${i * 70}ms` })
   width: 6px;
   height: 6px;
   border-radius: var(--radius-pill);
-  background: var(--wl-accent);
-  box-shadow: 0 0 0 3px var(--wl-accent-soft);
+  background: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-soft);
 }
 
 .empty__ticks {
@@ -1042,13 +1644,13 @@ const delay = (i: number) => ({ animationDelay: `${i * 70}ms` })
   align-items: flex-end;
   justify-content: center;
   padding: 0.65rem 1rem 0.75rem;
-  border-top: 1px solid var(--wl-line);
-  background: linear-gradient(180deg, transparent, var(--wl-surface-soft));
+  border-top: 1px solid var(--border);
+  background: linear-gradient(180deg, transparent, var(--bg-subtle));
   z-index: 1;
 }
 
-.empty__tick { width: 1px; height: 5px; background: var(--wl-line-strong); opacity: 0.5; }
-.empty__tick--major { height: 9px; background: var(--wl-ink-strong); opacity: 0.16; }
+.empty__tick { width: 1px; height: 5px; background: var(--border-strong); opacity: 0.5; }
+.empty__tick--major { height: 9px; background: var(--fg-heading); opacity: 0.16; }
 
 /* ── Error state (tray) ───────────────────────────────── */
 .data-state__error {
@@ -1059,11 +1661,12 @@ const delay = (i: number) => ({ animationDelay: `${i * 70}ms` })
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: clamp(2rem, 4vw, 3rem) clamp(1.25rem, 3vw, 2.5rem) 2rem;
-  background: var(--wl-surface);
-  border: 1px solid var(--wl-danger);
+  padding: var(--space-10) var(--space-4);
+  background: var(--color-danger-100);
+  border: 1px solid var(--color-danger-100);
+  border-inline-start: 3px solid var(--fg-danger);
   border-radius: var(--radius-md);
-  box-shadow: var(--wl-shadow-card);
+  box-shadow: var(--shadow-sm);
   isolation: isolate;
 }
 
@@ -1071,7 +1674,7 @@ const delay = (i: number) => ({ animationDelay: `${i * 70}ms` })
   position: absolute;
   width: 12px;
   height: 12px;
-  border: 0 solid var(--wl-danger);
+  border: 0 solid var(--fg-danger);
   z-index: 1;
 }
 
@@ -1087,7 +1690,7 @@ const delay = (i: number) => ({ animationDelay: `${i * 70}ms` })
   transform: translateX(-50%);
   width: 2px;
   height: 10px;
-  background: var(--wl-danger);
+  background: var(--fg-danger);
   z-index: 1;
 }
 
@@ -1107,7 +1710,7 @@ const delay = (i: number) => ({ animationDelay: `${i * 70}ms` })
   font-size: 10px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--wl-muted);
+  color: var(--fg-subtle);
   margin-bottom: 1.4rem;
 }
 
@@ -1116,7 +1719,7 @@ const delay = (i: number) => ({ animationDelay: `${i * 70}ms` })
   content: '';
   width: 24px;
   height: 1px;
-  background: var(--wl-line);
+  background: var(--border);
 }
 
 .tray__mount { position: relative; margin-bottom: 1.4rem; }
@@ -1126,11 +1729,11 @@ const delay = (i: number) => ({ animationDelay: `${i * 70}ms` })
   height: 58px;
   display: grid;
   place-items: center;
-  background: var(--wl-surface);
-  border: 1px solid var(--wl-danger);
+  background: var(--bg-surface);
+  border: 1px solid var(--fg-danger);
   border-radius: var(--radius-md);
-  color: var(--wl-danger);
-  box-shadow: inset 0 0 0 4px var(--wl-surface), var(--wl-shadow-card);
+  color: var(--fg-danger);
+  box-shadow: inset 0 0 0 4px var(--bg-surface), var(--shadow-sm);
 }
 
 .tray__mount-tick {
@@ -1140,21 +1743,21 @@ const delay = (i: number) => ({ animationDelay: `${i * 70}ms` })
   transform: translateX(-50%);
   width: 1px;
   height: 9px;
-  background: var(--wl-danger);
+  background: var(--fg-danger);
   opacity: 0.8;
 }
 
 .tray__title {
-  font-family: var(--wl-font-display);
+  font-family: var(--font-sans);
   font-size: 1.15rem;
   font-weight: 600;
   letter-spacing: -0.01em;
-  color: var(--wl-ink-strong);
+  color: var(--fg-heading);
   margin-bottom: 0.5rem;
 }
 
 .tray__desc {
-  color: var(--wl-ink-soft);
+  color: var(--fg-muted);
   font-size: 0.9rem;
   line-height: 1.55;
   margin-bottom: 1.4rem;
@@ -1176,44 +1779,171 @@ const delay = (i: number) => ({ animationDelay: `${i * 70}ms` })
   font-size: 9.5px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--wl-muted);
+  color: var(--fg-subtle);
 }
 
 .tray__dot {
   width: 6px;
   height: 6px;
   border-radius: var(--radius-pill);
-  background: var(--wl-danger);
-  box-shadow: 0 0 0 3px var(--wl-danger-soft);
+  background: var(--fg-danger);
+  box-shadow: 0 0 0 3px var(--color-danger-100);
 }
 
-/* ── Success state ────────────────────────────────────── */
-.data-state__success {
-  position: relative;
+/* ── Success / Loaded content state ──────────────────── */
+.data-state__content {
   width: 100%;
+  text-align: start;
+}
+
+/* ── Specific Skeleton Structural Layouts ────────────── */
+.sk-grid--help { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+.sk-grid--address { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+
+.sk-help-card {
   display: flex;
   flex-direction: column;
+  padding: 1.5rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  min-height: 180px;
+}
+.sk-help-card__top {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: clamp(1.5rem, 3vw, 2.5rem) clamp(1.25rem, 3vw, 2.5rem) 2rem;
-  background: var(--wl-surface);
-  border: 1px solid var(--wl-gold);
-  border-radius: var(--radius-md);
-  box-shadow: var(--wl-shadow-card);
-  isolation: isolate;
-  min-height: 200px;
 }
 
-.data-state__success__content {
-  align-self: stretch;
+.sk-address-cluster {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: 100%;
+}
+.sk-address-cluster__head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+.sk-address-card {
+  display: flex;
+  flex-direction: column;
+  padding: 1.25rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.sk-order-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+}
+.sk-order-detail__header,
+.sk-order-detail__stepper {
+  padding: 1.5rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+.sk-order-detail__stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.sk-order-detail__grid {
+  display: grid;
+  grid-template-columns: 1.8fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .sk-order-detail__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sk-order-confirm {
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+}
+.sk-order-confirm__hero {
+  padding: 2.5rem 2rem;
+  text-align: center;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+}
+
+.sk-profile-grid {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+  width: 100%;
+}
+.sk-profile-sidebar, .sk-profile-main {
+  padding: 1.5rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+@media (max-width: 840px) {
+  .sk-profile-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sk-about {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  width: 100%;
+}
+.sk-about__hero {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 2rem;
+  padding: 2.5rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  align-items: center;
+}
+.sk-about__hero-hud {
+  height: 220px;
+  border-radius: var(--radius-lg);
+}
+.sk-grid--pillars {
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+}
+@media (max-width: 840px) {
+  .sk-about__hero {
+    grid-template-columns: 1fr;
+    padding: 1.5rem;
+  }
+}
+
+.sk-table-card {
   width: 100%;
 }
 
 /* ── Entrance animations ──────────────────────────────── */
 @media (prefers-reduced-motion: no-preference) {
-  .data-state__empty .empty__halo { animation: haloIn 520ms var(--wl-ease-spring) both; }
-  .data-state__empty .data-state__empty__inner > *:not(.empty__halo) { animation: riseIn 420ms var(--wl-ease-spring) both; }
+  .data-state__empty .empty__halo { animation: haloIn 520ms var(--ease-out) both; }
+  .data-state__empty .data-state__empty__inner > *:not(.empty__halo) { animation: riseIn 420ms var(--ease-out) both; }
   .data-state__empty .data-state__empty__inner > *:nth-child(2) { animation-delay: 80ms; }
   .data-state__empty .data-state__empty__inner > *:nth-child(3) { animation-delay: 120ms; }
   .data-state__empty .data-state__empty__inner > *:nth-child(4) { animation-delay: 160ms; }
@@ -1229,7 +1959,7 @@ const delay = (i: number) => ({ animationDelay: `${i * 70}ms` })
   .data-state__error .tray__corner--br { animation-delay: 180ms; }
   .data-state__error .tray__inner { animation: riseIn 320ms cubic-bezier(0.16, 1, 0.3, 1) 80ms both; }
 
-  .data-state__success { animation: riseIn 420ms var(--wl-ease-spring) both; }
+  .data-state__content { animation: riseIn 420ms var(--ease-out) both; }
 }
 
 @keyframes haloIn { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
@@ -1243,7 +1973,7 @@ const delay = (i: number) => ({ animationDelay: `${i * 70}ms` })
   .data-state__error .tray__tick,
   .data-state__error .tray__mount-tick,
   .data-state__error .tray__inner,
-  .data-state__success {
+  .data-state__content {
     animation: none !important;
   }
 }

@@ -2,6 +2,7 @@ export enum CompanyType {
   Hospital = 1,
   Distributor = 2,
   Clinic = 3,
+  Supplier = 4,
 }
 
 export enum CompanyStatus {
@@ -85,6 +86,7 @@ export const COMPANY_TYPE_LABEL: Record<CompanyType, string> = {
   [CompanyType.Hospital]: 'Hospital',
   [CompanyType.Distributor]: 'Distributor',
   [CompanyType.Clinic]: 'Clinic',
+  [CompanyType.Supplier]: 'Supplier',
 }
 
 export const COMPANY_STATUS_LABEL: Record<CompanyStatus, string> = {

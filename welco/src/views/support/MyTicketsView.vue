@@ -178,7 +178,7 @@ async function closeTicket(id: string) {
           </button>
         </div>
 
-        <SkeletonLoader v-if="loading" type="card" :lines="4" height="140px" />
+        <SkeletonLoader v-if="loading" type="ticket" :count="4" />
 
         <DataState
           v-else
@@ -281,9 +281,9 @@ async function closeTicket(id: string) {
 }
 
 .search-input:focus {
-  border-color: #69a9ff;
-  box-shadow: 0 0 0 3px rgba(105, 169, 255, 0.12);
-  background: var(--wl-surface);
+  border-color: var(--border-focus);
+  box-shadow: var(--ring-focus);
+  background: var(--bg-surface);
 }
 
 .clear-btn {
@@ -314,7 +314,7 @@ async function closeTicket(id: string) {
   transition: border-color 0.15s;
 }
 
-.filter-select:focus { border-color: #69a9ff; }
+.filter-select:focus { border-color: var(--border-focus); box-shadow: var(--ring-focus); }
 
 .clear-filters-btn {
   display: inline-flex;
@@ -322,17 +322,17 @@ async function closeTicket(id: string) {
   gap: 0.3rem;
   height: 38px;
   padding: 0 0.85rem;
-  border: 1px solid #FCA5A5;
-  border-radius: 10px;
+  border: 1px solid var(--border-danger, #FFDAD6);
+  border-radius: var(--radius-sm, 4px);
   font-size: 12px;
-  font-weight: 700;
-  color: #DC2626;
-  background: var(--wl-danger-soft);
+  font-weight: 600;
+  color: var(--fg-danger, #DC3545);
+  background: var(--color-danger-50, #FFF8F7);
   cursor: pointer;
   transition: all 0.15s;
 }
 
-.clear-filters-btn:hover { background: rgba(242, 109, 109, 0.22); }
+.clear-filters-btn:hover { background: var(--color-danger-100, #FFDAD6); }
 
 .crumb-bar {
   display: flex;
@@ -427,11 +427,11 @@ async function closeTicket(id: string) {
 }
 
 .card {
-  background: var(--wl-surface);
-  border: 1px solid var(--wl-border, #E2E8F0);
-  border-radius: var(--wl-radius-card, 16px);
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #D9E2EC);
+  border-radius: var(--radius-card, 8px);
   padding: var(--wl-card-padding, 1.5rem);
-  box-shadow: var(--wl-shadow-card, 0 1px 3px rgba(0, 10, 25, 0.05));
+  box-shadow: var(--shadow-sm);
 }
 
 /* Form Card */
@@ -570,11 +570,11 @@ async function closeTicket(id: string) {
 }
 
 .ticket-card {
-  background: var(--wl-surface);
-  border: 1px solid var(--wl-border, #E2E8F0);
-  border-radius: var(--wl-radius-card, 16px);
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #D9E2EC);
+  border-radius: var(--radius-card, 8px);
   padding: var(--wl-card-padding, 1.25rem 1.5rem);
-  box-shadow: var(--wl-shadow-card, 0 1px 3px rgba(0, 10, 25, 0.05));
+  box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
   gap: 0.85rem;
@@ -582,8 +582,8 @@ async function closeTicket(id: string) {
 }
 
 .ticket-card:hover {
-  border-color: var(--wl-border-strong);
-  box-shadow: 0 4px 12px rgba(0, 10, 25, 0.06);
+  border-color: var(--primary, #0F3D56);
+  box-shadow: var(--shadow-md);
 }
 
 .ticket-card-top {
@@ -603,13 +603,13 @@ async function closeTicket(id: string) {
 .ticket-subject {
   font-size: 14.5px;
   font-weight: 700;
-  color: var(--wl-ink-strong);
+  color: var(--fg-heading, #102A43);
   margin: 0;
 }
 
 .ticket-date {
   font-size: 11px;
-  color: var(--wl-muted-soft);
+  color: var(--fg-muted, #627D98);
 }
 
 .ticket-status-actions {
@@ -625,7 +625,7 @@ async function closeTicket(id: string) {
   font-size: 11px;
   font-weight: 700;
   padding: 0.2rem 0.6rem;
-  border-radius: 9999px;
+  border-radius: var(--radius-xs, 3px);
 }
 
 .status-pill .dot {
@@ -635,29 +635,29 @@ async function closeTicket(id: string) {
 }
 
 .status-pill--open {
-  background: #FEF3C7;
-  color: var(--wl-warning);
+  background: var(--color-warning-50, #FFF8E1);
+  color: var(--fg-warning, #E67E22);
 }
-.status-pill--open .dot { background: #F59E0B; }
+.status-pill--open .dot { background: var(--color-warning-500, #E67E22); }
 
 .status-pill--answered {
-  background: var(--wl-success-soft);
-  color: var(--wl-success);
+  background: var(--color-success-50, #E8F5E9);
+  color: var(--fg-success, #198754);
 }
-.status-pill--answered .dot { background: #10B981; }
+.status-pill--answered .dot { background: var(--color-success-500, #198754); }
 
 .status-pill--closed {
-  background: var(--wl-surface-soft);
-  color: var(--wl-muted);
+  background: var(--surface-subtle, #F7F9FB);
+  color: var(--fg-muted, #627D98);
 }
-.status-pill--closed .dot { background: var(--wl-muted-soft); }
+.status-pill--closed .dot { background: var(--fg-muted, #627D98); }
 
 .btn-close-ticket {
-  border: 1px solid rgba(237, 66, 69, 0.35);
-  background: var(--wl-surface);
-  color: var(--wl-danger);
+  border: 1px solid var(--border-danger, #FFDAD6);
+  background: var(--color-danger-50, #FFF8F7);
+  color: var(--fg-danger, #DC3545);
   padding: 0.25rem 0.6rem;
-  border-radius: 6px;
+  border-radius: var(--radius-xs, 3px);
   font-size: 11px;
   font-weight: 700;
   cursor: pointer;

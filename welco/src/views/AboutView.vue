@@ -81,7 +81,7 @@ const pillars = computed(() => [
 
     <!-- Loading State -->
     <div v-if="loading" class="about-loading-wrap">
-      <SkeletonLoader type="card" :count="3" />
+      <SkeletonLoader type="about" />
     </div>
 
     <template v-else>
@@ -852,6 +852,25 @@ const pillars = computed(() => [
 @media (max-width: 1024px) {
   .hero-grid {
     grid-template-columns: 1fr;
+    justify-items: center;
+  }
+  .hero-copy {
+    align-items: center;
+    text-align: center;
+  }
+  .head-chip {
+    margin-inline: auto;
+  }
+  .hero-badges {
+    justify-content: center;
+  }
+  .hero-media-card {
+    max-width: 540px;
+    width: 100%;
+    margin-inline: auto;
+  }
+  .media-caption {
+    text-align: center;
   }
   .pillars-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -859,6 +878,19 @@ const pillars = computed(() => [
 }
 
 @media (max-width: 768px) {
+  .section-head {
+    align-items: center;
+    text-align: center;
+  }
+  .section-head .head-chip {
+    margin-inline: auto;
+  }
+  .section-head .section-title {
+    text-align: center;
+  }
+  .story-content {
+    text-align: center;
+  }
   .cross-grid {
     grid-template-columns: 1fr;
   }
@@ -871,10 +903,12 @@ const pillars = computed(() => [
   }
   .cta-inner {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
+    text-align: center;
   }
   .cta-actions {
     width: 100%;
+    justify-content: center;
   }
   .cta-actions .btn {
     flex: 1;

@@ -1,4 +1,4 @@
-import { MARKETPLACE_ROUTES } from '../../config/api.config'
+import { COMPANY_ROUTES, MARKETPLACE_ROUTES } from '../../config/api.config'
 import type { MarketplaceRepository, MarketplaceQuery } from '../../domain/ports/marketplace-repository'
 import type { PaginatedResult } from '../../domain/models/location'
 import type {
@@ -10,7 +10,9 @@ import type {
   UpdateProductPayload,
   CreateCategoryPayload,
   UpdateCategoryPayload,
+  SkuProviderDto,
 } from '../../domain/models/marketplace'
+import type { CompanyDto } from '../../domain/models/company'
 import type { HttpClient } from '../../infrastructure/http/http-client'
 import { ApiError } from '../../infrastructure/http/api-error'
 
@@ -186,6 +188,54 @@ export class ApiMarketplaceRepository implements MarketplaceRepository {
     }
   }
 
+  async getMyProducts(companyId: string, query: MarketplaceQuery = {}): Promise<PaginatedResult<ProductDto>> {
+    const page = query.page ?? 1
+    const pageSize = Math.min(50, Math.max(1, query.pageSize ?? 12))
+    const paginate = (items: ProductDto[]) => {
+      const totalCount = items.length
+      const totalPages = Math.max(1, Math.ceil(totalCount / pageSize))
+      return {
+        isSuccess: true,
+        data: items.slice((page - 1) * pageSize, page * pageSize),
+        totalCount,
+        pageNumber: page,
+        pageSize,
+        totalPages,
+        hasPreviousPage: page > 1,
+        hasNextPage: page < totalPages,
+        message: 'OK',
+        statusCode: 200,
+      }
+    }
+    const useFallback = async () => {
+      // Fallback for backends without /mine: filter the shared list by owner.
+      const all = await this.getProducts({ ...query, page: 1, pageSize: 50 })
+      return paginate(
+        (all.data || [])
+          .filter((p) => p && (p.companyId === companyId || (!p.companyId && p.supplierId === companyId)))
+          .map(normalizeProduct),
+      )
+    }
+    // Preferred: dedicated provider endpoint (ships with the backend phase).
+    // NOTE: http.get resolves (not throws) 401 GETs as an empty page.
+    try {
+      const params = new URLSearchParams()
+      if (query.search) params.set('SearchTerm', query.search)
+      if (query.sku) params.set('Sku', query.sku)
+      if (query.categoryId) params.set('categoryId', query.categoryId)
+      params.set('pageNumber', '1')
+      params.set('pageSize', '50')
+      const raw = await this.http.get<unknown>(`${MARKETPLACE_ROUTES.myProducts}?${params.toString()}`, { showFeedback: false })
+      if (!Array.isArray(raw) && (raw as PaginatedResult<ProductDto> | null)?.statusCode === 401) {
+        return useFallback()
+      }
+      const arr = (Array.isArray(raw) ? raw : (raw as PaginatedResult<ProductDto>)?.data ?? []) as ProductDto[]
+      return paginate(arr.map(normalizeProduct))
+    } catch {
+      return useFallback()
+    }
+  }
+
   async getProductById(id: string): Promise<ProductDto | null> {
     try {
       const data = await this.http.get<ProductDto>(MARKETPLACE_ROUTES.productById(id), { showFeedback: false })
@@ -312,6 +362,103 @@ export class ApiMarketplaceRepository implements MarketplaceRepository {
 
   async deleteCategory(id: string): Promise<void> {
     await this.http.del<void>(MARKETPLACE_ROUTES.categoryById(id))
+  }
+
+  async getCategoryProviders(
+    categoryId: string,
+    query: { page?: number; pageSize?: number } = {},
+  ): Promise<PaginatedResult<CompanyDto>> {
+    const page = query.page ?? 1
+    const pageSize = Math.min(50, Math.max(1, query.pageSize ?? 12))
+    const paginate = (items: CompanyDto[]) => ({
+      isSuccess: true,
+      data: items.slice((page - 1) * pageSize, page * pageSize),
+      totalCount: items.length,
+      pageNumber: page,
+      pageSize,
+      totalPages: Math.max(1, Math.ceil(items.length / pageSize)),
+      hasPreviousPage: page > 1,
+      hasNextPage: page < Math.max(1, Math.ceil(items.length / pageSize)),
+      message: 'OK',
+      statusCode: 200,
+    })
+    try {
+      const params = new URLSearchParams()
+      params.set('pageNumber', String(page))
+      params.set('pageSize', String(pageSize))
+      const raw = await this.http.get<unknown>(
+        `${MARKETPLACE_ROUTES.categoryProviders(categoryId)}?${params.toString()}`,
+        { showFeedback: false },
+      )
+      if (Array.isArray(raw)) return paginate(raw as CompanyDto[])
+      return raw as PaginatedResult<CompanyDto>
+    } catch {
+      // Fallback for backends without the endpoint: group locally.
+      const [prodRes, compRes, catRes] = await Promise.all([
+        this.getProducts({ page: 1, pageSize: 50 }).catch(() => null),
+        this.http
+          .get<unknown>(`${COMPANY_ROUTES.companyDirectory}?pageNumber=1&pageSize=50`, { showFeedback: false })
+          .catch(() => null),
+        this.getCategories().catch(() => [] as CategoryDto[]),
+      ])
+      const inCategory = (p: ProductDto): boolean => {
+        if (!p || !categoryId) return false
+        if (p.categoryId === categoryId) return true
+        const cat = catRes.find((c) => c && c.id === p.categoryId)
+        return !!cat && cat.parentCategoryId === categoryId
+      }
+      const owners = new Set<string>()
+      for (const p of prodRes?.data ?? []) {
+        if (!p || !inCategory(p)) continue
+        const key = p.companyId || p.supplierId || ''
+        if (key) owners.add(key)
+      }
+      const all: CompanyDto[] = Array.isArray(compRes)
+        ? (compRes as CompanyDto[])
+        : (Array.isArray((compRes as PaginatedResult<CompanyDto> | null)?.data)
+            ? (compRes as PaginatedResult<CompanyDto>).data
+            : [])
+      return paginate(
+        all.filter((c) => c && owners.has(c.id) && c.isActive !== false && (c.isProvider !== false || c.isProvider === undefined)),
+      )
+    }
+  }
+
+  async getSkuProviders(sku: string): Promise<SkuProviderDto[]> {
+    try {
+      const raw = await this.http.get<unknown>(MARKETPLACE_ROUTES.skuProviders(sku), { showFeedback: false })
+      if (Array.isArray(raw)) return raw as SkuProviderDto[]
+      const page = raw as PaginatedResult<SkuProviderDto> | null
+      return Array.isArray(page?.data) ? page.data : []
+    } catch {
+      // Fallback for backends without the endpoint: group locally.
+      const needle = sku.trim().toLowerCase()
+      if (!needle) return []
+      const [prodRes, compRes] = await Promise.all([
+        this.getProducts({ page: 1, pageSize: 50 }).catch(() => null),
+        this.http
+          .get<unknown>(`${COMPANY_ROUTES.companyDirectory}?pageNumber=1&pageSize=50`, { showFeedback: false })
+          .catch(() => null),
+      ])
+      const all: CompanyDto[] = Array.isArray(compRes)
+        ? (compRes as CompanyDto[])
+        : (Array.isArray((compRes as PaginatedResult<CompanyDto> | null)?.data)
+            ? (compRes as PaginatedResult<CompanyDto>).data
+            : [])
+      const byId = new Map(all.filter(Boolean).map((c) => [c.id, c]))
+      const seen = new Map<string, ProductDto>()
+      for (const p of prodRes?.data ?? []) {
+        if (!p?.sku || p.sku.trim().toLowerCase() !== needle) continue
+        const key = p.companyId || p.supplierId || ''
+        if (key && !seen.has(key)) seen.set(key, p)
+      }
+      const out: SkuProviderDto[] = []
+      for (const [ownerId, listing] of seen) {
+        const company = byId.get(ownerId) ?? null
+        if (company) out.push({ company, listing })
+      }
+      return out.sort((a, b) => (a.company?.name || '').localeCompare(b.company?.name || ''))
+    }
   }
 
   async getCurrencies(): Promise<CurrencyDto[]> {

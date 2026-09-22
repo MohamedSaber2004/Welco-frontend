@@ -1,3 +1,5 @@
+import type { CompanyDto } from './company'
+
 export interface CategoryDto {
   id: string
   slug?: string
@@ -5,12 +7,18 @@ export interface CategoryDto {
   nameAr: string
   descriptionEn?: string
   descriptionAr?: string
-  /** stored attachment name (place=1) resolved via `/files/{name}` — see ATTACHMENT-INTEGRATION.md */
+  /** stored attachment name (place=1) resolved via `/files/{name}` �?" see ATTACHMENT-INTEGRATION.md */
   imageName?: string | null
   icon?: string
   productCount?: number
   parentCategoryId?: string | null
   isActive?: boolean
+}
+
+/** One provider offering a SKU, with that provider's listing. */
+export interface SkuProviderDto {
+  company: CompanyDto | null
+  listing: ProductDto
 }
 
 export interface CurrencyDto {
@@ -90,6 +98,9 @@ export interface ProductDto {
   supplierId: string
   supplierNameEn: string
   supplierNameAr: string
+  /** Owning provider company (mediator model; null = legacy/global item). */
+  companyId?: string | null
+  companyName?: string | null
   manufacturerEn: string
   manufacturerAr: string
   price: number

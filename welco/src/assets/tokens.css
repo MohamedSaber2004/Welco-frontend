@@ -1,274 +1,216 @@
-/* Welco — Clinical Control-Panel Design System
- * Light mode only (Clinical White with Navy Classic accents)
- * Plus Jakarta Sans & Sora Display · Inter Body · JetBrains Mono Data
- */
-@import url('https://fonts.googleapis.com/css2?family=Alexandria:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Sora:wght@500;600;700;800&display=swap');
+/* ==========================================================================
+   Welco — Clinical Precision Tokens Bridge
+   Single source of truth is ./design-tokens.css.
+   This file aliases legacy --wl-* / --base / --surface / --ink tokens
+   to Clinical Precision semantic tokens so all 70+ views + components
+   inherit the new system without per-file rewrites.
+   ========================================================================== */
+@import './design-tokens.css';
 
 :root {
   color-scheme: light;
 
-  /* ── TYPE (one ratio: 1.250 major third) ── */
-  --wl-font-display: 'Plus Jakarta Sans', 'Sora', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --wl-font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --wl-font-mono: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, monospace;
-  --step--1: 0.84rem;
-  --step-0: 1rem;
-  --step-1: 1.25rem;
-  --step-2: 1.563rem;
-  --step-3: 1.953rem;
-  --step-4: 2.441rem;
-  --wl-leading-body: 1.6;
-  --wl-leading-display: 1.14;
+  /* ── Type — Plus Jakarta Sans (Display) + Inter (Body) + JetBrains Mono (Mono) ── */
+  --wl-font-display: var(--font-display);
+  --wl-font-body: var(--font-body);
+  --wl-font-mono: var(--font-mono);
+  --step--1: var(--text-sm);
+  --step-0: var(--text-base);
+  --step-1: var(--text-lg);
+  --step-2: var(--text-xl);
+  --step-3: var(--text-3xl);
+  --step-4: var(--text-4xl);
+  --wl-leading-body: var(--leading-normal);
+  --wl-leading-display: var(--leading-tight);
 
-  /* ── SPACE (4px harmonic base) ── */
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 20px;
-  --space-6: 24px;
-  --space-8: 32px;
-  --space-10: 40px;
-  --space-12: 48px;
-  --space-16: 64px;
+  /* ── Surfaces → Clinical Precision semantic ── */
+  --base: var(--bg-app);
+  --surface: var(--bg-surface);
+  --surface-soft: var(--bg-subtle);
+  --ink: var(--fg-body);
+  --ink-strong: var(--fg-heading);
+  --ink-soft: var(--fg-muted);
+  --muted: var(--fg-subtle);
+  --muted-soft: var(--fg-placeholder);
+  --line: var(--border);
+  --line-strong: var(--border-strong);
+  --sk-shimmer: linear-gradient(90deg, var(--bg-subtle) 0%, var(--bg-subtle) 25%, rgba(255, 255, 255, 0.85) 50%, var(--bg-subtle) 75%, var(--bg-subtle) 100%);
 
-  /* ── COLOR — Clinical White with Navy Classic accents ── */
-  --base: #ffffff;
-  --surface: #f8fafc;
-  --surface-soft: #f1f5f9;
-  --ink: #1e293b;
-  --ink-strong: #0f172a;
-  --ink-soft: #64748b;
-  --muted: #94a3b8;
-  --muted-soft: #cbd5e1;
-  --line: #e2e8f0;
-  --line-strong: #cbd5e1;
+  --primary: var(--brand);
+  --primary-hover: var(--brand-hover);
+  --primary-soft: var(--brand-soft);
+  --gold: var(--fg-warning);
+  --gold-soft: var(--color-warning-100);
+  --success: var(--fg-success);
+  --success-soft: var(--color-success-100);
+  --danger: var(--fg-danger);
+  --danger-soft: var(--color-danger-100);
+  --warning: var(--fg-warning);
+  --warning-soft: var(--color-warning-100);
 
-  /* Navy Classic accents */
-  --primary: #2563eb;
-  --primary-hover: #1d4ed8;
-  --primary-soft: rgba(37, 99, 235, 0.08);
-  --gold: #b45309;
-  --gold-soft: rgba(180, 83, 9, 0.08);
-  --success: #059669;
-  --success-soft: rgba(5, 150, 105, 0.08);
-  --danger: #dc2626;
-  --danger-soft: rgba(220, 38, 38, 0.08);
-  --warning: #d97706;
-  --warning-soft: rgba(217, 119, 6, 0.08);
+  --accent: var(--secondary);
+  --accent-hover: var(--secondary-hover);
+  --accent-soft: var(--secondary-soft);
+  --on-accent: var(--fg-on-brand);
 
-  /* Semantic color */
-  --accent: var(--primary);
-  --accent-hover: var(--primary-hover);
-  --accent-soft: var(--primary-soft);
-  --on-accent: #ffffff;
+  /* Gradients — Clinical precision uses flat sterile surfaces & calibrated brand gradient */
+  --wl-gradient-rail: var(--bg-surface);
+  --wl-gradient-card: var(--bg-surface);
+  --wl-gradient-panel: var(--bg-surface);
+  --wl-gradient-primary: var(--brand-gradient);
+  --wl-gradient-gold: linear-gradient(135deg, #F59E0B 0%, #E67E22 100%);
+  --wl-gradient-table-head: var(--bg-subtle);
+  --wl-gradient-toolbar: var(--bg-surface);
+  --wl-gradient-chip: var(--bg-subtle);
+  --wl-laser-sweep: linear-gradient(90deg, transparent, var(--secondary), transparent);
 
-  /* Gradient tokens */
-  --wl-gradient-rail: linear-gradient(180deg, #f1f5f9 0%, #f8fafc 45%, #ffffff 100%);
-  --wl-gradient-card: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 42%, #e2e8f0 100%);
-  --wl-gradient-panel: linear-gradient(135deg, #f1f5f9 0%, #f8fafc 55%, #ffffff 100%);
-  --wl-gradient-primary: linear-gradient(135deg, #3b82f6 0%, #2563eb 45%, #10b981 100%);
-  --wl-gradient-gold: linear-gradient(135deg, #eab36a 0%, #b45309 45%, #92400e 100%);
-  --wl-gradient-table-head: linear-gradient(90deg, #dbeafe 0%, #bfdbfe 45%, #dcfce7 100%);
-  --wl-gradient-toolbar: linear-gradient(90deg, rgba(37, 99, 235, 0.06) 0%, rgba(15, 23, 42, 0.03) 40%, rgba(5, 150, 105, 0.04) 100%);
-  --wl-gradient-chip: linear-gradient(90deg, rgba(37, 99, 235, 0.08), rgba(5, 150, 105, 0.06));
-  --wl-laser-sweep: linear-gradient(90deg, transparent, var(--primary), var(--surface), transparent);
+  /* Shadows → Clinical Precision elevation */
+  --shadow-card: var(--shadow-sm);
+  --shadow-hover: var(--shadow-md);
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-xl: var(--shadow-lg);
 
-  /* Shadows (light mode — soft elevation) */
-  --shadow-card: 0 0 0 1px rgba(0, 0, 0, 0.04), 0 4px 16px -2px rgba(0, 0, 0, 0.08), 0 12px 24px -4px rgba(0, 0, 0, 0.06);
-  --shadow-hover: 0 8px 24px -4px rgba(0, 0, 0, 0.12), 0 16px 32px -8px rgba(0, 0, 0, 0.08);
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.03);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.04), 0 2px 4px -2px rgba(0, 0, 0, 0.03);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.04), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+  /* Headings & Title effects — Clinical authority */
+  --wl-gold-text: var(--fg-warning);
+  --wl-gold-text-shadow: none;
+  --wl-gold-title-shadow: var(--shadow-xs);
+  --wl-gold-glow-soft: none;
+  --wl-gold-text-filter: none;
 
-  /* ── RADIUS (three values only) ── */
-  --radius-xs: 4px;
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --radius-full: 999px;
-  --radius-pill: 999px;
+  /* State tokens */
+  --wl-surface-hover: var(--bg-hover);
+  --wl-field: var(--bg-surface);
+  --wl-primary-ring: var(--ring-focus);
+  --wl-primary-shadow: var(--shadow-brand);
+  --wl-primary-glow: var(--ring-focus);
+  --wl-focus-ring: var(--ring-focus);
+  --wl-focus-ring-danger: 0 0 0 2px #FFFFFF, 0 0 0 4px var(--fg-danger);
+  --wl-gold-ring: 0 0 0 2px #FFFFFF, 0 0 0 4px var(--fg-warning);
+  --wl-gold-glow-soft: var(--shadow-xs);
 
-  /* ── Gold text effects (Navy Classic) ── */
-  --wl-gold-text: #92400e;
-  --wl-gold-text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9), 0 2px 14px rgba(180, 83, 9, 0.35);
-  --wl-gold-title-shadow: 0 1px 0 rgba(255, 255, 255, 0.9), 0 4px 26px rgba(180, 83, 9, 0.28), 0 2px 8px rgba(0, 0, 0, 0.15);
-  --wl-gold-glow-soft: 0 0 0 3px rgba(180, 83, 9, 0.12), 0 4px 18px rgba(180, 83, 9, 0.18);
-  --wl-gold-text-filter: drop-shadow(0 2px 10px rgba(180, 83, 9, 0.28)) drop-shadow(0 1px 0 rgba(255, 255, 255, 0.9));
-
-  /* ── State tokens ── */
-  --wl-surface-hover: rgba(37, 99, 235, 0.04);
-  --wl-field: rgba(255, 255, 255, 0.98);
-  --wl-primary-ring: 0 0 0 4px rgba(37, 99, 235, 0.15);
-  --wl-primary-shadow: 0 4px 18px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(37, 99, 235, 0.18);
-  --wl-primary-glow: 0 0 0 3.5px rgba(37, 99, 235, 0.15), 0 2px 10px rgba(37, 99, 235, 0.18);
-  --wl-focus-ring: 0 0 0 3.5px rgba(37, 99, 235, 0.2), 0 2px 10px rgba(37, 99, 235, 0.2);
-  --wl-focus-ring-danger: 0 0 0 3.5px rgba(220, 38, 38, 0.2);
-
-  /* ── Backward-compatible aliases (one name, one value) ── */
-  --wl-primary: var(--primary);
-  --wl-primary-hover: var(--primary-hover);
-  --wl-primary-soft: var(--primary-soft);
-  --wl-primary-rgb: 37, 99, 235;
-  --wl-accent: var(--accent);
-  --wl-accent-hover: var(--accent-hover);
-  --wl-accent-soft: var(--accent-soft);
-  --wl-accent-rgb: 37, 99, 235;
-  --wl-success: var(--success);
-  --wl-success-soft: var(--success-soft);
-  --wl-success-rgb: 5, 150, 105;
-  --wl-danger: var(--danger);
-  --wl-danger-soft: var(--danger-soft);
-  --wl-danger-rgb: 220, 38, 38;
-  --wl-warning: var(--warning);
-  --wl-warning-soft: var(--warning-soft);
-  --wl-warning-rgb: 217, 119, 6;
-  --wl-info: var(--primary);
-  --wl-info-soft: var(--primary-soft);
-  --wl-muted: var(--muted);
-  --wl-muted-soft: var(--muted-soft);
-  --wl-ink: var(--ink);
-  --wl-ink-strong: var(--ink-strong);
-  --wl-ink-soft: var(--ink-soft);
-  --wl-line: var(--line);
-  --wl-line-strong: var(--line-strong);
-  --wl-border: var(--line);
-  --wl-border-strong: var(--line-strong);
-  --wl-surface: var(--surface);
-  --wl-surface-soft: var(--surface-soft);
-  --wl-surface-hover: var(--wl-surface-hover);
-  --wl-bg-app: var(--base);
-  --wl-bg-surface: var(--surface);
-  --wl-bg-surface-soft: var(--surface-soft);
-  --wl-paper: var(--base);
-  --wl-paper-rgb: 255, 255, 255;
-  --wl-surface-rgb: 248, 250, 252;
-  --wl-ink-rgb: 30, 41, 59;
-  --wl-ink-strong-rgb: 15, 23, 42;
-  --wl-ink-soft-rgb: 100, 116, 139;
-  --wl-muted-rgb: 148, 163, 187;
-  --wl-on-primary: var(--base);
-  --wl-on-accent: var(--on-accent);
-  --wl-gold: var(--gold);
-  --wl-gold-hover: var(--gold);
-  --wl-gold-soft: var(--gold-soft);
-  --wl-gold-rgb: 180, 83, 9;
-  --wl-emerald: var(--success);
-  --wl-emerald-soft: var(--success-soft);
-  --wl-emerald-rgb: 5, 150, 105;
-  --wl-emerald-faint: #D1FAE5;
-  --wl-teal: #0D9488;
-  --wl-teal-soft: rgba(13, 148, 136, 0.08);
-  --wl-teal-dark: #0f766e;
-  --wl-teal-faint: #CCFBF1;
-  --wl-rose: #E11D48;
-  --wl-rose-soft: rgba(225, 29, 72, 0.08);
-  --wl-rose-faint: #FCE7F3;
-  --wl-amber-faint: #FEF3C7;
-  --wl-danger-faint: #FCA5A5;
-  --wl-indigo: #4F46E5;
-  --wl-indigo-soft: rgba(79, 70, 229, 0.08);
-  --wl-indigo-light: #6366F1;
-  --wl-primary-light: #69a9ff;
-  --wl-primary-active: #818CF8;
-  --wl-sky: #0284C7;
-  --wl-sky-soft: rgba(2, 132, 199, 0.08);
-  --wl-blue: #4F95F5;
-  --wl-blue-soft: rgba(79, 149, 245, 0.08);
-  --wl-gold-light: #F8C15D;
-  --wl-admin: var(--gold);
-  --wl-admin-soft: var(--gold-soft);
-  --wl-shadow: var(--shadow-card);
+  /* ── Backward-compatible aliases ── */
+  --wl-primary: var(--brand);
+  --wl-primary-hover: var(--brand-hover);
+  --wl-primary-soft: var(--brand-soft);
+  --wl-primary-rgb: 15, 61, 86;
+  --wl-accent: var(--secondary);
+  --wl-accent-hover: var(--secondary-hover);
+  --wl-accent-soft: var(--secondary-soft);
+  --wl-accent-rgb: 20, 125, 146;
+  --wl-success: var(--fg-success);
+  --wl-success-soft: var(--color-success-100);
+  --wl-success-rgb: 25, 135, 84;
+  --wl-danger: var(--fg-danger);
+  --wl-danger-soft: var(--color-danger-100);
+  --wl-danger-rgb: 220, 53, 69;
+  --wl-warning: var(--fg-warning);
+  --wl-warning-soft: var(--color-warning-100);
+  --wl-warning-rgb: 230, 126, 34;
+  --wl-info: var(--fg-info);
+  --wl-info-soft: var(--color-info-100);
+  --wl-info-rgb: 20, 125, 146;
+  --wl-muted: var(--fg-subtle);
+  --wl-muted-soft: var(--fg-placeholder);
+  --wl-ink: var(--fg-body);
+  --wl-ink-strong: var(--fg-heading);
+  --wl-ink-soft: var(--fg-muted);
+  --wl-line: var(--border);
+  --wl-line-strong: var(--border-strong);
+  --wl-border: var(--border);
+  --wl-border-strong: var(--border-strong);
+  --wl-surface: var(--bg-surface);
+  --wl-surface-soft: var(--bg-subtle);
+  --wl-bg-app: var(--bg-app);
+  --wl-bg-surface: var(--bg-surface);
+  --wl-bg-surface-soft: var(--bg-subtle);
+  --wl-paper: var(--bg-app);
+  --wl-paper-rgb: 247, 249, 251;
+  --wl-surface-rgb: 255, 255, 255;
+  --wl-ink-rgb: 66, 71, 77;
+  --wl-ink-strong-rgb: 16, 42, 67;
+  --wl-ink-soft-rgb: 98, 125, 152;
+  --wl-muted-rgb: 114, 120, 125;
+  --wl-on-primary: var(--fg-on-brand);
+  --wl-on-accent: var(--fg-on-brand);
+  --wl-on-gold: var(--fg-on-brand);
+  --wl-gold: var(--fg-warning);
+  --wl-gold-hover: var(--color-warning-500);
+  --wl-gold-soft: var(--color-warning-100);
+  --wl-gold-rgb: 230, 126, 34;
+  --wl-emerald: var(--fg-success);
+  --wl-emerald-soft: var(--color-success-100);
+  --wl-emerald-rgb: 25, 135, 84;
+  --wl-emerald-faint: var(--color-success-100);
+  --wl-teal: var(--secondary);
+  --wl-teal-soft: var(--secondary-soft);
+  --wl-teal-dark: var(--secondary-hover);
+  --wl-teal-faint: var(--color-teal-100);
+  --wl-rose: var(--fg-danger);
+  --wl-rose-soft: var(--color-danger-100);
+  --wl-rose-faint: var(--color-danger-100);
+  --wl-amber-faint: var(--color-warning-100);
+  --wl-danger-faint: var(--color-danger-100);
+  --wl-indigo: var(--brand);
+  --wl-indigo-soft: var(--brand-soft);
+  --wl-indigo-light: var(--color-brand-400);
+  --wl-primary-light: var(--color-brand-400);
+  --wl-primary-active: var(--brand-hover);
+  --wl-sky: var(--secondary);
+  --wl-sky-soft: var(--secondary-soft);
+  --wl-blue: var(--chart-1);
+  --wl-blue-soft: var(--color-brand-100);
+  --wl-gold-light: var(--color-warning-500);
+  --wl-admin: var(--brand);
+  --wl-admin-soft: var(--brand-soft);
+  --wl-shadow: var(--shadow-sm);
   --wl-shadow-sm: var(--shadow-sm);
   --wl-shadow-md: var(--shadow-md);
-  --wl-shadow-lg: var(--shadow-xl);
-  --wl-shadow-xl: var(--shadow-xl);
-  --wl-shadow-card: var(--shadow-card);
-  --wl-shadow-hover: var(--shadow-hover);
-  --wl-shadow-modal: var(--shadow-xl);
-  --wl-transition: 0.18s cubic-bezier(0.16, 1, 0.3, 1);
-  --wl-ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
-  --wl-max-width: 1280px;
-  --wl-max-width-admin: 1560px;
-  --wl-header-height: 56px;
+  --wl-shadow-lg: var(--shadow-lg);
+  --wl-shadow-xl: var(--shadow-lg);
+  --wl-shadow-card: var(--shadow-sm);
+  --wl-shadow-hover: var(--shadow-md);
+  --wl-shadow-modal: var(--shadow-lg);
+  --wl-shadow-primary: var(--shadow-brand);
+  --wl-transition: var(--duration-base) var(--ease-out);
+  --wl-ease-spring: var(--ease-out);
+  --wl-max-width: var(--content-max);
+  --wl-max-width-admin: var(--content-max);
+  --wl-header-height: var(--topbar-height);
   --wl-touch-min: 44px;
   --wl-header-search-min: 170px;
   --wl-header-search-max: 230px;
-  --wl-rail-width: 240px;
-  --wl-rail-collapsed: 64px;
-  --wl-gutter: 1.5rem;
-  --wl-section: 4rem;
-  --wl-page-padding-top: 1.75rem;
-  --wl-page-padding-bottom: 3.5rem;
-  --wl-page-gap: 1.5rem;
-  --wl-section-gap: 3.5rem;
-  --wl-card-padding: 1.5rem;
-  --wl-card-padding-sm: 1rem;
-  --wl-card-padding-lg: 2rem;
-  --wl-form-gap: 1.25rem;
-  --wl-field-gap: 0.45rem;
-  --wl-table-cell-padding-y: 8px;
-  --wl-table-cell-padding-x: 9px;
-  --wl-table-cell-padding: var(--wl-table-cell-padding-y) var(--wl-table-cell-padding-x);
-  --wl-modal-padding: 1.5rem;
-  --wl-modal-padding-sm: 1rem;
+  --wl-rail-width: var(--sidebar-width);
+  --wl-rail-collapsed: var(--sidebar-width-collapsed);
+  --wl-gutter: var(--gutter);
+  --wl-section: var(--space-16);
+  --wl-page-padding-top: var(--space-7);
+  --wl-page-padding-bottom: var(--space-12);
+  --wl-page-gap: var(--space-6);
+  --wl-section-gap: var(--space-10);
+  --wl-card-padding: var(--space-6);
+  --wl-card-padding-sm: var(--space-4);
+  --wl-card-padding-lg: var(--space-8);
+  --wl-form-gap: var(--space-5);
+  --wl-field-gap: var(--space-2);
+  --wl-table-cell-padding-y: var(--space-2);
+  --wl-table-cell-padding-x: var(--space-3);
+  --wl-table-cell-padding: var(--space-2) var(--space-3);
+  --wl-modal-padding: var(--space-6);
+  --wl-modal-padding-sm: var(--space-4);
   --wl-control-sm: 32px;
   --wl-control-md: 36px;
-  --wl-control-lg: 44px;
-  --wl-table-action-size: 27px;
-  --wl-primary-active: var(--primary-hover);
-  --wl-primary-faint: var(--primary-soft);
-  --wl-text-primary: var(--ink-strong);
-  --wl-text-secondary: var(--ink);
-  --wl-text-muted: var(--muted);
-  --wl-row-alt: var(--surface-soft);
-  --wl-app-glow:
-    radial-gradient(900px 420px at 12% -4%, rgba(5, 150, 105, 0.04), transparent 60%),
-    radial-gradient(1000px 480px at 88% -6%, rgba(100, 140, 255, 0.06), transparent 62%),
-    radial-gradient(760px 340px at 50% 110%, rgba(37, 99, 235, 0.04), transparent 60%),
-    linear-gradient(180deg, #f8fafc 0%, #f1f5f9 34%, #ffffff 100%);
-  --wl-dir-sign: 1;
-}
-
-/* ── Responsive overrides ── */
-@media (max-width: 768px) {
-  :root {
-    --wl-gutter: 1rem;
-    --wl-header-height: 52px;
-    --wl-page-padding-top: 1.25rem;
-    --wl-page-padding-bottom: 2.5rem;
-    --wl-page-gap: 1.25rem;
-    --wl-section: 3rem;
-    --wl-section-gap: 2.5rem;
-    --wl-card-padding: 1.15rem;
-    --wl-card-padding-lg: 1.35rem;
-    --wl-form-gap: 1rem;
-    --wl-table-cell-padding-y: 0.75rem;
-    --wl-table-cell-padding-x: 0.85rem;
-    --wl-modal-padding: 1.15rem;
-  }
-}
-
-@media (max-width: 480px) {
-  :root {
-    --wl-gutter: 0.85rem;
-    --wl-section: 2.25rem;
-    --wl-page-padding-top: 1rem;
-    --wl-page-padding-bottom: 2rem;
-    --wl-page-gap: 1rem;
-    --wl-section-gap: 2rem;
-    --wl-card-padding: 1rem;
-    --wl-card-padding-lg: 1.15rem;
-    --wl-form-gap: 0.85rem;
-    --wl-modal-padding: 0.85rem;
-  }
-}
-
-@media (max-width: 360px) {
-  :root {
-    --wl-gutter: 0.65rem;
-    --wl-page-padding-top: 0.75rem;
-    --wl-page-padding-bottom: 1.75rem;
-  }
+  --wl-control-lg: 40px;
+  --wl-table-action-size: 28px;
+  --wl-primary-active: var(--brand-hover);
+  --wl-primary-faint: var(--brand-soft);
+  --wl-text-primary: var(--fg-heading);
+  --wl-text-secondary: var(--fg-body);
+  --wl-text-muted: var(--fg-muted);
+  --wl-row-alt: var(--bg-subtle);
+  --wl-app-glow: none;
+  --wl-gradient-app: none;
+  --wl-gradient-modal: var(--bg-surface);
+  --wl-gradient-secondary: var(--bg-surface);
+  --wl-dir-sign: var(--flip);
 }

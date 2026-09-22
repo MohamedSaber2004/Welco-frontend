@@ -68,17 +68,22 @@ const toggleLang = () => {
 .auth-card {
   width: 100%;
   max-width: 440px;
-  background: var(--wl-surface);
-  border: 1px solid var(--wl-border);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
   border-radius: var(--radius-xl);
-  box-shadow: 0 16px 36px -8px rgba(0, 10, 25, 0.08), 0 6px 14px -4px rgba(0, 10, 25, 0.04);
+  box-shadow: var(--shadow-lg);
   position: relative;
   overflow: hidden;
-  padding: 1.75rem 1.85rem 1.5rem;
+  padding: var(--space-6);
   display: flex;
   flex-direction: column;
-transition: max-width 0.2s ease;
-  }
+  transition: max-width var(--duration-base) var(--ease-out);
+}
+
+@media (max-width: 480px) {
+  .auth-wrap { padding: var(--space-4) var(--space-4) !important; }
+  .auth-card { padding: var(--space-5) var(--space-4) !important; border-radius: var(--radius-lg) !important; }
+}
 
   .auth-card--wide {
   max-width: 540px;
@@ -90,7 +95,8 @@ transition: max-width 0.2s ease;
   top: 0;
   inset-inline: 0;
   height: 2px;
-  background: var(--wl-laser-sweep);
+  background: var(--brand-gradient);
+  opacity: 0.6;
 }
 
 .auth-card__top {

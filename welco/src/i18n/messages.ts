@@ -521,12 +521,12 @@ export type Messages = {
     containmentBadge: string
     contourTruth: string
     roleOrganizationUser: string
-    roleWelcoStaff: string
+    roleSales: string
     roleAdmin: string
     roleProvider: string
     roleDistributor: string
-    roleCustomer: string
-    welcoStaff: string
+    roleClient: string
+    sales: string
     organizationUser: string
     products: string
     createCountry: string
@@ -537,7 +537,6 @@ export type Messages = {
     editZone: string
     createUser: string
     editUser: string
-    sales: string
     orders: string
     companies: string
     salesDesc: string
@@ -706,10 +705,10 @@ export type Messages = {
     auditActionUpload: string
     auditActionDownload: string
     auditActionAssign: string
-    // Dashboard overview (Admin / Staff)
-    opsConsole: string
+    // Dashboard overview (Admin / Sales)
+    salesConsole: string
     fulfillmentHub: string
-    opsConsoleDesc: string
+    salesConsoleDesc: string
     issueQuotation: string
     processOrders: string
     openRfqQueue: string
@@ -764,7 +763,7 @@ export type Messages = {
     auditTrail: string
     liveLedger: string
     noAuditActivity: string
-    opsShortcuts: string
+    salesShortcuts: string
     adminShortcuts: string
     salesRfqQueue: string
     orderFulfillment: string
@@ -1089,8 +1088,40 @@ export type Messages = {
     wishlistLoginRequiredDesc: string
     wishlistOrgOnly: string
     wishlistOrgOnlyDesc: string
+    choose: string
+    current: string
     clearAll: string
     clearWishlistConfirm: string
+  }
+  provider: {
+    dashboard: string
+    myCatalog: string
+    myCatalogDesc: string
+    categories: string
+    categoriesDesc: string
+    newProduct: string
+    editProduct: string
+    newCategory: string
+    categoryExistsHint: string
+    noCompanyTitle: string
+    noCompanyDesc: string
+    noProducts: string
+    noProductsDesc: string
+    noCategories: string
+    noCategoriesDesc: string
+    linkCompany: string
+    offeredBy: string
+    providersInCategory: string
+    productsFromProvider: string
+    noProvidersHere: string
+    noProvidersHereDesc: string
+    noProviderProducts: string
+    viewAllProducts: string
+    providerProducts: string
+    storefront: string
+    memberSince: string
+    viewCatalog: string
+    categoryProviders: string
   }
   commerce: {
     checkoutTitle: string
@@ -1628,6 +1659,7 @@ export type Messages = {
     sortBy: string
     allTypes: string
     allCountries: string
+    supplier: string
     verifiedBadge: string
     providerCount: string
     noProvidersFound: string

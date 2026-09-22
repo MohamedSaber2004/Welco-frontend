@@ -19,7 +19,7 @@ import { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE, SESSION_COOKIE } from '../in
 import type { AuthBridge } from '../infrastructure/http/auth-bridge'
 import type { AttachmentService } from './attachment.service'
 import {
-  isStaffRole,
+  isSalesRole,
   resolveBusinessRole as resolveBusinessRoleFn,
   resolveBusinessRoleKey as resolveBusinessRoleKeyFn,
 } from '../domain/models/business-role'
@@ -236,17 +236,16 @@ export class AuthService {
     return u.roles.map((r) => r.toLowerCase()).includes('organizationuser') || u.userType === 2
   })
 
-  /** WelcoStaff/SnulStaff — internal operations roles (UserType 3), treated identically. */
-  readonly isWelcoStaff = computed(() => {
+  /** Sales/Internal Staff — internal operations roles (UserType 3), treated identically. */
+  readonly isSales = computed(() => {
     const u = this.user.value
     if (!u) return false
-    return u.roles.some((r) => isStaffRole(r)) || u.userType === 3
+    return u.roles.some((r) => isSalesRole(r)) || u.userType === 3
   })
 
   /**
    * 4 business roles derived on top of the 3 backend UserTypes:
-   * Admin, Provider/Distributor (OrgUser + company), Customer (buyer,
-   * OrgUser without company), WelcoStaff. The Provider IS the Company
+   * Admin, Provider/Distributor (OrgUser + company), Client (OrgUser without company), Sales (internal staff). The Provider IS the Company
    * of a distributor / organization user (see business-role.ts).
    */
   private toBusinessCtx(company?: { id?: string | null; type?: number; status?: unknown } | null) {
@@ -261,11 +260,12 @@ export class AuthService {
   }
 
   /** Seller = internal roles that live in /admin console. */
-  readonly isSeller = computed(() => this.isAdmin.value || this.isWelcoStaff.value)
+  readonly isSeller = computed(() => this.isAdmin.value || this.isSales.value)
 
   /** Suitable landing dashboard per role. Single source of truth for post-login + guestOnly redirects. */
   getDashboardRouteName(): string {
     if (this.isSeller.value) return 'admin-dashboard'
+    if (this.isProvider.value) return 'provider-catalog'
     if (this.isOrganizationUser.value) return 'account'
     return 'home'
   }
@@ -279,8 +279,9 @@ export class AuthService {
     if (!path || !path.startsWith('/')) return false
     const clean = path.split('?')[0]?.split('#')[0] ?? '/'
     if (clean.startsWith('/admin')) return this.isSeller.value
-    if (clean.startsWith('/account') || clean === '/wishlist') return !this.isSeller.value && this.isAuthenticated
-    if (clean === '/cart' || clean === '/checkout') return !this.isSeller.value
+    if (clean.startsWith('/provider')) return this.isProvider.value
+    if (clean.startsWith('/account') || clean === '/wishlist') return this.isOrganizationUser.value && this.isAuthenticated
+    if (clean === '/cart' || clean === '/checkout') return this.isOrganizationUser.value
     return true
   }
 
@@ -290,15 +291,19 @@ export class AuthService {
     return !!u && this.isOrganizationUser.value && !u.companyId && isPendingOrg(u.email)
   }
 
-  /** Obsolete Customer role — always false in current architecture. */
-  readonly isCustomer = computed(() => false)
-
-  /** Provider/Distributor — OrganizationUser. */
+  /** Provider/Distributor — OrganizationUser with company. */
   readonly isProvider = computed(() => {
     const u = this.user.value
     if (!u) return false
-    if (this.isAdmin.value || this.isWelcoStaff.value) return false
-    return this.isOrganizationUser.value
+    if (this.isAdmin.value || this.isSales.value) return false
+    return this.isOrganizationUser.value && !!u.companyId
+  })
+
+  /** Client — OrganizationUser without company (buyer). */
+  readonly isClient = computed(() => {
+    const u = this.user.value
+    if (!u) return false
+    return this.isOrganizationUser.value && !u.companyId
   })
 
   /** Whether the signed-in user already has a linked provider company. */

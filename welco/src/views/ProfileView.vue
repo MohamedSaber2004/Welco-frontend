@@ -106,10 +106,10 @@ const userTypeInfo = computed(() => {
   if (type === UserType.WelcoStaff) {
     return {
       type,
-      label: t('admin.roleWelcoStaff'),
+      label: t('admin.roleSales'),
       icon: 'support_agent',
-      pillClass: 'user-role-pill--staff',
-      desc: locale.value === 'ar' ? 'فريق الدعم الفني والعمليات' : 'Welco Staff & Operational Specialist',
+      pillClass: 'user-role-pill--sales',
+      desc: locale.value === 'ar' ? 'فريق المبيعات والعمليات' : 'Sales & Operational Specialist',
     }
   }
   // OrganizationUser is a Provider/Distributor (the company IS the provider).
@@ -122,8 +122,8 @@ const userTypeInfo = computed(() => {
   }
 })
 
-const isAdminOrStaff = computed(() => authService.isAdmin.value || authService.isWelcoStaff.value)
-const showCompanyInfo = computed(() => !isAdminOrStaff.value)
+const isAdminOrSales = computed(() => authService.isAdmin.value || authService.isSales.value)
+const showCompanyInfo = computed(() => !isAdminOrSales.value)
 const companyAddressesCount = computed(() => (showCompanyInfo.value ? companyService.companyAddresses.value.length : 0))
 
 const load = async () => {
@@ -247,25 +247,22 @@ const setLang = async (v: AppLanguage) => {
     </div>
 
     <!-- Executive Header -->
-    <header class="profile-head" :class="{ 'is-admin-head': isAdminOrStaff }">
-      <div class="head-chip mono" :class="{ 'head-chip--gold': isAdminOrStaff }">
+    <header class="profile-head" :class="{ 'is-admin-head': isAdminOrSales }">
+      <div class="head-chip mono" :class="{ 'head-chip--gold': isAdminOrSales }">
         <span class="pulse-dot"></span>
         <span>{{ t('profile.headerEyebrow') }}</span>
       </div>
-      <h1 class="head-title" :class="{ 'head-title--gold': isAdminOrStaff }">{{ t('profile.title') }}</h1>
+      <h1 class="head-title" :class="{ 'head-title--gold': isAdminOrSales }">{{ t('profile.title') }}</h1>
       <p class="head-subtitle">{{ t('profile.subtitle') }}</p>
     </header>
 
-    <div v-if="!user" class="profile-grid">
-      <SkeletonLoader type="card" height="320px" />
-      <SkeletonLoader type="card" height="320px" />
-    </div>
+    <SkeletonLoader v-if="!user" type="profile" />
 
     <div v-else class="profile-grid">
       <!-- Left Column: Identity Card, Language, Addresses Link -->
       <aside class="profile-sidebar">
         <!-- Identity Card -->
-        <div class="card id-card" :class="{ 'id-card--admin': userTypeInfo.pillClass === 'user-role-pill--admin', 'id-card--staff': userTypeInfo.pillClass === 'user-role-pill--staff' }">
+        <div class="card id-card" :class="{ 'id-card--admin': userTypeInfo.pillClass === 'user-role-pill--admin', 'id-card--sales': userTypeInfo.pillClass === 'user-role-pill--sales' }">
           <div class="avatar-holder">
             <AppImage
               :src="avatarUrl()"
@@ -298,7 +295,7 @@ const setLang = async (v: AppLanguage) => {
             class="user-display-name"
             :class="{
               'is-admin': userTypeInfo.pillClass === 'user-role-pill--admin',
-              'is-staff': userTypeInfo.pillClass === 'user-role-pill--staff',
+              'is-sales': userTypeInfo.pillClass === 'user-role-pill--sales',
             }"
           >
             {{ user?.fullName }}
@@ -395,7 +392,7 @@ const setLang = async (v: AppLanguage) => {
       <!-- Right Column: Personal Information & Password Change -->
       <main class="profile-main-stack">
         <!-- Executive Identity & Phone Code Overview for All User Types -->
-        <div class="account-specs-bar card" :class="{ 'account-specs-bar--admin': isAdminOrStaff }">
+        <div class="account-specs-bar card" :class="{ 'account-specs-bar--admin': isAdminOrSales }">
           <div class="specs-bar-cell">
             <span class="specs-bar-lbl mono">{{ t('profile.userType') }}</span>
             <div class="specs-bar-val">
@@ -419,7 +416,7 @@ const setLang = async (v: AppLanguage) => {
                 <span class="flag-icon text-[18px]">{{ userPhoneDetails.flag }}</span>
                 <strong
                   class="font-extrabold text-base"
-                  :class="isAdminOrStaff ? 'specs-admin-name' : 'text-indigo-600'"
+                  :class="isAdminOrSales ? 'specs-admin-name' : 'text-indigo-600'"
                   >{{ userPhoneDetails.dialCode }}</strong
                 >
                 <span class="text-xs text-slate-500 font-mono">({{ userPhoneDetails.iso }})</span>
@@ -540,8 +537,23 @@ const setLang = async (v: AppLanguage) => {
           </div>
 
           <!-- Loading state -->
-          <div v-if="companyLoading" class="company-skeleton-wrap">
-            <SkeletonLoader type="card" height="120px" />
+          <div v-if="companyLoading" class="company-detail-box" style="pointer-events:none">
+            <div class="company-headline" style="border:none">
+              <div class="company-icon-box animate-pulse" style="background:var(--bg-subtle)"></div>
+              <div class="company-name-meta" style="width:70%">
+                <div class="company-title-row">
+                  <div class="sk animate-pulse" style="height:20px;width:180px;border-radius:var(--radius-sm);background:var(--bg-subtle)"></div>
+                  <div class="sk animate-pulse" style="height:22px;width:80px;border-radius:var(--radius-pill);background:var(--bg-subtle)"></div>
+                </div>
+                <div class="sk animate-pulse" style="height:12px;width:140px;border-radius:var(--radius-sm);margin-top:6px;background:var(--bg-subtle)"></div>
+              </div>
+            </div>
+            <div class="company-specs-grid">
+              <div v-for="s in 3" :key="s" class="spec-cell">
+                <div class="sk animate-pulse" style="height:10px;width:60px;border-radius:var(--radius-sm);background:var(--bg-subtle)"></div>
+                <div class="sk animate-pulse" style="height:16px;width:100px;border-radius:var(--radius-sm);margin-top:6px;background:var(--bg-subtle)"></div>
+              </div>
+            </div>
           </div>
 
           <!-- Linked Company View -->
@@ -940,7 +952,7 @@ const setLang = async (v: AppLanguage) => {
   text-shadow: 0 1px 8px rgba(233, 168, 37, 0.25);
 }
 
-.user-role-pill--staff {
+.user-role-pill--sales {
   background: rgba(62, 215, 180, 0.12);
   color: var(--wl-success);
   border: 1px solid rgba(62, 215, 180, 0.32);
@@ -1167,8 +1179,8 @@ const setLang = async (v: AppLanguage) => {
   width: 7px;
   height: 7px;
   border-radius: var(--radius-pill);
-  background: #10B981;
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+  background: var(--fg-success, #198754);
+  box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.2);
   flex-shrink: 0;
 }
 
@@ -1195,17 +1207,17 @@ const setLang = async (v: AppLanguage) => {
   font-weight: 800;
   color: var(--wl-primary);
   background: var(--wl-primary-soft);
-  border: 1px solid rgba(105, 169, 255, 0.2);
+  border: 1px solid rgba(15, 61, 86, 0.15);
   padding: var(--space-1) var(--space-2);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-xs, 3px);
   letter-spacing: 0.05em;
   white-space: nowrap;
 }
 
 .card-badge--amber {
-  color: var(--wl-accent, #B45309);
-  background: var(--wl-accent-soft, #FFFBEB);
-  border-color: rgba(245, 158, 11, 0.25);
+  color: var(--fg-warning, #E67E22);
+  background: var(--color-warning-50, #FFF8E1);
+  border-color: rgba(230, 126, 34, 0.25);
 }
 
 .card-badge--indigo {

@@ -20,24 +20,32 @@ const isGuid = (val?: string | null): boolean => {
 }
 
 /**
- * 3-role model: Admin, Welco Staff, and Provider / Distributor (OrganizationUser).
+ * 4-role model: Admin, Sales, Provider / Distributor, Client.
  */
 const formatRole = (
   user: UserDto | UserDetailsDto,
-  _company?: { id?: string | null } | null,
+  company?: { id?: string | null } | null,
 ): { role: string; roleKey: string } => {
-  const orgLabel = { role: 'Provider / Distributor', roleKey: 'roleProvider' }
+  const hasCompany = !!company?.id
   if (user.roles && user.roles.length > 0) {
     const rawRole = user.roles[0] ?? ''
     if (rawRole.toLowerCase().includes('admin')) return { role: 'Admin', roleKey: 'roleAdmin' }
-    if (rawRole.toLowerCase().includes('staff')) return { role: 'Welco Staff', roleKey: 'roleWelcoStaff' }
-    if (rawRole.toLowerCase().includes('org') || rawRole.toLowerCase().includes('user')) return orgLabel
+    if (rawRole.toLowerCase().includes('staff') || rawRole.toLowerCase().includes('sales')) return { role: 'Sales', roleKey: 'roleSales' }
+    if (rawRole.toLowerCase().includes('org') || rawRole.toLowerCase().includes('user')) {
+      return hasCompany
+        ? { role: 'Provider / Distributor', roleKey: 'roleProvider' }
+        : { role: 'Client', roleKey: 'roleClient' }
+    }
     return { role: rawRole, roleKey: rawRole }
   }
 
   if (user.userType === UserType.Admin) return { role: 'Admin', roleKey: 'roleAdmin' }
-  if (user.userType === UserType.WelcoStaff) return { role: 'Welco Staff', roleKey: 'roleWelcoStaff' }
-  if (user.userType === UserType.OrganizationUser) return orgLabel
+  if (user.userType === UserType.WelcoStaff) return { role: 'Sales', roleKey: 'roleSales' }
+  if (user.userType === UserType.OrganizationUser) {
+    return hasCompany
+      ? { role: 'Provider / Distributor', roleKey: 'roleProvider' }
+      : { role: 'Client', roleKey: 'roleClient' }
+  }
 
   return { role: 'User', roleKey: 'roleUser' }
 }
@@ -138,17 +146,16 @@ export function useUserLookup() {
       case 'admin':
       case 'roleadmin':
         return 'role-badge--admin'
-      case 'welco staff':
-      case 'rolewelcostaff':
-      case 'staff':
-        return 'role-badge--staff'
-      case 'organization':
-      case 'organization user':
-      case 'roleorganizationuser':
+      case 'sales':
+      case 'rolesales':
+        return 'role-badge--sales'
       case 'provider / distributor':
       case 'roleprovider':
       case 'roledistributor':
-        return 'role-badge--org'
+        return 'role-badge--provider'
+      case 'client':
+      case 'roleclient':
+        return 'role-badge--client'
       case 'system':
         return 'role-badge--system'
       default:

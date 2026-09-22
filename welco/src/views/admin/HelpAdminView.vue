@@ -3,6 +3,7 @@ import { onMounted, ref, computed } from 'vue'
 import { t } from '../../i18n'
 import { contentService } from '../../di/container'
 import AdminLayout from '../../components/layout/AdminLayout.vue'
+import SkeletonLoader from '../../components/ui/SkeletonLoader.vue'
 import AppPagination from '../../components/ui/AppPagination.vue'
 import BaseModal from '../../components/ui/BaseModal.vue'
 import BaseButton from '../../components/ui/BaseButton.vue'
@@ -547,7 +548,9 @@ const closeFaqDetails = () => {
         </button>
       </div>
 
-      <div v-if="loading" class="empty-tray-card mono">{{ t('common.loading') }}</div>
+      <div v-if="loading">
+        <SkeletonLoader type="table" :count="5" />
+      </div>
 
       <template v-else>
         <!-- TAB 1: HELP CATEGORIES -->
@@ -1240,9 +1243,9 @@ const closeFaqDetails = () => {
 }
 
 .search-input:focus {
-  border-color: #69a9ff;
-  box-shadow: 0 0 0 3px rgba(105, 169, 255, 0.12);
-  background: var(--wl-surface);
+  border-color: var(--border-focus);
+  box-shadow: var(--ring-focus);
+  background: var(--bg-surface);
 }
 
 .clear-btn {
@@ -1266,17 +1269,17 @@ const closeFaqDetails = () => {
   gap: 0.3rem;
   height: 38px;
   padding: 0 0.85rem;
-  border: 1px solid #FCA5A5;
-  border-radius: 10px;
+  border: 1px solid var(--border-danger, #FFDAD6);
+  border-radius: var(--radius-sm, 4px);
   font-size: 12px;
-  font-weight: 700;
-  color: var(--wl-danger);
-  background: var(--wl-danger-soft);
+  font-weight: 600;
+  color: var(--fg-danger, #DC3545);
+  background: var(--color-danger-50, #FFF8F7);
   cursor: pointer;
   transition: all 0.15s;
 }
 
-.clear-filters-btn:hover { background: rgba(242, 109, 109, 0.22); }
+.clear-filters-btn:hover { background: var(--color-danger-100, #FFDAD6); }
 
 .admin-head {
   display: flex;
@@ -1292,11 +1295,11 @@ const closeFaqDetails = () => {
   gap: 0.45rem;
   font-size: 10px;
   font-weight: 700;
-  color: var(--wl-primary);
-  background: var(--wl-primary-soft);
-  border: 1px solid rgba(var(--wl-primary-rgb), 0.3);
+  color: var(--primary, #0F3D56);
+  background: var(--brand-soft, #EDF4FF);
+  border: 1px solid var(--border, #D9E2EC);
   padding: 0.2rem 0.6rem;
-  border-radius: 9999px;
+  border-radius: var(--radius-xs, 3px);
   letter-spacing: 0.06em;
   margin-bottom: 0.5rem;
 }
@@ -1305,22 +1308,22 @@ const closeFaqDetails = () => {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--wl-primary);
+  background: var(--primary, #0F3D56);
 }
 
 .head-title {
-  font-family: var(--wl-font-display, system-ui);
+  font-family: var(--font-display);
   font-size: 1.68rem;
   font-weight: 800;
   letter-spacing: -0.025em;
-  color: var(--wl-ink-strong);
+  color: var(--fg-heading, #102A43);
   margin: 0;
   line-height: 1.1;
 }
 
 .head-subtitle {
   font-size: 13.5px;
-  color: var(--wl-muted);
+  color: var(--fg-muted, #627D98);
   margin: 0.25rem 0 0;
 }
 
@@ -1328,7 +1331,7 @@ const closeFaqDetails = () => {
 .tab-ribbon {
   display: flex;
   gap: 0.5rem;
-  border-bottom: 1.5px solid var(--wl-border, #E2E8F0);
+  border-bottom: 1px solid var(--border, #D9E2EC);
 }
 
 .tab-btn {
@@ -1336,11 +1339,11 @@ const closeFaqDetails = () => {
   border: none;
   background: transparent;
   font-size: 13.5px;
-  font-weight: 700;
-  color: var(--wl-muted, #64748B);
+  font-weight: 600;
+  color: var(--fg-muted, #627D98);
   cursor: pointer;
   border-bottom: 2px solid transparent;
-  margin-bottom: -1.5px;
+  margin-bottom: -1px;
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
@@ -1348,30 +1351,30 @@ const closeFaqDetails = () => {
 }
 
 .tab-btn:hover {
-  color: var(--wl-ink-strong, #0F172A);
+  color: var(--fg-heading, #102A43);
 }
 
 .tab-btn.is-active {
-  color: var(--wl-primary, #69a9ff);
-  border-bottom-color: var(--wl-primary, #69a9ff);
+  color: var(--primary, #0F3D56);
+  border-bottom-color: var(--primary, #0F3D56);
 }
 
 .tab-chip {
   font-size: 10px;
   font-weight: 700;
-  background: var(--wl-surface-soft);
-  color: var(--wl-ink-soft);
+  background: var(--surface-subtle, #F7F9FB);
+  color: var(--fg-muted, #627D98);
   padding: 0.1rem 0.45rem;
-  border-radius: 9999px;
+  border-radius: var(--radius-xs, 3px);
 }
 
 .empty-tray-card {
   padding: 3rem;
   text-align: center;
-  background: var(--wl-surface);
-  border: 1px solid var(--wl-border);
-  border-radius: 16px;
-  color: var(--wl-muted-soft);
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #D9E2EC);
+  border-radius: var(--radius-card, 8px);
+  color: var(--fg-muted, #627D98);
   font-size: 13px;
 }
 
@@ -1383,11 +1386,11 @@ const closeFaqDetails = () => {
 
 /* Executive Table */
 .table-card {
-  background: var(--wl-surface);
-  border: 1px solid var(--wl-border, #E2E8F0);
-  border-radius: var(--wl-radius-card, 16px);
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #D9E2EC);
+  border-radius: var(--radius-card, 8px);
   overflow: hidden;
-  box-shadow: var(--wl-shadow-card, 0 1px 3px rgba(0, 10, 25, 0.05));
+  box-shadow: var(--shadow-sm);
 }
 
 .table-wrap {

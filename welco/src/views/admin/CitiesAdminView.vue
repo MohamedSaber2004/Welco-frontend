@@ -13,7 +13,7 @@ import type { CityDto, CountryDto } from '../../domain/models/location'
 
 const cities = ref<CityDto[]>([])
 const countries = ref<CountryDto[]>([])
-const loading = ref(false)
+const loading = ref(true)
 const search = ref('')
 const filterCountry = ref('')
 const fetchError = ref('')

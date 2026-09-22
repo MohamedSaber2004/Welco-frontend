@@ -2246,6 +2246,29 @@ const navigateToOemFromModal = () => {
   .home .hero__search-bar input:focus::placeholder { animation: none; }
 }
 
+/* Browse by clinical specialty: white, contained, and evenly spaced. */
+.home section[aria-labelledby="cat-heading"] {
+  background: #fff;
+  border: 0;
+  padding-block: clamp(3rem, 6vw, 6rem);
+}
+.home section[aria-labelledby="cat-heading"] .section__inner {
+  max-width: 1320px;
+  margin-inline: auto;
+  padding-inline: clamp(1rem, 4vw, 2.75rem);
+}
+.home section[aria-labelledby="cat-heading"] .section-head {
+  margin-bottom: clamp(1.25rem, 3vw, 2rem);
+}
+.home section[aria-labelledby="cat-heading"] .section-desc {
+  max-width: 46rem;
+  margin-bottom: clamp(1.25rem, 3vw, 2rem);
+}
+.home section[aria-labelledby="cat-heading"] .cat-grid {
+  margin-inline: 0;
+  gap: clamp(.75rem, 2vw, 1.25rem);
+}
+
 @media (max-width: 760px) {
   .home .hero, .home .hero__inner { min-height: auto; }
   .home .hero__inner { grid-template-columns: 1fr; gap: 2.5rem; }

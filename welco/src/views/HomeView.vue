@@ -277,7 +277,6 @@ const navigateToOemFromModal = () => {
               <AppImage
                 :src="p.imageName"
                 placeholder-type="company"
-                :placeholder-text="p.name"
                 :alt="p.name"
                 fit="contain"
                 height="70px"
@@ -2149,6 +2148,32 @@ const navigateToOemFromModal = () => {
 .home .about-content .section-title { max-width: 620px; }
 .home .about-media { border-radius: 1rem; overflow: hidden; box-shadow: var(--platform-shadow); background: white; }
 .home .about-media__img { mix-blend-mode: multiply; }
+
+.home .provider-tile__logo {
+  height: 142px;
+  min-height: 142px;
+  width: 100%;
+  min-width: 0;
+  padding: 1rem;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, var(--platform-aqua), #f9fcfb);
+}
+.home .provider-tile__logo :deep(.app-image-placeholder) {
+  inset: 0;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+.home .provider-tile__logo :deep(.placeholder-icon-badge) {
+  width: 52px;
+  height: 52px;
+  flex: 0 0 52px;
+}
+.home .provider-tile__logo :deep(.placeholder-icon) { font-size: 26px; }
+.home .provider-tile__logo :deep(.placeholder-text) { display: none; }
 
 @media (prefers-reduced-motion: reduce) {
   .home .hero__search-bar input:focus::placeholder { animation: none; }

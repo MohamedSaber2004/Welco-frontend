@@ -164,9 +164,11 @@ const toggleLang = async () => {
 <style scoped>
 .admin-shell {
   min-height: 100vh;
-  background: var(--wl-paper);
+  background:
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--secondary) 8%, transparent), transparent 34rem),
+    var(--wl-paper);
   display: flex;
-  gap: var(--wl-gutter);
+  gap: clamp(1rem, 2vw, 1.75rem);
   padding: var(--wl-page-padding-top) var(--wl-gutter) var(--wl-page-padding-bottom);
   padding-inline-start: max(var(--wl-gutter), env(safe-area-inset-left));
   padding-inline-end: max(var(--wl-gutter), env(safe-area-inset-right));
@@ -188,7 +190,8 @@ const toggleLang = async () => {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  box-shadow: var(--wl-shadow-card);
+  box-shadow: 0 18px 46px rgba(8, 47, 73, 0.10);
+  backdrop-filter: blur(14px);
   transition: width 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 

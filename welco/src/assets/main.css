@@ -174,7 +174,9 @@
 :where(input, select, textarea):focus-visible { border-color: var(--border-focus); box-shadow: var(--ring-focus); }
 
 #app { min-height: 100vh; display: flex; flex-direction: column; background-color: var(--bg-app); overflow-x: clip; }
-main { flex: 1; min-width: 0; overflow-x: clip; }
+/* NOTE: do NOT add overflow-x to main — it breaks position:sticky on the admin sidebar rail.
+   Horizontal overflow is already clipped by #app above. */
+main { flex: 1; min-width: 0; }
 @media (max-width: 768px) {
   main {
     padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));

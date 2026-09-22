@@ -185,8 +185,8 @@ const toggleLang = async () => {
   border-radius: var(--radius-lg);
   flex-shrink: 0;
   position: sticky;
-  top: var(--wl-page-padding-top, 1.5rem);
-  height: calc(100vh - var(--wl-page-padding-top, 1.5rem) - var(--wl-page-padding-bottom, 3.5rem));
+  top: calc(var(--wl-header-height, 56px) + var(--wl-page-padding-top, 1.5rem));
+  height: calc(100vh - var(--wl-header-height, 56px) - var(--wl-page-padding-top, 1.5rem) - var(--wl-page-padding-bottom, 3.5rem));
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -461,7 +461,7 @@ const toggleLang = async () => {
     background: var(--wl-surface);
     border-bottom: 1px solid var(--wl-border);
     position: sticky;
-    top: 0;
+    top: var(--wl-header-height, 56px);
     z-index: 20;
     overscroll-behavior-x: contain;
   }

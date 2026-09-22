@@ -483,8 +483,22 @@ input[type="checkbox"]:focus-visible, input[type="radio"]:focus-visible { box-sh
 html[dir='rtl'] .icon--directional, html[dir='rtl'] [data-flip], html[dir='rtl'] .link-arrow { transform: scaleX(calc(-1 * 1)); }
 .link-arrow--back { display: inline-block; transform: scaleX(-1); transition: transform var(--duration-fast) ease; }
 html[dir='rtl'] .link-arrow--back { transform: scaleX(1) !important; }
-svg.icon--directional, svg.link-arrow { transform-origin: center; vertical-align: middle; }
-.btn:hover .icon--directional, .trade-link:hover .icon--directional { transform: translateX(calc(2px * var(--flip, 1))); }
+.btn:hover .icon--directional,
+.trade-link:hover .icon--directional,
+.cross-link:hover .icon--directional,
+.related-link:hover .icon--directional,
+.view-all-btn:hover .icon--directional,
+.bento-card:hover .icon--directional {
+  transform: translateX(2px);
+}
+html[dir='rtl'] .btn:hover .icon--directional,
+html[dir='rtl'] .trade-link:hover .icon--directional,
+html[dir='rtl'] .cross-link:hover .icon--directional,
+html[dir='rtl'] .related-link:hover .icon--directional,
+html[dir='rtl'] .view-all-btn:hover .icon--directional,
+html[dir='rtl'] .bento-card:hover .icon--directional {
+  transform: scaleX(-1) translateX(2px);
+}
 html[dir='rtl'] .left-0 { left: auto !important; right: 0 !important; }
 html[dir='rtl'] .right-0 { right: auto !important; left: 0 !important; }
 html[dir='rtl'] .pl-10 { padding-left: 0 !important; padding-inline-start: 2.5rem !important; }

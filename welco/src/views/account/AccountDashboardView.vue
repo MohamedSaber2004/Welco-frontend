@@ -156,8 +156,8 @@ onMounted(loadDashboard)
             <span class="pill-dot"></span>
             {{ t('account.verifiedPartner') }}
           </span>
-          <span v-if="myCompany.countryNameEn" class="company-country mono">
-            {{ myCompany.countryNameEn }}
+          <span v-if="myCompany.countryNameEn || myCompany.countryNameAr" class="company-country mono">
+            {{ locale === 'ar' ? (myCompany.countryNameAr || myCompany.countryNameEn) : (myCompany.countryNameEn || myCompany.countryNameAr) }}
           </span>
         </div>
       </div>

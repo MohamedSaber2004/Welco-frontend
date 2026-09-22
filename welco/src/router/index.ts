@@ -3,7 +3,7 @@ import { t, type MessageKey } from '../i18n'
 import { services } from '../di/container'
 import { isPendingOrg } from '../utils/pending-org-marker'
 import { toastService } from '../infrastructure/feedback/toast.service'
-import { requestTracker } from '../application/request.tracker'
+import { routeLoading } from '../application/route-loading'
 
 declare module 'vue-router' {
   interface RouteMeta {
@@ -349,7 +349,7 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to) => {
-  requestTracker.begin()
+  routeLoading.value = true
   const auth = services.authService
   let isAuthenticated = auth.isAuthenticated
 
@@ -420,7 +420,7 @@ router.beforeEach(async (to) => {
 })
 
 router.afterEach((to) => {
-  requestTracker.settle()
+  routeLoading.value = false
   const key = to.meta.titleKey
   if (key) {
     document.title = `${t(key)} · Welco`
@@ -444,7 +444,7 @@ router.afterEach((to) => {
 })
 
 router.onError(() => {
-  requestTracker.settle()
+  routeLoading.value = false
 })
 
 export default router

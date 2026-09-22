@@ -9,7 +9,7 @@ import StatusPill from '../../components/ui/StatusPill.vue'
 import { services } from '../../di/container'
 import { confirmService } from '../../infrastructure/feedback/confirm.service'
 import { toastService } from '../../infrastructure/feedback/toast.service'
-import { t } from '../../i18n'
+import { t, locale } from '../../i18n'
 import type {
   LandingPageDto,
   CreateLandingPagePayload,
@@ -292,10 +292,10 @@ onMounted(load)
         </div>
         <select v-model="typeFilter" class="toolbar-select mono" :aria-label="t('admin.pageType')">
           <option value="all">{{ t('common.all') }}</option>
-          <option value="Brand">Brand</option>
-          <option value="About">About</option>
-          <option value="Specialty">Specialty</option>
-          <option value="Procedure">Procedure</option>
+          <option value="Brand">{{ locale === 'ar' ? 'علامة تجارية (Brand)' : 'Brand' }}</option>
+          <option value="About">{{ locale === 'ar' ? 'من نحن (About)' : 'About' }}</option>
+          <option value="Specialty">{{ locale === 'ar' ? 'تخصص سريري (Specialty)' : 'Specialty' }}</option>
+          <option value="Procedure">{{ locale === 'ar' ? 'إجراء جراحي (Procedure)' : 'Procedure' }}</option>
         </select>
         <span class="mono counter-text">{{ filtered.length }} {{ t('common.of') }} {{ pages.length }}</span>
       </div>

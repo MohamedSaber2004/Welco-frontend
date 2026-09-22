@@ -1,20 +1,53 @@
 <script setup lang="ts">
-import { requestTracker } from '../../application/request.tracker'
+import { ref, watch, nextTick } from 'vue'
+import { routeLoading } from '../../application/route-loading'
+
+// Ensure the spinner stays visible for at least one animation frame
+// so it actually renders before it can be hidden. Without this,
+// beforeEach → afterEach can resolve in the same microtask tick and
+// Vue's reactivity batching collapses the true→false into a no-op.
+const visible = ref(false)
+let hideTimer: ReturnType<typeof setTimeout> | null = null
+
+watch(routeLoading, async (loading) => {
+  if (loading) {
+    if (hideTimer !== null) {
+      clearTimeout(hideTimer)
+      hideTimer = null
+    }
+    await nextTick()
+    visible.value = true
+  } else {
+    // Keep visible for at least 280ms so the animation is perceivable
+    hideTimer = setTimeout(() => {
+      visible.value = false
+      hideTimer = null
+    }, 280)
+  }
+}, { immediate: true })
 </script>
 
 <template>
   <Transition name="loading-spinner">
-    <div v-if="requestTracker.isLoading.value" class="loading-spinner" role="status" aria-live="polite" aria-label="Loading">
+    <div v-if="visible" class="loading-spinner" role="status" aria-live="polite" aria-label="Loading">
       <span class="loading-spinner__ring" aria-hidden="true" />
-      <span class="loading-spinner__label">Loading</span>
+      <span class="loading-spinner__label">Loading…</span>
     </div>
   </Transition>
 </template>
 
+<!-- Global block: @keyframes must NOT be scoped — Vue adds a hash suffix
+     to scoped keyframe names but not to the animation: property references,
+     causing the animation to silently fail. -->
+<style>
+@keyframes spinner-rotate { to { transform: rotate(360deg); } }
+@keyframes spinner-pulse {
+  0%, 100% { transform: scale(.86); opacity: .55; }
+  50%       { transform: scale(1.08); opacity: 1; }
+}
+</style>
+
 <style scoped>
-/* Centered loading overlay for route and API transitions. It remains mounted for
-   the full requestTracker loading window, so the animation does not disappear
-   while page data is still arriving. */
 .loading-spinner {
   position: fixed;
   inset: 0;
@@ -57,12 +90,13 @@ import { requestTracker } from '../../application/request.tracker'
   text-transform: uppercase;
   text-shadow: 0 1px 10px rgba(2,25,39,.55);
 }
-@keyframes spinner-rotate { to { transform: rotate(360deg); } }
-@keyframes spinner-pulse { 0%, 100% { transform: scale(.86); opacity: .55; } 50% { transform: scale(1.08); opacity: 1; } }
-.loading-spinner-enter-active, .loading-spinner-leave-active { transition: opacity .18s ease; }
-.loading-spinner-enter-from, .loading-spinner-leave-to { opacity: 0; }
+.loading-spinner-enter-active,
+.loading-spinner-leave-active { transition: opacity .18s ease; }
+.loading-spinner-enter-from,
+.loading-spinner-leave-to { opacity: 0; }
 @media (prefers-reduced-motion: reduce) {
-  .loading-spinner__ring, .loading-spinner::before { animation: none; }
+  .loading-spinner__ring,
+  .loading-spinner::before { animation: none; }
 }
 @media (max-width: 520px) {
   .loading-spinner { padding: 1rem; }

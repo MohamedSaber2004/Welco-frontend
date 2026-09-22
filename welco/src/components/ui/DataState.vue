@@ -268,19 +268,13 @@ const delay = (i: number) => ({ animationDelay: `${-((i % 16) * 90)}ms` })
         <template v-else-if="skeletonType === 'category-grid'">
           <div class="sk-grid sk-grid--category" :style="{ gap: skeletonGap }">
             <div v-for="i in gridCount" :key="i" class="sk-cat" :style="delay(i)">
-              <div class="sk-cat__media sk" :style="delay(i)">
-                <div class="sk" style="position:absolute;top:10px;inset-inline-end:10px;width:82px;height:18px;border-radius:var(--radius-pill)" :style="delay(i+1)"></div>
-              </div>
+              <!-- Image area — mirrors cat-media at 110px -->
+              <div class="sk-cat__media sk" :style="delay(i)"></div>
+              <!-- Body — mirrors cat-body: name + alt + count -->
               <div class="sk-cat__body">
-                <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
-                  <div class="sk" style="width:62%;height:16px;border-radius:var(--radius-sm)" :style="delay(i+2)"></div>
-                  <div class="sk" style="width:42px;height:14px;border-radius:var(--radius-sm)" :style="delay(i+3)"></div>
-                </div>
-                <div class="sk" style="width:38%;height:11px;border-radius:var(--radius-sm);margin-top:6px" :style="delay(i+3)"></div>
-                <div style="display:flex;gap:8px;margin-top:14px;padding-top:10px;border-top:1px solid var(--border)">
-                  <div class="sk" style="height:32px;flex:1;border-radius:var(--radius-md)" :style="delay(i+4)"></div>
-                  <div class="sk" style="height:32px;flex:1;border-radius:var(--radius-md)" :style="delay(i+5)"></div>
-                </div>
+                <div class="sk" style="width:70%;height:15px;border-radius:var(--radius-sm)" :style="delay(i+1)"></div>
+                <div class="sk" style="width:45%;height:12px;border-radius:var(--radius-sm);margin-top:5px" :style="delay(i+2)"></div>
+                <div class="sk" style="width:52px;height:11px;border-radius:var(--radius-pill);margin-top:8px" :style="delay(i+3)"></div>
               </div>
             </div>
           </div>
@@ -1143,14 +1137,16 @@ const delay = (i: number) => ({ animationDelay: `${-((i % 16) * 90)}ms` })
   box-shadow: var(--shadow-sm);
 }
 .sk-cat__media {
-  height: 172px;
+  height: 110px;
   border-radius: 0;
   border: none;
   border-bottom: 1px solid var(--sk-border, #E2E6EA);
 }
 .sk-cat__body {
-  padding: 0.95rem 0.9rem 1.05rem;
+  padding: 0.75rem 0.75rem 0.9rem;
   background: var(--bg-surface);
+  display: flex;
+  flex-direction: column;
 }
 
 /* ── Stats skeleton — mirrors StatCard exactly ─────────── */

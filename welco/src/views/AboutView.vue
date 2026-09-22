@@ -57,13 +57,13 @@ const pillars = computed(() => [
     icon: 'public',
     title: t('about.globalTitle'),
     desc: t('about.globalDesc'),
-    badge: '40+ COUNTRIES',
+    badge: locale.value === 'ar' ? '+40 دولة' : '40+ COUNTRIES',
   },
   {
     icon: 'token',
     title: t('about.oemTitle'),
     desc: t('about.oemDesc'),
-    badge: 'CUSTOM UDI',
+    badge: locale.value === 'ar' ? 'UDI مخصص' : 'CUSTOM UDI',
   },
 ])
 </script>
@@ -245,7 +245,7 @@ const pillars = computed(() => [
             <div class="cross-card__head">
               <span class="material-symbols-outlined cross-icon text-indigo-500">precision_manufacturing</span>
               <div>
-                <span class="mono cross-tag">CUSTOM METALLURGY</span>
+                <span class="mono cross-tag">{{ locale === 'ar' ? 'تشغيل معادن مخصص' : 'CUSTOM METALLURGY' }}</span>
                 <h3 class="cross-title">{{ t('about.exploreOem') }}</h3>
               </div>
             </div>
@@ -267,7 +267,7 @@ const pillars = computed(() => [
       <section class="about-cta-banner">
         <div class="cta-inner">
           <div class="cta-copy">
-            <span class="mono cta-eyebrow">CLINICAL PROCUREMENT & DISTRIBUTION</span>
+            <span class="mono cta-eyebrow">{{ locale === 'ar' ? 'التوريد والتوزيع الطبي السريري' : 'CLINICAL PROCUREMENT & DISTRIBUTION' }}</span>
             <h2 class="cta-title">
               {{ locale === 'ar'
                 ? 'جاهز لتجهيز منشأتك الصحية بأدوات جراحية معتمدة؟'

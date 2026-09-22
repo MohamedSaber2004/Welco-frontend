@@ -391,17 +391,12 @@ const navigateToCategory = (catId: string) => {
 
 .search-icon {
   position: absolute;
-  left: 12px;
+  inset-inline-start: 12px;
   top: 50%;
   transform: translateY(-50%);
   color: var(--wl-muted);
   font-size: 20px;
   pointer-events: none;
-}
-
-[dir="rtl"] .search-icon {
-  left: auto;
-  right: 12px;
 }
 
 .search-input {
@@ -424,7 +419,7 @@ const navigateToCategory = (catId: string) => {
 
 .clear-search-btn {
   position: absolute;
-  right: 10px;
+  inset-inline-end: 10px;
   top: 50%;
   transform: translateY(-50%);
   background: none;
@@ -434,11 +429,6 @@ const navigateToCategory = (catId: string) => {
   padding: 4px;
   display: flex;
   align-items: center;
-}
-
-[dir="rtl"] .clear-search-btn {
-  right: auto;
-  left: 10px;
 }
 
 .toolbar-actions {
@@ -481,20 +471,16 @@ const navigateToCategory = (catId: string) => {
 
 .sort-icon {
   position: absolute;
-  left: 10px;
+  inset-inline-start: 10px;
   color: var(--wl-muted);
   font-size: 18px;
   pointer-events: none;
 }
 
-[dir="rtl"] .sort-icon {
-  left: auto;
-  right: 10px;
-}
-
 .sort-select {
   height: 44px;
-  padding: 0 1rem 0 2rem;
+  padding: 0 1rem;
+  padding-inline-start: 2rem;
   border-radius: var(--wl-radius-sm);
   border: 1px solid var(--wl-border);
   background: var(--wl-surface);
@@ -507,10 +493,6 @@ const navigateToCategory = (catId: string) => {
 
 .sort-select:focus {
   border-color: var(--wl-primary);
-}
-
-[dir="rtl"] .sort-select {
-  padding: 0 2rem 0 1rem;
 }
 
 /* Categories Grid */
@@ -550,7 +532,7 @@ const navigateToCategory = (catId: string) => {
 .cat-badge {
   position: absolute;
   top: 10px;
-  right: 10px;
+  inset-inline-end: 10px;
   padding: 3px 8px;
   background: var(--wl-overlay-tint, rgba(0, 10, 25, 0.75));
   backdrop-filter: blur(4px);
@@ -560,11 +542,6 @@ const navigateToCategory = (catId: string) => {
   border-radius: 4px;
   letter-spacing: 0.03em;
   z-index: 2;
-}
-
-[dir="rtl"] .cat-badge {
-  right: auto;
-  left: 10px;
 }
 
 .cat-card__body {

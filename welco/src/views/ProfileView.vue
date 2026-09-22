@@ -50,12 +50,11 @@ const companyStatusLabel = (status?: CompanyStatus | string | number) => {
 const companyCountryName = (comp?: CompanyDto | null) => {
   if (!comp) return ''
   if (locale.value === 'ar' && comp.countryNameAr) return comp.countryNameAr
-  if (comp.countryNameEn) return comp.countryNameEn
   if (comp.countryId) {
     const c = locationService.countries.value.find((x) => x.id === comp.countryId)
-    if (c) return locale.value === 'ar' ? c.nameAr : c.nameEn
+    if (c) return locale.value === 'ar' ? (c.nameAr || c.nameEn) : (c.nameEn || c.nameAr)
   }
-  return comp.countryNameEn || ''
+  return (locale.value === 'ar' ? (comp.countryNameAr || comp.countryNameEn) : (comp.countryNameEn || comp.countryNameAr)) || ''
 }
 
 const formatDate = (dateStr?: string) => {

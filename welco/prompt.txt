@@ -1,2 +1,3 @@
-:56304/api/v1/user-management/companies/directory?pageNumber=1&pageSize=8:1  Failed to load resource: the server responded with a status of 401 (Unauthorized)
-:56304/api/v1/user-management/companies?pageNumber=1&pageSize=8:1  Failed to load resource: the server responded with a status of 401 (Unauthorized)
+api/v1/carts/cd7f1e9a-bc69-475a-bda6-098c37254af4/items:1  Failed to load resource: the server responded with a status of 404 (Not Found)
+
+that is calling although the opened is admin dashboard why that fix it although in admin dasbhoard where is the navbar of admin layout is not appeared ??????

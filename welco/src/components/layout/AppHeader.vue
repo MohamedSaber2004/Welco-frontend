@@ -550,8 +550,7 @@ watch(isAuthed, (v) => {
 .header__dropdown {
   position: absolute;
   top: calc(100% + var(--space-2));
-  right: 0;
-  left: auto;
+  inset-inline-end: 0;
   min-width: 200px;
   max-width: calc(100vw - 1.5rem);
   padding: var(--space-2);

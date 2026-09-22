@@ -32,7 +32,9 @@ const handleTerritoryKeydown = (e: KeyboardEvent, columnIndex: number) => {
 
   if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
     e.preventDefault()
-    const dir = e.key === 'ArrowRight' ? 1 : -1
+    const isRtl = document.documentElement.dir === 'rtl'
+    const forwardKey = isRtl ? 'ArrowLeft' : 'ArrowRight'
+    const dir = e.key === forwardKey ? 1 : -1
     const next = (columnIndex + dir + columns.length) % columns.length
     activeColumnIndex.value = next
     const nextCol = columns[next]

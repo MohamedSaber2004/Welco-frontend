@@ -1,5 +1,20 @@
 @import './base.css';
 
+/* Welco platform visual language: clinical trust, operational clarity, and a warm human accent. */
+:root {
+  --platform-ink: #092f43;
+  --platform-ink-soft: #385866;
+  --platform-teal: #0b7f86;
+  --platform-teal-deep: #07545f;
+  --platform-aqua: #e8f5f3;
+  --platform-mist: #f4f8f7;
+  --platform-lime: #d6f36a;
+  --platform-coral: #ff8b6b;
+  --platform-border: rgba(9, 47, 67, 0.13);
+  --platform-shadow: 0 18px 50px rgba(9, 47, 67, 0.11);
+  --platform-display: 'Plus Jakarta Sans', 'Inter', sans-serif;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

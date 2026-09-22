@@ -2095,6 +2095,62 @@ const navigateToOemFromModal = () => {
     justify-content: center;
   }
 }
+
+/* 2026 platform landing treatment */
+.home {
+  background: var(--platform-mist);
+  color: var(--platform-ink);
+}
+.home .hero {
+  min-height: min(700px, 76vh);
+  background: linear-gradient(118deg, #062f45 0%, #0b6370 58%, #13969a 100%) !important;
+  border: 0;
+  border-radius: 0 0 2rem 2rem;
+  color: white;
+}
+.home .hero::before {
+  background: radial-gradient(circle at 78% 24%, rgba(214, 243, 106, .26), transparent 20rem), linear-gradient(135deg, transparent 0 55%, rgba(255,255,255,.08) 55% 56%, transparent 56%);
+  opacity: 1;
+}
+.home .hero::after { height: 4px; background: var(--platform-lime); opacity: .85; }
+.home .hero__inner { max-width: 1320px; min-height: min(700px, 76vh); grid-template-columns: minmax(0, 1.05fr) minmax(360px, .8fr); gap: clamp(2rem, 6vw, 7rem); padding-block: clamp(3.5rem, 8vw, 7rem); }
+.home .hero__copy { position: relative; z-index: 1; }
+.home .hero h1 { max-width: 760px; margin-top: .45rem; color: #f7fffe; font-size: clamp(2.65rem, 5.8vw, 5.7rem); line-height: .98; letter-spacing: -.065em; }
+.home .hero h1 em { color: var(--platform-lime) !important; background: none; }
+.home .hero p { max-width: 620px; color: rgba(247,255,254,.78); font-size: clamp(1rem, 1.4vw, 1.2rem); line-height: 1.7; }
+.home .hero__search { max-width: 610px; }
+.home .hero__search-bar { height: 58px; padding-inline-start: 1rem; border: 1px solid rgba(255,255,255,.28); background: rgba(255,255,255,.12); box-shadow: 0 15px 35px rgba(1,27,40,.18); }
+.home .hero__search-bar input { color: white; }
+.home .hero__search-bar input::placeholder { color: rgba(255,255,255,.65); }
+.home .hero__search-btn { height: 46px; border-radius: 999px; background: var(--platform-lime); color: var(--platform-ink); }
+.home .hero__ctas .btn-primary { background: white; color: var(--platform-ink); border-color: white; border-radius: 999px; padding-inline: 1.4rem; }
+.home .hero__ctas .btn-secondary { background: transparent; color: white; border-color: rgba(255,255,255,.45); border-radius: 999px; padding-inline: 1.4rem; }
+.home .hero__logo-box { min-height: 360px; border: 1px solid rgba(255,255,255,.22); border-radius: 1.5rem; background: rgba(255,255,255,.10); box-shadow: 0 24px 70px rgba(1,27,40,.22); transform: rotate(2deg); }
+.home .hero__logo-box::before { background: var(--platform-lime); height: 4px; }
+.home .hero__logo-box img { border-radius: 1rem; mix-blend-mode: screen; opacity: .94; }
+.home .section { padding-block: clamp(4rem, 8vw, 8rem); }
+.home .section--providers { background: #fff; border: 0; }
+.home .section--soft { background: var(--platform-mist); border: 0; }
+.home .section-head { align-items: end; margin-bottom: 1rem; }
+.home .section__eyebrow { color: var(--platform-teal) !important; font-weight: 800; letter-spacing: .14em; }
+.home .section-title { max-width: 700px; color: var(--platform-ink); font-size: clamp(2rem, 4vw, 3.6rem); letter-spacing: -.055em; line-height: 1.04; }
+.home .section-desc { max-width: 680px; color: var(--platform-ink-soft); font-size: 1.05rem; }
+.home .provider-tile, .home .cat-card, .home .home-cert-card, .home .cat-explorer { border: 1px solid var(--platform-border); border-radius: 1.1rem; box-shadow: 0 8px 26px rgba(9,47,67,.06); background: #fff; }
+.home .provider-tile:hover, .home .cat-card:hover, .home .home-cert-card:hover { border-color: rgba(11,127,134,.45); box-shadow: var(--platform-shadow); transform: translateY(-4px); }
+.home .cat-media { border-radius: 1rem 1rem 0 0; background: var(--platform-aqua); }
+.home .cat-explorer { background: var(--platform-ink); color: white; border: 0; }
+.home .cat-explorer__title, .home .cat-explorer .provider-viewall { color: white; }
+.home .about-grid { border-radius: 1.5rem; padding: clamp(2rem, 5vw, 5rem); background: var(--platform-aqua); }
+.home .about-content .section-title { max-width: 620px; }
+.home .about-media { border-radius: 1rem; overflow: hidden; box-shadow: var(--platform-shadow); background: white; }
+.home .about-media__img { mix-blend-mode: multiply; }
+
+@media (max-width: 760px) {
+  .home .hero, .home .hero__inner { min-height: auto; }
+  .home .hero__inner { grid-template-columns: 1fr; gap: 2.5rem; }
+  .home .hero__logo-box { min-height: 230px; max-width: 520px; transform: rotate(0); }
+  .home .hero h1 { font-size: clamp(2.7rem, 13vw, 4.4rem); }
+}
 </style>
 
 

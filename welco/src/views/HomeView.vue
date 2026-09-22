@@ -371,13 +371,21 @@ const navigateToOemFromModal = () => {
         </DataState>
 
         <div v-if="cats.length" class="cat-explorer card">
+          <div class="cat-explorer__intro">
+            <div>
+              <span class="mono cat-explorer__eyebrow">{{ t('home.browseClinicalSpecialty') }}</span>
+              <h3 class="cat-explorer__heading">{{ t('provider.providersInCategory') }}</h3>
+            </div>
+            <span class="cat-explorer__step mono">01 <span aria-hidden="true">/</span> {{ cats.length.toString().padStart(2, '0') }}</span>
+          </div>
           <div class="cat-explorer__pills" role="tablist" :aria-label="t('marketplace.categoriesTitle')">
-            <button
-              v-for="c in cats"
-              :key="c.id"
-              type="button"
-              role="tab"
-              class="pill"
+              <button
+                v-for="(c, index) in cats"
+                :key="c.id"
+                type="button"
+                role="tab"
+                class="pill cat-explorer__pill"
+                :aria-label="`${localized(c.nameEn, c.nameAr)} · ${index + 1}`"
               :class="{ 'pill--active': explorerCatId === c.id }"
               :aria-selected="explorerCatId === c.id"
               @click="selectExplorerCat(c.id)"
@@ -405,6 +413,7 @@ const navigateToOemFromModal = () => {
                   :key="prov.id"
                   type="button"
                   class="cat-provider"
+                  :aria-label="`${prov.name} · ${t('provider.viewCatalog')}`"
                   @click="openProviderStorefront(prov.id)"
                 >
                   <AppImage
@@ -1266,22 +1275,40 @@ const navigateToOemFromModal = () => {
 
 /* Category → providers → products explorer */
 .cat-explorer {
-  margin-top: var(--space-6);
-  padding: var(--space-5);
+  margin-top: clamp(1.5rem, 4vw, 3rem);
+  padding: clamp(1rem, 3vw, 2rem);
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-5);
+  border: 1px solid color-mix(in srgb, var(--platform-teal) 22%, var(--border));
+  border-radius: 1.5rem;
+  background: linear-gradient(145deg, #092f43 0%, #0b5865 100%);
+  box-shadow: 0 22px 55px rgba(9, 47, 67, .2);
+  color: white;
 }
+.cat-explorer__intro { display: flex; align-items: end; justify-content: space-between; gap: 1rem; }
+.cat-explorer__eyebrow { display: block; color: var(--platform-lime); font-size: .7rem; letter-spacing: .14em; text-transform: uppercase; }
+.cat-explorer__heading { margin: .35rem 0 0; color: #f7fffe; font-size: clamp(1.25rem, 2.4vw, 1.8rem); letter-spacing: -.03em; }
+.cat-explorer__step { color: rgba(247,255,254,.58); font-size: .7rem; letter-spacing: .12em; }
+.cat-explorer__step span { padding-inline: .3rem; color: var(--platform-lime); }
+
 .cat-explorer__pills {
   display: flex;
-  gap: var(--space-2);
+  gap: .55rem;
   overflow-x: auto;
-  padding-bottom: var(--space-1);
+  padding: .25rem .1rem .7rem;
   scrollbar-width: none;
+  border-bottom: 1px solid rgba(255,255,255,.16);
 }
 .cat-explorer__pills::-webkit-scrollbar { display: none; }
 .cat-explorer__pills .pill { flex-shrink: 0; }
+.cat-explorer__pill { border-color: rgba(255,255,255,.2); background: rgba(255,255,255,.08); color: rgba(247,255,254,.78); }
+.cat-explorer__pill:hover { border-color: rgba(214,243,106,.68); background: rgba(214,243,106,.12); color: #f7fffe; }
+.cat-explorer__pill.pill--active { border-color: var(--platform-lime); background: var(--platform-lime); color: var(--platform-ink); box-shadow: 0 7px 18px rgba(214,243,106,.22); }
 .cat-explorer__body { display: flex; flex-direction: column; gap: var(--space-4); }
+.cat-explorer__head { padding-bottom: .25rem; }
+.cat-explorer__head .cat-explorer__title { color: #f7fffe; }
+.cat-explorer__head .provider-viewall { color: var(--platform-lime); }
 .cat-explorer__head {
   display: flex;
   align-items: center;
@@ -1308,9 +1335,23 @@ const navigateToOemFromModal = () => {
 }
 .cat-explorer__providers {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: .75rem;
 }
+.cat-provider {
+  min-height: 188px;
+  padding: .9rem;
+  align-items: stretch;
+  border-color: rgba(255,255,255,.14);
+  background: rgba(255,255,255,.1);
+  box-shadow: 0 9px 22px rgba(2,25,39,.12);
+}
+.cat-provider:hover { border-color: var(--platform-lime); background: rgba(255,255,255,.16); box-shadow: 0 14px 28px rgba(2,25,39,.2); transform: translateY(-3px); }
+.cat-provider:focus-visible { outline: 3px solid var(--platform-lime); outline-offset: 3px; }
+.cat-provider__img { height: 82px; min-height: 82px; border: 1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.94); }
+.cat-provider__name { color: #f7fffe; }
+.cat-provider__country { color: rgba(247,255,254,.62); }
+.cat-provider__cta { margin-top: auto; color: var(--platform-lime); }
 .cat-provider {
   display: flex;
   flex-direction: column;
@@ -1356,7 +1397,12 @@ const navigateToOemFromModal = () => {
   gap: var(--space-3);
 }
 @media (max-width: 640px) {
-  .cat-explorer { padding: var(--space-4); }
+  .cat-explorer { padding: var(--space-4); border-radius: 1.1rem; }
+  .cat-explorer__intro { align-items: start; flex-direction: column; }
+  .cat-explorer__step { align-self: end; }
+  .cat-explorer__providers { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cat-provider { min-height: 170px; padding: .65rem; }
+  .cat-provider__img { height: 68px; min-height: 68px; }
   .provider-mini-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 

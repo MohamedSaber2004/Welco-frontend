@@ -144,12 +144,7 @@ const handleError = (e: Event) => {
         </span>
       </div>
 
-      <!-- No Image Label -->
-      <div class="placeholder-no-image-text mono">
-        {{ t('common.noImage') }}
-      </div>
-
-      <!-- Optional SKU or Category Label -->
+  <!-- Optional SKU or Category Label -->
       <div v-if="placeholderText" class="placeholder-text mono" dir="auto">
         {{ placeholderText }}
       </div>
@@ -297,18 +292,6 @@ const handleError = (e: Event) => {
   font-variant-numeric: tabular-nums;
 }
 
-/* No Image Text */
-.placeholder-no-image-text {
-  position: relative;
-  z-index: 1;
-  font-family: var(--font-mono, monospace);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  color: var(--wl-muted, #627D98);
-  text-transform: uppercase;
-  user-select: none;
-}
 
 /* Specific Sizes/Variants */
 .app-image-wrap--avatar .placeholder-icon-badge {

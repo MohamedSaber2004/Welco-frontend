@@ -361,7 +361,7 @@ const memberYear = computed(() => {
 .store-row__img :deep(.app-image-placeholder) { position: absolute; inset: 0; min-width: 0; min-height: 0; }
 .store-row__img :deep(.placeholder-icon-badge) { width: 30px; height: 30px; flex: 0 0 30px; }
 .store-row__img :deep(.placeholder-icon) { font-size: 17px; }
-.store-row__img :deep(.placeholder-no-image-text) { max-width: 100%; font-size: 7px; line-height: 1.1; }
+
 .store-row__img :deep(.placeholder-text) { max-width: 92%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 8px; padding: 1px 4px; }
 .store-row__img :deep(.placeholder-grid), .store-row__img :deep(.placeholder-crosshairs) { pointer-events: none; }
 .store-row__main { display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; }

@@ -545,7 +545,7 @@ watch([applicationSearch, statusFilter], () => {
                     <td>
                       <span class="type-pill mono">{{ COMPANY_TYPE_LABEL[c.type] ?? c.type }}</span>
                     </td>
-                    <td class="mono text-xs text-slate-600">{{ c.countryNameEn ?? '—' }}</td>
+                    <td class="mono text-xs text-slate-600">{{ (locale === 'ar' ? (c.countryNameAr || c.countryNameEn) : (c.countryNameEn || c.countryNameAr)) ?? '—' }}</td>
                     <td class="text-end">
                       <span
                         class="status-pill mono"
@@ -721,7 +721,7 @@ watch([applicationSearch, statusFilter], () => {
                         <span v-if="app.phone" class="mono applicant-phone">{{ app.phone }}</span>
                       </div>
                     </td>
-                    <td class="mono text-xs text-slate-600">{{ app.countryNameEn || app.countryName || '—' }}</td>
+                    <td class="mono text-xs text-slate-600">{{ app.countryName || app.countryNameEn || '—' }}</td>
                     <td>
                       <span class="vol-pill mono">{{ app.salesVolumeBand }}</span>
                     </td>

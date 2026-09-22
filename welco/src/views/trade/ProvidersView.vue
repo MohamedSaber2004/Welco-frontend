@@ -464,8 +464,8 @@ const browseProviderProducts = (providerId: string) => {
                   :placeholder-text="provider.name"
                   :alt="provider.name"
                   fit="contain"
-                  height="110px"
-                  class="provider-card__img"
+  height="180px"
+  class="provider-card__img"
                 />
                 <span class="badge-verified mono">
                   <span class="material-symbols-outlined text-[13px]">verified</span>
@@ -906,7 +906,8 @@ const browseProviderProducts = (providerId: string) => {
 
 .provider-card__logo-wrap {
   position: relative;
-  height: 140px;
+  height: 180px;
+  min-height: 180px;
   background: linear-gradient(180deg, var(--wl-surface-soft) 0%, var(--wl-surface) 100%);
   border-bottom: 1px solid var(--wl-border);
   padding: 1rem;
@@ -915,10 +916,19 @@ const browseProviderProducts = (providerId: string) => {
   justify-content: center;
 }
 
-.provider-card__img {
+  .provider-card__img {
+  width: 100%;
+  height: 100%;
   max-width: 100%;
   max-height: 100%;
-}
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  }
+  .provider-card__img :deep(.app-image-placeholder) { inset: 0; min-width: 0; min-height: 0; overflow: hidden; }
+  .provider-card__img :deep(.placeholder-text) { max-width: min(86%, 240px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .provider-card__img :deep(.placeholder-icon-badge) { width: 48px; height: 48px; flex: 0 0 48px; }
+  .provider-card__img :deep(.placeholder-icon) { font-size: 24px; }
 
 .badge-verified {
   position: absolute;

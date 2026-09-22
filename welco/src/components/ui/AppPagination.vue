@@ -181,7 +181,8 @@ const goTo = (p: number | string) => {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 0.85rem 0.25rem 0.25rem;
+  padding: 1rem 0.25rem 0.25rem;
+  border-top: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
   user-select: none;
   flex-wrap: wrap;
 }
@@ -248,7 +249,34 @@ const goTo = (p: number | string) => {
   font-weight: var(--weight-regular);
   font-family: var(--font-sans);
   cursor: pointer;
-  transition: border-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+  transition: transform 180ms var(--ease-out), border-color 180ms var(--ease-out), color 180ms var(--ease-out), background-color 180ms var(--ease-out), box-shadow 180ms var(--ease-out);
+}
+
+.page-nav-btn:not(:disabled):hover,
+.page-num-btn:not(:disabled):hover {
+  transform: translateY(-2px);
+  border-color: var(--brand);
+  color: var(--fg-heading);
+  background: var(--brand-soft);
+  box-shadow: 0 6px 14px color-mix(in srgb, var(--brand) 16%, transparent);
+}
+.page-num-btn.is-active {
+  border-color: var(--brand);
+  background: var(--brand);
+  color: var(--on-brand, #fff);
+  box-shadow: 0 7px 16px color-mix(in srgb, var(--brand) 28%, transparent);
+}
+.page-nav-btn:focus-visible, .page-num-btn:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--brand) 34%, transparent);
+  outline-offset: 2px;
+}
+@media (hover: none) { .page-nav-btn:not(:disabled):hover, .page-num-btn:not(:disabled):hover { transform: none; } }
+@media (max-width: 560px) {
+  .custom-pagination { justify-content: center; gap: .75rem; }
+  .pagination__info { width: 100%; justify-content: center; order: 2; font-size: var(--text-xs); }
+  .pagination__controls { width: 100%; justify-content: center; }
+  .page-nav-btn .nav-text { display: none; }
+  .page-nav-btn { width: 38px; padding: 0; }
 }
 
 .page-nav-btn {

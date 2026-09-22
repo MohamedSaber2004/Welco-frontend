@@ -235,9 +235,8 @@ const memberYear = computed(() => {
         >
           <AppImage
             :src="p.imageName"
-            placeholder-type="product"
-            :placeholder-text="p.sku"
-            :alt="localized(p.nameEn, p.nameAr)"
+  placeholder-type="product"
+  :alt="localized(p.nameEn, p.nameAr)"
             fit="contain"
             class="store-row__img"
           />
@@ -357,7 +356,13 @@ const memberYear = computed(() => {
 }
 .store-row:last-child { border-bottom: 0; }
 .store-row:hover { background: var(--bg-hover); }
-.store-row__img { width: 64px; height: 64px; border-radius: var(--radius-md); border: 1px solid var(--border); }
+.store-row__img { width: 64px; height: 64px; min-width: 64px; min-height: 64px; aspect-ratio: 1; flex: 0 0 64px; border-radius: var(--radius-md); border: 1px solid var(--border); background: var(--bg-subtle); }
+.store-row__img :deep(.app-image-placeholder) { position: absolute; inset: 0; min-width: 0; min-height: 0; }
+.store-row__img :deep(.placeholder-icon-badge) { width: 30px; height: 30px; flex: 0 0 30px; }
+.store-row__img :deep(.placeholder-icon) { font-size: 17px; }
+
+.store-row__img :deep(.placeholder-text) { max-width: 92%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 8px; padding: 1px 4px; }
+.store-row__img :deep(.placeholder-grid), .store-row__img :deep(.placeholder-crosshairs) { pointer-events: none; }
 .store-row__main { display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; }
 .store-row__name {
   font-size: var(--text-base);
@@ -378,7 +383,7 @@ const memberYear = computed(() => {
   .store-hero__logo { width: 72px; height: 72px; }
   .store-hero__name { font-size: var(--text-2xl); }
   .store-row { grid-template-columns: 52px minmax(0, 1fr) 20px; }
-  .store-row__img { width: 52px; height: 52px; }
+  .store-row__img { width: 52px; height: 52px; min-width: 52px; min-height: 52px; flex-basis: 52px; }
   .store-row__side { grid-column: 2; flex-direction: row; align-items: center; justify-content: space-between; }
   .store-row__go { display: none; }
 }

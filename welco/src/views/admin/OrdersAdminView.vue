@@ -238,7 +238,7 @@ function goPage(p: number) {
                       :disabled="acting === o.id"
                       @click="advance(o)"
                     >
-                      <span class="material-symbols-outlined text-[15px]">arrow_forward</span>
+                      <span class="material-symbols-outlined text-[15px] icon--directional">arrow_forward</span>
                       <span>{{ t('commerce.markAs', { status: NEXT[o.status] as string }) }}</span>
                     </button>
                     <span v-else class="mono text-xs text-slate-400">{{ t('admin.orderCompleted') }}</span>
@@ -282,7 +282,7 @@ function goPage(p: number) {
               :loading="acting === selectedOrder.id"
               @click="advance(selectedOrder)"
             >
-              <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+              <span class="material-symbols-outlined text-[16px] icon--directional">arrow_forward</span>
               <span>{{ t('commerce.markAs', { status: NEXT[selectedOrder.status] as string }) }}</span>
             </BaseButton>
           </div>

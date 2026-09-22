@@ -323,9 +323,8 @@ const filteredSidebarCategories = computed(() => {
               <div class="catalog-card__media" :style="{ background: productMediaUrl(p.imageName, p.imageGradient).background }">
                 <AppImage
                   :src="p.imageName"
-                  placeholder-type="product"
-                  :placeholder-text="p.sku"
-                  :alt="localized(p.nameEn, p.nameAr)"
+  placeholder-type="product"
+  :alt="localized(p.nameEn, p.nameAr)"
                   fit="contain"
                   class="catalog-card__img"
                 />

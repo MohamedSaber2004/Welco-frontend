@@ -144,12 +144,7 @@ const handleError = (e: Event) => {
         </span>
       </div>
 
-      <!-- No Image Label -->
-      <div class="placeholder-no-image-text mono">
-        {{ t('common.noImage') }}
-      </div>
-
-      <!-- Optional SKU or Category Label -->
+  <!-- Optional SKU or Category Label -->
       <div v-if="placeholderText" class="placeholder-text mono" dir="auto">
         {{ placeholderText }}
       </div>
@@ -194,7 +189,8 @@ const handleError = (e: Event) => {
   justify-content: center;
   gap: 6px;
   padding: 12px;
-  background: linear-gradient(145deg, var(--wl-surface-soft) 0%, var(--wl-surface) 100%);
+  background: linear-gradient(145deg, color-mix(in srgb, var(--bg-subtle) 88%, var(--brand-soft) 12%) 0%, var(--bg-surface) 100%);
+  border: 1px solid color-mix(in srgb, var(--border) 78%, transparent);
   user-select: none;
   overflow: hidden;
 }
@@ -296,18 +292,6 @@ const handleError = (e: Event) => {
   font-variant-numeric: tabular-nums;
 }
 
-/* No Image Text */
-.placeholder-no-image-text {
-  position: relative;
-  z-index: 1;
-  font-family: var(--font-mono, monospace);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  color: var(--wl-muted, #627D98);
-  text-transform: uppercase;
-  user-select: none;
-}
 
 /* Specific Sizes/Variants */
 .app-image-wrap--avatar .placeholder-icon-badge {

@@ -8,7 +8,8 @@ import AppImage from '../../components/ui/AppImage.vue'
 import { services } from '../../di/container'
 import { t, locale } from '../../i18n'
 import type { CompanyDto } from '../../domain/models/company'
-import type { CategoryDto } from '../../domain/models/marketplace'
+import type { CategoryDto, ProductDto } from '../../domain/models/marketplace'
+import { formatPrice } from '../../utils/format'
 
 const route = useRoute()
 const router = useRouter()
@@ -21,6 +22,9 @@ const category = ref<CategoryDto | null>(null)
 const categoryLoading = ref(true)
 
 const providers = ref<CompanyDto[]>([])
+const products = ref<ProductDto[]>([])
+const productsLoading = ref(true)
+const productsError = ref('')
 const totalCount = ref(0)
 const loading = ref(true)
 const fetchError = ref('')
@@ -36,6 +40,20 @@ const loadCategory = async () => {
     category.value = null
   } finally {
     categoryLoading.value = false
+  }
+}
+
+const loadProducts = async () => {
+  productsLoading.value = true
+  productsError.value = ''
+  try {
+    const res = await services.marketplaceRepository.getProducts({ categoryId: categoryId.value, page: 1, pageSize: 6 })
+    products.value = Array.isArray(res?.data) ? res.data : []
+  } catch (e) {
+    productsError.value = e instanceof Error ? e.message : t('common.error')
+    products.value = []
+  } finally {
+    productsLoading.value = false
   }
 }
 
@@ -67,6 +85,7 @@ const reloadAll = () => {
   page.value = 1
   void loadCategory()
   void loadProviders()
+  void loadProducts()
 }
 
 onMounted(reloadAll)
@@ -119,6 +138,30 @@ const openStorefront = (id: string) => {
       </div>
     </DataState>
 
+    <section v-if="category" class="category-products-section" aria-labelledby="category-products-title">
+      <div class="section-heading-row">
+        <div>
+          <div class="mono section-kicker">{{ t('marketplace.title') }}</div>
+          <h2 id="category-products-title">{{ t('provider.providerProducts') }}</h2>
+        </div>
+        <button type="button" class="btn btn--secondary btn--sm" @click="router.push({ name: 'marketplace', query: { categoryId: categoryId } })">
+          {{ t('provider.viewCatalog') }} <span class="icon--directional">→</span>
+        </button>
+      </div>
+      <DataState :loading="productsLoading" :error="productsError" skeleton-type="catalog-grid" :skeleton-count="3" :empty="!products.length && !productsLoading" :empty-title="t('provider.noProducts')" @retry="loadProducts">
+        <div class="category-products-grid">
+          <button v-for="product in products" :key="product.id" type="button" class="category-product-card" @click="router.push({ name: 'marketplace-product', params: { id: product.id } })">
+            <AppImage :src="product.imageName" placeholder-type="product" :alt="localized(product.nameEn, product.nameAr)" fit="contain" class="category-product-card__image" />
+            <span class="category-product-card__body">
+              <strong dir="auto">{{ localized(product.nameEn, product.nameAr) }}</strong>
+              <span class="mono">{{ product.sku }}</span>
+              <span class="category-product-card__price">{{ formatPrice(product.price, locale) }} {{ product.currencySymbol || product.currencyCode || '$' }}</span>
+            </span>
+          </button>
+        </div>
+      </DataState>
+    </section>
+
     <DataState
       :loading="loading"
       :error="fetchError"
@@ -169,7 +212,21 @@ const openStorefront = (id: string) => {
 </template>
 
 <style scoped>
-.cat-providers { display: flex; flex-direction: column; gap: var(--space-5); }
+.cat-providers { display: flex; flex-direction: column; gap: var(--space-6); }
+.section-heading-row { display: flex; justify-content: space-between; align-items: end; gap: var(--space-4); margin-bottom: var(--space-4); }
+.section-heading-row h2 { margin: .25rem 0 0; color: var(--fg-heading); font-size: var(--text-2xl); letter-spacing: var(--tracking-tight); }
+.section-kicker { color: var(--brand); font-size: var(--text-xs); text-transform: uppercase; letter-spacing: var(--tracking-wide); }
+.category-products-section { padding-top: var(--space-3); }
+.category-products-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-4); }
+.category-product-card { display: flex; flex-direction: column; overflow: hidden; padding: 0; text-align: start; background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); cursor: pointer; transition: transform var(--duration-base) var(--ease-out), border-color var(--duration-base) var(--ease-out), box-shadow var(--duration-base) var(--ease-out); }
+.category-product-card:hover { transform: translateY(-3px); border-color: var(--brand); box-shadow: var(--shadow-md); }
+.category-product-card__image { width: 100%; height: 155px; border-bottom: 1px solid var(--border); background: var(--bg-subtle); }
+.category-product-card__body { display: flex; flex-direction: column; gap: var(--space-1); padding: var(--space-4); min-width: 0; }
+.category-product-card__body strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--fg-heading); }
+.category-product-card__body .mono { color: var(--fg-subtle); font-size: var(--text-xs); }
+.category-product-card__price { margin-top: var(--space-2); color: var(--brand); font-weight: var(--weight-bold); }
+@media (max-width: 760px) { .category-products-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 520px) { .section-heading-row { align-items: start; flex-direction: column; } .category-products-grid { grid-template-columns: minmax(0, 1fr); } }
 .cat-hero {
   display: grid;
   grid-template-columns: 220px minmax(0, 1fr);

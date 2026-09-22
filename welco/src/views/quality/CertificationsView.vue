@@ -265,17 +265,12 @@ const goPage = (p: number) => {
 
 .search-icon {
   position: absolute;
-  left: 10px;
+  inset-inline-start: 10px;
   top: 50%;
   transform: translateY(-50%);
   color: var(--wl-muted);
   font-size: 18px;
   pointer-events: none;
-}
-
-[dir="rtl"] .search-icon {
-  left: auto;
-  right: 10px;
 }
 
 .search-input {
@@ -295,7 +290,7 @@ const goPage = (p: number) => {
 
 .clear-search-btn {
   position: absolute;
-  right: 8px;
+  inset-inline-end: 8px;
   top: 50%;
   transform: translateY(-50%);
   background: none;
@@ -303,11 +298,6 @@ const goPage = (p: number) => {
   color: var(--wl-muted);
   cursor: pointer;
   padding: 2px;
-}
-
-[dir="rtl"] .clear-search-btn {
-  right: auto;
-  left: 8px;
 }
 
 .filter-chips {

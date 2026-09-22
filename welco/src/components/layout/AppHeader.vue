@@ -299,8 +299,10 @@ watch(isAuthed, (v) => {
   position: sticky;
   top: 0;
   z-index: var(--z-sticky);
-  background: var(--bg-surface);
-  border-bottom: 1px solid var(--border);
+  background: color-mix(in srgb, var(--bg-surface) 88%, transparent);
+  backdrop-filter: blur(18px) saturate(1.15);
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+  box-shadow: 0 8px 28px rgba(8, 47, 73, 0.06);
   padding-inline-start: env(safe-area-inset-left, 0px);
   padding-inline-end: env(safe-area-inset-right, 0px);
 }
@@ -548,8 +550,7 @@ watch(isAuthed, (v) => {
 .header__dropdown {
   position: absolute;
   top: calc(100% + var(--space-2));
-  right: 0;
-  left: auto;
+  inset-inline-end: 0;
   min-width: 200px;
   max-width: calc(100vw - 1.5rem);
   padding: var(--space-2);

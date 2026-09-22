@@ -55,7 +55,8 @@ const toggleLang = () => {
 <style scoped>
 .auth-wrap {
   min-height: calc(100vh - var(--wl-header-height, 56px));
-  background: var(--wl-paper);
+  background: radial-gradient(circle at 12% 10%, rgba(214,243,106,.16), transparent 22rem), linear-gradient(135deg, #062f45 0%, #0b6370 58%, #e8f5f3 140%);
+  color: #f7fffe;
   display: grid;
   place-items: center;
   padding: 2.5rem var(--wl-gutter);
@@ -68,10 +69,11 @@ const toggleLang = () => {
 .auth-card {
   width: 100%;
   max-width: 440px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-lg);
+  background: color-mix(in srgb, var(--bg-surface) 94%, transparent);
+  border: 1px solid rgba(255,255,255,.38);
+  border-radius: 1.5rem;
+  box-shadow: 0 28px 70px rgba(2, 25, 39, .24);
+  backdrop-filter: blur(18px);
   position: relative;
   overflow: hidden;
   padding: var(--space-6);

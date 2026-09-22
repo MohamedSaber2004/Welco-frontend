@@ -81,7 +81,7 @@ const isDashboardRoute = computed(() => {
 <template>
   <a href="#main-content" class="visually-hidden">{{ t('common.skipToMain') }}</a>
   <LoadingBar />
-  <AppHeader v-if="!isDashboardRoute" />
+  <AppHeader />
   <ToastContainer />
   <ResultModal />
   <ConfirmDialog />

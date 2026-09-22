@@ -74,9 +74,10 @@ const isAuthed = computed(() => authService.isAuthenticated)
 
 <style scoped>
 .footer {
-  background: var(--wl-surface);
-  border-top: 1px solid var(--wl-border);
-  padding: 3rem var(--wl-gutter) 1.5rem;
+  background: var(--platform-ink);
+  color: rgba(247, 255, 254, .78);
+  border-top: 0;
+  padding: clamp(3rem, 7vw, 6rem) var(--wl-gutter) 1.5rem;
   position: relative;
   padding-inline-start: max(var(--wl-gutter), env(safe-area-inset-left, 0px));
   padding-inline-end: max(var(--wl-gutter), env(safe-area-inset-right, 0px));

@@ -158,9 +158,8 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
               <div class="product-card__media" :style="{ background: productMediaUrl(p.imageName, p.imageGradient).background }">
                 <AppImage
                   :src="p.imageName"
-                  placeholder-type="product"
-                  :placeholder-text="p.sku"
-                  :alt="localized(p.nameEn, p.nameAr)"
+  placeholder-type="product"
+  :alt="localized(p.nameEn, p.nameAr)"
                   fit="contain"
                   class="product-card__img"
                 />
@@ -206,7 +205,7 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
           <router-link v-for="rp in relatedPages" :key="rp.id" :to="{ name: 'landing-page', params: { slug: rp.slug } }" class="related-card">
             <div class="related-card__header">
               <span class="related-type mono">{{ rp.type }}</span>
-              <span class="material-symbols-outlined related-arrow">arrow_forward</span>
+              <span class="material-symbols-outlined related-arrow icon--directional">arrow_forward</span>
             </div>
             <h4 class="related-title" dir="auto">{{ localized(rp.heroTitle || rp.slug, rp.heroTitle || rp.slug) }}</h4>
               <span class="related-link mono">{{ t('landing.browseInstruments') }} <span class="icon--directional">→</span></span>

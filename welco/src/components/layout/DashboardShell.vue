@@ -164,9 +164,11 @@ const toggleLang = async () => {
 <style scoped>
 .admin-shell {
   min-height: 100vh;
-  background: var(--wl-paper);
+  background:
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--secondary) 8%, transparent), transparent 34rem),
+    var(--wl-paper);
   display: flex;
-  gap: var(--wl-gutter);
+  gap: clamp(1rem, 2vw, 1.75rem);
   padding: var(--wl-page-padding-top) var(--wl-gutter) var(--wl-page-padding-bottom);
   padding-inline-start: max(var(--wl-gutter), env(safe-area-inset-left));
   padding-inline-end: max(var(--wl-gutter), env(safe-area-inset-right));
@@ -183,12 +185,13 @@ const toggleLang = async () => {
   border-radius: var(--radius-lg);
   flex-shrink: 0;
   position: sticky;
-  top: var(--wl-page-padding-top, 1.5rem);
-  height: calc(100vh - var(--wl-page-padding-top, 1.5rem) - var(--wl-page-padding-bottom, 3.5rem));
+  top: calc(var(--wl-header-height, 56px) + var(--wl-page-padding-top, 1.5rem));
+  height: calc(100vh - var(--wl-header-height, 56px) - var(--wl-page-padding-top, 1.5rem) - var(--wl-page-padding-bottom, 3.5rem));
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  box-shadow: var(--wl-shadow-card);
+  box-shadow: 0 18px 46px rgba(8, 47, 73, 0.10);
+  backdrop-filter: blur(14px);
   transition: width 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -406,12 +409,18 @@ const toggleLang = async () => {
   justify-content: center;
 }
 
-.admin-main {
+  .admin-main {
   flex: 1;
   min-width: 0;
   width: 100%;
+  max-width: 100%;
   box-sizing: border-box;
-}
+  overflow-x: clip;
+  }
+  .admin-main__inner { min-width: 0; max-width: 100%; overflow-x: clip; }
+  .admin-main__inner :deep(.page-shell) { padding-inline: max(1rem, env(safe-area-inset-left)); padding-inline-end: max(1rem, env(safe-area-inset-right)); }
+  .admin-main__inner :deep(.grid), .admin-main__inner :deep(.dashboard-grid) { min-width: 0; }
+  .admin-main__inner :deep(.table-wrap), .admin-main__inner :deep(.table-responsive) { max-width: 100%; overflow-x: auto; }
 
 .admin-main__inner {
   max-width: var(--wl-max-width-admin, 1560px);
@@ -452,7 +461,7 @@ const toggleLang = async () => {
     background: var(--wl-surface);
     border-bottom: 1px solid var(--wl-border);
     position: sticky;
-    top: 0;
+    top: var(--wl-header-height, 56px);
     z-index: 20;
     overscroll-behavior-x: contain;
   }

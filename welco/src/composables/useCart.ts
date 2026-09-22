@@ -62,9 +62,14 @@ function resolveCurrencyId(): string | undefined {
 
 async function syncToServer(): Promise<void> {
   if (typeof window === 'undefined') return
-  // Backend carts require bearer even for sessionId guests (401 otherwise).
-  // Guests stay local-only to avoid console 401 spam; server sync runs after login.
-  const preUserId = services.authService.user.value?.id ?? null
+  const auth = services.authService
+  // Never sync customer carts for admins, sales staff, or providers
+  if (auth.isAdmin.value || auth.isSales.value || auth.isProvider.value) {
+    serverCartId.value = null
+    try { localStorage.removeItem('welco-cart-id') } catch {}
+    return
+  }
+  const preUserId = auth.user.value?.id ?? null
   if (!preUserId) return
   try {
     const sid = getSessionId()
@@ -76,10 +81,16 @@ async function syncToServer(): Promise<void> {
           serverCartId.value = id
           try { localStorage.setItem('welco-cart-id', id) } catch { /* offline fallback */ }
         }
-      } catch { /* stay local-only */ }
+      } catch (err: unknown) {
+        const status = (err as { status?: number; statusCode?: number })?.status ?? (err as { statusCode?: number })?.statusCode
+        if (status === 404 || String((err as Error)?.message).includes('404')) {
+          serverCartId.value = null
+          try { localStorage.removeItem('welco-cart-id') } catch {}
+        }
+      }
       return
     }
-    const userId = services.authService.user.value?.id ?? null
+    const userId = auth.user.value?.id ?? null
     const payload = buildCreateCartPayload(userId, sid, resolveCurrencyId())
     let cartId = serverCartId.value
     if (!cartId) {
@@ -88,7 +99,13 @@ async function syncToServer(): Promise<void> {
           const existing = await services.commerceRepository.getBySession(sid)
           const id = (existing as unknown as { id?: string } | null)?.id
           if (id) cartId = id
-        } catch { /* no reusable guest cart */ }
+        } catch (err: unknown) {
+          const status = (err as { status?: number; statusCode?: number })?.status ?? (err as { statusCode?: number })?.statusCode
+          if (status === 404 || String((err as Error)?.message).includes('404')) {
+            serverCartId.value = null
+            try { localStorage.removeItem('welco-cart-id') } catch {}
+          }
+        }
       }
       if (!cartId) {
         const created = await services.commerceRepository.createCart(payload)
@@ -107,7 +124,15 @@ async function syncToServer(): Promise<void> {
           quantity: line.quantity,
           unitPriceSnapshot: line.product.price,
         })
-      } catch { /* per-line failure stays local-only */ }
+      } catch (err: unknown) {
+        const status = (err as { status?: number; statusCode?: number })?.status ?? (err as { statusCode?: number })?.statusCode
+        if (status === 404 || String((err as Error)?.message).includes('404')) {
+          // Stale cart ID in localStorage no longer exists on backend; invalidate it
+          serverCartId.value = null
+          try { localStorage.removeItem('welco-cart-id') } catch {}
+          break
+        }
+      }
     }
   } catch (err) {
     try { toastService.error(err instanceof Error ? err.message : t('common.error')) } catch { /* never block */ }
@@ -119,8 +144,11 @@ async function clearServerCart(): Promise<void> {
   if (!id) return
   try {
     await services.commerceRepository.clearCart(id)
-  } catch (err) {
-    try { toastService.error(err instanceof Error ? err.message : t('common.error')) } catch { /* never block */ }
+  } catch (err: unknown) {
+    const status = (err as { status?: number; statusCode?: number })?.status ?? (err as { statusCode?: number })?.statusCode
+    if (status !== 404 && !String((err as Error)?.message).includes('404')) {
+      try { toastService.error(err instanceof Error ? err.message : t('common.error')) } catch { /* never block */ }
+    }
   } finally {
     serverCartId.value = null
     try { localStorage.removeItem('welco-cart-id') } catch { /* offline fallback */ }
@@ -301,19 +329,33 @@ export function useCart() {
     return quoteItems.map(q => ({ productId: q.productId, quantity: q.quantity, unitPrice: q.unitPrice }))
   }
 
-  // Best-effort server sync when authenticated.
+  // Best-effort server sync when authenticated as a buyer (never for admin/seller).
   // Fire-and-forget: localStorage remains the offline fallback, sync failures
   // never block checkout. Guests stay local-only (backend 401s anon carts).
   // Re-sync on login so guest items added before sign-in merge to server.
   if (typeof window !== 'undefined' && import.meta.env?.MODE !== 'test') {
     if (!serverSyncScheduled) {
       serverSyncScheduled = true
-      void syncToServer()
-      // Watch once (module-level guard via serverSyncScheduled) for login merge.
+      const auth = services.authService
+      const isBuyerRole = () => {
+        if (!auth.isAuthenticated) return false
+        return !auth.isAdmin.value && !auth.isSales.value && !auth.isProvider.value
+      }
+      if (auth.isAdmin.value || auth.isSales.value || auth.isProvider.value) {
+        serverCartId.value = null
+        try { localStorage.removeItem('welco-cart-id') } catch {}
+      } else if (isBuyerRole()) {
+        void syncToServer()
+      }
       watch(
-        () => services.authService.user.value?.id,
+        () => auth.user.value?.id,
         (id, prev) => {
-          if (id && id !== prev) void syncToServer()
+          if (auth.isAdmin.value || auth.isSales.value || auth.isProvider.value) {
+            serverCartId.value = null
+            try { localStorage.removeItem('welco-cart-id') } catch {}
+          } else if (id && id !== prev && isBuyerRole()) {
+            void syncToServer()
+          }
         },
       )
     }

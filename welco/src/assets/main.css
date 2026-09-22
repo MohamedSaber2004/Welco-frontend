@@ -72,6 +72,23 @@
 :where(button, .btn, .card, .panel, .admin-link, .provider-tile, .cat-card, .category-product-card):focus-visible { outline: 3px solid color-mix(in srgb, var(--brand) 38%, transparent); outline-offset: 3px; }
 :where(.card, .panel, .toolbar, .data-state__empty) { overflow: hidden; }
 :where(.section, .hero, .page-shell, .admin-shell) { max-width: 100%; overflow-x: clip; }
+
+:where(input, select, textarea) {
+  color: var(--fg-heading);
+  background: var(--bg-surface);
+  border-color: var(--border-strong, var(--border));
+}
+:where(input, select, textarea)::placeholder { color: var(--fg-placeholder); opacity: 1; }
+:where(input, select, textarea):focus,
+:where(input, select, textarea):focus-visible {
+  color: var(--fg-heading);
+  background: var(--bg-surface);
+  border-color: var(--brand);
+  outline: 0;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 20%, transparent), 0 5px 18px rgba(8,47,73,.08);
+}
+:where(input, select, textarea):disabled { color: var(--fg-muted); background: var(--bg-subtle); }
+
 @media (hover: none) {
   :where(button, .btn, .card, .panel, .admin-link, .provider-tile, .cat-card, .category-product-card):not(:disabled):hover { transform: none; }
 }
@@ -1050,7 +1067,7 @@ button:not(:disabled):hover { transform: translateY(-1px); }
 /* Light-only lock: never let an OS dark preference leak through */
 :root { color-scheme: light !important; }
 
-/* ═══════════════════════════════════════════════════════════════════
+/* ═════════════════════════════════════════════════���═════════════════
  * RESPONSIVE + CLINICAL PRECISION ADAPTATION — every view, component & UI state
  * Covers files with no local @media (admin CRUD, lists, auth) by
  * normalizing the shared classes they all run on, plus fluid type,

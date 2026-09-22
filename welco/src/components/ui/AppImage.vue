@@ -194,7 +194,8 @@ const handleError = (e: Event) => {
   justify-content: center;
   gap: 6px;
   padding: 12px;
-  background: linear-gradient(145deg, var(--wl-surface-soft) 0%, var(--wl-surface) 100%);
+  background: linear-gradient(145deg, color-mix(in srgb, var(--bg-subtle) 88%, var(--brand-soft) 12%) 0%, var(--bg-surface) 100%);
+  border: 1px solid color-mix(in srgb, var(--border) 78%, transparent);
   user-select: none;
   overflow: hidden;
 }

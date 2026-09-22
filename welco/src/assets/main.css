@@ -89,6 +89,20 @@
 :where(.card, .panel, .toolbar, .data-state__empty) { overflow: hidden; }
 :where(.section, .hero, .page-shell, .admin-shell) { max-width: 100%; overflow-x: clip; }
 
+/* Product cards already render SKU/name below the media; missing-image media stays icon-only. */
+:where(.catalog-card__img, .product-card__img, .category-product-card__image, .provider-mini__img, .store-row__img, .product-img, .rel-media__img, .line-item__thumb-img, .cart-thumb__img) {
+  overflow: hidden;
+}
+:where(.catalog-card__img, .product-card__img, .category-product-card__image, .provider-mini__img, .store-row__img, .product-img, .rel-media__img, .line-item__thumb-img, .cart-thumb__img) .app-image-placeholder {
+  inset: 0;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+:where(.catalog-card__img, .product-card__img, .category-product-card__image, .provider-mini__img, .store-row__img, .product-img, .rel-media__img, .line-item__thumb-img, .cart-thumb__img) .placeholder-text { display: none !important; }
+:where(.catalog-card__img, .product-card__img, .category-product-card__image, .provider-mini__img, .store-row__img, .product-img, .rel-media__img, .line-item__thumb-img, .cart-thumb__img) .placeholder-icon-badge { margin: 0; }
+
+
 :where(input, select, textarea) {
   color: var(--fg-heading);
   background: var(--bg-surface);

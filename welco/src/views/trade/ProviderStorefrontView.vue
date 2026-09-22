@@ -235,9 +235,8 @@ const memberYear = computed(() => {
         >
           <AppImage
             :src="p.imageName"
-            placeholder-type="product"
-            :placeholder-text="p.sku"
-            :alt="localized(p.nameEn, p.nameAr)"
+  placeholder-type="product"
+  :alt="localized(p.nameEn, p.nameAr)"
             fit="contain"
             class="store-row__img"
           />

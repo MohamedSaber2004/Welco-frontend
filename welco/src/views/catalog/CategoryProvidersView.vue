@@ -151,7 +151,7 @@ const openStorefront = (id: string) => {
       <DataState :loading="productsLoading" :error="productsError" skeleton-type="catalog-grid" :skeleton-count="3" :empty="!products.length && !productsLoading" :empty-title="t('provider.noProducts')" @retry="loadProducts">
         <div class="category-products-grid">
           <button v-for="product in products" :key="product.id" type="button" class="category-product-card" @click="router.push({ name: 'marketplace-product', params: { id: product.id } })">
-            <AppImage :src="product.imageName" placeholder-type="product" :placeholder-text="product.sku" :alt="localized(product.nameEn, product.nameAr)" fit="contain" class="category-product-card__image" />
+            <AppImage :src="product.imageName" placeholder-type="product" :alt="localized(product.nameEn, product.nameAr)" fit="contain" class="category-product-card__image" />
             <span class="category-product-card__body">
               <strong dir="auto">{{ localized(product.nameEn, product.nameAr) }}</strong>
               <span class="mono">{{ product.sku }}</span>

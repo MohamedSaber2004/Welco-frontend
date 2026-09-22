@@ -312,9 +312,8 @@ const navigateToOemFromModal = () => {
               >
                 <AppImage
                   :src="prod.imageName"
-                  placeholder-type="product"
-                  :placeholder-text="prod.sku"
-                  :alt="localized(prod.nameEn, prod.nameAr)"
+  placeholder-type="product"
+  :alt="localized(prod.nameEn, prod.nameAr)"
                   fit="contain"
                   class="provider-mini__img"
                 />

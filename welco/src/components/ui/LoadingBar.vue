@@ -18,8 +18,9 @@ import { requestTracker } from '../../application/request.tracker'
   position: fixed;
   top: 0;
   inset-inline: 0;
-  height: 3px;
+  height: 5px;
   z-index: 9999;
+  filter: drop-shadow(0 2px 8px rgba(11, 127, 134, .35));
   background: transparent;
   pointer-events: none;
 }
@@ -28,7 +29,8 @@ import { requestTracker } from '../../application/request.tracker'
   position: relative;
   width: 100%;
   height: 100%;
-  background: rgba(20, 125, 146, 0.12);  /* brand ghost track */
+  background: linear-gradient(90deg, rgba(11, 127, 134, .08), rgba(214, 243, 106, .22), rgba(11, 127, 134, .08));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.35);
   overflow: hidden;
 }
 
@@ -36,17 +38,12 @@ import { requestTracker } from '../../application/request.tracker'
   position: absolute;
   inset-block: 0;
   inset-inline-start: 0;
-  width: 50%;
-  /* Clinical Precision 3-stop gradient: Navy → Steel Teal → Surgical Cyan */
-  background: linear-gradient(
-    90deg,
-    var(--color-primary-700, #0F3D56) 0%,
-    var(--color-primary-500, #147D92) 50%,
-    var(--color-primary-400, #28A7A1) 100%
-  );
-  border-radius: 0 2px 2px 0;
+  width: 34%;
+  background: linear-gradient(90deg, #07545f 0%, #0b7f86 48%, #d6f36a 100%);
+  border-radius: 999px;
+  box-shadow: 0 0 12px rgba(214, 243, 106, .7), 0 0 4px rgba(11, 127, 134, .8);
   will-change: transform;
-  animation: lb-sweep 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation: lb-sweep 1.15s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
 @keyframes lb-sweep {

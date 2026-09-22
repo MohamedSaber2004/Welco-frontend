@@ -158,9 +158,9 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
               <div class="product-card__media" :style="{ background: productMediaUrl(p.imageName, p.imageGradient).background }">
                 <AppImage
                   :src="p.imageName"
-  placeholder-type="product"
-  :alt="localized(p.nameEn, p.nameAr)"
-                  fit="contain"
+                  placeholder-type="product"
+                  :alt="localized(p.nameEn, p.nameAr)"
+                  fit="cover"
                   class="product-card__img"
                 />
               </div>
@@ -539,18 +539,20 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
 }
 
 .product-card__media {
-  height: 160px;
+  height: 195px;
+  width: 100%;
   position: relative;
-  display: grid;
-  place-items: center;
-  padding: 0.75rem;
+  overflow: hidden;
+  display: block;
+  padding: 0;
   background: var(--wl-surface-soft);
 }
 
 .product-card__img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
   transition: transform 0.25s ease;
 }
 

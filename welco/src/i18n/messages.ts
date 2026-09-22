@@ -1151,6 +1151,32 @@ export type Messages = {
     memberSince: string
     viewCatalog: string
     categoryProviders: string
+    quotes: string
+    quotesDesc: string
+    orders: string
+    ordersDesc: string
+    support: string
+    supportDesc: string
+    negotiationRequests: string
+    acceptNegotiation: string
+    counterOffer: string
+    counterAmount: string
+    counterNote: string
+    proposedTargetPrice: string
+    requestedDiscount: string
+    clientNote: string
+    acceptSuccess: string
+    counterSuccess: string
+    declineSuccess: string
+    statusUpdated: string
+    contactAdmin: string
+    callAdminSupport: string
+    adminHotline: string
+    escalateIssue: string
+    issueSubject: string
+    issueMessage: string
+    sendIssue: string
+    issueSentSuccess: string
   }
   commerce: {
     checkoutTitle: string
@@ -1338,6 +1364,13 @@ export type Messages = {
     statusDeclined: string
     statusExpired: string
     validThrough: string
+    negotiateTotal: string
+    negotiateTotalDesc: string
+    proposedTarget: string
+    negotiationReason: string
+    negotiationReasonPlaceholder: string
+    targetPriceValidation: string
+    negotiationSummary: string
   }
   oem: {
     title: string

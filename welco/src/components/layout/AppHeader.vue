@@ -176,7 +176,6 @@ watch(isAuthed, (v) => {
 
         <button class="icon-btn lang-btn" :aria-label="locale === 'ar' ? 'English' : 'العربية'" :title="locale === 'ar' ? 'Switch to English' : 'التحويل إلى العربية'" @click="toggleLang">
           <span class="material-symbols-outlined" style="font-size:18px" aria-hidden="true">language</span>
-          <span class="lang-btn__text">{{ locale === 'ar' ? 'EN' : 'عربي' }}</span>
         </button>
 
         <template v-if="isAuthed">

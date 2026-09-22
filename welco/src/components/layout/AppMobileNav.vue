@@ -245,8 +245,8 @@ const isPathActive = (path: string, exact = false) => {
 
         <!-- Categorized Nav Grid of All Allowed Pages -->
         <div class="sheet-body">
-          <!-- Section: Admin & Staff Management (if seller) -->
-          <div v-if="isSeller" class="sheet-section">
+          <!-- Section: Admin & Staff Management (strictly for authenticated sellers) -->
+          <div v-if="isAuthed && isSeller" class="sheet-section">
             <div class="sheet-section-title mono">{{ locale === 'ar' ? 'لوحة التحكم والعمليات' : 'CONSOLE & OPERATIONS' }}</div>
             <div class="sheet-grid">
               <button type="button" class="sheet-item" @click="navigateTo('/admin')">
@@ -452,13 +452,23 @@ const isPathActive = (path: string, exact = false) => {
                 </span>
               </button>
 
-              <button type="button" class="sheet-item" @click="navigateTo('/oem')">
-                <span class="sheet-icon-box sheet-icon--indigo">
-                  <span class="material-symbols-outlined">precision_manufacturing</span>
+              <button type="button" class="sheet-item" @click="navigateTo('/most-selling')">
+                <span class="sheet-icon-box sheet-icon--rose">
+                  <span class="material-symbols-outlined">trending_up</span>
                 </span>
                 <span class="sheet-item__text">
-                  <strong>{{ t('nav.oem') }}</strong>
-                  <small>{{ locale === 'ar' ? 'تصنيع خاص بالعلامة التجارية' : 'Custom private label' }}</small>
+                  <strong>{{ t('mostSellingPage.title') }}</strong>
+                  <small>{{ locale === 'ar' ? 'الأكثر طلباً ومبيعاً' : 'Highest demand instruments' }}</small>
+                </span>
+              </button>
+
+              <button type="button" class="sheet-item" @click="navigateTo('/categories')">
+                <span class="sheet-icon-box sheet-icon--teal">
+                  <span class="material-symbols-outlined">category</span>
+                </span>
+                <span class="sheet-item__text">
+                  <strong>{{ t('nav.categories') }}</strong>
+                  <small>{{ locale === 'ar' ? 'تصفح التخصصات الجراحية' : 'Surgical specialties' }}</small>
                 </span>
               </button>
 
@@ -518,7 +528,7 @@ const isPathActive = (path: string, exact = false) => {
                 </span>
               </button>
 
-              <button type="button" class="sheet-item" @click="navigateTo('/locations')">
+              <button v-if="isAdmin && isAuthed" type="button" class="sheet-item" @click="navigateTo('/locations')">
                 <span class="sheet-icon-box sheet-icon--slate">
                   <span class="material-symbols-outlined">public</span>
                 </span>
@@ -538,9 +548,8 @@ const isPathActive = (path: string, exact = false) => {
               <span class="material-symbols-outlined text-[18px]">manage_accounts</span>
               <span>{{ t('nav.profile') }}</span>
             </button>
-            <button type="button" class="sheet-foot-btn" @click="toggleLang">
+            <button type="button" class="sheet-foot-btn" :aria-label="locale === 'ar' ? 'English' : 'العربية'" :title="locale === 'ar' ? 'Switch to English' : 'التحويل إلى العربية'" @click="toggleLang">
               <span class="material-symbols-outlined text-[18px]">language</span>
-              <span>{{ locale === 'ar' ? 'English' : 'العربية' }}</span>
             </button>
             <button type="button" class="sheet-foot-btn sheet-foot-btn--danger" @click="handleLogout">
               <span class="material-symbols-outlined text-[18px]">logout</span>
@@ -556,9 +565,8 @@ const isPathActive = (path: string, exact = false) => {
               <span class="material-symbols-outlined text-[18px]">person_add</span>
               <span>{{ t('nav.register') }}</span>
             </button>
-            <button type="button" class="sheet-foot-btn" @click="toggleLang">
+            <button type="button" class="sheet-foot-btn" :aria-label="locale === 'ar' ? 'English' : 'العربية'" :title="locale === 'ar' ? 'Switch to English' : 'التحويل إلى العربية'" @click="toggleLang">
               <span class="material-symbols-outlined text-[18px]">language</span>
-              <span>{{ locale === 'ar' ? 'English' : 'العربية' }}</span>
             </button>
           </template>
         </footer>

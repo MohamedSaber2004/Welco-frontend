@@ -133,11 +133,11 @@ const toggleLang = async () => {
         <button
           type="button"
           class="rail__lang-btn mono"
+          :aria-label="locale === 'ar' ? 'English' : 'العربية'"
           :title="locale === 'ar' ? 'Switch to English' : 'التحويل إلى العربية'"
           @click="toggleLang"
         >
           <span class="material-symbols-outlined text-[16px]">language</span>
-          <span v-if="!collapsed">{{ locale === 'ar' ? 'English' : 'العربية' }}</span>
         </button>
       </div>
     </aside>

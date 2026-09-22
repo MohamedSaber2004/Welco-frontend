@@ -49,6 +49,16 @@ const currencySearchQuery = ref('')
 const currencyDropdownEl = ref<HTMLElement | null>(null)
 const isRefreshingRates = ref(false)
 
+// Total price negotiation state
+const enableNegotiation = ref(false)
+const targetProposedTotal = ref<number | null>(null)
+const negotiationReason = ref('')
+
+const requestedDiscountPercent = computed(() => {
+  if (!displayTotal.value || !targetProposedTotal.value || targetProposedTotal.value >= displayTotal.value) return 0
+  return Math.round(((displayTotal.value - targetProposedTotal.value) / displayTotal.value) * 100)
+})
+
 function onDocumentClick(e: MouseEvent) {
   if (showCurrencyDropdown.value && currencyDropdownEl.value) {
     if (!currencyDropdownEl.value.contains(e.target as Node)) {
@@ -275,6 +285,13 @@ const submitRfq = async () => {
     void router.push({ name: 'login', query: { redirect: '/cart' } })
     return
   }
+  if (enableNegotiation.value) {
+    if (!targetProposedTotal.value || targetProposedTotal.value <= 0) {
+      toastService.info(t('sales.targetPriceValidation'))
+      return
+    }
+  }
+
   // Force-refresh company data (bypass cache) to guarantee we have a fresh companyId
   await companyService.loadMyCompany(true)
   const company = companyService.myCompany.value
@@ -289,9 +306,15 @@ const submitRfq = async () => {
   }
   submittingRfq.value = true
   try {
+    let finalNote = quoteNote.value || ''
+    if (enableNegotiation.value && targetProposedTotal.value) {
+      const negotiationPrefix = `[PRICE_NEGOTIATION: TARGET_TOTAL=${targetProposedTotal.value} ${targetCurrency.value} (Discount: ${requestedDiscountPercent.value}%)][REASON: ${negotiationReason.value || 'N/A'}]`
+      finalNote = finalNote ? `${negotiationPrefix}\n\n${finalNote}` : negotiationPrefix
+    }
+
     const res = await salesService.createRfq({
       companyId,
-      note: quoteNote.value || undefined,
+      note: finalNote || undefined,
       items: toRfqItems(),
     })
     if (res.ok && res.rfq) {
@@ -622,6 +645,69 @@ const submitRfq = async () => {
               class="notes-textarea"
               @input="setNote(($event.target as HTMLTextAreaElement).value)"
             ></textarea>
+          </div>
+
+          <!-- Price Negotiation Section -->
+          <div class="negotiation-card" :class="{ 'is-active': enableNegotiation }">
+            <div class="negotiation-toggle" @click="enableNegotiation = !enableNegotiation">
+              <label class="toggle-checkbox" @click.stop>
+                <input
+                  v-model="enableNegotiation"
+                  type="checkbox"
+                  class="sr-only"
+                />
+                <span class="custom-checkbox" :class="{ 'is-checked': enableNegotiation }">
+                  <span v-if="enableNegotiation" class="material-symbols-outlined text-[14px]">check</span>
+                </span>
+              </label>
+              <div class="toggle-text">
+                <span class="negotiation-title mono">{{ t('sales.negotiateTotal') }}</span>
+                <p class="negotiation-desc">{{ t('sales.negotiateTotalDesc') }}</p>
+              </div>
+            </div>
+
+            <div v-if="enableNegotiation" class="negotiation-fields">
+              <div class="form-group">
+                <div class="field-label-row">
+                  <label for="cart-target-price" class="notes-lbl mono">{{ t('sales.proposedTarget') }}</label>
+                  <span v-if="requestedDiscountPercent > 0" class="discount-pill mono">
+                    -{{ requestedDiscountPercent }}% {{ t('provider.requestedDiscount') }}
+                  </span>
+                </div>
+                <div class="price-input-wrap">
+                  <span class="price-currency-tag mono">{{ activeCurrencyMeta.symbol }} ({{ targetCurrency }})</span>
+                  <input
+                    id="cart-target-price"
+                    v-model.number="targetProposedTotal"
+                    type="number"
+                    min="1"
+                    :placeholder="displayTotal ? String(Math.round(displayTotal * 0.9)) : '0'"
+                    class="price-input mono"
+                  />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="cart-negotiation-reason" class="notes-lbl mono">{{ t('sales.negotiationReason') }}</label>
+                <textarea
+                  id="cart-negotiation-reason"
+                  v-model="negotiationReason"
+                  rows="2"
+                  :placeholder="t('sales.negotiationReasonPlaceholder')"
+                  class="notes-textarea"
+                ></textarea>
+              </div>
+
+              <div v-if="targetProposedTotal" class="negotiation-badge-row mono">
+                <span class="material-symbols-outlined text-[16px] text-emerald-600">handshake</span>
+                <span>
+                  {{ t('sales.negotiationSummary', {
+                    target: `${activeCurrencyMeta.symbol} ${targetProposedTotal.toLocaleString()} ${targetCurrency}`,
+                    discount: requestedDiscountPercent
+                  }) }}
+                </span>
+              </div>
+            </div>
           </div>
 
           <!-- Actions -->
@@ -1620,6 +1706,147 @@ const submitRfq = async () => {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+}
+
+/* Price Negotiation Card */
+.negotiation-card {
+  margin-bottom: var(--space-4);
+  border: 1px dashed var(--wl-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  background: var(--wl-surface-soft);
+  transition: all 0.2s ease;
+}
+
+.negotiation-card.is-active {
+  border: 1px solid var(--wl-primary);
+  background: var(--wl-surface);
+  box-shadow: 0 4px 12px rgba(179, 139, 45, 0.08);
+}
+
+.negotiation-toggle {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggle-checkbox {
+  margin-top: 2px;
+  cursor: pointer;
+}
+
+.custom-checkbox {
+  width: 18px;
+  height: 18px;
+  border-radius: var(--radius-xs, 4px);
+  border: 1.5px solid var(--wl-border);
+  background: var(--wl-surface);
+  display: grid;
+  place-items: center;
+  color: #fff;
+  transition: all 0.15s ease;
+}
+
+.custom-checkbox.is-checked {
+  background: var(--wl-primary);
+  border-color: var(--wl-primary);
+}
+
+.toggle-text {
+  flex: 1;
+}
+
+.negotiation-title {
+  font-size: var(--step-0);
+  font-weight: 700;
+  color: var(--wl-ink-strong);
+  display: block;
+}
+
+.negotiation-desc {
+  font-size: var(--step--1);
+  color: var(--wl-muted);
+  margin: var(--space-1) 0 0;
+  line-height: 1.35;
+}
+
+.negotiation-fields {
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--wl-border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.field-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-1);
+}
+
+.discount-pill {
+  font-size: 11px;
+  font-weight: 700;
+  color: #059669;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  padding: 1px 8px;
+  border-radius: var(--radius-full);
+}
+
+.price-input-wrap {
+  display: flex;
+  align-items: center;
+  border: 1.5px solid var(--wl-border);
+  border-radius: var(--radius-md);
+  background: var(--wl-surface);
+  overflow: hidden;
+  transition: border-color 0.15s ease;
+}
+
+.price-input-wrap:focus-within {
+  border-color: var(--wl-primary);
+  box-shadow: var(--wl-focus-ring);
+}
+
+.price-currency-tag {
+  padding: 0 var(--space-3);
+  font-size: var(--step--1);
+  font-weight: 700;
+  color: var(--wl-muted);
+  background: var(--wl-surface-soft);
+  border-inline-end: 1px solid var(--wl-border);
+  height: 38px;
+  display: flex;
+  align-items: center;
+}
+
+.price-input {
+  flex: 1;
+  height: 38px;
+  padding: 0 var(--space-3);
+  border: none;
+  background: transparent;
+  font-size: var(--step-0);
+  font-weight: 700;
+  color: var(--wl-ink-strong);
+  outline: none;
+}
+
+.negotiation-badge-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: var(--wl-success-soft);
+  border: 1px solid var(--wl-border);
+  border-radius: var(--radius-sm);
+  font-size: var(--step--1);
+  color: var(--wl-ink-strong);
 }
 
 @media (max-width: 980px) {

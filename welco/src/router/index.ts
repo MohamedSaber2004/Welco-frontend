@@ -299,7 +299,19 @@ const router = createRouter({
     },
     {
       path: '/provider',
-      redirect: '/provider/catalog',
+      redirect: '/provider/quotes',
+    },
+    {
+      path: '/provider/quotes',
+      name: 'provider-quotes',
+      component: () => import('../views/provider/ProviderQuotesView.vue'),
+      meta: { titleKey: 'provider.quotes', requiresAuth: true, requiresProvider: true },
+    },
+    {
+      path: '/provider/orders',
+      name: 'provider-orders',
+      component: () => import('../views/provider/ProviderOrdersView.vue'),
+      meta: { titleKey: 'provider.orders', requiresAuth: true, requiresProvider: true },
     },
     {
       path: '/provider/catalog',
@@ -312,6 +324,12 @@ const router = createRouter({
       name: 'provider-categories',
       component: () => import('../views/provider/ProviderCategoriesView.vue'),
       meta: { titleKey: 'provider.categories', requiresAuth: true, requiresProvider: true },
+    },
+    {
+      path: '/provider/support',
+      name: 'provider-support',
+      component: () => import('../views/provider/ProviderSupportView.vue'),
+      meta: { titleKey: 'provider.support', requiresAuth: true, requiresProvider: true },
     },
     {
       path: '/admin/certifications',
@@ -402,7 +420,7 @@ router.beforeEach(async (to) => {
   if (to.meta.requiresAuth && !isAuthenticated) {
     return { name: 'login', query: { redirect: to.fullPath } }
   }
-  if (to.meta.requiresProvider && !auth.isProvider.value) {
+  if (to.meta.requiresProvider && !auth.isProvider.value && !auth.isAdmin.value) {
     return { name: 'home' }
   }
   if (to.meta.guestOnly && isAuthenticated) {

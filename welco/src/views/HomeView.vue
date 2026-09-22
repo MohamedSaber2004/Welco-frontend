@@ -302,7 +302,7 @@ const navigateToOemFromModal = () => {
                   :src="p.imageName"
                   placeholder-type="product"
                   :alt="localized(p.nameEn, p.nameAr)"
-                  fit="contain"
+                  fit="cover"
                   class="product-card__img"
                 />
                 <span v-if="p.isNew" class="mono product-card__badge">{{ t('home.newBadge') }}</span>
@@ -1926,18 +1926,25 @@ const navigateToOemFromModal = () => {
 }
 
 .product-card__media {
-  height: 180px;
+  height: 200px;
+  width: 100%;
   position: relative;
   overflow: hidden;
-  display: grid;
-  place-items: center;
+  display: block;
+  background: var(--wl-surface-soft, #f8fafc);
 }
 
 .product-card__img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  padding: var(--space-3);
+  object-fit: cover;
+  display: block;
+  padding: 0;
+  transition: transform 0.3s ease;
+}
+
+.product-card:hover .product-card__img {
+  transform: scale(1.05);
 }
 
 .product-card__sku {

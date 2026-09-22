@@ -14,6 +14,7 @@ import { toUploadPlace } from '../../application/attachment.service'
 import { resolveFileUrl } from '../../utils/file-url'
 import type { RfqDto } from '../../domain/models/sales'
 import { formatPrice } from '../../utils/format'
+import { parseNegotiationNote } from '../../utils/negotiation'
 
 const route = useRoute()
 const router = useRouter()
@@ -140,10 +141,27 @@ onMounted(async () => {
             </article>
           </div>
 
+          <!-- Price Negotiation Banner if present -->
+          <div v-if="parseNegotiationNote(rfq.note).isNegotiation" class="negotiation-summary-card">
+            <div class="negotiation-summary-header">
+              <span class="material-symbols-outlined text-emerald-600">handshake</span>
+              <div>
+                <strong class="mono text-emerald-800">{{ t('sales.negotiateTotal') }}</strong>
+                <p class="mono text-xs text-emerald-700">
+                  {{ t('sales.proposedTarget') }}: <strong>{{ parseNegotiationNote(rfq.note).targetTotal }}</strong>
+                  <span v-if="parseNegotiationNote(rfq.note).discountPercent">({{ parseNegotiationNote(rfq.note).discountPercent }}% {{ t('provider.requestedDiscount') }})</span>
+                </p>
+              </div>
+            </div>
+            <p v-if="parseNegotiationNote(rfq.note).reason" class="negotiation-reason-text">
+              <em>"{{ parseNegotiationNote(rfq.note).reason }}"</em>
+            </p>
+          </div>
+
           <!-- Notes Callout Banner if present -->
-          <div v-if="rfq.note" class="notes-banner mono">
+          <div v-if="parseNegotiationNote(rfq.note).cleanNote" class="notes-banner mono">
             <span class="material-symbols-outlined text-[16px] text-indigo-600">sticky_note_2</span>
-            <span><strong>{{ t('sales.notes') }}:</strong> {{ rfq.note }}</span>
+            <span><strong>{{ t('sales.notes') }}:</strong> {{ parseNegotiationNote(rfq.note).cleanNote }}</span>
           </div>
         </main>
 
@@ -433,6 +451,30 @@ onMounted(async () => {
   border: 1px solid var(--border, #D9E2EC);
   padding: 0.75rem 1rem;
   border-radius: var(--radius-sm, 4px);
+}
+
+.negotiation-summary-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-sm, 4px);
+  margin-top: 1rem;
+}
+
+.negotiation-summary-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.negotiation-reason-text {
+  font-size: 12px;
+  color: #065f46;
+  margin: 0;
+  padding-inline-start: 2rem;
 }
 
 /* Sidebar */

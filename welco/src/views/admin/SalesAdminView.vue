@@ -14,6 +14,7 @@ import { t, locale } from '../../i18n'
 import type { QuoteDto, RfqDto } from '../../domain/models/sales'
 import { RFQ_STATUSES, QUOTE_STATUSES } from '../../domain/models/sales'
 import { formatPrice } from '../../utils/format'
+import { parseNegotiationNote } from '../../utils/negotiation'
 
 const route = useRoute()
 const router = useRouter()
@@ -474,7 +475,14 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
               <tbody>
                 <tr v-for="r in paginatedRfqs" :key="r.id" class="exec-row">
                   <td>
-                    <strong class="mono rfq-num">{{ r.rfqNumber || '—' }}</strong>
+                    <div style="display: flex; flex-direction: column; gap: 4px;">
+                      <strong class="mono rfq-num">{{ r.rfqNumber || '—' }}</strong>
+                      <span v-if="parseNegotiationNote(r.note).isNegotiation" style="display: inline-flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 700; color: #065f46; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 1px 6px; border-radius: 9999px; width: fit-content;" class="mono">
+                        <span class="material-symbols-outlined" style="font-size: 13px;">handshake</span>
+                        <span>{{ parseNegotiationNote(r.note).targetTotal }}</span>
+                        <span v-if="parseNegotiationNote(r.note).discountPercent">(-{{ parseNegotiationNote(r.note).discountPercent }}%)</span>
+                      </span>
+                    </div>
                   </td>
                   <td>
                     <strong class="company-name">{{ r.companyName || '—' }}</strong>

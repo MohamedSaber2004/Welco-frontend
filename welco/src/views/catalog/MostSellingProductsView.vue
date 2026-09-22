@@ -367,7 +367,7 @@ const goToProduct = (id: string) => {
                   :src="p.imageName"
                   placeholder-type="product"
                   :alt="localized(p.nameEn, p.nameAr)"
-                  fit="contain"
+                  fit="cover"
                   class="product-card__img"
                 />
 
@@ -810,19 +810,25 @@ const goToProduct = (id: string) => {
 
 .product-card__media {
   position: relative;
-  height: 210px;
-  background: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1.25rem;
+  height: 220px;
+  width: 100%;
+  background: var(--surface-subtle, #f8fafc);
+  overflow: hidden;
+  display: block;
+  padding: 0;
   border-bottom: 1px solid var(--border-color, #f1f5f9);
 }
 
 .product-card__img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.product-card:hover .product-card__img {
+  transform: scale(1.05);
 }
 
 /* Rank Badges */

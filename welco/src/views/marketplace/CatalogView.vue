@@ -323,9 +323,9 @@ const filteredSidebarCategories = computed(() => {
               <div class="catalog-card__media" :style="{ background: productMediaUrl(p.imageName, p.imageGradient).background }">
                 <AppImage
                   :src="p.imageName"
-  placeholder-type="product"
-  :alt="localized(p.nameEn, p.nameAr)"
-                  fit="contain"
+                  placeholder-type="product"
+                  :alt="localized(p.nameEn, p.nameAr)"
+                  fit="cover"
                   class="catalog-card__img"
                 />
                 <div class="catalog-card__badges">
@@ -907,10 +907,10 @@ const filteredSidebarCategories = computed(() => {
 }
 
 .catalog-card__media {
-  height: 160px;
+  height: 195px;
+  width: 100%;
   position: relative;
-  display: grid;
-  place-items: center;
+  display: block;
   overflow: hidden;
   border-bottom: 1px solid var(--wl-line);
 }

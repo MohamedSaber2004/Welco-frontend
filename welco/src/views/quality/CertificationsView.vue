@@ -179,26 +179,30 @@ const goPage = (p: number) => {
       >
         <div class="cert-grid">
           <article v-for="c in paginatedCerts" :key="c.id" class="cert-card">
-            <div class="card-head-row">
-              <div class="seal-box" :class="{ 'seal-box--pdf': isPdfDoc(c.certificationImageName) }">
-                <span v-if="isPdfDoc(c.certificationImageName)" class="material-symbols-outlined seal-pdf-icon">picture_as_pdf</span>
-                <AppImage
-                  v-else
-                  :src="c.certificationImageName"
-                  placeholder-type="document"
-                  :alt="c.title"
-                  class="seal-img"
-                />
+            <!-- Full-width certificate banner image -->
+            <div class="cert-card__media" :class="{ 'cert-card__media--pdf': isPdfDoc(c.certificationImageName) }">
+              <div v-if="isPdfDoc(c.certificationImageName)" class="cert-pdf-placeholder">
+                <span class="material-symbols-outlined cert-pdf-icon">picture_as_pdf</span>
+                <span class="mono text-xs">{{ c.certificateNumber || 'PDF Document' }}</span>
               </div>
-
+              <AppImage
+                v-else
+                :src="c.certificationImageName"
+                placeholder-type="document"
+                :alt="c.title"
+                fit="cover"
+                class="cert-card__img"
+              />
               <span
-                class="status-pill mono"
+                class="status-pill cert-status-pill mono"
                 :class="isActive(c) ? 'status-pill--active' : 'status-pill--expired'"
               >
                 <span class="dot"></span>
                 <span>{{ isActive(c) ? t('common.verified') : t('common.pending') }}</span>
               </span>
             </div>
+
+            <div class="cert-card__body">
 
             <h3 class="cert-title-text">{{ c.title }}</h3>
             <div class="ref-badge mono">
@@ -224,6 +228,7 @@ const goPage = (p: number) => {
                 <dd class="mono">{{ new Date(c.expiryDate).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</dd>
               </div>
             </dl>
+            </div>
           </article>
         </div>
 
@@ -521,51 +526,76 @@ const goPage = (p: number) => {
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
   border-radius: 16px;
-  padding: 1.5rem;
+  padding: 0;
   box-shadow: var(--wl-shadow-card);
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
+  overflow: hidden;
   transition: all 0.2s ease;
 }
 
 .cert-card:hover {
   border-color: var(--wl-primary);
   box-shadow: var(--wl-shadow-card-hover);
+  transform: translateY(-2px);
 }
 
-.card-head-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.seal-box {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  background: var(--wl-surface-soft);
-  border: 1px solid var(--wl-border);
-  display: grid;
-  place-items: center;
+.cert-card__media {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  background: var(--wl-surface-soft, #f1f5f9);
   overflow: hidden;
-  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid var(--wl-border);
 }
 
-.seal-box--pdf {
-  background: var(--wl-danger-faint);
-  border-color: var(--wl-danger-border);
-}
-
-.seal-pdf-icon {
-  font-size: 26px;
-  color: var(--wl-danger);
-}
-
-.seal-img {
+.cert-card__img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
+  transition: transform 0.35s ease;
+}
+
+.cert-card:hover .cert-card__img {
+  transform: scale(1.04);
+}
+
+.cert-status-pill {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 2;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+[dir="rtl"] .cert-status-pill {
+  right: auto;
+  left: 0.75rem;
+}
+
+.cert-pdf-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: var(--wl-danger);
+}
+
+.cert-pdf-icon {
+  font-size: 3rem;
+}
+
+.cert-card__body {
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  flex: 1;
 }
 
 .cert-card-actions {

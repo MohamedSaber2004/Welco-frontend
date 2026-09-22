@@ -2120,8 +2120,11 @@ const navigateToOemFromModal = () => {
 .home .hero p { max-width: 620px; color: rgba(247,255,254,.78); font-size: clamp(1rem, 1.4vw, 1.2rem); line-height: 1.7; }
 .home .hero__search { max-width: 610px; }
 .home .hero__search-bar { height: 58px; padding-inline-start: 1rem; border: 1px solid rgba(255,255,255,.28); background: rgba(255,255,255,.12); box-shadow: 0 15px 35px rgba(1,27,40,.18); }
-.home .hero__search-bar input { color: white; }
+.home .hero__search-bar input { color: #f7fffe; caret-color: var(--platform-lime); }
 .home .hero__search-bar input::placeholder { color: rgba(255,255,255,.65); }
+.home .hero__search-bar input:focus,
+.home .hero__search-bar input:focus-visible { color: #f7fffe; background: transparent; border-color: transparent; box-shadow: none; outline: 0; }
+.home .hero__search-bar input:focus::placeholder { color: rgba(255,255,255,.52); }
 .home .hero__search-btn { height: 46px; border-radius: 999px; background: var(--platform-lime); color: var(--platform-ink); }
 .home .hero__ctas .btn-primary { background: white; color: var(--platform-ink); border-color: white; border-radius: 999px; padding-inline: 1.4rem; }
 .home .hero__ctas .btn-secondary { background: transparent; color: white; border-color: rgba(255,255,255,.45); border-radius: 999px; padding-inline: 1.4rem; }

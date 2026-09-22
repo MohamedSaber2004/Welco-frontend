@@ -89,6 +89,25 @@
 }
 :where(input, select, textarea):disabled { color: var(--fg-muted); background: var(--bg-subtle); }
 
+/* Password visibility controls stay visually centered and never inherit button hover lift. */
+.pwd-toggle-btn,
+.password-toggle,
+.password-visibility-toggle {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  transform: translateY(-50%) !important;
+  line-height: 1 !important;
+}
+.pwd-toggle-btn:hover,
+.password-toggle:hover,
+.password-visibility-toggle:hover { transform: translateY(-50%) !important; }
+.pwd-toggle-btn .material-symbols-outlined,
+.password-toggle .material-symbols-outlined,
+.password-visibility-toggle .material-symbols-outlined { font-size: 19px; line-height: 1; }
+
 @media (hover: none) {
   :where(button, .btn, .card, .panel, .admin-link, .provider-tile, .cat-card, .category-product-card):not(:disabled):hover { transform: none; }
 }

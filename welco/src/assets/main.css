@@ -16,6 +16,51 @@
 }
 
 @tailwind base;
+
+/* Shared loading and empty-state language across every route. */
+.data-state__loading,
+.skeleton-wrapper,
+.sk-grid,
+.sk-list,
+.sk-table,
+.sk-form,
+.sk-hero {
+  width: 100%;
+}
+
+.sk, .sk-card, .sk-card__media, .sk-row, [class*="skeleton"] .sk {
+  background: linear-gradient(110deg, color-mix(in srgb, var(--bg-subtle) 88%, white 12%) 8%, color-mix(in srgb, var(--brand-soft) 55%, white 45%) 18%, color-mix(in srgb, var(--bg-subtle) 88%, white 12%) 33%);
+  background-size: 220% 100%;
+  animation: welco-skeleton 1.45s linear infinite;
+  border-color: color-mix(in srgb, var(--border) 70%, transparent) !important;
+}
+
+@keyframes welco-skeleton {
+  to { background-position-x: -220%; }
+}
+
+.data-state__empty {
+  position: relative;
+  min-height: 300px;
+  margin: clamp(1rem, 3vw, 2rem) 0;
+  padding: clamp(2rem, 5vw, 4rem) 1.25rem;
+  overflow: hidden;
+  isolation: isolate;
+  border: 1px solid color-mix(in srgb, var(--border) 75%, transparent);
+  border-radius: 1.5rem;
+  background: linear-gradient(145deg, color-mix(in srgb, var(--bg-surface) 92%, var(--brand-soft) 8%), var(--bg-surface));
+  box-shadow: 0 16px 44px rgba(8, 47, 73, .06);
+}
+.data-state__empty__grid { opacity: .5 !important; background-image: linear-gradient(color-mix(in srgb, var(--brand) 12%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--brand) 12%, transparent) 1px, transparent 1px) !important; }
+.empty__halo { width: 116px !important; height: 116px !important; margin-bottom: 1.25rem !important; background: radial-gradient(circle, color-mix(in srgb, var(--brand-soft) 75%, white 25%), transparent 68%) !important; box-shadow: 0 12px 28px color-mix(in srgb, var(--brand) 16%, transparent) !important; }
+.empty__icon { width: 66px !important; height: 66px !important; border: 1px solid color-mix(in srgb, var(--brand) 25%, var(--border)) !important; background: var(--bg-surface) !important; color: var(--brand) !important; box-shadow: 0 8px 20px rgba(8,47,73,.12) !important; }
+.empty__icon .material-symbols-outlined { font-size: 30px !important; }
+.empty__title { color: var(--fg-heading) !important; font-size: clamp(1.1rem, 2vw, 1.45rem) !important; }
+.empty__desc { color: var(--fg-muted) !important; max-width: 38ch; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sk, .sk-card, .sk-card__media, .sk-row, [class*="skeleton"] .sk { animation: none; }
+}
 @tailwind components;
 @tailwind utilities;
 

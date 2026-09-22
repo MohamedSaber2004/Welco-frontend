@@ -26,9 +26,59 @@ export default {
         'gold-faint': 'var(--color-warning-100)',
         admin: 'var(--brand)',
         'admin-soft': 'var(--brand-soft)',
-        error: 'var(--fg-danger)',
+
+        // Status colors with full scales
+        success: 'var(--color-success-500)',
+        'success-50': 'var(--color-success-50)',
+        'success-100': 'var(--color-success-100)',
+        'success-200': 'var(--color-success-200)',
+        'success-300': 'var(--color-success-300)',
+        'success-400': 'var(--color-success-400)',
+        'success-500': 'var(--color-success-500)',
+        'success-600': 'var(--color-success-600)',
+        'success-700': 'var(--color-success-700)',
+        'success-800': 'var(--color-success-800)',
+        'success-900': 'var(--color-success-900)',
+
+        warning: 'var(--color-warning-500)',
+        'warning-50': 'var(--color-warning-50)',
+        'warning-100': 'var(--color-warning-100)',
+        'warning-200': 'var(--color-warning-200)',
+        'warning-300': 'var(--color-warning-300)',
+        'warning-400': 'var(--color-warning-400)',
+        'warning-500': 'var(--color-warning-500)',
+        'warning-600': 'var(--color-warning-600)',
+        'warning-700': 'var(--color-warning-700)',
+        'warning-800': 'var(--color-warning-800)',
+        'warning-900': 'var(--color-warning-900)',
+
+        error: 'var(--color-danger-500)',
+        'error-50': 'var(--color-danger-50)',
+        'error-100': 'var(--color-danger-100)',
+        'error-200': 'var(--color-danger-200)',
+        'error-300': 'var(--color-danger-300)',
+        'error-400': 'var(--color-danger-400)',
+        'error-500': 'var(--color-danger-500)',
+        'error-600': 'var(--color-danger-600)',
+        'error-700': 'var(--color-danger-700)',
+        'error-800': 'var(--color-danger-800)',
+        'error-900': 'var(--color-danger-900)',
         'on-error': 'var(--fg-on-brand)',
         'error-container': 'var(--color-danger-100)',
+
+        info: 'var(--color-info-500)',
+        'info-50': 'var(--color-info-50)',
+        'info-100': 'var(--color-info-100)',
+        'info-200': 'var(--color-info-200)',
+        'info-300': 'var(--color-info-300)',
+        'info-400': 'var(--color-info-400)',
+        'info-500': 'var(--color-info-500)',
+        'info-600': 'var(--color-info-600)',
+        'info-700': 'var(--color-info-700)',
+        'info-800': 'var(--color-info-800)',
+        'info-900': 'var(--color-info-900)',
+
+        // Surfaces & Text
         surface: 'var(--bg-surface)',
         'surface-dim': '#C1DDFB',
         'surface-bright': 'var(--bg-surface)',
@@ -49,12 +99,13 @@ export default {
         'on-background': 'var(--fg-heading)',
       },
       borderRadius: {
-        sm: '0.125rem',   // 2px
-        DEFAULT: '0.25rem', // 4px (Base Radius)
-        md: '0.375rem',  // 6px
-        lg: '0.5rem',    // 8px (Container Radius)
-        xl: '0.75rem',   // 12px (Outer Container Radius)
-        full: '9999px',
+        xs: 'var(--radius-xs)',    // 3px
+        sm: 'var(--radius-sm)',    // 4px (Base Radius)
+        md: 'var(--radius-md)',    // 6px
+        lg: 'var(--radius-lg)',    // 8px (Container Radius)
+        xl: 'var(--radius-xl)',    // 12px (Outer Container Radius)
+        '2xl': 'var(--radius-2xl)',// 16px
+        full: 'var(--radius-pill)',// 9999px
       },
       spacing: {
         'input-sm': '36px',
@@ -82,14 +133,44 @@ export default {
         '4xl': 'var(--text-4xl)',
       },
       boxShadow: {
+        none: 'none',
         xs: 'var(--shadow-xs)',
         sm: 'var(--shadow-sm)',
         DEFAULT: 'var(--shadow-sm)',
         md: 'var(--shadow-md)',
         lg: 'var(--shadow-lg)',
+        xl: 'var(--shadow-xl)',
+        '2xl': 'var(--shadow-2xl)',
+        inner: 'var(--shadow-inner)',
         glow: 'var(--ring-focus)',
-        'glow-danger': '0 0 0 2px #FFFFFF, 0 0 0 4px #DC3545',
+        'glow-error': 'var(--ring-focus-error)',
+        'glow-success': 'var(--ring-focus-success)',
         brand: 'var(--shadow-brand)',
+      },
+      transitionDuration: {
+        fast: 'var(--duration-fast)',
+        base: 'var(--duration-base)',
+        slow: 'var(--duration-slow)',
+      },
+      transitionTimingFunction: {
+        'ease-out': 'var(--ease-out)',
+        'ease-in-out': 'var(--ease-in-out)',
+      },
+      borderColor: {
+        DEFAULT: 'var(--border)',
+        'strong': 'var(--border-strong)',
+        'focus': 'var(--border-focus)',
+        'error': 'var(--border-error)',
+        'success': 'var(--border-success)',
+        'warning': 'var(--border-warning)',
+      },
+      divideColor: {
+        DEFAULT: 'var(--border)',
+      },
+      opacity: {
+        'hover': 'var(--state-hover-opacity)',
+        'active': 'var(--state-active-opacity)',
+        'disabled': 'var(--state-disabled-opacity)',
       },
     },
   },

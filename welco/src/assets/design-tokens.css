@@ -1,37 +1,20 @@
-/* ==========================================================================
-   Welco — Clinical Precision Design Tokens
-   Tailored for enterprise B2B surgical instrument manufacturing & digital procurement.
-   Single source of truth for color, type, space, radius, elevation, motion.
-   Load this file BEFORE components.css and tokens.css.
 
-   Naming:
-     --color-*     raw palette
-     --bg / --fg / --border / --brand ...   semantic tokens (preferred)
-   ========================================================================== */
-
-/* --------------------------------------------------------------------------
-   1. Typography Imports (Plus Jakarta Sans, Inter, JetBrains Mono)
-   -------------------------------------------------------------------------- */
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap");
 
 :root {
-  /* ------------------------------------------------------------------
-     2. Raw palette — Clinical Precision System
-     ------------------------------------------------------------------ */
 
-  /* Brand — Deep Medical Navy (#0F3D56) & Steel Teal (#147D92) */
   --color-brand-50:  #EDF4FF;
   --color-brand-100: #E3EFFF;
   --color-brand-200: #C8E6FF;
   --color-brand-300: #A3CBEA;
   --color-brand-400: #80A8C5;
-  --color-brand-500: #147D92;  /* Steel Teal interactive */
-  --color-brand-600: #0F3D56;  /* Deep Medical Navy (base primary brand) */
+  --color-brand-500: #147D92;  
+  --color-brand-600: #0F3D56;  
   --color-brand-700: #0C3145;
   --color-brand-800: #082434;
-  --color-brand-900: #001D32;  /* Deep slate ink */
+  --color-brand-900: #001D32;  
 
-  /* Neutrals — Clinical slate canvas, sterile white, precision borders */
+
   --color-neutral-0:   #FFFFFF;  /* Sterile clean white */
   --color-neutral-25:  #FCFDFE;
   --color-neutral-50:  #F7F9FB;  /* Clinical canvas base */
@@ -61,19 +44,50 @@
   --color-violet-500: #147D92;
   --color-violet-100: #EDF4FF;
 
-  /* Regulatory & Status */
-  --color-success-500: #198754;  /* Verified ISO/CE compliance */
-  --color-success-600: #157347;
+  /* Regulatory & Status — Enhanced Contrast (WCAG AA/AAA) */
+  --color-success-50:  #F0FDF4;
   --color-success-100: #DCFCE7;
-  --color-warning-500: #F59E0B;  /* Regulatory Amber / lot-tracing alert */
-  --color-warning-600: #E67E22;
+  --color-success-200: #BBF7D0;
+  --color-success-300: #86EFAC;
+  --color-success-400: #4ADE80;
+  --color-success-500: #16A34A;  /* Verified ISO/CE compliance */
+  --color-success-600: #15803D;
+  --color-success-700: #166534;
+  --color-success-800: #166534;
+  --color-success-900: #0D2818;
+
+  --color-warning-50:  #FFFBEB;
   --color-warning-100: #FEF3C7;
-  --color-danger-500:  #DC3545;  /* Out-of-spec tolerance / critical warning */
-  --color-danger-600:  #BA1A1A;
-  --color-danger-100:  #FFDAD6;
-  --color-info-500:    #147D92;  /* Steel Teal metric & info callout */
-  --color-info-600:    #0F3D56;
-  --color-info-100:    #EDF4FF;
+  --color-warning-200: #FDE68A;
+  --color-warning-300: #FCD34D;
+  --color-warning-400: #FBBF24;
+  --color-warning-500: #D97706;  /* Regulatory Amber / lot-tracing alert */
+  --color-warning-600: #B45309;
+  --color-warning-700: #92400E;
+  --color-warning-800: #78350F;
+  --color-warning-900: #451A03;
+
+  --color-danger-50:   #FEF2F2;
+  --color-danger-100:  #FEE2E2;
+  --color-danger-200:  #FECACA;
+  --color-danger-300:  #FCA5A5;
+  --color-danger-400:  #F87171;
+  --color-danger-500:  #EF4444;  /* Out-of-spec tolerance / critical warning */
+  --color-danger-600:  #DC2626;
+  --color-danger-700:  #B91C1C;
+  --color-danger-800:  #991B1B;
+  --color-danger-900:  #7F1D1D;
+
+  --color-info-50:     #F0F9FF;
+  --color-info-100:    #E0F2FE;
+  --color-info-200:    #BAE6FD;
+  --color-info-300:    #7DD3FC;
+  --color-info-400:    #38BDF8;
+  --color-info-500:    #0EA5E9;  /* Steel Teal metric & info callout */
+  --color-info-600:    #0284C7;
+  --color-info-700:    #0369A1;
+  --color-info-800:    #075985;
+  --color-info-900:    #0C4A6E;
 
   /* Data visualization — Clinical precision series */
   --chart-1: #0F3D56;  /* Deep medical navy — primary metric */
@@ -121,16 +135,33 @@
   --tertiary-hover:  #00413E;
   --tertiary-soft:   #D8EAFF;
 
-  /* Borders */
+  /* Borders — Hierarchy */
   --border:        #D9E2EC;  /* Border clinical hairline 1px */
-  --border-strong: #C2C7CD;  /* Outline variant */
-  --border-focus:  #147D92;  /* Surgical steel teal focus boundary */
+  --border-strong: #C2C7CD;  /* Outline variant / structural divide */
+  --border-focus:  #0EA5E9;  /* Precision Teal focus boundary */
+  --border-error:  #EF4444;  /* Error state border */
+  --border-success: #16A34A; /* Success state border */
+  --border-warning: #D97706; /* Warning state border */
 
-  /* Feedback */
-  --fg-success: #198754;
-  --fg-warning: #E67E22;
-  --fg-danger:  #DC3545;
-  --fg-info:    #147D92;
+  /* Feedback — Interactive States */
+  --fg-success: #16A34A;
+  --fg-success-hover: #15803D;
+  --fg-success-active: #166534;
+  --fg-warning: #D97706;
+  --fg-warning-hover: #B45309;
+  --fg-warning-active: #92400E;
+  --fg-danger:  #EF4444;
+  --fg-danger-hover: #DC2626;
+  --fg-danger-active: #B91C1C;
+  --fg-info:    #0EA5E9;
+  --fg-info-hover: #0284C7;
+  --fg-info-active: #0369A1;
+
+  /* Interactive States */
+  --state-hover-opacity: 0.08;
+  --state-active-opacity: 0.12;
+  --state-disabled-opacity: 0.48;
+  --state-focus-ring: 0 0 0 3px rgba(15, 61, 86, 0.1), 0 0 0 4px #147D92;
 
   /* ------------------------------------------------------------------
      4. Typography Scale & Families
@@ -193,14 +224,19 @@
   --radius-pill: 9999px; /* Round avatar & icon button only */
 
   /* ------------------------------------------------------------------
-     7. Elevation — Level 1 Static Hairline & Level 2 Ambient Hover
+     7. Elevation — Professional Shadows with Depth
      ------------------------------------------------------------------ */
   --shadow-xs: 0 1px 2px rgba(16, 42, 67, 0.04);
-  --shadow-sm: 0 1px 3px rgba(16, 42, 67, 0.05);
+  --shadow-sm: 0 1px 3px rgba(16, 42, 67, 0.05), 0 1px 2px rgba(16, 42, 67, 0.03);
   --shadow-md: 0 4px 14px -2px rgba(16, 42, 67, 0.06), 0 2px 6px -1px rgba(16, 42, 67, 0.04);
   --shadow-lg: 0 12px 28px -4px rgba(16, 42, 67, 0.12), 0 4px 12px -2px rgba(16, 42, 67, 0.06);
+  --shadow-xl: 0 20px 40px -4px rgba(16, 42, 67, 0.16), 0 8px 16px -2px rgba(16, 42, 67, 0.08);
+  --shadow-2xl: 0 25px 50px -12px rgba(16, 42, 67, 0.20);
   --shadow-brand: 0 6px 18px rgba(15, 61, 86, 0.18);
-  --ring-focus: 0 0 0 2px #FFFFFF, 0 0 0 4px #147D92;
+  --shadow-inner: inset 0 2px 4px rgba(16, 42, 67, 0.05);
+  --ring-focus: 0 0 0 3px rgba(15, 61, 86, 0.1), 0 0 0 4px #147D92;
+  --ring-focus-error: 0 0 0 3px rgba(239, 68, 68, 0.1), 0 0 0 4px #EF4444;
+  --ring-focus-success: 0 0 0 3px rgba(22, 163, 74, 0.1), 0 0 0 4px #16A34A;
 
   /* ------------------------------------------------------------------
      8. Layout

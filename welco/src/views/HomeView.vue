@@ -2119,12 +2119,14 @@ const navigateToOemFromModal = () => {
 .home .hero h1 em { color: var(--platform-lime) !important; background: none; }
 .home .hero p { max-width: 620px; color: rgba(247,255,254,.78); font-size: clamp(1rem, 1.4vw, 1.2rem); line-height: 1.7; }
 .home .hero__search { max-width: 610px; }
-.home .hero__search-bar { height: 58px; padding-inline-start: 1rem; border: 1px solid rgba(255,255,255,.28); background: rgba(255,255,255,.12); box-shadow: 0 15px 35px rgba(1,27,40,.18); }
-.home .hero__search-bar input { color: #f7fffe; caret-color: var(--platform-lime); }
-.home .hero__search-bar input::placeholder { color: rgba(255,255,255,.65); }
+.home .hero__search-bar { height: 58px; padding-inline-start: 1rem; border: 1px solid rgba(255,255,255,.28); background: rgba(255,255,255,.12); box-shadow: 0 15px 35px rgba(1,27,40,.18); transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease; }
+.home .hero__search-bar input { color: #f7fffe; caret-color: var(--platform-lime); transition: color 180ms ease; }
+.home .hero__search-bar input::placeholder { color: rgba(255,255,255,.65); opacity: 1; transition: color 180ms ease, opacity 180ms ease, transform 180ms ease; }
+.home .hero__search-bar:focus-within { background: #fff; border-color: var(--platform-lime); box-shadow: 0 0 0 4px rgba(214,243,106,.22), 0 18px 40px rgba(1,27,40,.24); }
 .home .hero__search-bar input:focus,
-.home .hero__search-bar input:focus-visible { color: #f7fffe; background: transparent; border-color: transparent; box-shadow: none; outline: 0; }
-.home .hero__search-bar input:focus::placeholder { color: rgba(255,255,255,.52); }
+.home .hero__search-bar input:focus-visible { color: #071923; caret-color: var(--platform-teal); background: transparent; border-color: transparent; box-shadow: none; outline: 0; }
+.home .hero__search-bar input:focus::placeholder { color: #52656b; opacity: .72; transform: translateX(6px); animation: hero-placeholder-pulse 1.35s ease-in-out infinite alternate; }
+@keyframes hero-placeholder-pulse { from { opacity: .42; letter-spacing: 0; } to { opacity: .86; letter-spacing: .018em; } }
 .home .hero__search-btn { height: 46px; border-radius: 999px; background: var(--platform-lime); color: var(--platform-ink); }
 .home .hero__ctas .btn-primary { background: white; color: var(--platform-ink); border-color: white; border-radius: 999px; padding-inline: 1.4rem; }
 .home .hero__ctas .btn-secondary { background: transparent; color: white; border-color: rgba(255,255,255,.45); border-radius: 999px; padding-inline: 1.4rem; }
@@ -2147,6 +2149,10 @@ const navigateToOemFromModal = () => {
 .home .about-content .section-title { max-width: 620px; }
 .home .about-media { border-radius: 1rem; overflow: hidden; box-shadow: var(--platform-shadow); background: white; }
 .home .about-media__img { mix-blend-mode: multiply; }
+
+@media (prefers-reduced-motion: reduce) {
+  .home .hero__search-bar input:focus::placeholder { animation: none; }
+}
 
 @media (max-width: 760px) {
   .home .hero, .home .hero__inner { min-height: auto; }

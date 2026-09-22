@@ -199,6 +199,32 @@ export type Messages = {
     mostSellingEyebrow: string
     mostSellingSubtitle: string
   }
+  mostSellingPage: {
+    eyebrow: string
+    title: string
+    subtitle: string
+    breadcrumb: string
+    badgeRank: string
+    allCategories: string
+    allMaterials: string
+    inStockOnly: string
+    searchPlaceholder: string
+    sortBy: string
+    sortRank: string
+    sortPriceAsc: string
+    sortPriceDesc: string
+    sortNameAsc: string
+    totalCount: string
+    noProducts: string
+    noProductsDesc: string
+    clearFilters: string
+    featureSteel: string
+    featureSteelDesc: string
+    featureDiscount: string
+    featureDiscountDesc: string
+    featureCompliance: string
+    featureComplianceDesc: string
+  }
   about: {
     title: string
     subtitle: string

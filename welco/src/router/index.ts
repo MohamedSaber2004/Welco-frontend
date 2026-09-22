@@ -104,6 +104,12 @@ const router = createRouter({
       meta: { titleKey: 'marketplace.title' },
     },
     {
+      path: '/most-selling',
+      name: 'most-selling-products',
+      component: () => import('../views/catalog/MostSellingProductsView.vue'),
+      meta: { titleKey: 'mostSellingPage.title' },
+    },
+    {
       path: '/marketplace/product/:id',
       name: 'marketplace-product',
       component: () => import('../views/marketplace/ProductDetailView.vue'),

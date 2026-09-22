@@ -276,7 +276,7 @@ const navigateToOemFromModal = () => {
             <div class="mono section__eyebrow">{{ t('home.mostSellingEyebrow') }}</div>
             <h2 id="most-selling-heading" class="section-title">{{ t('home.mostSellingTitle') }}</h2>
           </div>
-          <router-link to="/marketplace" class="btn btn-ghost btn-sm view-all-btn">
+          <router-link to="/most-selling" class="btn btn-ghost btn-sm view-all-btn">
             <span>{{ t('common.viewAll') }}</span>
             <span class="icon--directional">→</span>
           </router-link>

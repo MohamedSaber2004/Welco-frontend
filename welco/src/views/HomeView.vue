@@ -376,7 +376,6 @@ const navigateToOemFromModal = () => {
               <span class="mono cat-explorer__eyebrow">{{ t('home.browseClinicalSpecialty') }}</span>
               <h3 class="cat-explorer__heading">{{ t('provider.providersInCategory') }}</h3>
             </div>
-            <span class="cat-explorer__step mono">01 <span aria-hidden="true">/</span> {{ cats.length.toString().padStart(2, '0') }}</span>
           </div>
           <div class="cat-explorer__pills" role="tablist" :aria-label="t('marketplace.categoriesTitle')">
               <button
@@ -1346,7 +1345,10 @@ const navigateToOemFromModal = () => {
   background: rgba(255,255,255,.1);
   box-shadow: 0 9px 22px rgba(2,25,39,.12);
 }
-.cat-provider:hover { border-color: var(--platform-lime); background: rgba(255,255,255,.16); box-shadow: 0 14px 28px rgba(2,25,39,.2); transform: translateY(-3px); }
+.cat-provider:hover { border-color: var(--platform-lime); background: linear-gradient(145deg, rgba(255,255,255,.2), rgba(214,243,106,.09)); box-shadow: 0 18px 34px rgba(2,25,39,.28), inset 0 1px 0 rgba(255,255,255,.16); transform: translateY(-5px); }
+.cat-provider:hover .cat-provider__img { border-color: rgba(214,243,106,.72); transform: scale(1.035); }
+.cat-provider:hover .cat-provider__cta { letter-spacing: .02em; }
+.cat-provider__img, .cat-provider__cta { transition: border-color 180ms ease, transform 180ms ease, letter-spacing 180ms ease; }
 .cat-provider:focus-visible { outline: 3px solid var(--platform-lime); outline-offset: 3px; }
 .cat-provider__img { height: 82px; min-height: 82px; border: 1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.94); }
 .cat-provider__name { color: #f7fffe; }

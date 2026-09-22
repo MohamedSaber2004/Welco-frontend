@@ -616,9 +616,9 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  background: var(--wl-surface-soft);
-  border: 1px solid var(--wl-border);
-  color: var(--wl-ink-strong);
+  background: var(--wl-primary);
+  border: 1px solid var(--wl-primary);
+  color: #ffffff !important;
   font-size: 11.5px;
   font-weight: 600;
   padding: 0.35rem 0.65rem;
@@ -627,10 +627,15 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
   transition: all 0.15s ease;
 }
 
+.add-quote-btn,
+.add-quote-btn * {
+  color: #ffffff !important;
+}
+
 .add-quote-btn:hover {
-  background: var(--wl-primary);
-  border-color: var(--wl-primary);
-  color: var(--wl-ink-strong);
+  background: var(--wl-primary-hover);
+  border-color: var(--wl-primary-hover);
+  color: #ffffff !important;
 }
 
 /* Category fallback */

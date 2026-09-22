@@ -326,6 +326,38 @@ export class ApiMarketplaceRepository implements MarketplaceRepository {
     }
   }
 
+  async getMostSellingProducts(limit: number = 8): Promise<ProductDto[]> {
+    try {
+      const raw = await this.http.get<unknown>(`${MARKETPLACE_ROUTES.mostSelling}?limit=${limit}`, { showFeedback: false })
+      if (Array.isArray(raw)) return (raw as ProductDto[]).map(normalizeProduct)
+      if (raw && typeof raw === 'object') {
+        const obj = raw as Record<string, unknown>
+        if (Array.isArray(obj.data)) return (obj.data as ProductDto[]).map(normalizeProduct)
+        if (Array.isArray(obj.Data)) return (obj.Data as ProductDto[]).map(normalizeProduct)
+        const paginated = toPaginated<ProductDto>(raw)
+        if (paginated) return paginated.data.map(normalizeProduct)
+      }
+      return []
+    } catch (e) {
+      if (e instanceof ApiError && (e.status === 404 || e.status === 401)) {
+        return []
+      }
+      // Fallback to topSelling route
+      try {
+        const rawFallback = await this.http.get<unknown>(`${MARKETPLACE_ROUTES.topSelling}?limit=${limit}`, { showFeedback: false })
+        if (Array.isArray(rawFallback)) return (rawFallback as ProductDto[]).map(normalizeProduct)
+        if (rawFallback && typeof rawFallback === 'object') {
+          const obj = rawFallback as Record<string, unknown>
+          if (Array.isArray(obj.data)) return (obj.data as ProductDto[]).map(normalizeProduct)
+          if (Array.isArray(obj.Data)) return (obj.Data as ProductDto[]).map(normalizeProduct)
+        }
+      } catch {
+        // quiet fallback
+      }
+      return []
+    }
+  }
+
   async createProduct(payload: CreateProductPayload): Promise<ProductDto> {
     const raw = await this.http.post<ProductDto>(MARKETPLACE_ROUTES.products, payload)
     return normalizeProduct(raw)

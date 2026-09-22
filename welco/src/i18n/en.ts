@@ -197,6 +197,9 @@ export const en: Messages = {
     ourProvidersEyebrow: 'VERIFIED HEALTHCARE NETWORK',
     ourProvidersSubtitle: 'Accredited medical manufacturers, hospital networks, and authorized surgical distributors.',
     verifiedSupplier: 'Verified Provider',
+    mostSellingTitle: 'Most Selling Products',
+    mostSellingEyebrow: 'BESTSELLERS · SURGICAL SUITE DEMAND',
+    mostSellingSubtitle: 'High-demand precision instruments trusted daily by operating theatres worldwide.',
   },
   about: {
     title: 'About Welco Surgical',

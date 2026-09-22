@@ -1,3 +1,74 @@
-api/v1/carts/cd7f1e9a-bc69-475a-bda6-098c37254af4/items:1  Failed to load resource: the server responded with a status of 404 (Not Found)
+[plugin:vite:css] [postcss] ENOENT: no such file or directory, open 'E:\Welco Frontend Site\Welco\Welco\globals.css'
+E:/Welco Frontend Site/Welco/welco/src/assets/main.css:undefined:null
+    at async open (node:internal/fs/promises:639:25)
+    at async Object.readFile (node:internal/fs/promises:1246:14)
+    at async Object.load (file:///E:/Welco%20Frontend%20Site/Welco/welco/node_modules/vite/dist/node/chunks/node.js:23169:17)
+    at async loadImportContent (file:///E:/Welco%20Frontend%20Site/Welco/welco/node_modules/vite/dist/node/chunks/postcss-import.js:390:19)
+    at async Promise.all (index 0)
+    at async resolveImportId (file:///E:/Welco%20Frontend%20Site/Welco/welco/node_modules/vite/dist/node/chunks/postcss-import.js:376:20)
+    at async parseStyles (file:///E:/Welco%20Frontend%20Site/Welco/welco/node_modules/vite/dist/node/chunks/postcss-import.js:328:4)
+    at async Object.Once (file:///E:/Welco%20Frontend%20Site/Welco/welco/node_modules/vite/dist/node/chunks/postcss-import.js:453:20)
+    at async LazyResult.runAsync (E:\Welco Frontend Site\Welco\welco\node_modules\postcss\lib\lazy-result.js:299:11)
+    at async runPostCSS (file:///E:/Welco%20Frontend%20Site/Welco/welco/node_modules/vite/dist/node/chunks/node.js:23223:19)
 
-that is calling although the opened is admin dashboard why that fix it although in admin dasbhoard where is the navbar of admin layout is not appeared ??????
+
+build error on vercel:
+01:19:20.521 Running build in Washington, D.C., USA (East) – iad1
+01:19:20.522 Build machine configuration: 2 cores, 8 GB
+01:19:20.652 Cloning github.com/MohamedSaber2004/Welco-frontend (Branch: master, Commit: 9ef6709)
+01:19:21.603 Cloning completed: 950.000ms
+01:19:21.708 Restored build cache from previous deployment (GKuPDeWDNhSYgYkBj2R7twAUgBcr)
+01:19:22.077 Running "vercel build"
+01:19:22.089 Vercel CLI 59.23.2
+01:19:22.694 Warning: Detected "engines": { "node": "^22.18.0 || >=24.12.0" } in your `package.json` that will automatically upgrade when a new major Node.js Version is released. Learn More: https://vercel.link/node-version
+01:19:22.699 Running "install" command: `npm install`...
+01:19:23.809 
+01:19:23.809 up to date, audited 381 packages in 984ms
+01:19:23.809 
+01:19:23.809 102 packages are looking for funding
+01:19:23.809   run `npm fund` for details
+01:19:23.810 
+01:19:23.810 found 0 vulnerabilities
+01:19:24.065 
+01:19:24.065 > welco@0.0.0 build
+01:19:24.065 > run-p type-check "build-only {@}" --
+01:19:24.065 
+01:19:24.275 
+01:19:24.276 > welco@0.0.0 type-check
+01:19:24.277 > vue-tsc --build
+01:19:24.277 
+01:19:24.279 
+01:19:24.279 > welco@0.0.0 build-only
+01:19:24.279 > vite build
+01:19:24.280 
+01:19:24.720 vite v8.2.2 building client environment for production...
+01:19:24.797 transforming...
+01:19:28.705 Unable to resolve `@import "./globals.css"` from /vercel/path0/welco/src/assets
+01:19:28.722 ✓ 327 modules transformed.
+01:19:28.723 ✗ Build failed in 4.00s
+01:19:28.727 error during build:
+01:19:28.727 Build failed with 1 error:
+01:19:28.727 
+01:19:28.727 [plugin vite:css] /vercel/path0/welco/src/assets/main.css:undefined:NaN
+01:19:28.727 Error: [postcss] ENOENT: no such file or directory, open './globals.css'
+01:19:28.727     at async open (node:internal/fs/promises:697:25)
+01:19:28.728     at async Object.readFile (node:internal/fs/promises:1348:14)
+01:19:28.728     at async Object.load (file:///vercel/path0/welco/node_modules/vite/dist/node/chunks/node.js:23169:17)
+01:19:28.728     at async loadImportContent (file:///vercel/path0/welco/node_modules/vite/dist/node/chunks/postcss-import.js:390:19)
+01:19:28.728     at async Promise.all (index 0)
+01:19:28.728     at async resolveImportId (file:///vercel/path0/welco/node_modules/vite/dist/node/chunks/postcss-import.js:376:20)
+01:19:28.728     at async parseStyles (file:///vercel/path0/welco/node_modules/vite/dist/node/chunks/postcss-import.js:328:4)
+01:19:28.728     at async Object.Once (file:///vercel/path0/welco/node_modules/vite/dist/node/chunks/postcss-import.js:453:20)
+01:19:28.728     at async LazyResult.runAsync (/vercel/path0/welco/node_modules/postcss/lib/lazy-result.js:299:11)
+01:19:28.728     at async runPostCSS (file:///vercel/path0/welco/node_modules/vite/dist/node/chunks/node.js:23223:19)
+01:19:28.728     at aggregateBindingErrorsIntoJsError (file:///vercel/path0/welco/node_modules/rolldown/dist/shared/error-HDibX49O.mjs:48:18)
+01:19:28.728     at unwrapBindingResult (file:///vercel/path0/welco/node_modules/rolldown/dist/shared/error-HDibX49O.mjs:18:128)
+01:19:28.728     at #build (file:///vercel/path0/welco/node_modules/rolldown/dist/shared/rolldown-C9Hfg50O.mjs:133:34)
+01:19:28.728     at async buildEnvironment (file:///vercel/path0/welco/node_modules/vite/dist/node/chunks/node.js:33821:66)
+01:19:28.729     at async Object.build (file:///vercel/path0/welco/node_modules/vite/dist/node/chunks/node.js:34242:19)
+01:19:28.729     at async Object.buildApp (file:///vercel/path0/welco/node_modules/vite/dist/node/chunks/node.js:34239:153)
+01:19:28.729     at async CAC.<anonymous> (file:///vercel/path0/welco/node_modules/vite/dist/node/cli.js:776:3) {
+01:19:28.729   errors: [Getter/Setter]
+01:19:28.729 }
+01:19:28.841 ERROR: "build-only" exited with 1.
+01:19:28.859 Error: Command "npm run build" exited with 1

@@ -198,6 +198,9 @@ export const ar: Messages = {
     ourProvidersEyebrow: 'شبكة الرعاية الصحية المعتمدة',
     ourProvidersSubtitle: 'مصنّعو أجهزة طبية معتمدون، شبكات مستشفيات رائدة، وموزعون جراحيون مرخصون.',
     verifiedSupplier: 'مزود معتمد',
+    mostSellingTitle: 'المنتجات الأكثر مبيعاً',
+    mostSellingEyebrow: 'الأكثر طلباً · جراحة دقيقة معتمدة',
+    mostSellingSubtitle: 'أدوات جراحية دقيقة وعالية الطلب تحظى بثقة غرف العمليات والمستشفيات حول العالم.',
   },
   about: {
     title: 'عن ويلكو للأدوات الجراحية',

@@ -60,6 +60,8 @@ export const MARKETPLACE_ROUTES = {
   myProducts: '/api/v1/products/mine',
   productById: (id: string) => `/api/v1/products/${id}`,
   featured: '/api/v1/products',
+  mostSelling: '/api/v1/products/most-selling',
+  topSelling: '/api/v1/products/top-selling',
   categories: '/api/v1/categories',
   categoryById: (id: string) => `/api/v1/categories/${id}`,
   categoryProducts: (id: string) => `/api/v1/categories/${id}/products`,

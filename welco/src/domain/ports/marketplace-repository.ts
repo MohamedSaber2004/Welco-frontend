@@ -49,5 +49,6 @@ export interface MarketplaceRepository {
   deleteCategory(id: string): Promise<void>
 
   getFeaturedProducts(): Promise<ProductDto[]>
+  getMostSellingProducts(limit?: number): Promise<ProductDto[]>
   getCurrencies(): Promise<CurrencyDto[]>
 }

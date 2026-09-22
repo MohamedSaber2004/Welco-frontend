@@ -1129,23 +1129,36 @@ const filteredSidebarCategories = computed(() => {
 .card-action-btn--quote {
   background: var(--wl-primary);
   border: 1px solid var(--wl-primary);
-  color: var(--wl-ink-strong);
+  color: #ffffff !important;
   box-shadow: var(--shadow-card);
+}
+
+.card-action-btn--quote,
+.card-action-btn--quote * {
+  color: #ffffff !important;
 }
 
 .card-action-btn--quote:hover:not(:disabled) {
   background: var(--wl-primary-hover);
+  border-color: var(--wl-primary-hover);
+  color: #ffffff !important;
   transform: translateY(-0.5px);
   box-shadow: var(--shadow-hover);
 }
 
 .card-action-btn--quote:active:not(:disabled) {
+  color: #ffffff !important;
   transform: translateY(0);
+}
+
+.card-action-btn--quote:focus-visible {
+  color: #ffffff !important;
 }
 
 .card-action-btn--quote:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+  color: #ffffff !important;
 }
 
 .catalog-wishlist-btn {

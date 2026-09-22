@@ -18,6 +18,7 @@ export class MarketplaceService {
 
   products = ref<ProductDto[]>([])
   featured = ref<ProductDto[]>([])
+  mostSelling = ref<ProductDto[]>([])
   categories = ref<CategoryDto[]>([])
   currencies = ref<CurrencyDto[]>([])
   loading = ref(false)
@@ -61,6 +62,10 @@ export class MarketplaceService {
 
   async loadFeatured() {
     this.featured.value = await this.repo.getFeaturedProducts()
+  }
+
+  async loadMostSelling(limit: number = 8) {
+    this.mostSelling.value = await this.repo.getMostSellingProducts(limit)
   }
 
   async getProduct(id: string) {

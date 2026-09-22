@@ -195,6 +195,9 @@ export type Messages = {
     ourProvidersEyebrow: string
     ourProvidersSubtitle: string
     verifiedSupplier: string
+    mostSellingTitle: string
+    mostSellingEyebrow: string
+    mostSellingSubtitle: string
   }
   about: {
     title: string

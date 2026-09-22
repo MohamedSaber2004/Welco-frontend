@@ -14,8 +14,10 @@ import BaseModal from '../components/ui/BaseModal.vue'
 import BaseButton from '../components/ui/BaseButton.vue'
 import AppImage from '../components/ui/AppImage.vue'
 import { formatPrice } from '../utils/format'
+import { useCart } from '../composables/useCart'
 
 const router = useRouter()
+const { add: addToCart } = useCart()
 const heroSearch = ref('')
 const goSearch = () => {
   void router.push({ name: 'marketplace', query: heroSearch.value ? { search: heroSearch.value } : {} })
@@ -26,7 +28,18 @@ const certifications = ref<CertificationDto[]>([])
 const landingPages = ref<LandingPageDto[]>([])
 const aboutPage = ref<LandingPageDto | null>(null)
 const providers = ref<CompanyDto[]>([])
+const mostSellingProducts = ref<ProductDto[]>([])
+const mostSellingLoading = ref(true)
 const loading = ref(true)
+
+const handleAddToQuote = (id: string) => {
+  const p = mostSellingProducts.value.find((x) => x.id === id)
+  if (!p) return
+  addToCart(p, 1)
+  toastService.success(
+    t('catalog.quoteSuccess', { product: localized(p.nameEn, p.nameAr) }),
+  )
+}
 
 /* ── Category → providers → products, served by backend endpoints ── */
 const expandedProviderId = ref<string | null>(null)
@@ -144,6 +157,17 @@ onMounted(async () => {
         .catch(() => {
           providers.value = []
         }),
+      services.marketplaceRepository
+        .getMostSellingProducts(8)
+        .then((items) => {
+          mostSellingProducts.value = items || []
+        })
+        .catch(() => {
+          mostSellingProducts.value = []
+        })
+        .finally(() => {
+          mostSellingLoading.value = false
+        }),
     ])
     if (svc.categories.value.length) cats.value = svc.categories.value.slice(0, 8)
     certifications.value = services.certificationService.certifications.value
@@ -244,7 +268,67 @@ const navigateToOemFromModal = () => {
       </div>
     </header>
 
-<!-- Our Providers Section -->
+    <!-- Most Products Selling Section (First section after hero) -->
+    <section class="section section--most-selling" aria-labelledby="most-selling-heading">
+      <div class="section__inner">
+        <div class="section-head">
+          <div>
+            <div class="mono section__eyebrow">{{ t('home.mostSellingEyebrow') }}</div>
+            <h2 id="most-selling-heading" class="section-title">{{ t('home.mostSellingTitle') }}</h2>
+          </div>
+          <router-link to="/marketplace" class="btn btn-ghost btn-sm view-all-btn">
+            <span>{{ t('common.viewAll') }}</span>
+            <span class="icon--directional">→</span>
+          </router-link>
+        </div>
+        <p class="section-desc">{{ t('home.mostSellingSubtitle') }}</p>
+
+        <DataState
+          :loading="mostSellingLoading && !mostSellingProducts.length"
+          :empty="!mostSellingProducts.length && !mostSellingLoading"
+          skeleton-type="product-card"
+          :skeleton-count="4"
+          min-height="250px"
+        >
+          <div class="product-grid">
+            <article
+              v-for="p in mostSellingProducts"
+              :key="p.id"
+              class="product-card"
+              @click="router.push({ name: 'marketplace-product', params: { id: p.id } })"
+            >
+              <div class="product-card__media">
+                <AppImage
+                  :src="p.imageName"
+                  placeholder-type="product"
+                  :alt="localized(p.nameEn, p.nameAr)"
+                  fit="contain"
+                  class="product-card__img"
+                />
+                <span v-if="p.isNew" class="mono product-card__badge">{{ t('home.newBadge') }}</span>
+                <span v-if="p.stock > 0" class="mono product-card__stock product-card__stock--in">{{ t('catalog.inStock') }}</span>
+                <span v-else class="mono product-card__stock product-card__stock--out">{{ t('catalog.madeToOrder') }}</span>
+              </div>
+              <div class="product-card__body">
+                <div class="mono product-card__category" dir="auto">{{ localized(p.categoryNameEn, p.categoryNameAr) }}</div>
+                <h3 class="product-card__title" dir="auto">{{ localized(p.nameEn, p.nameAr) }}</h3>
+                <div class="mono product-card__meta-alt" dir="auto">{{ locale === 'en' ? p.nameAr : p.nameEn }}</div>
+                <div class="mono product-card__meta">{{ p.companyName || p.manufacturerEn || 'Welco Surgical' }} · CE Certified</div>
+                <div class="product-card__foot">
+                  <strong class="mono-num">{{ formatPrice(p.price, locale) }} {{ p.currencySymbol || '$' }}</strong>
+                  <button class="btn btn-primary btn-sm btn-quote-white" type="button" @click.stop="handleAddToQuote(p.id)">
+                    <span class="material-symbols-outlined text-[15px]">add_shopping_cart</span>
+                    <span>{{ t('marketplace.addToQuote') }}</span>
+                  </button>
+                </div>
+              </div>
+            </article>
+          </div>
+        </DataState>
+      </div>
+    </section>
+
+    <!-- Our Providers Section -->
 <section class="section section--providers" aria-labelledby="providers-heading">
   <div class="section__inner">
     <div class="section-head">
@@ -1943,6 +2027,29 @@ const navigateToOemFromModal = () => {
     align-items: stretch;
     gap: var(--space-2);
   }
+}
+
+.section--most-selling {
+  border-bottom: 1px solid var(--wl-border);
+  background-color: var(--wl-surface-subtle);
+}
+
+.btn-quote-white {
+  background: var(--wl-primary) !important;
+  border-color: var(--wl-primary) !important;
+  color: #ffffff !important;
+  gap: 0.35rem;
+}
+
+.btn-quote-white,
+.btn-quote-white * {
+  color: #ffffff !important;
+}
+
+.btn-quote-white:hover {
+  background: var(--wl-primary-hover) !important;
+  border-color: var(--wl-primary-hover) !important;
+  color: #ffffff !important;
 }
 
 @media (max-width: 1024px) {

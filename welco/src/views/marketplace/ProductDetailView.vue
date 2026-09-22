@@ -499,14 +499,13 @@ const resolvedDescription = computed(() => {
           </div>
 
           <!-- Visual Stage Footer: Technical Spec Bar -->
-          <div class="pdp-visual-foot mono">
+          <div v-if="product.material || product.lengthCm || product.isActive" class="pdp-visual-foot mono">
             <div class="visual-foot__left">
-              <span class="foot-material">{{ product.material || 'German Stainless Steel' }}</span>
-              <span v-if="product.lengthCm" class="foot-length"> · {{ product.lengthCm }} cm</span>
-              <span class="foot-finish"> · Satin Matte</span>
+              <span v-if="product.material" class="foot-material">{{ product.material }}</span>
+              <span v-if="product.lengthCm" class="foot-length"><template v-if="product.material"> · </template>{{ product.lengthCm }} cm</span>
             </div>
-            <div class="visual-foot__right">
-              <span class="foot-cert">Autoclavable 134°C · ISO 13485</span>
+            <div v-if="product.isActive" class="visual-foot__right">
+              <span class="foot-cert">{{ t('catalog.ceMarked') }}</span>
             </div>
           </div>
         </div>
@@ -533,34 +532,36 @@ const resolvedDescription = computed(() => {
           </div>
 
           <!-- Regulatory & Manufacturer Subhead -->
-          <div class="pdp-subhead mono">
-            <span>{{ product.manufacturerEn || 'Welco Precision Surgical' }}</span>
-            <span class="dot-sep">·</span>
-            <span class="pdp-compliance-tag">{{ product.isActive ? t('catalog.ceMarked') : 'CE Certified' }}</span>
-            <span class="dot-sep">·</span>
-            <span>Class I Medical Device</span>
+          <div v-if="product.manufacturerEn || product.manufacturerAr || product.companyName || product.isActive" class="pdp-subhead mono">
+            <span v-if="product.manufacturerEn || product.manufacturerAr || product.companyName">
+              {{ localized(product.manufacturerEn, product.manufacturerAr) || product.companyName }}
+            </span>
+            <template v-if="(product.manufacturerEn || product.manufacturerAr || product.companyName) && product.isActive">
+              <span class="dot-sep">·</span>
+            </template>
+            <span v-if="product.isActive" class="pdp-compliance-tag">{{ t('catalog.ceMarked') }}</span>
           </div>
 
           <!-- Key Technical Specs Strip -->
           <div class="pdp-specs-strip">
-            <div class="spec-chip">
-              <span class="spec-chip__k mono">Material</span>
-              <strong class="spec-chip__v">{{ product.material || 'German Stainless' }}</strong>
+            <div v-if="product.material" class="spec-chip">
+              <span class="spec-chip__k mono">{{ t('pdp.specMaterial') || 'Material' }}</span>
+              <strong class="spec-chip__v">{{ product.material }}</strong>
+            </div>
+            <div v-if="product.lengthCm" class="spec-chip">
+              <span class="spec-chip__k mono">{{ t('pdp.specLength') || 'Length' }}</span>
+              <strong class="spec-chip__v">{{ product.lengthCm }} cm</strong>
             </div>
             <div class="spec-chip">
-              <span class="spec-chip__k mono">Length</span>
-              <strong class="spec-chip__v">{{ product.lengthCm ? `${product.lengthCm} cm` : 'Standard' }}</strong>
-            </div>
-            <div class="spec-chip">
-              <span class="spec-chip__k mono">Inventory</span>
+              <span class="spec-chip__k mono">{{ locale === 'ar' ? 'المخزون' : 'Inventory' }}</span>
               <strong class="spec-chip__v">
                 {{ product.stock > 0 ? t('catalog.inStock') : t('catalog.madeToOrder') }}
                 <span v-if="product.stock > 0" class="mono text-muted"> ({{ product.stock }})</span>
               </strong>
             </div>
-            <div class="spec-chip">
-              <span class="spec-chip__k mono">Unit</span>
-              <strong class="spec-chip__v">{{ locale === 'ar' ? (product.unitAr || product.unit || 'قطعة') : (product.unit || 'pcs') }}</strong>
+            <div v-if="product.unit || product.unitAr" class="spec-chip">
+              <span class="spec-chip__k mono">{{ locale === 'ar' ? 'الوحدة' : 'Unit' }}</span>
+              <strong class="spec-chip__v">{{ locale === 'ar' ? (product.unitAr || product.unit) : (product.unit || product.unitAr) }}</strong>
             </div>
           </div>
 
@@ -586,15 +587,17 @@ const resolvedDescription = computed(() => {
 
             <!-- Commercial Terms Bar -->
             <div class="pdp-terms-bar mono">
-              <div class="terms-item">
+              <div v-if="product.minOrderQty" class="terms-item">
                 <span class="material-symbols-outlined text-[15px]">inventory_2</span>
-                <span>MOQ: {{ product.minOrderQty || 1 }} {{ locale === 'ar' ? (product.unitAr || product.unit || 'قطعة') : (product.unit || 'pcs') }}</span>
+                <span>MOQ: {{ product.minOrderQty }} {{ locale === 'ar' ? (product.unitAr || product.unit || 'قطعة') : (product.unit || 'pcs') }}</span>
               </div>
-              <span class="dot-sep">·</span>
-              <div class="terms-item">
-                <span class="material-symbols-outlined text-[15px]">verified</span>
-                <span>CE Class I MDR Compliant</span>
-              </div>
+              <template v-if="product.isActive">
+                <span v-if="product.minOrderQty" class="dot-sep">·</span>
+                <div class="terms-item">
+                  <span class="material-symbols-outlined text-[15px]">verified</span>
+                  <span>{{ t('catalog.ceMarked') }}</span>
+                </div>
+              </template>
             </div>
           </div>
 
@@ -722,45 +725,45 @@ const resolvedDescription = computed(() => {
 
           <!-- Tab Content: Specs -->
           <div v-if="activeTab === 'specs'" class="pdp-tab-content">
-            <div class="pdp-desc-box">
+            <div v-if="resolvedDescription" class="pdp-desc-box">
               <p class="desc-text" dir="auto">
-                {{ resolvedDescription || 'Premium surgical instrument manufactured from high-grade German stainless steel, meeting international standards for performance, longevity, and clinical precision.' }}
+                {{ resolvedDescription }}
               </p>
             </div>
 
-            <!-- Structured Specifications Table -->
+            <!-- Structured Specifications Table (from API data only) -->
             <dl class="pdp-spec-list">
-              <div class="spec-row">
+              <div v-if="product.sku" class="spec-row">
+                <dt class="mono">SKU</dt>
+                <dd class="mono">{{ product.sku }}</dd>
+              </div>
+              <div v-if="product.material" class="spec-row">
                 <dt class="mono">{{ t('pdp.specMaterial') }}</dt>
-                <dd>{{ product.material || 'AISI 420 / 410 German Surgical Stainless Steel' }}</dd>
+                <dd>{{ product.material }}</dd>
               </div>
-              <div class="spec-row">
+              <div v-if="product.lengthCm" class="spec-row">
                 <dt class="mono">{{ t('pdp.specLength') }}</dt>
-                <dd>{{ product.lengthCm ? `${product.lengthCm} cm (${(product.lengthCm / 2.54).toFixed(1)} in)` : 'Calibrated Standard' }}</dd>
+                <dd>{{ product.lengthCm }} cm ({{ (product.lengthCm / 2.54).toFixed(1) }} in)</dd>
               </div>
-              <div class="spec-row">
-                <dt class="mono">Surface Finish</dt>
-                <dd>Anti-Glare Satin Matte / Non-Reflective</dd>
-              </div>
-              <div class="spec-row">
-                <dt class="mono">{{ t('pdp.specSterilization') }}</dt>
-                <dd>Autoclavable up to 134°C (273°F) · EtO · Gamma Radiation</dd>
-              </div>
-              <div class="spec-row">
-                <dt class="mono">{{ t('pdp.specRegulatory') }}</dt>
-                <dd>CE Marked Class I (EU MDR 2017/745) · ISO 13485:2016 Certified</dd>
-              </div>
-              <div class="spec-row">
+              <div v-if="product.unit || product.unitAr" class="spec-row">
                 <dt class="mono">{{ t('pdp.specPackaging') }}</dt>
-                <dd>1 {{ product.unit || 'pcs' }} per sterile protective peel pouch · MOQ: {{ product.minOrderQty || 1 }}</dd>
+                <dd>{{ locale === 'ar' ? (product.unitAr || product.unit) : (product.unit || product.unitAr) }} · MOQ: {{ product.minOrderQty || 1 }}</dd>
               </div>
-              <div class="spec-row">
-                <dt class="mono">Manufacturer</dt>
-                <dd>{{ product.manufacturerEn || 'Welco Surgical Instruments Ltd.' }}</dd>
+              <div v-if="product.categoryNameEn || product.categoryNameAr" class="spec-row">
+                <dt class="mono">{{ t('marketplace.categoriesTitle') }}</dt>
+                <dd>{{ localized(product.categoryNameEn, product.categoryNameAr) }}</dd>
+              </div>
+              <div v-if="product.manufacturerEn || product.manufacturerAr || product.companyName" class="spec-row">
+                <dt class="mono">{{ locale === 'ar' ? 'الجهة المصنعة' : 'Manufacturer' }}</dt>
+                <dd>{{ localized(product.manufacturerEn, product.manufacturerAr) || product.companyName }}</dd>
+              </div>
+              <div v-if="product.isActive" class="spec-row">
+                <dt class="mono">{{ t('pdp.specRegulatory') }}</dt>
+                <dd>{{ t('catalog.ceMarked') }}</dd>
               </div>
             </dl>
 
-            <!-- Custom specifications string if provided -->
+            <!-- Custom specifications string if provided from API -->
             <div v-if="product.specifications" class="pdp-spec-notes mono">
               <div class="spec-notes-title">Additional Technical Notes:</div>
               <div class="spec-notes-body">{{ product.specifications }}</div>
@@ -911,8 +914,8 @@ const resolvedDescription = computed(() => {
               <span class="rel-cat mono">{{ localized(p.categoryNameEn, p.categoryNameAr) }}</span>
               <h4 class="rel-name" dir="auto">{{ localized(p.nameEn, p.nameAr) }}</h4>
               <div class="rel-name-alt mono" dir="auto">{{ locale === 'ar' ? p.nameEn : p.nameAr }}</div>
-              <div class="rel-specs-mono mono">
-                {{ p.lengthCm ? `${p.lengthCm} cm · ` : '' }}{{ p.material || t('catalog.materialStainless') }}
+              <div v-if="p.lengthCm || p.material" class="rel-specs-mono mono">
+                {{ p.lengthCm ? `${p.lengthCm} cm` : '' }}{{ p.lengthCm && p.material ? ' · ' : '' }}{{ p.material || '' }}
               </div>
               <div class="rel-foot">
                 <strong class="mono rel-price">
@@ -1014,8 +1017,8 @@ const resolvedDescription = computed(() => {
             <span v-if="product.material"> · {{ product.material }}</span>
             <span v-if="product.lengthCm"> · {{ product.lengthCm }} cm</span>
           </div>
-          <div class="inspect-foot__badge">
-            <span>CE CLASS I · ISO 13485 CERTIFIED</span>
+          <div v-if="product.isActive" class="inspect-foot__badge">
+            <span>{{ t('catalog.ceMarked') }}</span>
           </div>
         </div>
       </div>

@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { t } from '../../i18n'
+import { t, locale } from '../../i18n'
 import { authService } from '../../di/container'
 import { contentService } from '../../di/container'
 import { toastService } from '../../infrastructure/feedback/toast.service'
 import SkeletonLoader from '../../components/ui/SkeletonLoader.vue'
 import DataState from '../../components/ui/DataState.vue'
+import BaseModal from '../../components/ui/BaseModal.vue'
 import { resolveFileUrl, isStoredFileName } from '../../utils/file-url'
 import BackButton from '../../components/ui/BackButton.vue'
+import type { HelpArticleDto } from '../../domain/models/content'
 
 const router = useRouter()
 const search = ref('')
@@ -23,6 +25,33 @@ const openFaq = ref<string | null>(null)
 const isAuthed = computed(() => authService.isAuthenticated)
 const isBuyer = computed(() => authService.isOrganizationUser.value)
 const isSeller = computed(() => authService.isAdmin.value || authService.isSales.value)
+
+const selectedArticle = ref<HelpArticleDto | null>(null)
+const articleModalOpen = ref(false)
+const articleFeedbackGiven = ref(false)
+
+function openArticle(a: HelpArticleDto) {
+  selectedArticle.value = a
+  articleFeedbackGiven.value = false
+  articleModalOpen.value = true
+}
+
+function giveArticleFeedback(_helpful: 'yes' | 'no') {
+  articleFeedbackGiven.value = true
+  toastService.success(locale.value === 'ar' ? 'شكراً لمشاركتنا رأيك!' : 'Thank you for your feedback!')
+}
+
+const quickSubjects = [
+  'Order Status & Tracking',
+  'Technical Instrument Specifications',
+  'Price Quotation Inquiry',
+  'Returns & RMA Protocol',
+  'Custom OEM Instrumentation',
+]
+
+function setTicketSubject(subj: string) {
+  ticketSubject.value = subj
+}
 
 const ticketSubject = ref('')
 const ticketMessage = ref('')
@@ -76,7 +105,15 @@ const COLOR_PALETTE = ['#0F3D56', '#147D92', '#28A7A1', '#E67E22', '#198754', '#
 
 const visibleFaqs = computed(() => {
   const list = Array.isArray(faqs.value) ? faqs.value : []
-  return list.filter((f) => f && f.isActive !== false)
+  const q = search.value.trim().toLowerCase()
+  return list.filter((f) => {
+    if (!f || f.isActive === false) return false
+    if (!q) return true
+    return (
+      (f.question && f.question.toLowerCase().includes(q)) ||
+      (f.answer && f.answer.toLowerCase().includes(q))
+    )
+  })
 })
 
 const guideCards = computed(() => {
@@ -433,7 +470,15 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
           min-height="200px"
         >
           <div class="article-grid">
-            <article v-for="a in filteredArticles" :key="a.id" class="article-card">
+            <article
+              v-for="a in filteredArticles"
+              :key="a.id"
+              class="article-card article-card--interactive"
+              role="button"
+              tabindex="0"
+              @click="openArticle(a)"
+              @keydown.enter="openArticle(a)"
+            >
               <div class="article-card__head">
                 <span class="article-thumb" aria-hidden="true">
                   <img
@@ -453,6 +498,10 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
               </div>
               <h3 class="article-card__title">{{ a.title }}</h3>
               <p class="article-card__body">{{ a.body }}</p>
+              <div class="article-card__footer">
+                <span class="article-read-cta mono">{{ t('common.viewAll') || 'Read Protocol' }}</span>
+                <span class="material-symbols-outlined text-[15px] icon--directional">arrow_forward</span>
+              </div>
             </article>
           </div>
         </DataState>
@@ -655,6 +704,22 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
               </div>
 
               <form v-else class="ticket-form" @submit.prevent="submitTicket">
+                <div class="quick-subject-chips">
+                  <span class="quick-chips-label mono">Quick topics:</span>
+                  <div class="quick-chips-list">
+                    <button
+                      v-for="subj in quickSubjects"
+                      :key="subj"
+                      type="button"
+                      class="quick-subject-btn mono"
+                      :class="{ 'is-selected': ticketSubject === subj }"
+                      @click="setTicketSubject(subj)"
+                    >
+                      {{ subj }}
+                    </button>
+                  </div>
+                </div>
+
                 <div class="form-field">
                   <label class="form-label mono" for="ticket-subject">
                     <span>{{ t('help.subject') }}</span>
@@ -730,6 +795,53 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
         </div>
       </section>
     </template>
+
+    <!-- Article Reading Modal -->
+    <BaseModal
+      v-model="articleModalOpen"
+      :title="selectedArticle?.title || 'Help Article'"
+      max-width="680px"
+    >
+      <div v-if="selectedArticle" class="article-modal">
+        <div class="article-modal__meta mono">
+          <span class="article-modal__cat">{{ categoryName(selectedArticle.categoryId) }}</span>
+          <span class="dot-sep">·</span>
+          <span>{{ t('help.readTime', { minutes: 3 }) }}</span>
+        </div>
+
+        <h2 class="article-modal__title">{{ selectedArticle.title }}</h2>
+
+        <div class="article-modal__body">
+          <p
+            v-for="(para, idx) in selectedArticle.body.split('\n\n')"
+            :key="idx"
+            class="article-modal__para"
+          >
+            {{ para }}
+          </p>
+        </div>
+
+        <div class="article-modal__feedback">
+          <div v-if="articleFeedbackGiven" class="feedback-done mono">
+            <span class="material-symbols-outlined text-[18px]">check_circle</span>
+            <span>{{ locale === 'ar' ? 'شكراً لمشاركتنا رأيك!' : 'Thank you for your feedback!' }}</span>
+          </div>
+          <div v-else class="feedback-row">
+            <span class="mono">{{ locale === 'ar' ? 'هل كان هذا الدليل مفيداً؟' : 'Was this protocol helpful?' }}</span>
+            <div class="feedback-buttons">
+              <button type="button" class="btn btn-sm btn-ghost" @click="giveArticleFeedback('yes')">
+                <span class="material-symbols-outlined text-[16px]">thumb_up</span>
+                <span>{{ locale === 'ar' ? 'نعم' : 'Yes' }}</span>
+              </button>
+              <button type="button" class="btn btn-sm btn-ghost" @click="giveArticleFeedback('no')">
+                <span class="material-symbols-outlined text-[16px]">thumb_down</span>
+                <span>{{ locale === 'ar' ? 'لا' : 'No' }}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </BaseModal>
   </div>
 </template>
 
@@ -1389,6 +1501,164 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
   color: var(--wl-ink-soft);
   line-height: 1.55;
   margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.article-card--interactive {
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.article-card--interactive:hover {
+  border-color: var(--wl-primary, #0f3d56);
+  box-shadow: 0 8px 24px rgba(15, 61, 86, 0.08);
+  transform: translateY(-2px);
+}
+
+.article-card--interactive:hover .article-read-cta {
+  color: var(--wl-primary, #0f3d56);
+}
+
+.article-card__footer {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: auto;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--wl-border, #edf2f7);
+  color: var(--wl-muted, #64748b);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.article-card__footer .icon--directional {
+  transition: transform 0.2s ease;
+}
+
+.article-card--interactive:hover .article-card__footer .icon--directional {
+  transform: translateX(4px);
+}
+
+[dir="rtl"] .article-card--interactive:hover .article-card__footer .icon--directional {
+  transform: translateX(-4px);
+}
+
+/* Quick Topic Chips */
+.quick-subject-chips {
+  margin-bottom: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.quick-chips-label {
+  font-size: 0.75rem;
+  color: var(--wl-muted, #64748b);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.quick-chips-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.quick-subject-btn {
+  font-size: 0.75rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid var(--wl-border, #e2e8f0);
+  background: var(--wl-surface-soft, #f8fafc);
+  color: var(--wl-ink, #1e293b);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.quick-subject-btn:hover {
+  border-color: var(--wl-primary, #0f3d56);
+  background: #ffffff;
+  color: var(--wl-primary, #0f3d56);
+}
+
+.quick-subject-btn.is-selected {
+  border-color: var(--wl-primary, #0f3d56);
+  background: var(--wl-primary, #0f3d56);
+  color: #ffffff;
+  font-weight: 700;
+}
+
+/* Article Modal */
+.article-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0.5rem 0.25rem;
+}
+
+.article-modal__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--wl-muted, #64748b);
+}
+
+.article-modal__cat {
+  color: var(--wl-primary, #0f3d56);
+  font-weight: 700;
+}
+
+.article-modal__title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--wl-ink-strong, #0f172a);
+  line-height: 1.3;
+  margin: 0;
+}
+
+.article-modal__body {
+  font-size: 0.95rem;
+  color: var(--wl-ink-soft, #334155);
+  line-height: 1.7;
+  max-height: 55vh;
+  overflow-y: auto;
+  padding-inline-end: 0.5rem;
+}
+
+.article-modal__para {
+  margin: 0 0 1rem;
+}
+
+.article-modal__feedback {
+  padding-top: 1rem;
+  border-top: 1px solid var(--wl-border, #e2e8f0);
+  margin-top: 0.5rem;
+}
+
+.feedback-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.feedback-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.feedback-done {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--wl-primary, #0f3d56);
+  font-size: 0.85rem;
+  font-weight: 700;
 }
 
 /* FAQ Accordion */

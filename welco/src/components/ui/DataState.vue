@@ -183,13 +183,14 @@ const errorMessage = computed(() => props.errorMessage || 'Unable to load data. 
 /* ── Skeleton helpers ─────────────────────────────────── */
 const gridCount = computed(() => {
   const t = props.skeletonType
-  if (t === 'catalog-grid') return props.skeletonCount ?? 6
+  if (t === 'product-card') return props.skeletonCount ?? 4
+  if (t === 'catalog-grid') return props.skeletonCount ?? 4
   if (t === 'category-grid') return props.skeletonCount ?? 8
   if (t === 'stats-grid') return props.skeletonCount ?? 4
   if (t === 'location-grid') return props.skeletonCount ?? 3
   if (t === 'pills') return props.skeletonCount ?? 6
   if (t === 'provider-grid') return props.skeletonCount ?? 4
-  if (t === 'provider-cards') return props.skeletonCount ?? 6
+  if (t === 'provider-cards') return props.skeletonCount ?? 4
   if (t === 'cert-grid') return props.skeletonCount ?? 4
   if (t === 'help-grid') return props.skeletonCount ?? 6
   if (t === 'address-grid') return props.skeletonCount ?? 4
@@ -237,7 +238,7 @@ const delay = (i: number) => ({ animationDelay: `${-((i % 16) * 90)}ms` })
         </template>
         <template v-else-if="skeletonType === 'product-card' || skeletonType === 'catalog-grid'">
           <div class="sk-grid sk-grid--catalog" :style="{ gap: skeletonGap }">
-            <div v-for="i in (skeletonType === 'product-card' ? 1 : gridCount)" :key="i" class="sk-card" :style="delay(i)">
+            <div v-for="i in gridCount" :key="i" class="sk-card" :style="delay(i)">
               <div class="sk-card__media sk" :style="delay(i)">
                 <div class="sk-card__media-badges">
                   <div class="sk" style="width:68px;height:18px;border-radius:var(--radius-pill)" :style="delay(i+1)"></div>
@@ -1032,10 +1033,24 @@ const delay = (i: number) => ({ animationDelay: `${-((i % 16) * 90)}ms` })
   justify-items: stretch;
   gap: 1rem;
 }
-.sk-grid--catalog  { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+.sk-grid--catalog  { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .sk-grid--category { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
-.sk-grid--provider { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+.sk-grid--provider { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .sk-grid--prov-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+@media (max-width: 1024px) {
+  .sk-grid--catalog,
+  .sk-grid--provider {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .sk-grid--catalog,
+  .sk-grid--provider {
+    grid-template-columns: 1fr;
+  }
+}
 
 /* ticket cards mirror */
 .sk-tickets { display: flex; flex-direction: column; width: 100%; gap: 0.75rem; }

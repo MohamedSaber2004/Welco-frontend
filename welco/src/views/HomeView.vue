@@ -440,7 +440,7 @@ const navigateToOemFromModal = () => {
                 <AppImage
                   :src="c.imageName"
                   placeholder-type="category"
-                  :placeholder-text="localized(c.nameEn, c.nameAr)"
+                  :placeholder-text="''"
                   :alt="localized(c.nameEn, c.nameAr)"
                   class="cat-media__img"
                 />
@@ -505,7 +505,7 @@ const navigateToOemFromModal = () => {
                     <AppImage
                       :src="prov.imageName"
                       placeholder-type="company"
-                      :placeholder-text="prov.name"
+                      :placeholder-text="''"
                       :alt="prov.name"
                       fit="contain"
                       class="cat-provider__img"
@@ -529,7 +529,7 @@ const navigateToOemFromModal = () => {
       </div>
     </section>
     <!-- Audited Quality Standards Section -->
-    <section class="section section--soft" aria-labelledby="home-certs-heading">
+    <section class="section section--certs" aria-labelledby="home-certs-heading">
       <div class="section__inner">
         <div class="section-head">
           <div>
@@ -569,7 +569,7 @@ const navigateToOemFromModal = () => {
         </DataState>
       </div>
     </section>
-    <section class="section section--soft" aria-labelledby="about-heading">
+    <section class="section section--about" aria-labelledby="about-heading">
       <div class="section__inner about-grid">
         <div class="about-content">
           <div class="mono section__eyebrow">{{ t('home.aboutEyebrow') }}</div>
@@ -1521,9 +1521,25 @@ const navigateToOemFromModal = () => {
   border-radius: 10px;
   border: 1px solid #edf2f7;
   background: #f8fafc;
-  padding: 0.5rem;
+  padding: 0;
+  overflow: hidden;
   object-fit: contain;
   transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cat-provider__img:not(.is-placeholder) :deep(img) {
+  padding: 0.5rem;
+}
+.cat-provider__img :deep(.app-image-placeholder) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+.cat-provider__img :deep(.placeholder-icon-badge) {
+  margin: auto;
 }
 .cat-provider:hover .cat-provider__img {
   transform: scale(1.04);
@@ -2037,8 +2053,8 @@ const navigateToOemFromModal = () => {
 }
 
 .section--most-selling {
-  border-bottom: 1px solid var(--wl-border);
-  background-color: var(--wl-surface-subtle);
+  border-bottom: 1px solid var(--wl-border, #edf2f7);
+  background-color: #ffffff;
 }
 
 .btn-quote-white {
@@ -2455,8 +2471,79 @@ const navigateToOemFromModal = () => {
 .home .hero__logo-box::before { background: var(--platform-lime); height: 4px; }
 .home .hero__logo-box img { border-radius: 1rem; mix-blend-mode: screen; opacity: .94; }
 .home .section { padding-block: clamp(4rem, 8vw, 8rem); }
-.home .section--providers { background: #fff; border: 0; }
-.home .section--soft { background: var(--platform-mist); border: 0; }
+
+/* Alternating Section Background Mechanism:
+   1. Hero: Hero background (dark teal gradient)
+   2. Most Selling: Pure White (#ffffff)
+   3. Providers: Hero background (dark teal gradient)
+   4. Clinical Specialty: Pure White (#ffffff)
+   5. Certifications: Hero background (dark teal gradient)
+   6. About: Pure White (#ffffff)
+*/
+.home .section--most-selling {
+  background: #ffffff !important;
+  border-bottom: 1px solid #f1f5f9;
+}
+.home .section--most-selling .section-title {
+  color: var(--platform-ink);
+}
+.home .section--most-selling .section-desc {
+  color: var(--platform-ink-soft);
+}
+.home .section--most-selling .section__eyebrow {
+  color: var(--platform-teal) !important;
+}
+
+.home .section--providers {
+  background: linear-gradient(118deg, #062f45 0%, #0b6370 58%, #13969a 100%) !important;
+  border: 0;
+  color: white;
+}
+.home .section--providers .section-title {
+  color: #f7fffe !important;
+}
+.home .section--providers .section-desc {
+  color: rgba(247, 255, 254, 0.85) !important;
+}
+.home .section--providers .section__eyebrow {
+  color: var(--platform-lime) !important;
+}
+.home .section--providers .view-all-btn {
+  color: #f7fffe !important;
+  border-color: rgba(255, 255, 255, 0.28) !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+.home .section--providers .view-all-btn:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+}
+
+.home .section--certs {
+  background: linear-gradient(118deg, #062f45 0%, #0b6370 58%, #13969a 100%) !important;
+  border: 0;
+  color: white;
+}
+.home .section--certs .section-title {
+  color: #f7fffe !important;
+}
+.home .section--certs .section-desc {
+  color: rgba(247, 255, 254, 0.85) !important;
+}
+.home .section--certs .section__eyebrow {
+  color: var(--platform-lime) !important;
+}
+.home .section--certs .view-all-btn {
+  color: #f7fffe !important;
+  border-color: rgba(255, 255, 255, 0.28) !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+.home .section--certs .view-all-btn:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+}
+
+.home .section--about {
+  background: #ffffff !important;
+  border-top: 1px solid #f1f5f9;
+}
 .home .section-head { align-items: end; margin-bottom: 1rem; }
 .home .section__eyebrow { color: var(--platform-teal) !important; font-weight: 800; letter-spacing: .14em; }
 .home .section-title { max-width: 700px; color: var(--platform-ink); font-size: clamp(2rem, 4vw, 3.6rem); letter-spacing: -.055em; line-height: 1.04; }

@@ -409,12 +409,18 @@ const toggleLang = async () => {
   justify-content: center;
 }
 
-.admin-main {
+  .admin-main {
   flex: 1;
   min-width: 0;
   width: 100%;
+  max-width: 100%;
   box-sizing: border-box;
-}
+  overflow-x: clip;
+  }
+  .admin-main__inner { min-width: 0; max-width: 100%; overflow-x: clip; }
+  .admin-main__inner :deep(.page-shell) { padding-inline: max(1rem, env(safe-area-inset-left)); padding-inline-end: max(1rem, env(safe-area-inset-right)); }
+  .admin-main__inner :deep(.grid), .admin-main__inner :deep(.dashboard-grid) { min-width: 0; }
+  .admin-main__inner :deep(.table-wrap), .admin-main__inner :deep(.table-responsive) { max-width: 100%; overflow-x: auto; }
 
 .admin-main__inner {
   max-width: var(--wl-max-width-admin, 1560px);

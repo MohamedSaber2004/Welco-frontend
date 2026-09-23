@@ -74,9 +74,9 @@ const isAuthed = computed(() => authService.isAuthenticated)
 
 <style scoped>
 .footer {
-  background: var(--platform-ink);
-  color: rgba(247, 255, 254, .78);
-  border-top: 0;
+  background: radial-gradient(circle at 78% 24%, rgba(214, 243, 106, .26), transparent 22rem), linear-gradient(118deg, #062f45 0%, #0b6370 58%, #13969a 100%);
+  color: rgba(247, 255, 254, .85);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
   padding: clamp(3rem, 7vw, 6rem) var(--wl-gutter) 1.5rem;
   position: relative;
   padding-inline-start: max(var(--wl-gutter), env(safe-area-inset-left, 0px));
@@ -84,13 +84,7 @@ const isAuthed = computed(() => authService.isAuthenticated)
   padding-bottom: max(1.5rem, env(safe-area-inset-bottom, 0px));
 }
 .footer::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  inset-inline: 0;
-  height: 1px;
-  background: var(--border);
-  opacity: 1;
+  display: none;
 }
 .footer__inner {
   max-width: var(--wl-max-width);
@@ -119,14 +113,14 @@ const isAuthed = computed(() => authService.isAuthenticated)
   font-family: var(--wl-font-display);
   font-size: 1.15rem;
   font-weight: 800;
-  color: var(--wl-ink-strong);
+  color: #ffffff;
   letter-spacing: -0.015em;
 }
 
 .brand-desc {
   margin: 0.85rem 0 1.15rem;
   font-size: 13px;
-  color: var(--wl-ink-soft);
+  color: rgba(247, 255, 254, 0.85);
   line-height: 1.6;
   max-width: 320px;
 }
@@ -140,41 +134,42 @@ const isAuthed = computed(() => authService.isAuthenticated)
 .footer-badge {
   font-size: var(--text-2xs);
   font-weight: var(--weight-medium);
-  color: var(--brand);
-  background: var(--brand-soft);
-  border: 1px solid var(--brand-soft);
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.22);
   padding: 0.2rem 0.5rem;
   border-radius: var(--radius-xs);
 }
 
+.footer__col h4,
 .footer__title {
   font-family: var(--font-display);
   font-size: var(--text-xs);
   letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
-  color: var(--fg-heading);
+  color: var(--platform-lime, #d6f36a);
   margin-bottom: 0.95rem;
-  font-weight: var(--weight-semibold);
+  font-weight: 700;
 }
 
 .footer__link {
   display: block;
   font-size: 13.5px;
   padding: 0.35rem 0;
-  color: var(--wl-ink-soft);
+  color: rgba(247, 255, 254, 0.82);
   text-decoration: none;
   transition: color 0.15s ease, transform 0.15s ease;
 }
 
 .footer__link:hover {
-  color: var(--wl-primary);
+  color: var(--platform-lime, #d6f36a);
   transform: translateX(2px);
 }
 
 .footer__note {
   display: block;
   font-size: 10.5px;
-  color: var(--wl-muted);
+  color: rgba(247, 255, 254, 0.65);
   padding: 0.35rem 0;
   line-height: 1.5;
 }
@@ -183,13 +178,13 @@ const isAuthed = computed(() => authService.isAuthenticated)
 }
 @media (hover: none) {
   .footer__link:hover { transform: none; }
-  .footer__link:active { color: var(--wl-primary); }
+  .footer__link:active { color: var(--platform-lime, #d6f36a); }
 }
 
 .footer__bottom {
   max-width: var(--wl-max-width);
   margin: 2.5rem auto 0;
-  border-top: 1px solid var(--wl-border);
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
   padding-top: 1.25rem;
   display: flex;
   justify-content: space-between;
@@ -197,7 +192,7 @@ const isAuthed = computed(() => authService.isAuthenticated)
   gap: 1rem;
   flex-wrap: wrap;
   font-size: 11.5px;
-  color: var(--wl-muted);
+  color: rgba(247, 255, 254, 0.7);
 }
 
 .footer__bottom-left {
@@ -208,7 +203,7 @@ const isAuthed = computed(() => authService.isAuthenticated)
 
 .compliance-note {
   font-size: 10.5px;
-  color: var(--wl-muted-soft);
+  color: rgba(247, 255, 254, 0.6);
 }
 
 .telemetry-pill {
@@ -220,9 +215,9 @@ const isAuthed = computed(() => authService.isAuthenticated)
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--wl-success);
-  background: var(--wl-success-soft);
-  border: 1px solid rgba(25, 135, 84, 0.2);
+  color: #062f45;
+  background: var(--platform-lime, #d6f36a);
+  border: 1px solid rgba(214, 243, 106, 0.4);
   padding: 0.2rem 0.55rem;
   border-radius: var(--radius-xs, 3px);
 }
@@ -230,8 +225,8 @@ const isAuthed = computed(() => authService.isAuthenticated)
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: currentColor;
-  box-shadow: 0 0 0 2px var(--wl-success-soft);
+  background: #062f45;
+  box-shadow: 0 0 0 2px rgba(6, 47, 69, 0.2);
 }
 
 @media (max-width: 1024px) {

@@ -449,7 +449,7 @@ onUnmounted(_removeListeners)
         :value="staffMetrics.rfqTotal"
         to="/admin/sales"
         tone="amber"
-        :trend="staffMetrics.pendingRfqsCount > 0 ? `${staffMetrics.pendingRfqsCount} ${t('admin.trendPending')}` : t('admin.trendQuoted')"
+        icon-only
       >
         <template #icon><span class="material-symbols-outlined text-[18px]">request_quote</span></template>
       </StatCard>
@@ -459,7 +459,7 @@ onUnmounted(_removeListeners)
         :value="staffMetrics.orderTotal"
         to="/admin/orders"
         tone="indigo"
-        :trend="staffMetrics.pendingOrdersCount > 0 ? `${staffMetrics.pendingOrdersCount} ${t('admin.trendActive')}` : t('admin.trendFulfilled')"
+        icon-only
       >
         <template #icon><span class="material-symbols-outlined text-[18px]">local_shipping</span></template>
       </StatCard>
@@ -469,7 +469,7 @@ onUnmounted(_removeListeners)
         :value="staffMetrics.openTicketsCount"
         to="/admin/tickets"
         tone="amber"
-        :trend="staffMetrics.openTicketsCount > 0 ? `${staffMetrics.openTicketsCount} ${t('admin.trendOpen')}` : t('admin.trendAnswered')"
+        icon-only
       >
         <template #icon><span class="material-symbols-outlined text-[18px]">support_agent</span></template>
       </StatCard>
@@ -478,8 +478,8 @@ onUnmounted(_removeListeners)
         :label="t('admin.productsTitle')"
         :value="stats.products"
         to="/marketplace"
-        :trend="stats.products > 0 ? `${stats.products} ${t('admin.active')}` : undefined"
         tone="emerald"
+        icon-only
       >
         <template #icon><span class="material-symbols-outlined text-[18px]">inventory_2</span></template>
       </StatCard>
@@ -491,8 +491,8 @@ onUnmounted(_removeListeners)
         :label="t('admin.totalCountries')"
         :value="liveCounts.countries"
         to="/admin/countries"
-        :trend="t('admin.activeLineage')"
         tone="indigo"
+        icon-only
       >
         <template #icon><span class="material-symbols-outlined text-[18px]">public</span></template>
       </StatCard>
@@ -501,8 +501,8 @@ onUnmounted(_removeListeners)
         :label="t('admin.totalCities')"
         :value="liveCounts.cities"
         to="/admin/cities"
-        :trend="t('admin.distributionHubs')"
         tone="emerald"
+        icon-only
       >
         <template #icon><span class="material-symbols-outlined text-[18px]">location_city</span></template>
       </StatCard>
@@ -511,8 +511,8 @@ onUnmounted(_removeListeners)
         :label="t('admin.totalZones')"
         :value="liveCounts.zones"
         to="/admin/zones"
-        :trend="t('admin.deliveryDropPoints')"
         tone="slate"
+        icon-only
       >
         <template #icon><span class="material-symbols-outlined text-[18px]">my_location</span></template>
       </StatCard>
@@ -521,8 +521,8 @@ onUnmounted(_removeListeners)
         :label="t('admin.totalUsers')"
         :value="stats.users"
         to="/admin/users"
-        :trend="t('admin.platformAccounts')"
         tone="indigo"
+        icon-only
       >
         <template #icon><span class="material-symbols-outlined text-[18px]">group</span></template>
       </StatCard>
@@ -531,8 +531,8 @@ onUnmounted(_removeListeners)
         :label="t('admin.distributorApps')"
         :value="stats.pendingApps"
         to="/admin/companies"
-        :trend="stats.pendingApps > 0 ? `${stats.pendingApps} ${t('admin.trendPending')}` : t('admin.trendReviewed')"
         tone="amber"
+        icon-only
       >
         <template #icon><span class="material-symbols-outlined text-[18px]">apartment</span></template>
       </StatCard>
@@ -541,8 +541,8 @@ onUnmounted(_removeListeners)
         :label="t('admin.productsTitle')"
         :value="stats.products"
         to="/marketplace"
-        :trend="stats.products > 0 ? `${stats.products} ${t('admin.active')}` : undefined"
         tone="emerald"
+        icon-only
       >
         <template #icon><span class="material-symbols-outlined text-[18px]">inventory_2</span></template>
       </StatCard>

@@ -7,6 +7,7 @@ const props = withDefaults(
     value: string | number
     hint?: string
     to?: string
+    iconOnly?: boolean
     trend?: string
     trendUp?: boolean
     sparkline?: number[]
@@ -15,6 +16,7 @@ const props = withDefaults(
   {
     hint: undefined,
     to: undefined,
+    iconOnly: false,
     trend: undefined,
     trendUp: undefined,
     sparkline: undefined,
@@ -83,9 +85,18 @@ const strokeColor = computed(() => {
     :is="to ? 'router-link' : 'div'"
     :to="to ?? undefined"
     class="stat-card"
-    :class="[`stat-card--${tone}`, { 'is-interactive': Boolean(to) }]"
+    :class="[`stat-card--${tone}`, { 'is-interactive': Boolean(to), 'is-icon-only': iconOnly }]"
+    :aria-label="label"
   >
-    <div class="stat-card__header">
+    <div v-if="iconOnly" class="stat-card__icon-only" aria-hidden="true">
+      <div v-if="$slots.icon" class="stat-card__icon-wrap">
+        <slot name="icon" />
+      </div>
+      <div class="stat-card__value mono-num">{{ value }}</div>
+    </div>
+
+    <template v-else>
+      <div class="stat-card__header">
       <span class="stat-card__label mono">{{ label }}</span>
       <div class="stat-card__top-right">
         <span
@@ -126,6 +137,7 @@ const strokeColor = computed(() => {
         </svg>
       </div>
     </div>
+    </template>
   </component>
 </template>
 
@@ -150,6 +162,27 @@ const strokeColor = computed(() => {
 .stat-card.is-interactive:hover {
   border-color: var(--border-strong);
   box-shadow: var(--shadow-md);
+}
+
+.stat-card.is-icon-only {
+  align-items: center;
+  justify-content: center;
+  min-height: 88px;
+  padding: var(--space-4);
+}
+
+.stat-card__icon-only {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  direction: inherit;
+  width: 100%;
+}
+
+.stat-card.is-icon-only .stat-card__value {
+  font-size: var(--text-2xl);
+  line-height: var(--leading-tight);
 }
 
 .stat-card__header {

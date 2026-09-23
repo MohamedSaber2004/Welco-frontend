@@ -171,7 +171,7 @@ watch(isAuthed, (v) => {
         </router-link>
         <router-link v-if="!isSeller" to="/cart" class="icon-btn" :aria-label="t('nav.cart')" :title="t('nav.cart')">
           <span class="material-symbols-outlined" style="font-size:18px">shopping_bag</span>
-          <span v-if="cartCount > 0" class="icon-btn__badge">{{ cartCount > 9 ? '9+' : cartCount }}</span>
+          <span v-if="cartCount > 0" class="icon-btn__badge icon-btn__badge--cart">{{ cartCount > 9 ? '9+' : cartCount }}</span>
         </router-link>
 
         <button class="icon-btn lang-btn" :aria-label="locale === 'ar' ? 'English' : 'العربية'" :title="locale === 'ar' ? 'Switch to English' : 'التحويل إلى العربية'" @click="toggleLang">
@@ -498,6 +498,19 @@ watch(isAuthed, (v) => {
   place-items: center;
   border-radius: var(--radius-full);
   border: 2px solid #062f45;
+}
+.icon-btn__badge--cart {
+  top: -5px;
+  inset-inline-end: -5px;
+  min-width: 21px;
+  height: 21px;
+  padding: 0 5px;
+  background: var(--platform-lime, #d6f36a);
+  color: #062f45;
+  border-color: #062f45;
+  font-size: 11px;
+  font-weight: 800;
+  box-shadow: 0 2px 8px rgba(6, 47, 69, 0.28);
 }
 .btn {
   font-family: var(--wl-font-body);

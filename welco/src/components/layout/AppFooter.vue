@@ -74,9 +74,9 @@ const isAuthed = computed(() => authService.isAuthenticated)
 
 <style scoped>
 .footer {
-  background: radial-gradient(circle at 78% 24%, rgba(214, 243, 106, .26), transparent 22rem), linear-gradient(118deg, #062f45 0%, #0b6370 58%, #13969a 100%);
-  color: rgba(247, 255, 254, .85);
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  background: radial-gradient(circle at 78% 24%, rgba(214, 243, 106, .26), transparent 22rem), linear-gradient(118deg, #062f45 0%, #0b6370 58%, #13969a 100%) !important;
+  color: rgba(247, 255, 254, .85) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.12) !important;
   padding: clamp(3rem, 7vw, 6rem) var(--wl-gutter) 1.5rem;
   position: relative;
   padding-inline-start: max(var(--wl-gutter), env(safe-area-inset-left, 0px));

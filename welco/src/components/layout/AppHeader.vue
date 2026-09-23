@@ -298,10 +298,10 @@ watch(isAuthed, (v) => {
   position: sticky;
   top: 0;
   z-index: var(--z-sticky);
-  background: radial-gradient(circle at 85% 24%, rgba(214, 243, 106, 0.20), transparent 22rem), linear-gradient(118deg, #062f45 0%, #0b6370 58%, #13969a 100%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow: 0 8px 28px rgba(2, 25, 39, 0.25);
-  color: #ffffff;
+  background: radial-gradient(circle at 85% 24%, rgba(214, 243, 106, 0.20), transparent 22rem), linear-gradient(118deg, #062f45 0%, #0b6370 58%, #13969a 100%) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14) !important;
+  box-shadow: 0 8px 28px rgba(2, 25, 39, 0.25) !important;
+  color: #ffffff !important;
   padding-inline-start: env(safe-area-inset-left, 0px);
   padding-inline-end: env(safe-area-inset-right, 0px);
 }

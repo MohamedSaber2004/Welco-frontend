@@ -6,6 +6,9 @@ import SkeletonLoader from '../components/ui/SkeletonLoader.vue'
 import BackButton from '../components/ui/BackButton.vue'
 import PhoneInput from '../components/ui/PhoneInput.vue'
 import AppImage from '../components/ui/AppImage.vue'
+import FileUpload from '../components/ui/FileUpload.vue'
+import BaseButton from '../components/ui/BaseButton.vue'
+import { ATTACHMENT_PLACE, MEDIA_TYPE } from '../config/api.config'
 import { AppLanguage, UserType } from '../domain/models/user'
 import type { CompanyDto } from '../domain/models/company'
 import { CompanyType, CompanyStatus } from '../domain/models/company'
@@ -105,10 +108,19 @@ const userTypeInfo = computed(() => {
   if (type === UserType.WelcoStaff) {
     return {
       type,
-      label: t('admin.roleSales'),
-      icon: 'support_agent',
-      pillClass: 'user-role-pill--sales',
-      desc: locale.value === 'ar' ? 'فريق المبيعات والعمليات' : 'Sales & Operational Specialist',
+      label: t('admin.roleAdmin'),
+      icon: 'shield_person',
+      pillClass: 'user-role-pill--admin',
+      desc: locale.value === 'ar' ? 'صلاحيات إدارية كاملة' : 'Full Administrator Privileges',
+    }
+  }
+  if (type === UserType.Client) {
+    return {
+      type,
+      label: t('admin.roleClient'),
+      icon: 'person',
+      pillClass: 'user-role-pill--client',
+      desc: locale.value === 'ar' ? 'مشتري / عميل معتمد' : 'Verified Buyer / Client',
     }
   }
   // OrganizationUser is a Provider/Distributor (the company IS the provider).
@@ -121,7 +133,7 @@ const userTypeInfo = computed(() => {
   }
 })
 
-const isAdminOrSales = computed(() => authService.isAdmin.value || authService.isSales.value)
+const isAdminOrSales = computed(() => authService.isAdmin.value)
 const showCompanyInfo = computed(() => !isAdminOrSales.value)
 const companyAddressesCount = computed(() => (showCompanyInfo.value ? companyService.companyAddresses.value.length : 0))
 
@@ -138,7 +150,15 @@ const load = async () => {
     phoneNumber.value = res.profile.phoneNumber ?? ''
     language.value = res.profile.language
     profilePictureName.value = res.profile.profilePictureName ?? null
-    profileCompany.value = (res.profile.company as CompanyDto) ?? null
+    const fromProfile = (res.profile.company as CompanyDto) ?? null
+    profileCompany.value = fromProfile
+    // Keep the two company sources from diverging. `myCompany` is the
+    // authoritative record (fuller projection, and the one the edit form
+    // writes through), so backfill anything the profile payload is missing —
+    // most importantly the brand logo on older cached profile responses.
+    if (fromProfile && !companyService.myCompany.value) {
+      companyService.myCompany.value = fromProfile
+    }
   } else if (user.value) {
     fullName.value = user.value.fullName
     phoneNumber.value = user.value.phoneNumber ?? ''
@@ -147,6 +167,62 @@ const load = async () => {
   }
 }
 onMounted(load)
+
+/* ── Organization self-service editing ─────────────────── */
+const editingCompany = ref(false)
+const companyFormError = ref('')
+const companySaving = ref(false)
+const companyForm = ref({ name: '', email: '', countryId: '', imageName: '' })
+
+const countryOptions = computed(() =>
+  [...locationService.countries.value]
+    .filter((c) => c.id)
+    .sort((a, b) => (locale.value === 'ar' ? (a.nameAr || a.nameEn).localeCompare(b.nameAr || b.nameEn, 'ar') : (a.nameEn || a.nameAr).localeCompare(b.nameEn || b.nameAr, 'en'))),
+)
+
+const startCompanyEdit = () => {
+  const c = myCompany.value
+  if (!c) return
+  companyForm.value = {
+    name: c.name ?? '',
+    email: c.email ?? '',
+    // Only a real id can match a <select> option; never fall back to a
+    // country name or the picker would submit an unresolvable value.
+    countryId: c.countryId ?? '',
+    imageName: c.imageName ?? '',
+  }
+  companyFormError.value = ''
+  editingCompany.value = true
+}
+
+const cancelCompanyEdit = () => {
+  editingCompany.value = false
+  companyFormError.value = ''
+}
+
+const saveCompany = async () => {
+  if (!myCompany.value) return
+  companySaving.value = true
+  companyFormError.value = ''
+  try {
+    const res = await companyService.updateMyCompany({
+      name: companyForm.value.name,
+      email: companyForm.value.email,
+      countryId: companyForm.value.countryId,
+      imageName: companyForm.value.imageName,
+    })
+    if (res.ok) {
+      editingCompany.value = false
+      // Mirror the saved record into the profile-side copy so the read view
+      // and any other consumer of profileCompany agree immediately.
+      if (res.data) profileCompany.value = res.data
+    } else {
+      companyFormError.value = res.error
+    }
+  } finally {
+    companySaving.value = false
+  }
+}
 
 const avatarUrl = () => resolveFileUrl(profilePictureName.value)
 const pictureInput = ref<HTMLInputElement | null>(null)
@@ -556,11 +632,18 @@ const setLang = async (v: AppLanguage) => {
           </div>
 
           <!-- Linked Company View -->
-          <div v-else-if="myCompany" class="company-detail-box">
+          <div v-else-if="myCompany && !editingCompany" class="company-detail-box">
             <!-- Company Headline Banner -->
             <div class="company-headline">
               <div class="company-icon-box">
-                <span class="material-symbols-outlined text-[28px] text-indigo-600">domain</span>
+                <AppImage
+                  v-if="myCompany.imageName"
+                  :src="myCompany.imageName"
+                  placeholder-type="company"
+                  :alt="myCompany.name"
+                  class="company-logo"
+                />
+                <span v-else class="material-symbols-outlined text-[28px] text-indigo-600">domain</span>
               </div>
               <div class="company-name-meta">
                 <div class="company-title-row">
@@ -582,6 +665,15 @@ const setLang = async (v: AppLanguage) => {
                   <span>{{ myCompany.email }}</span>
                 </p>
               </div>
+              <button
+                type="button"
+                class="btn-company-edit mono"
+                :aria-label="t('admin.editCompany')"
+                @click="startCompanyEdit"
+              >
+                <span class="material-symbols-outlined text-[17px]">edit</span>
+                <span>{{ t('common.edit') }}</span>
+              </button>
             </div>
 
             <!-- Key Specs Grid -->
@@ -625,6 +717,86 @@ const setLang = async (v: AppLanguage) => {
               </router-link>
             </div>
           </div>
+
+          <!-- Organization Edit Form -->
+          <form v-else-if="myCompany && editingCompany" class="company-edit-form" @submit.prevent="saveCompany">
+            <p class="company-edit-hint">{{ t('profile.companyEditHint') }}</p>
+
+            <div class="field-item">
+              <label class="vip-field-label mono" for="company-logo">{{ t('admin.companyImage') }}</label>
+              <div class="company-logo-preview">
+                <AppImage
+                  :src="companyForm.imageName || null"
+                  placeholder-type="company"
+                  :alt="companyForm.name || t('admin.companyImage')"
+                  class="company-logo company-logo--lg"
+                />
+              </div>
+              <FileUpload
+                :model-value="companyForm.imageName || null"
+                :place="ATTACHMENT_PLACE.PROVIDERS"
+                :file-type="MEDIA_TYPE.IMAGE"
+                accept="image/*"
+                :label="t('admin.companyImage')"
+                :hint="t('attachment.dropHint')"
+                @update:modelValue="companyForm.imageName = $event ?? ''"
+              />
+            </div>
+
+            <div class="field-item">
+              <label class="vip-field-label mono" for="company-name">{{ t('profile.companyName') }} *</label>
+              <input
+                id="company-name"
+                v-model="companyForm.name"
+                type="text"
+                class="vip-48-input"
+                dir="auto"
+                required
+              />
+            </div>
+
+            <div class="field-item">
+              <label class="vip-field-label mono" for="company-email">{{ t('profile.companyEmail') }}</label>
+              <input
+                id="company-email"
+                v-model="companyForm.email"
+                type="email"
+                class="vip-48-input"
+                dir="ltr"
+                :placeholder="t('profile.companyEmailPlaceholder')"
+              />
+            </div>
+
+            <div class="field-item">
+              <label class="vip-field-label mono" for="company-country">{{ t('profile.companyCountry') }} *</label>
+              <select id="company-country" v-model="companyForm.countryId" class="vip-48-input" required>
+                <option value="" disabled>{{ t('profile.companyCountryPlaceholder') }}</option>
+                <option v-for="c in countryOptions" :key="c.id" :value="c.id">
+                  {{ locale === 'ar' ? c.nameAr || c.nameEn : c.nameEn || c.nameAr }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Read-only: admin-controlled fields -->
+            <div class="company-locked-note">
+              <span class="material-symbols-outlined text-[16px]">lock</span>
+              <span class="mono">
+                {{ t('profile.companyType') }}: {{ companyTypeName(myCompany.type) }} ·
+                {{ companyStatusLabel(myCompany.status) }}
+              </span>
+            </div>
+
+            <p v-if="companyFormError" class="modal-error-banner" role="alert">{{ companyFormError }}</p>
+
+            <div class="company-edit-actions">
+              <BaseButton variant="secondary" type="button" @click="cancelCompanyEdit">
+                {{ t('common.cancel') }}
+              </BaseButton>
+              <BaseButton variant="primary" type="submit" :loading="companySaving">
+                {{ t('common.save') }}
+              </BaseButton>
+            </div>
+          </form>
 
           <!-- Empty Company State -->
           <div v-else class="empty-company-box">
@@ -1502,12 +1674,103 @@ const setLang = async (v: AppLanguage) => {
   flex-shrink: 0;
 }
 
+.company-logo {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+}
+
 .company-name-meta {
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
   flex: 1;
   min-width: 0;
+}
+
+/* Edit trigger in the company headline */
+.btn-company-edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  padding: 7px 12px;
+  border: 1px solid var(--wl-border);
+  border-radius: var(--radius-pill);
+  background: var(--wl-surface);
+  color: var(--wl-ink-strong);
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.btn-company-edit:hover {
+  border-color: var(--wl-primary);
+  color: var(--wl-primary);
+  background: var(--wl-primary-soft);
+}
+
+.btn-company-edit:focus-visible {
+  outline: 2px solid var(--wl-primary);
+  outline-offset: 2px;
+}
+
+/* Organization edit form */
+.company-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border: 1px solid var(--wl-border);
+  border-radius: var(--radius-lg);
+  background: var(--wl-surface-soft);
+}
+
+.company-edit-hint {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--wl-muted);
+}
+
+.company-logo-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 88px;
+  height: 88px;
+  margin-bottom: var(--space-2);
+  padding: 6px;
+  border: 1px solid var(--wl-border);
+  border-radius: var(--radius-md);
+  background: var(--wl-surface);
+}
+
+.company-logo--lg {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-sm);
+}
+
+.company-locked-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px dashed var(--wl-border);
+  border-radius: var(--radius-md);
+  background: var(--wl-surface);
+  font-size: 0.72rem;
+  color: var(--wl-muted);
+}
+
+.company-edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  flex-wrap: wrap;
 }
 
 .company-title-row {

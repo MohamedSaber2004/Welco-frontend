@@ -35,6 +35,8 @@ const props = withDefaults(
     errorCode?: string
 
     /* skeleton / loading props */
+    useSpinner?: boolean
+    spinnerLabel?: string
     skeletonType?: 'text' | 'card' | 'circle' | 'table-row' | 'custom'
       | 'product-card' | 'catalog-grid' | 'category-grid' | 'stats-grid'
       | 'table' | 'pdp' | 'list' | 'form' | 'location-grid' | 'hero' | 'pills'
@@ -74,6 +76,8 @@ const props = withDefaults(
     errorMessage: 'Unable to load data. Please check your connection and try again.',
     retryText: 'Retry',
     errorCode: undefined,
+    useSpinner: false,
+    spinnerLabel: '',
     skeletonType: 'text',
     skeletonLines: 1,
     skeletonCount: 6,
@@ -173,8 +177,8 @@ const emptyCopy = computed(() => {
   }
 })
 
-const emptyTitle = computed(() => emptyCopy.value.title)
-const emptyDescription = computed(() => emptyCopy.value.description)
+const resolvedEmptyTitle = computed(() => emptyCopy.value.title)
+const resolvedEmptyDescription = computed(() => emptyCopy.value.description)
 
 /* ── Error-state copy helpers ─────────────────────────── */
 const errorTitle = computed(() => props.errorTitle || 'Something went wrong')
@@ -212,8 +216,12 @@ const delay = (i: number) => ({ animationDelay: `${-((i % 16) * 90)}ms` })
     :aria-busy="resolvedState === 'loading' ? 'true' : 'false'"
   >
     <!-- ══ Loading ══════════════════════════════════════════ -->
-    <div v-if="resolvedState === 'loading' && showLoading" class="data-state__loading" role="status" aria-live="polite">
-      <slot name="loading">
+    <div v-if="resolvedState === 'loading' && showLoading" class="data-state__loading" :class="{ 'data-state__loading--spinner': useSpinner }" role="status" aria-live="polite">
+      <div v-if="useSpinner" class="data-state__spinner">
+        <span class="data-state__spinner-ring" aria-hidden="true"></span>
+        <p v-if="spinnerLabel" class="data-state__spinner-label">{{ spinnerLabel }}</p>
+      </div>
+      <slot v-else name="loading">
         <template v-if="skeletonType === 'text'">
           <div class="skeleton-wrapper">
             <div v-for="i in skeletonLines" :key="i" class="sk sk--text"
@@ -731,8 +739,8 @@ const delay = (i: number) => ({ animationDelay: `${-((i % 16) * 90)}ms` })
           <span class="empty__code-line" aria-hidden="true"></span>
         </div>
 
-        <h3 v-if="emptyTitle" class="empty__title">{{ emptyTitle }}</h3>
-        <p v-if="emptyDescription" class="empty__desc">{{ emptyDescription }}</p>
+        <h3 v-if="resolvedEmptyTitle" class="empty__title">{{ resolvedEmptyTitle }}</h3>
+        <p v-if="resolvedEmptyDescription" class="empty__desc">{{ resolvedEmptyDescription }}</p>
 
         <div v-if="$slots.default || actionText" class="empty__actions">
           <slot>
@@ -829,6 +837,46 @@ const delay = (i: number) => ({ animationDelay: `${-((i % 16) * 90)}ms` })
   flex-direction: column;
   gap: var(--space-2);
   width: 100%;
+}
+
+/* ── Spinner loading state ────────────────────────────── */
+.data-state__loading--spinner {
+  align-items: center;
+  justify-content: center;
+  min-height: 220px;
+  padding: var(--space-8) var(--space-4);
+}
+
+.data-state__spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.data-state__spinner-ring {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 3px solid var(--sk-border, #E2E6EA);
+  border-top-color: var(--brand, var(--wl-primary, #2563EB));
+  animation: data-state-spin 800ms linear infinite;
+  will-change: transform;
+}
+
+.data-state__spinner-label {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--fg-muted, var(--wl-muted, #627D98));
+  letter-spacing: 0.01em;
+}
+
+@keyframes data-state-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .data-state__spinner-ring { animation-duration: 2.4s; }
 }
 
 /* ── Core skeleton atom ───────────────────────────────── */

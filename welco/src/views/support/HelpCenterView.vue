@@ -24,7 +24,7 @@ const loading = ref(true)
 const openFaq = ref<string | null>(null)
 const isAuthed = computed(() => authService.isAuthenticated)
 const isBuyer = computed(() => authService.isOrganizationUser.value)
-const isSeller = computed(() => authService.isAdmin.value || authService.isSales.value)
+const isSeller = computed(() => authService.isAdmin.value)
 
 const selectedArticle = ref<HelpArticleDto | null>(null)
 const articleModalOpen = ref(false)
@@ -36,6 +36,7 @@ function openArticle(a: HelpArticleDto) {
   articleModalOpen.value = true
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function giveArticleFeedback(_helpful: 'yes' | 'no') {
   articleFeedbackGiven.value = true
   toastService.success(locale.value === 'ar' ? 'شكراً لمشاركتنا رأيك!' : 'Thank you for your feedback!')

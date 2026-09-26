@@ -152,6 +152,7 @@ export const COMPANY_ROUTES = {
   base: '/api/v1/user-management',
   companies: '/api/v1/user-management/companies',
   companyDirectory: '/api/v1/user-management/companies/directory',
+  myCompany: '/api/v1/user-management/companies/my',
   companyById: (id: string) => `/api/v1/user-management/companies/${id}`,
   companyProducts: (id: string) => `/api/v1/user-management/companies/${id}/products`,
   companyAddresses: (companyId: string) => `/api/v1/user-management/companies/${companyId}/addresses`,
@@ -178,6 +179,7 @@ export const ATTACHMENT_ROUTES = {
   upload: '/api/v1/attachments/upload',
   uploadMultiple: '/api/v1/attachments/upload-multiple',
   replace: (name: string) => `/api/v1/attachments/${encodeURIComponent(name)}`,
+  delete: (name: string) => `/api/v1/attachments/${encodeURIComponent(name)}`,
   download: '/api/v1/attachments/download',
   files: (name: string) => `/files/${name}`,
 } as const

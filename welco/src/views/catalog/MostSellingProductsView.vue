@@ -38,7 +38,7 @@ const localized = (en?: string | null, ar?: string | null) => {
 const loadData = async () => {
   loading.value = true
   try {
-    const [_, cats] = await Promise.allSettled([
+    const [, cats] = await Promise.allSettled([
       marketplaceService.loadMostSelling(48),
       marketplaceService.getCategories(),
     ])

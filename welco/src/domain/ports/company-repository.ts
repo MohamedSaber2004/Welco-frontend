@@ -3,6 +3,7 @@ import type {
   CompanyDto,
   CreateCompanyPayload,
   UpdateCompanyPayload,
+  UpdateMyCompanyPayload,
   DistributorApplicationDto,
   DistributorApplicationPayload,
   OemInquiryPayload,
@@ -56,6 +57,13 @@ export interface CompanyRepository {
   getCompanyProducts(companyId: string, query?: CompanyProductsQuery): Promise<PaginatedResult<ProductDto>>
   createCompany(payload: CreateCompanyPayload): Promise<CompanyDto>
   updateCompany(id: string, payload: UpdateCompanyPayload): Promise<CompanyDto>
+  /**
+   * Self-service update of the signed-in user's own company.
+   * Only the provider-owned fields (name, email, country, logo) are sent —
+   * the backend ignores/rejects attempts to change admin-controlled fields.
+   * Send `imageName: ''` to clear the logo.
+   */
+  updateMyCompany(payload: UpdateMyCompanyPayload): Promise<CompanyDto>
   deleteCompany(id: string): Promise<void>
   submitDistributorApplication(payload: DistributorApplicationPayload): Promise<DistributorApplicationDto>
   getDistributorApplications(query?: DistributorApplicationQuery): Promise<PaginatedResult<DistributorApplicationDto>>

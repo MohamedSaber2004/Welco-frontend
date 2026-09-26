@@ -27,8 +27,9 @@ export const formatCurrency = (value: number, locale = 'en', currency = 'USD'): 
 }
 
 export const formatPrice = (value: number, locale = 'en'): string => {
+  const safeLocale = locale === 'ar' || locale?.startsWith('ar') ? 'ar-EG' : 'en-US'
   try {
-    return new Intl.NumberFormat(locale === 'ar' ? 'ar-EG' : 'en-US', {
+    return new Intl.NumberFormat(safeLocale, {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(value)
@@ -38,6 +39,5 @@ export const formatPrice = (value: number, locale = 'en'): string => {
 }
 
 export const formatCurrencySymbol = (value: number, locale = 'en', symbol = '$'): string => {
-  const formatted = formatCurrency(value, locale, 'USD')
   return `${symbol}${value.toFixed(2)}`
 }

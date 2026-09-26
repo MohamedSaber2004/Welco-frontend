@@ -187,7 +187,7 @@ async function placeOrderFromQuote() {
             <div class="amount-val-box">
               <span class="mono amount-label">{{ t('commerce.total') }}</span>
               <strong class="mono amount-big">
-                ${{ formatPrice(quote.amount, locale) }} {{ quote.currency || 'USD' }}
+                {{ formatPrice(quote.amount, locale) }} {{ quote.currency || 'USD' }}
               </strong>
             </div>
             <div class="validity-row mono">
@@ -365,7 +365,7 @@ async function placeOrderFromQuote() {
 /* Detail 2-Column Grid */
 .detail-grid {
   display: grid;
-  grid-template-columns: 1fr 340px;
+  grid-template-columns: minmax(0, 1fr) 340px;
   gap: var(--wl-page-gap, 1.5rem);
   align-items: start;
 }

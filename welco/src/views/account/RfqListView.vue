@@ -172,6 +172,9 @@ onMounted(() => {
                 <td class="mono text-xs text-slate-500">{{ new Date(r.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</td>
                 <td>
                   <strong class="mono rfq-num">{{ r.rfqNumber || '—' }}</strong>
+                  <span v-if="r.requestedCurrency" class="mono text-[10px] text-indigo-700 bg-indigo-50 px-1.5 py-0.5 rounded font-semibold ms-1">
+                    {{ r.requestedCurrency }}
+                  </span>
                 </td>
                 <td>
                   <div class="product-names-cell">
@@ -187,7 +190,16 @@ onMounted(() => {
                   </div>
                 </td>
                 <td>
-                  <strong class="mono amount-text">${{ formatPrice(r.total ?? 0, locale) }}</strong>
+                  <div class="mono amount-block">
+                    <strong class="amount-text">{{ formatPrice(r.total ?? 0, locale) }} {{ r.requestedCurrency || r.currency || 'USD' }}</strong>
+                    <div
+                      v-if="r.baseCurrency && r.requestedCurrency && r.baseCurrency !== r.requestedCurrency"
+                      class="text-[11px] text-slate-500 font-normal"
+                      :title="`${t('sales.baseCurrency')}: ${r.baseCurrency} → ${t('sales.requestedCurrency')}: ${r.requestedCurrency}`"
+                    >
+                      {{ r.baseCurrency }} → {{ r.requestedCurrency }}
+                    </div>
+                  </div>
                 </td>
                 <td>
                   <StatusPill :status="r.status" />
@@ -328,6 +340,9 @@ onMounted(() => {
 
 .table-wrap {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  min-width: 0;
 }
 
 .exec-table {
@@ -537,6 +552,18 @@ onMounted(() => {
   padding: 0.1rem 0.35rem;
   border-radius: 4px;
   align-self: flex-start;
+}
+
+@media (max-width: 640px) {
+  .filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .search-wrap {
+    max-width: 100%;
+    min-width: 0;
+    width: 100%;
+  }
 }
 </style>
 

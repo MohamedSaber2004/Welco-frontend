@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, nextTick } from 'vue'
 import { routeLoading } from '../../application/route-loading'
+import { t } from '../../i18n'
 
 // Ensure the spinner stays visible for at least one animation frame
 // so it actually renders before it can be hidden. Without this,
@@ -31,7 +32,7 @@ watch(routeLoading, async (loading) => {
   <Transition name="loading-spinner">
     <div v-if="visible" class="loading-spinner" role="status" aria-live="polite" aria-label="Loading">
       <span class="loading-spinner__ring" aria-hidden="true" />
-      <span class="loading-spinner__label">Loading…</span>
+      <span class="loading-spinner__label">{{ t('common.loading') }}</span>
     </div>
   </Transition>
 </template>

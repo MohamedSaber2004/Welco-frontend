@@ -4,6 +4,7 @@ import {
   type CompanyDto,
   type CreateCompanyPayload,
   type UpdateCompanyPayload,
+  type UpdateMyCompanyPayload,
   type DistributorApplicationDto,
   type DistributorApplicationPayload,
   type OemInquiryPayload,
@@ -118,6 +119,15 @@ export class ApiCompanyRepository implements CompanyRepository {
 
   async updateCompany(id: string, payload: UpdateCompanyPayload): Promise<CompanyDto> {
     return await this.http.put<CompanyDto>(COMPANY_ROUTES.companyById(id), { id, ...payload })
+  }
+
+  async updateMyCompany(payload: UpdateMyCompanyPayload): Promise<CompanyDto> {
+    // Send the full logo state every time so clearing works: the backend
+    // treats an empty string as "remove the logo" and null as "leave as is".
+    return await this.http.put<CompanyDto>(COMPANY_ROUTES.myCompany, {
+      ...payload,
+      imageName: payload.imageName ?? '',
+    })
   }
 
   async deleteCompany(id: string): Promise<void> {

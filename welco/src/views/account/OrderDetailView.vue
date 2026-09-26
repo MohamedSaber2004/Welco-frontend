@@ -273,7 +273,7 @@ function statusIndex(o: OrderDto): number {
 /* Detail Grid */
 .detail-grid {
   display: grid;
-  grid-template-columns: 1fr 300px;
+  grid-template-columns: minmax(0, 1fr) 300px;
   gap: var(--wl-page-gap);
   align-items: start;
 }

@@ -83,6 +83,16 @@ export class AttachmentService {
     }
   }
 
+  /** Delete a stored attachment. */
+  async delete(name: string, place: number = 1, fileType: number = 0): Promise<boolean> {
+    try {
+      return await this.repo.deleteFile(name, place, fileType)
+    } catch (err) {
+      if (import.meta.env.DEV) console.warn('[attachment] delete failed', err)
+      return false
+    }
+  }
+
   private begin(): void {
     this.uploading.value = true
     this.progress.value = 0

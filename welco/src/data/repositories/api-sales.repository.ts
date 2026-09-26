@@ -13,6 +13,7 @@ import type {
 import { QUOTE_STATUSES, RFQ_STATUSES } from '../../domain/models/sales'
 import type { ProductInquiryDto, ProductInquiryQuery, SalesRepository, SalesQuery } from '../../domain/ports/sales-repository'
 import type { HttpClient } from '../../infrastructure/http/http-client'
+import { parseRfqCurrencyNote, parseRfqHeaderCurrency } from '../../utils/rfq-currency'
 
 type RawObj = Record<string, unknown>
 
@@ -69,6 +70,12 @@ function normalizeRfqItem(raw: unknown, rfqId: string): RfqItemDto {
   const nameAr =
     pickStr(o, 'productNameAr', 'ProductNameAr', 'nameAr', 'NameAr') ||
     pickStr(product, 'nameAr', 'NameAr')
+  const rawNotes = pickStr(o, 'notes', 'Notes', 'note', 'Note') || null
+  const currencyMeta = parseRfqCurrencyNote(rawNotes)
+  const rawUnitPrice = pickNum(o, 'unitPrice', 'UnitPrice', 'price', 'Price')
+  const unitPrice = currencyMeta.requestedPrice ?? rawUnitPrice ?? 0
+  const basePrice = currencyMeta.basePrice ?? (currencyMeta.hasConversion ? rawUnitPrice : unitPrice)
+  const requestedPrice = currencyMeta.requestedPrice ?? unitPrice
   return {
     id: pickStr(o, 'id', 'Id') || `${rfqId}:${pickStr(o, 'productId', 'ProductId')}`,
     rfqId: pickStr(o, 'rfqId', 'RfqId') || rfqId,
@@ -76,8 +83,13 @@ function normalizeRfqItem(raw: unknown, rfqId: string): RfqItemDto {
     productNameEn: nameEn,
     productNameAr: nameAr || null,
     quantity: pickNum(o, 'quantity', 'Quantity') ?? 1,
-    notes: pickStr(o, 'notes', 'Notes', 'note', 'Note') || null,
-    unitPrice: pickNum(o, 'unitPrice', 'UnitPrice', 'price', 'Price'),
+    notes: currencyMeta.cleanNote || rawNotes,
+    unitPrice,
+    baseCurrency: currencyMeta.baseCurrency,
+    requestedCurrency: currencyMeta.requestedCurrency,
+    basePrice,
+    requestedPrice,
+    exchangeRate: currencyMeta.rate,
     imageGradient: pickStr(o, 'imageGradient', 'ImageGradient') || undefined,
     imageName: pickStr(o, 'imageName', 'ImageName', 'image', 'Image') || null,
   }
@@ -87,6 +99,27 @@ function normalizeRfq(raw: unknown): RfqDto {
   const o = asObj(raw)
   const id = pickStr(o, 'id', 'Id')
   const items = pickArr(o, 'items', 'Items', 'rfqItems', 'RfqItems', 'lines', 'Lines')
+  const rawNote = pickStr(o, 'note', 'Note', 'notes', 'Notes') || undefined
+  const headerCurrency = parseRfqHeaderCurrency(rawNote)
+  const normalizedItems = items.map((it) => normalizeRfqItem(it, id))
+
+  const requestedCurrency =
+    headerCurrency.requestedCurrency ||
+    normalizedItems.find((it) => it.requestedCurrency)?.requestedCurrency ||
+    pickStr(o, 'currency', 'Currency') ||
+    'USD'
+  const baseCurrency =
+    headerCurrency.baseCurrency ||
+    normalizedItems.find((it) => it.baseCurrency)?.baseCurrency ||
+    'USD'
+
+  for (const it of normalizedItems) {
+    if (!it.requestedCurrency) it.requestedCurrency = requestedCurrency
+    if (!it.baseCurrency) it.baseCurrency = baseCurrency
+    if (it.basePrice == null) it.basePrice = it.unitPrice ?? 0
+    if (it.requestedPrice == null) it.requestedPrice = it.unitPrice ?? 0
+  }
+
   return {
     id,
     rfqNumber: pickStr(o, 'rfqNumber', 'RfqNumber', 'number', 'Number') || id,
@@ -95,10 +128,12 @@ function normalizeRfq(raw: unknown): RfqDto {
     userId: pickStr(o, 'userId', 'UserId') || undefined,
     status: normalizeRfqStatus(o.status ?? o.Status),
     assignedSalesRepId: pickStr(o, 'assignedSalesRepId', 'AssignedSalesRepId') || null,
-    items: items.map((it) => normalizeRfqItem(it, id)),
+    items: normalizedItems,
     total: pickNum(o, 'total', 'Total', 'amount', 'Amount'),
-    currency: pickStr(o, 'currency', 'Currency') || undefined,
-    note: pickStr(o, 'note', 'Note', 'notes', 'Notes') || undefined,
+    currency: requestedCurrency,
+    requestedCurrency,
+    baseCurrency,
+    note: rawNote,
     createdAt: pickStr(o, 'createdAt', 'CreatedAt'),
   }
 }

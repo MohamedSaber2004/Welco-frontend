@@ -7,3 +7,11 @@ import { ref } from 'vue'
  * API calls (pagination, search, section data fetch, etc.).
  */
 export const routeLoading = ref(false)
+
+export function startGlobalLoading(): void {
+  routeLoading.value = true
+}
+
+export function stopGlobalLoading(): void {
+  routeLoading.value = false
+}

@@ -278,6 +278,15 @@ const handleRemove = async (id: string) => {
   remove(id)
 }
 
+const distinctBaseCurrencies = computed(() => {
+  const set = new Set<string>()
+  for (const it of items.value) {
+    const c = (it.product.currencyCode || it.product.currency || 'USD').toUpperCase()
+    if (c !== targetCurrency.value.toUpperCase()) set.add(c)
+  }
+  return Array.from(set)
+})
+
 const submitRfq = async () => {
   if (!items.value.length || submittingRfq.value) return
   if (!authService.isAuthenticated) {
@@ -307,14 +316,20 @@ const submitRfq = async () => {
   submittingRfq.value = true
   try {
     let finalNote = quoteNote.value || ''
+    const tCur = targetCurrency.value.toUpperCase()
+    const firstProductCurrency = (items.value[0]?.product.currencyCode || items.value[0]?.product.currency || 'USD').toUpperCase()
+    const currencyHeaderPrefix = `[REQUESTED_CURRENCY: ${tCur} (Base: ${firstProductCurrency})]`
+
     if (enableNegotiation.value && targetProposedTotal.value) {
-      const negotiationPrefix = `[PRICE_NEGOTIATION: TARGET_TOTAL=${targetProposedTotal.value} ${targetCurrency.value} (Discount: ${requestedDiscountPercent.value}%)][REASON: ${negotiationReason.value || 'N/A'}]`
-      finalNote = finalNote ? `${negotiationPrefix}\n\n${finalNote}` : negotiationPrefix
+      const negotiationPrefix = `[PRICE_NEGOTIATION: TARGET_TOTAL=${targetProposedTotal.value} ${tCur} (Discount: ${requestedDiscountPercent.value}%)][REASON: ${negotiationReason.value || 'N/A'}]`
+      finalNote = `${currencyHeaderPrefix}\n${negotiationPrefix}${finalNote ? `\n\n${finalNote}` : ''}`
+    } else {
+      finalNote = `${currencyHeaderPrefix}${finalNote ? `\n\n${finalNote}` : ''}`
     }
 
     const res = await salesService.createRfq({
       companyId,
-      note: finalNote || undefined,
+      note: finalNote,
       items: toRfqItems(),
     })
     if (res.ok && res.rfq) {
@@ -717,6 +732,18 @@ const submitRfq = async () => {
               <span>{{ t('commerce.placeOrder') }} · {{ activeCurrencyMeta.symbol }} {{ fmtQuote(displayTotal) }} {{ targetCurrency }}</span>
             </button>
 
+            <!-- RFQ Requested Currency Notice -->
+            <div class="rfq-currency-chip mono">
+              <span class="material-symbols-outlined text-[16px] text-indigo-600">currency_exchange</span>
+              <div class="rfq-currency-text">
+                <span class="text-xs text-muted">{{ t('sales.rfqCurrencyTitle') }}:</span>
+                <strong class="text-xs text-indigo-700">{{ targetCurrency }}</strong>
+                <span v-if="distinctBaseCurrencies.length" class="text-xs text-slate-500">
+                  ({{ t('sales.convertedFromBase') }}: {{ distinctBaseCurrencies.join(', ') }})
+                </span>
+              </div>
+            </div>
+
             <button
               class="btn btn-ghost btn-block"
               type="button"
@@ -832,8 +859,8 @@ const submitRfq = async () => {
 /* Layout */
 .cart-layout {
   display: grid;
-  grid-template-columns: 1fr 390px;
-  gap: 2.25rem;
+  grid-template-columns: minmax(0, 1fr) 380px;
+  gap: clamp(1.25rem, 2.5vw, 2.25rem);
   align-items: start;
 }
 
@@ -1708,6 +1735,23 @@ const submitRfq = async () => {
   gap: var(--space-2);
 }
 
+.rfq-currency-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: var(--radius-md, 8px);
+  background: var(--wl-surface-soft, #f8fafc);
+  border: 1px dashed var(--wl-border, #cbd5e1);
+}
+
+.rfq-currency-text {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
 /* Price Negotiation Card */
 .negotiation-card {
   margin-bottom: var(--space-4);
@@ -1849,9 +1893,10 @@ const submitRfq = async () => {
   color: var(--wl-ink-strong);
 }
 
-@media (max-width: 980px) {
+@media (max-width: 1024px) {
   .cart-layout {
     grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
   .cart-summary-col {
     position: static;

@@ -409,24 +409,32 @@ const toggleLang = async () => {
   justify-content: center;
 }
 
-  .admin-main {
+.admin-main {
   flex: 1;
   min-width: 0;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
-  overflow-x: clip;
-  }
-  .admin-main__inner { min-width: 0; max-width: 100%; overflow-x: clip; }
-  .admin-main__inner :deep(.page-shell) { padding-inline: max(1rem, env(safe-area-inset-left)); padding-inline-end: max(1rem, env(safe-area-inset-right)); }
-  .admin-main__inner :deep(.grid), .admin-main__inner :deep(.dashboard-grid) { min-width: 0; }
-  .admin-main__inner :deep(.table-wrap), .admin-main__inner :deep(.table-responsive) { max-width: 100%; overflow-x: auto; }
+}
 
 .admin-main__inner {
   max-width: var(--wl-max-width-admin, 1560px);
   margin: 0 auto;
   width: 100%;
   min-width: 0;
+  box-sizing: border-box;
+}
+
+.admin-main__inner :deep(.grid),
+.admin-main__inner :deep(.dashboard-grid) {
+  min-width: 0;
+}
+
+.admin-main__inner :deep(.table-wrap),
+.admin-main__inner :deep(.table-responsive) {
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .admin-mobile {
@@ -452,9 +460,9 @@ const toggleLang = async () => {
   .admin-mobile {
     display: flex;
     gap: 0.4rem;
-    padding: 0.6rem var(--wl-gutter);
-    padding-inline-start: max(var(--wl-gutter), env(safe-area-inset-left));
-    padding-inline-end: max(var(--wl-gutter), env(safe-area-inset-right));
+    padding: 0.6rem var(--gutter, 1rem);
+    padding-inline-start: max(var(--gutter, 1rem), env(safe-area-inset-left));
+    padding-inline-end: max(var(--gutter, 1rem), env(safe-area-inset-right));
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
@@ -495,9 +503,9 @@ const toggleLang = async () => {
     padding: 0;
   }
   .admin-main__inner {
-    padding: var(--wl-page-padding-top) var(--wl-gutter) var(--wl-page-padding-bottom);
-    padding-inline-start: max(var(--wl-gutter), env(safe-area-inset-left));
-    padding-inline-end: max(var(--wl-gutter), env(safe-area-inset-right));
+    padding: var(--space-4) var(--gutter, 1rem) var(--space-8);
+    padding-inline-start: max(var(--gutter, 1rem), env(safe-area-inset-left));
+    padding-inline-end: max(var(--gutter, 1rem), env(safe-area-inset-right));
   }
 }
 </style>

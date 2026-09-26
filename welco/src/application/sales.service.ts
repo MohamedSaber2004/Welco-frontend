@@ -28,7 +28,10 @@ export class SalesService {
   private withTotals(rfq: RfqDto): RfqDto {
     if (!rfq) return rfq
     const items = Array.isArray(rfq.items) ? rfq.items : []
-    const total = items.reduce((s, i) => s + (i?.unitPrice ?? 0) * (i?.quantity ?? 1), 0)
+    const total = items.reduce((s, i) => {
+      const price = i?.requestedPrice != null ? i.requestedPrice : (i?.unitPrice ?? 0)
+      return s + price * (i?.quantity ?? 1)
+    }, 0)
     return { ...rfq, items, total }
   }
 

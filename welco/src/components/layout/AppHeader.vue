@@ -44,10 +44,9 @@ const toggleLang = async () => {
 
 const isAuthed  = computed(() => authService.isAuthenticated)
 const isAdmin   = computed(() => authService.isAdmin.value)
-const isSales   = computed(() => authService.isSales.value)
-const isBuyer   = computed(() => authService.isOrganizationUser.value)
-const isSeller  = computed(() => isAdmin.value || isSales.value)
+const isStaff   = computed(() => isAdmin.value)
 const isProvider = computed(() => authService.isProvider.value)
+const isBuyer   = computed(() => authService.isClient.value)
 const user      = computed(() => authService.user.value)
 const avatarSrc = computed(() => {
   const name = user.value?.profilePictureName
@@ -108,7 +107,7 @@ watch(isAuthed, (v) => {
     <div class="header__inner">
       <div class="header__brand">
         <button
-          v-if="!(isSeller && isAuthed)"
+          v-if="!((isStaff || isProvider) && isAuthed)"
           class="header__burger"
           :aria-label="t('nav.toggleMenu')"
           :aria-expanded="mobileOpen"
@@ -120,13 +119,13 @@ watch(isAuthed, (v) => {
           <span :class="{ open: mobileOpen }"></span>
         </button>
 
-        <router-link :to="isSeller && isAuthed ? '/admin' : '/'" class="logo" @click="closeMobile" :aria-label="t('nav.home')">
+        <router-link :to="isStaff && isAuthed ? '/admin' : (isProvider && isAuthed ? '/provider' : '/')" class="logo" @click="closeMobile" :aria-label="t('nav.home')">
           <img src="/logo.jpeg" alt="Welco" class="logo__img" width="120" height="28" loading="eager" />
           <span class="logo__word">Welco</span>
         </router-link>
       </div>
 
-      <nav v-if="!(isSeller && isAuthed)" class="navbar-menu" :aria-label="t('nav.navigation')">
+      <nav v-if="!((isStaff || isProvider) && isAuthed)" class="navbar-menu" :aria-label="t('nav.navigation')">
         <template v-if="isBuyer && isAuthed">
           <router-link to="/" class="navbar-menu__link">{{ t('nav.home') }}</router-link>
           <router-link to="/marketplace" class="navbar-menu__link">{{ t('nav.marketplace') }}</router-link>
@@ -135,7 +134,6 @@ watch(isAuthed, (v) => {
           <router-link to="/wishlist" class="navbar-menu__link">{{ t('nav.wishlist') }}</router-link>
           <router-link to="/help/my-tickets" class="navbar-menu__link">{{ t('help.myTickets') }}</router-link>
           <router-link to="/help" class="navbar-menu__link">{{ t('nav.help') }}</router-link>
-          <router-link v-if="isProvider" to="/provider" class="navbar-menu__link">{{ t('provider.dashboard') }}</router-link>
         </template>
         <template v-else>
           <router-link to="/" class="navbar-menu__link">{{ t('nav.home') }}</router-link>
@@ -148,7 +146,7 @@ watch(isAuthed, (v) => {
       </nav>
       <div v-else class="navbar-menu navbar-menu--spacer"></div>
 
-      <form v-if="!(isSeller && isAuthed)" class="header__search" @submit.prevent="onSearch" role="search">
+      <form v-if="!((isStaff || isProvider) && isAuthed)" class="header__search" @submit.prevent="onSearch" role="search">
         <span class="material-symbols-outlined header__search-icon" aria-hidden="true">search</span>
         <input v-model="searchQuery" :placeholder="t('marketplace.searchPlaceholder')" :aria-label="t('marketplace.searchPlaceholder')" />
         <span class="header__search-kbd mono">⌘K</span>
@@ -156,7 +154,7 @@ watch(isAuthed, (v) => {
 
       <div class="header__actions">
         <button
-          v-if="!(isSeller && isAuthed)"
+          v-if="!((isStaff || isProvider) && isAuthed)"
           class="icon-btn header__search-mobile-btn"
           :aria-label="t('marketplace.searchPlaceholder')"
           type="button"
@@ -165,11 +163,11 @@ watch(isAuthed, (v) => {
           <span class="material-symbols-outlined" style="font-size:18px">search</span>
         </button>
 
-        <router-link v-if="isAuthed && !isSeller" to="/wishlist" class="icon-btn" :aria-label="t('nav.wishlist')" :title="t('nav.wishlist')">
+        <router-link v-if="isAuthed && !isStaff && !isProvider" to="/wishlist" class="icon-btn" :aria-label="t('nav.wishlist')" :title="t('nav.wishlist')">
           <span class="material-symbols-outlined" style="font-size:18px">favorite</span>
           <span v-if="wishlistCount > 0" class="icon-btn__badge">{{ wishlistCount > 9 ? '9+' : wishlistCount }}</span>
         </router-link>
-        <router-link v-if="!isSeller" to="/cart" class="icon-btn" :aria-label="t('nav.cart')" :title="t('nav.cart')">
+        <router-link v-if="!isStaff && !isProvider" to="/cart" class="icon-btn" :aria-label="t('nav.cart')" :title="t('nav.cart')">
           <span class="material-symbols-outlined" style="font-size:18px">shopping_bag</span>
           <span v-if="cartCount > 0" class="icon-btn__badge icon-btn__badge--cart">{{ cartCount > 9 ? '9+' : cartCount }}</span>
         </router-link>
@@ -187,7 +185,7 @@ watch(isAuthed, (v) => {
               </span>
               <span class="header__user-text">
                 <span class="header__user-name">{{ user?.fullName }}</span>
-                <span class="header__user-role mono">{{ isSeller ? (isAdmin ? t('admin.roleAdmin') : t('admin.roleSales')) : userRoleLabel }}</span>
+                <span class="header__user-role mono">{{ isStaff ? t('admin.roleAdmin') : (isProvider ? t('admin.roleProvider') : userRoleLabel) }}</span>
               </span>
             </button>
             <Transition name="drop">
@@ -196,6 +194,22 @@ watch(isAuthed, (v) => {
                   <strong>{{ user?.fullName }}</strong>
                   <span>{{ user?.email }}</span>
                 </div>
+                <router-link v-if="isProvider" to="/provider" class="header__dropdown-item" role="menuitem" @click="userMenuOpen=false">
+                  <span class="material-symbols-outlined text-[18px]">dashboard</span>
+                  <span>{{ t('provider.dashboard') }}</span>
+                </router-link>
+                <router-link v-if="isProvider" to="/provider/catalog" class="header__dropdown-item" role="menuitem" @click="userMenuOpen=false">
+                  <span class="material-symbols-outlined text-[18px]">inventory_2</span>
+                  <span>{{ t('provider.myCatalog') }}</span>
+                </router-link>
+                <router-link v-if="isProvider" to="/provider/quotes" class="header__dropdown-item" role="menuitem" @click="userMenuOpen=false">
+                  <span class="material-symbols-outlined text-[18px]">request_quote</span>
+                  <span>{{ t('provider.quotes') }}</span>
+                </router-link>
+                <router-link v-if="isProvider" to="/provider/orders" class="header__dropdown-item" role="menuitem" @click="userMenuOpen=false">
+                  <span class="material-symbols-outlined text-[18px]">local_shipping</span>
+                  <span>{{ t('provider.orders') }}</span>
+                </router-link>
                 <router-link to="/profile" class="header__dropdown-item" role="menuitem" @click="userMenuOpen=false">
                   <span class="material-symbols-outlined text-[18px]">person</span>
                   <span>{{ t('nav.profile') }}</span>
@@ -398,6 +412,7 @@ watch(isAuthed, (v) => {
 .header__search:focus-within { border-color: var(--platform-lime, #d6f36a); box-shadow: 0 0 0 3px rgba(214, 243, 106, 0.25); background: rgba(255, 255, 255, 0.20); }
 .header__search-icon { font-size: 18px; color: rgba(255, 255, 255, 0.75); flex-shrink: 0; }
 .header__search input { flex: 1; min-width: 0; min-height: 0; height: 100%; border: none; background: transparent; outline: none; font-size: 13px; color: #ffffff; font-family: var(--font-body); }
+.header__search input:focus { background: transparent !important; }
 .header__search input::placeholder { color: rgba(247, 255, 254, 0.65); }
 [dir="rtl"] .header__search input { direction: rtl; text-align: right; }
 .header__search-kbd {
@@ -766,6 +781,9 @@ watch(isAuthed, (v) => {
   outline: none;
   font-size: 14px;
   color: #ffffff;
+}
+.header__mobile-search-form input:focus {
+  background: transparent !important;
 }
 .header__mobile-search-form input::placeholder {
   color: rgba(247, 255, 254, 0.65);

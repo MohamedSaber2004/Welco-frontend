@@ -38,6 +38,7 @@ export interface User {
   updatedAt?: string | null
   roles: string[]
   companyId?: string | null
+  company?: import('./company').CompanyDto | null
   tint?: string
 }
 
@@ -89,10 +90,14 @@ export interface UserDto {
   createdAt: string
   updatedAt?: string | null
   roles: string[]
+  companyId?: string | null
+  company?: import('./company').CompanyDto | null
 }
 
 export interface UserDetailsDto extends UserDto {
   addresses: import('./address').UserAddressDto[]
+  companyId?: string | null
+  company?: import('./company').CompanyDto | null
 }
 
 export interface CreateUserPayload {
@@ -116,12 +121,12 @@ export interface UpdateUserPayload {
 export const USER_TINTS = ['#0ea5e9', '#8b5cf6', '#ec4899', '#10b981', '#f59e0b'] as const
 
 export const USER_TYPE_ROLE_KEY = (
-  userType: UserType,
-): 'roleAdmin' | 'roleSales' | 'roleProvider' | 'roleClient' =>
-  userType === UserType.Admin
-    ? 'roleAdmin'
-    : userType === UserType.WelcoStaff
-      ? 'roleSales'
-      : userType === UserType.OrganizationUser
-        ? 'roleProvider'
-        : 'roleClient'
+   userType: UserType,
+): 'roleAdmin' | 'roleProvider' | 'roleClient' =>
+   userType === UserType.Admin
+     ? 'roleAdmin'
+     : userType === UserType.WelcoStaff
+       ? 'roleAdmin'
+       : userType === UserType.OrganizationUser
+         ? 'roleProvider'
+         : 'roleClient'

@@ -27,6 +27,7 @@ export class ApiCommerceRepository implements CommerceRepository {
     if (query.pageSize) params.set('pageSize', String(Math.min(50, Math.max(1, query.pageSize))))
     if (query.status) params.set('status', query.status)
     if (query.searchTerm) params.set('searchTerm', query.searchTerm)
+    if (query.companyId) params.set('companyId', query.companyId)
     const qs = params.toString()
     try {
       const raw = await this.http.get<unknown>(qs ? `${COMMERCE_ROUTES.orders}?${qs}` : COMMERCE_ROUTES.orders, { showFeedback: false })

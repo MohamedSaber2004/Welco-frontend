@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { t } from '../../i18n'
 import { resolveFileUrl, isNullOrPlaceholder, markBrokenUrl, isKnownBrokenUrl } from '../../utils/file-url'
 
 export interface AppImageProps {

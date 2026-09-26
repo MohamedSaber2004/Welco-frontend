@@ -23,7 +23,7 @@
   --color-neutral-300: #C2C7CD;  /* Outline variant / strong divide */
   --color-neutral-400: #80A8C5;  /* Placeholder / subdued */
   --color-neutral-500: #72787D;  /* Structural outline */
-  --color-neutral-600: #627D98;  /* Muted steel grey / metadata */
+  --color-neutral-600: #7a90a8;  /* Muted steel grey / metadata — lighter for ≥4.5:1 contrast */
   --color-neutral-700: #42474D;  /* Body typography / on-surface-variant */
   --color-neutral-800: #16334A;  /* Inverse surface */
   --color-neutral-900: #102A43;  /* High-legibility ink primary / headings */
@@ -245,7 +245,7 @@
   --sidebar-width-collapsed: 76px;
   --topbar-height: 74px;
   --content-max: 1440px;
-  --gutter: 1.75rem; /* 28px desktop gutter */
+  --gutter: clamp(1rem, 2.5vw, 1.75rem); /* Responsive fluid gutter */
 
   /* ------------------------------------------------------------------
      9. Motion — Calibrated 150ms-200ms surgical transitions
@@ -274,6 +274,21 @@
   --ink-display: #082f49;
   --accent-lime: #c4f05b;
   --hero-gradient: linear-gradient(125deg, #062c43 0%, #0b4d63 58%, #137f8b 100%);
+}
+
+@media (max-width: 768px) {
+  :root {
+    --gutter: 1rem;
+    --topbar-height: 62px;
+    --sidebar-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --gutter: 0.85rem;
+    --topbar-height: 58px;
+  }
 }
 
 /* --------------------------------------------------------------------------
@@ -315,3 +330,151 @@
 [dir="rtl"], html[dir="rtl"] {
   --flip: -1;
 }
+
+/* --------------------------------------------------------------------------
+   13. Animation Keyframes & Layout Utilities (Clinical Precision Motion)
+   -------------------------------------------------------------------------- */
+@keyframes wlFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes wlFadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes wlScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes wlSlideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(calc(12px * var(--flip, 1)));
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes wlShimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes wlPulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.5; }
+}
+
+/* Universal Animation Utility Classes */
+.anim-fade-in {
+  animation: wlFadeIn var(--duration-base, 180ms) var(--ease-out) forwards;
+}
+
+.anim-fade-in-up {
+  animation: wlFadeInUp var(--duration-base, 220ms) var(--ease-out) forwards;
+}
+
+.anim-scale-in {
+  animation: wlScaleIn var(--duration-fast, 160ms) var(--ease-out) forwards;
+}
+
+.anim-card-hover {
+  transition: transform var(--duration-fast, 160ms) var(--ease-out),
+              box-shadow var(--duration-fast, 160ms) var(--ease-out),
+              border-color var(--duration-fast, 160ms) var(--ease-out);
+}
+
+.anim-card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: color-mix(in srgb, var(--brand, #0F3D56) 30%, var(--border));
+}
+
+.interactive-lift {
+  transition: transform var(--duration-fast, 120ms) var(--ease-out),
+              box-shadow var(--duration-fast, 120ms) var(--ease-out);
+}
+
+.interactive-lift:hover {
+  transform: translateY(-1px);
+}
+
+.interactive-lift:active {
+  transform: translateY(1px);
+}
+
+/* Custom Slim Clinical Scrollbar */
+.custom-scrollbar::-webkit-scrollbar,
+.table-wrap::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track,
+.table-wrap::-webkit-scrollbar-track {
+  background: var(--bg-subtle, #EDF4FF);
+  border-radius: var(--radius-pill, 9999px);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb,
+.table-wrap::-webkit-scrollbar-thumb {
+  background: var(--color-neutral-300, #C2C7CD);
+  border-radius: var(--radius-pill, 9999px);
+  transition: background var(--duration-fast);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover,
+.table-wrap::-webkit-scrollbar-thumb:hover {
+  background: var(--color-brand-400, #80A8C5);
+}
+
+/* Responsive Grid Utilities (prevents 1fr content blowout & overflow) */
+.grid-auto-fit-sm {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+  gap: var(--space-4);
+}
+
+.grid-auto-fit-md {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: var(--space-4);
+}
+
+.grid-auto-fit-lg {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: var(--space-5);
+}
+
+/* Tactile Button Press */
+.btn-press {
+  transition: transform var(--duration-fast, 120ms) var(--ease-out);
+}
+.btn-press:active:not(:disabled) {
+  transform: scale(0.975);
+}
+
+/* Subtle Glow for Active/Focused Elements */
+.glow-brand {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand, #0F3D56) 18%, transparent), var(--shadow-sm);
+}
+
+

@@ -17,6 +17,7 @@ export type Messages = {
     delete: string
     edit: string
     add: string
+    remove: string
     reset: string
     searchPlaceholder: string
     noData: string
@@ -69,6 +70,10 @@ export type Messages = {
     noResults: string
     searchResults: string
     clearFilters: string
+    minimize: string
+    maximize: string
+    fullscreen: string
+    exitFullscreen: string
   }
   nav: {
     home: string
@@ -353,10 +358,14 @@ export type Messages = {
     emailPlaceholderLogin: string
     passwordPlaceholder: string
     dialLinked: string
+    registerStepAccountType: string
+    registerStepAccountTypeDesc: string
     registerStep1Title: string
     registerStep1Subtitle: string
     registerStep2Title: string
     registerStep2Subtitle: string
+    registerStep3Title: string
+    registerStep3Subtitle: string
     errCompanyRequired: string
     companyType: string
     errCompanyTypeRequired: string
@@ -448,6 +457,10 @@ export type Messages = {
     companyStatus: string
     companyAddresses: string
     companyCreated: string
+    companyEmailPlaceholder: string
+    companyCountryPlaceholder: string
+    companyEditHint: string
+    companySaved: string
     noCompanyLinked: string
     noCompanyLinkedDesc: string
     applyDistributor: string
@@ -550,7 +563,6 @@ export type Messages = {
     containmentBadge: string
     contourTruth: string
     roleOrganizationUser: string
-    roleSales: string
     roleAdmin: string
     roleProvider: string
     roleDistributor: string
@@ -579,6 +591,7 @@ export type Messages = {
     distributorApps: string
     oemInquiries: string
     oemInquiryDeleted: string
+    oemInquiryDeletedConfirm: string
     pendingAppsCount: string
     approveApplication: string
     rejectApplication: string
@@ -589,6 +602,22 @@ export type Messages = {
     emptyApplicationsDesc: string
     applicant: string
     submittedDate: string
+    distributorAppDetails: string
+    relatedUserDetails: string
+    noRelatedUser: string
+    userActive: string
+    userInactive: string
+    emailConfirmed: string
+    emailNotConfirmed: string
+    viewUserInAdmin: string
+    applicantContact: string
+    facilitySpecs: string
+    allApplications: string
+    pendingReview: string
+    approvedPartners: string
+    declinedInquiries: string
+    partnerDossier: string
+    accountVerification: string
     catalogSection: string
     productsTitle: string
     categoriesTitle: string
@@ -1177,6 +1206,9 @@ export type Messages = {
     issueMessage: string
     sendIssue: string
     issueSentSuccess: string
+    requestedCurrencyNote: string
+    basePricingNote: string
+    clientRequestedCurrency: string
   }
   commerce: {
     checkoutTitle: string
@@ -1371,6 +1403,14 @@ export type Messages = {
     negotiationReasonPlaceholder: string
     targetPriceValidation: string
     negotiationSummary: string
+    rfqCurrencyTitle: string
+    requestedCurrency: string
+    baseCurrency: string
+    convertedFromBase: string
+    baseUnitPrice: string
+    requestedUnitPrice: string
+    exchangeRateUsed: string
+    conversionSummary: string
   }
   oem: {
     title: string
@@ -1602,6 +1642,9 @@ export type Messages = {
     fileTooLarge: string
     uploadFailed: string
     emptyFile: string
+    zoomIn: string
+    zoomOut: string
+    resetZoom: string
   }
   pdp: {
     tabSpecs: string

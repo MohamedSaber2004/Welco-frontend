@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { authService } from '../../di/container'
 import { toastService } from '../../infrastructure/feedback/toast.service'
 import { t } from '../../i18n'
+import { startGlobalLoading, stopGlobalLoading } from '../../application/route-loading'
 import AuthShell from '../../components/auth/AuthShell.vue'
 import { isPendingOrg } from '../../utils/pending-org-marker'
 
@@ -55,45 +56,50 @@ const handleVerify = async () => {
   }
 
   loading.value = true
-  const res = await authService.verifyEmailOtp({
-    email: email.value.trim(),
-    otpCode: otpCode.value.trim(),
-  })
-  loading.value = false
+  startGlobalLoading()
+  try {
+    const res = await authService.verifyEmailOtp({
+      email: email.value.trim(),
+      otpCode: otpCode.value.trim(),
+    })
 
-  if (res.ok) {
-    let registeredAsOrg = false
-    try {
-      const raw = sessionStorage.getItem('welco-pending-register')
-      if (raw) {
-        registeredAsOrg = true
+    if (res.ok) {
+      let registeredAsOrg = false
+      try {
+        const raw = sessionStorage.getItem('welco-pending-register')
+        if (raw) {
+          registeredAsOrg = true
+        }
+        sessionStorage.removeItem('welco-pending-email')
+        sessionStorage.removeItem('welco-pending-register')
+      } catch {}
+      if (!registeredAsOrg && isPendingOrg(email.value)) registeredAsOrg = true
+
+      if (registeredAsOrg) {
+        if (authService.isAuthenticated) {
+          await authService.logout().catch(() => {})
+        }
+        toastService.info(t('distributor.pendingApproval'))
+        await router.push({ name: 'login' })
+        return
       }
-      sessionStorage.removeItem('welco-pending-email')
-      sessionStorage.removeItem('welco-pending-register')
-    } catch {}
-    if (!registeredAsOrg && isPendingOrg(email.value)) registeredAsOrg = true
 
-    if (registeredAsOrg) {
       if (authService.isAuthenticated) {
-        await authService.logout().catch(() => {})
+        toastService.success(t('auth.welcomeBackToast'))
+        const redirect = (route.query.redirect as string) || ''
+        if (redirect) await router.push(redirect)
+        else if (authService.isAdmin.value) await router.push({ name: 'admin-dashboard' })
+        else await router.push({ name: 'home' })
+      } else {
+        toastService.success(t('common.operationDone'))
+        await router.push({ name: 'login' })
       }
-      toastService.info(t('distributor.pendingApproval'))
-      await router.push({ name: 'login' })
-      return
-    }
-
-    if (authService.isAuthenticated) {
-      toastService.success(t('auth.welcomeBackToast'))
-      const redirect = (route.query.redirect as string) || ''
-      if (redirect) await router.push(redirect)
-      else if (authService.isAdmin.value) await router.push({ name: 'admin-dashboard' })
-      else await router.push({ name: 'home' })
     } else {
-      toastService.success(t('common.operationDone'))
-      await router.push({ name: 'login' })
+      error.value = res.error
     }
-  } else {
-    error.value = res.error
+  } finally {
+    loading.value = false
+    stopGlobalLoading()
   }
 }
 
@@ -105,6 +111,7 @@ const handleResend = async () => {
   }
 
   resending.value = true
+  startGlobalLoading()
   try {
     const raw = sessionStorage.getItem('welco-pending-register')
     if (raw) {
@@ -117,6 +124,7 @@ const handleResend = async () => {
     toastService.error(e instanceof Error ? e.message : t('auth.errGeneric'))
   } finally {
     resending.value = false
+    stopGlobalLoading()
   }
 }
 </script>
@@ -173,9 +181,9 @@ const handleResend = async () => {
         </div>
 
         <button type="submit" :disabled="loading" class="vip-submit-btn">
-          <span v-if="!loading">{{ t('auth.verify') }}</span>
-          <span v-else>{{ t('auth.verifying') }}</span>
-          <span class="material-symbols-outlined text-[18px] icon--directional">arrow_forward</span>
+          <span v-if="loading" class="btn-spinner" aria-hidden="true"></span>
+          <span>{{ loading ? t('auth.verifying') : t('auth.verify') }}</span>
+          <span v-if="!loading" class="material-symbols-outlined text-[18px] icon--directional">arrow_forward</span>
         </button>
 
         <div class="resend-box">
@@ -348,6 +356,21 @@ const handleResend = async () => {
 .vip-submit-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.btn-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: reg-spin 0.7s linear infinite;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+@keyframes reg-spin {
+  to { transform: rotate(360deg); }
 }
 
 .resend-box {

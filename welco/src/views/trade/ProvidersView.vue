@@ -464,8 +464,8 @@ const browseProviderProducts = (providerId: string) => {
                   :placeholder-text="provider.name"
                   :alt="provider.name"
                   fit="contain"
-  height="180px"
-  class="provider-card__img"
+                  height="180px"
+                  class="provider-card__img"
                 />
                 <span class="badge-verified mono">
                   <span class="material-symbols-outlined text-[13px]">verified</span>

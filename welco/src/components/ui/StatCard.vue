@@ -88,11 +88,14 @@ const strokeColor = computed(() => {
     :class="[`stat-card--${tone}`, { 'is-interactive': Boolean(to), 'is-icon-only': iconOnly }]"
     :aria-label="label"
   >
-    <div v-if="iconOnly" class="stat-card__icon-only" aria-hidden="true">
+    <div v-if="iconOnly" class="stat-card__compact">
       <div v-if="$slots.icon" class="stat-card__icon-wrap">
         <slot name="icon" />
       </div>
-      <div class="stat-card__value mono-num">{{ value }}</div>
+      <div class="stat-card__compact-info">
+        <span class="stat-card__label mono">{{ label }}</span>
+        <div class="stat-card__value mono-num">{{ value }}</div>
+      </div>
     </div>
 
     <template v-else>
@@ -165,24 +168,50 @@ const strokeColor = computed(() => {
 }
 
 .stat-card.is-icon-only {
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
-  min-height: 88px;
-  padding: var(--space-4);
+  justify-content: flex-start;
+  min-height: 72px;
+  padding: var(--space-3) var(--space-4);
+  gap: var(--space-3);
+  box-shadow: var(--shadow-sm);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
 }
 
-.stat-card__icon-only {
+.stat-card__compact {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.65rem;
-  direction: inherit;
+  gap: var(--space-3);
   width: 100%;
+  min-width: 0;
 }
 
-.stat-card.is-icon-only .stat-card__value {
-  font-size: var(--text-2xl);
-  line-height: var(--leading-tight);
+.stat-card__compact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.stat-card__compact-info .stat-card__label {
+  font-size: 11px;
+  font-weight: var(--weight-semibold, 600);
+  color: var(--fg-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.stat-card__compact-info .stat-card__value {
+  font-size: 1.35rem;
+  font-weight: var(--weight-bold, 700);
+  line-height: 1.15;
+  color: var(--fg-heading);
 }
 
 .stat-card__header {

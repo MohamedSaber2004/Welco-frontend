@@ -7,7 +7,7 @@ import BaseModal from '../../components/ui/BaseModal.vue'
 import StatusPill from '../../components/ui/StatusPill.vue'
 import DataState from '../../components/ui/DataState.vue'
 import AppPagination from '../../components/ui/AppPagination.vue'
-import { salesService } from '../../di/container'
+import { authService, salesService } from '../../di/container'
 import { toastService } from '../../infrastructure/feedback/toast.service'
 import { confirmService } from '../../infrastructure/feedback/confirm.service'
 import { t, locale } from '../../i18n'
@@ -166,6 +166,10 @@ const goQuotePage = (p: number) => {
 }
 
 onMounted(async () => {
+  if (authService.isAdmin.value) {
+    void router.replace('/admin')
+    return
+  }
   loading.value = true
   fetchError.value = ''
   try {
@@ -477,6 +481,9 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
                   <td>
                     <div style="display: flex; flex-direction: column; gap: 4px;">
                       <strong class="mono rfq-num">{{ r.rfqNumber || '—' }}</strong>
+                      <span v-if="r.requestedCurrency" class="mono text-[10px] text-indigo-700 bg-indigo-50 px-1.5 py-0.5 rounded font-semibold w-fit">
+                        {{ r.requestedCurrency }}
+                      </span>
                       <span v-if="parseNegotiationNote(r.note).isNegotiation" style="display: inline-flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 700; color: #065f46; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 1px 6px; border-radius: 9999px; width: fit-content;" class="mono">
                         <span class="material-symbols-outlined" style="font-size: 13px;">handshake</span>
                         <span>{{ parseNegotiationNote(r.note).targetTotal }}</span>
@@ -502,7 +509,16 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
                     </div>
                   </td>
                   <td>
-                    <strong class="mono amount-num">${{ formatPrice(r.total ?? 0, locale) }}</strong>
+                    <div class="mono">
+                      <strong class="amount-num">{{ formatPrice(r.total ?? 0, locale) }} {{ r.requestedCurrency || r.currency || 'USD' }}</strong>
+                      <div
+                        v-if="r.baseCurrency && r.requestedCurrency && r.baseCurrency !== r.requestedCurrency"
+                        class="text-[11px] text-slate-500 font-normal"
+                        :title="`${t('sales.baseCurrency')}: ${r.baseCurrency} → ${t('sales.requestedCurrency')}: ${r.requestedCurrency}`"
+                      >
+                        {{ r.baseCurrency }} → {{ r.requestedCurrency }}
+                      </div>
+                    </div>
                   </td>
                   <td>
                     <StatusPill :status="r.status" />
@@ -834,13 +850,21 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
         max-width="640px"
       >
         <form class="modal-form-stack" @submit.prevent="submitQuote">
+          <div v-if="targetRfq?.baseCurrency && targetRfq?.baseCurrency !== (targetRfq?.requestedCurrency || targetRfq?.currency)" class="currency-reminder-box mono" style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 6px; background: #eef2ff; border: 1px solid #c7d2fe; margin-bottom: 12px;">
+            <span class="material-symbols-outlined text-[15px] text-indigo-600">currency_exchange</span>
+            <span class="text-xs">
+              {{ t('sales.requestedCurrency') }}: <strong class="text-indigo-700">{{ targetRfq?.requestedCurrency || targetRfq?.currency || 'USD' }}</strong>
+              <span class="text-slate-500"> ({{ t('sales.convertedFromBase') }}: {{ targetRfq?.baseCurrency }})</span>
+            </span>
+          </div>
+
           <div class="pricing-table-wrap">
             <table class="modal-pricing-table">
               <thead>
                 <tr>
                   <th>{{ t('admin.quoteProduct') }}</th>
                   <th class="text-end">{{ t('marketplace.quantity') }}</th>
-                  <th class="text-end">{{ t('admin.quoteUnitPrice') }}</th>
+                  <th class="text-end">{{ t('admin.quoteUnitPrice') }} ({{ targetRfq?.requestedCurrency || targetRfq?.currency || 'USD' }})</th>
                   <th class="text-end">{{ t('admin.quoteSubtotal') }}</th>
                 </tr>
               </thead>
@@ -859,7 +883,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
                     />
                   </td>
                   <td class="text-end mono subtotal-num">
-                    ${{ formatPrice(l.quantity * l.unitPrice, locale) }}
+                    {{ formatPrice(l.quantity * l.unitPrice, locale) }} {{ targetRfq?.requestedCurrency || targetRfq?.currency || 'USD' }}
                   </td>
                 </tr>
               </tbody>
@@ -874,7 +898,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 
             <div class="total-quote-box">
               <span class="total-label mono">{{ t('admin.totalProposal') }}</span>
-              <strong class="total-value mono">${{ formatPrice(quoteAmount, locale) }}</strong>
+              <strong class="total-value mono">{{ formatPrice(quoteAmount, locale) }} {{ targetRfq?.requestedCurrency || targetRfq?.currency || 'USD' }}</strong>
             </div>
           </div>
 
@@ -899,6 +923,9 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 /* ── Search & Filter Bar ── */
@@ -1207,6 +1234,9 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 
 .table-wrap {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  min-width: 0;
 }
 
 .exec-table {
@@ -1300,7 +1330,10 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 .pricing-table-wrap {
   border: 1px solid var(--wl-border);
   border-radius: 10px;
-  overflow: hidden;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  min-width: 0;
 }
 
 .modal-pricing-table {
@@ -1777,6 +1810,27 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
   margin-top: 0.5rem;
   padding-top: 0.85rem;
   border-top: 1px solid var(--wl-border);
+}
+
+@media (max-width: 640px) {
+  .search-filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .search-wrap {
+    max-width: 100%;
+    min-width: 0;
+    width: 100%;
+  }
+  .quote-modal-total-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  .quote-modal-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
 </style>
 

@@ -105,4 +105,14 @@ export class ApiAttachmentRepository implements AttachmentRepository {
       showFeedback: false,
     })
   }
+
+  async deleteFile(name: string, place: number = 1, fileType: number = 0): Promise<boolean> {
+    try {
+      const qs = new URLSearchParams({ place: String(place), fileType: String(fileType) })
+      await this.http.delete(`${ATTACHMENT_ROUTES.delete(name)}?${qs.toString()}`, { showFeedback: false })
+      return true
+    } catch {
+      return false
+    }
+  }
 }

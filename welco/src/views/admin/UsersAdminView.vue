@@ -7,10 +7,12 @@ import BaseModal from '../../components/ui/BaseModal.vue'
 import BaseButton from '../../components/ui/BaseButton.vue'
 import FileUpload from '../../components/ui/FileUpload.vue'
 import { useUsers } from '../../composables/useUsers'
-import { t } from '../../i18n'
+import { t, locale } from '../../i18n'
 import { UserType, USER_TYPE_ROLE_KEY } from '../../domain/models/user'
 import type { UserDto } from '../../domain/models/user'
-import { authService, locationService, userRepository } from '../../di/container'
+import { authService, locationService, userRepository, companyRepository } from '../../di/container'
+import type { CompanyDto } from '../../domain/models/company'
+import { CompanyType, CompanyStatus } from '../../domain/models/company'
 import { confirmService } from '../../infrastructure/feedback/confirm.service'
 import { ATTACHMENT_PLACE, MEDIA_TYPE } from '../../config/api.config'
 import { toastService } from '../../infrastructure/feedback/toast.service'
@@ -39,18 +41,93 @@ const {
   handleDelete,
 } = useUsers()
 
-// --- Details modal ---
+// --- Details modal & Company data loading ---
 const showDetailsModal = ref(false)
 const selectedUser = ref<UserDto | null>(null)
+const detailsLoading = ref(false)
+const relatedCompany = ref<CompanyDto | null>(null)
+const companyLoading = ref(false)
 
-const openDetails = (u: UserDto) => {
+const isDistributorOrProvider = (u: UserDto | null): boolean => {
+  if (!u) return false
+  if (u.userType === UserType.OrganizationUser) return true
+  if (Array.isArray(u.roles)) {
+    return u.roles.some((r) => ['Provider', 'Distributor', 'OrganizationUser'].includes(r))
+  }
+  return false
+}
+
+const openDetails = async (u: UserDto) => {
   selectedUser.value = u
   showDetailsModal.value = true
+  relatedCompany.value = null
+  detailsLoading.value = true
+
+  try {
+    const userDetails = await userRepository.getUserById(u.id)
+    if (userDetails) {
+      selectedUser.value = userDetails
+    }
+  } catch {
+    // Keep initial user if getById fails
+  } finally {
+    detailsLoading.value = false
+  }
+
+  // Load related company data if provider or distributor
+  if (isDistributorOrProvider(selectedUser.value)) {
+    companyLoading.value = true
+    try {
+      const compId = selectedUser.value?.companyId || (selectedUser.value as unknown as Record<string, unknown>)?.CompanyId
+      if (selectedUser.value?.company) {
+        relatedCompany.value = selectedUser.value.company
+      } else if (compId) {
+        const comp = await companyRepository.getCompanyById(String(compId)).catch(() => null)
+        if (comp) {
+          relatedCompany.value = comp
+        }
+      }
+
+      if (!relatedCompany.value && selectedUser.value?.email) {
+        const compList = await companyRepository.getCompanies({ searchTerm: selectedUser.value.email }).catch(() => null)
+        const matched = compList?.data?.find(
+          (c) => c.email?.toLowerCase() === selectedUser.value?.email.toLowerCase(),
+        )
+        if (matched) {
+          relatedCompany.value = matched
+        } else {
+          const apps = await companyRepository.getDistributorApplications({ searchTerm: selectedUser.value.email }).catch(() => null)
+          const matchedApp = apps?.data?.find(
+            (a) => a.email?.toLowerCase() === selectedUser.value?.email.toLowerCase(),
+          )
+          if (matchedApp) {
+            relatedCompany.value = {
+              id: matchedApp.id,
+              name: matchedApp.companyName,
+              email: matchedApp.email,
+              type: matchedApp.type,
+              countryId: matchedApp.countryId,
+              countryNameEn: matchedApp.countryName,
+              status: (typeof matchedApp.status === 'number' ? (matchedApp.status as unknown as CompanyStatus) : CompanyStatus.Pending),
+              isActive: true,
+              isProvider: true,
+              createdAt: '',
+            }
+          }
+        }
+      }
+    } catch {
+      // Non-blocking
+    } finally {
+      companyLoading.value = false
+    }
+  }
 }
 
 const closeDetails = () => {
   showDetailsModal.value = false
   selectedUser.value = null
+  relatedCompany.value = null
 }
 
 // --- Activate / Deactivate (never yourself — backend rejects self-deactivation) ---
@@ -265,8 +342,7 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
                     <span
                       class="role-pill mono"
                       :class="{
-                        'role-pill--admin': u.userType === UserType.Admin,
-                        'role-pill--sales': u.userType === UserType.WelcoStaff,
+                        'role-pill--admin': u.userType === UserType.Admin || u.userType === UserType.WelcoStaff,
                         'role-pill--org': u.userType === UserType.OrganizationUser,
                       }"
                     >
@@ -393,11 +469,11 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
             </div>
             <div class="form-field">
               <label class="field-label" for="user-role">{{ t('admin.userType') }} *</label>
-              <select id="user-role" v-model="form.userType" class="field-select">
-                <option :value="UserType.Admin">{{ t('admin.roleAdmin') }}</option>
-                <option :value="UserType.WelcoStaff">{{ t('admin.roleSales') }}</option>
-                <option :value="UserType.OrganizationUser">{{ t('admin.roleProvider') }}</option>
-              </select>
+                <select id="user-role" v-model="form.userType" class="field-select">
+                  <option :value="UserType.Admin">{{ t('admin.roleAdmin') }}</option>
+                  <option :value="UserType.Client">{{ t('admin.roleClient') }}</option>
+                  <option :value="UserType.OrganizationUser">{{ t('admin.roleProvider') }}</option>
+                </select>
             </div>
           </div>
           <div v-if="!editing" class="form-field">
@@ -469,8 +545,7 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
                 <span
                   class="role-pill mono"
                   :class="{
-                    'role-pill--admin': selectedUser.userType === UserType.Admin,
-                    'role-pill--staff': selectedUser.userType === UserType.WelcoStaff,
+                    'role-pill--admin': selectedUser.userType === UserType.Admin || selectedUser.userType === UserType.WelcoStaff,
                     'role-pill--org': selectedUser.userType === UserType.OrganizationUser,
                   }"
                 >
@@ -494,6 +569,63 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
             <div class="detail-item">
               <span class="detail-k mono">{{ t('admin.email') }}</span>
               <strong class="detail-v mono">{{ selectedUser.isEmailConfirmed ? t('common.verified') : t('common.pending') }}</strong>
+            </div>
+          </div>
+
+          <!-- Related Company Data (for Distributor / Provider) -->
+          <div v-if="isDistributorOrProvider(selectedUser)" class="user-company-section">
+            <div class="company-section-head mono">
+              <div class="flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[17px] text-teal-600">apartment</span>
+                <span class="font-bold">{{ t('admin.companies') }}</span>
+              </div>
+              <router-link to="/admin/companies" class="comp-link mono text-xs">
+                <span>{{ t('common.viewAll') }}</span>
+                <span class="material-symbols-outlined text-[13px] icon--directional">open_in_new</span>
+              </router-link>
+            </div>
+
+            <div v-if="companyLoading" class="company-loading-card">
+              <span class="pulse-dot"></span>
+              <span class="mono text-xs text-muted">{{ t('common.loading') }}...</span>
+            </div>
+
+            <div v-else-if="relatedCompany" class="company-info-card">
+              <div class="company-info-head">
+                <div class="company-icon-box">
+                  <span class="material-symbols-outlined text-[20px] text-teal-700">domain</span>
+                </div>
+                <div class="company-meta-col">
+                  <strong class="company-name-title">{{ relatedCompany.name }}</strong>
+                  <div class="company-chips flex items-center gap-1.5 flex-wrap">
+                    <span class="badge-chip mono text-[10px]">
+                      {{ relatedCompany.type === CompanyType.Distributor ? (t('providers.distributor') || 'Distributor') : (t('admin.roleProvider') || 'Provider') }}
+                    </span>
+                    <span
+                      class="badge-chip mono text-[10px]"
+                      :class="relatedCompany.status === CompanyStatus.Approved ? 'badge-chip--success' : 'badge-chip--warning'"
+                    >
+                      {{ relatedCompany.status === CompanyStatus.Approved ? t('common.verified') : t('common.pending') }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="company-grid-props mono text-xs">
+                <div v-if="relatedCompany.email" class="prop-item">
+                  <span class="prop-label">{{ t('admin.email') }}:</span>
+                  <span class="prop-value">{{ relatedCompany.email }}</span>
+                </div>
+                <div v-if="relatedCompany.countryNameEn || relatedCompany.countryNameAr" class="prop-item">
+                  <span class="prop-label">{{ t('admin.countries') }}:</span>
+                  <span class="prop-value">{{ locale === 'ar' ? (relatedCompany.countryNameAr || relatedCompany.countryNameEn) : (relatedCompany.countryNameEn || relatedCompany.countryNameAr) }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div v-else class="company-empty-box mono text-xs">
+              <span class="material-symbols-outlined text-[17px] text-amber-500">info</span>
+              <span>{{ locale === 'ar' ? 'لم يتم ربط شركة بهذا المستخدم حتى الآن.' : 'No company record is currently linked to this user.' }}</span>
             </div>
           </div>
           <div class="modal-foot modal-foot--split">
@@ -617,6 +749,9 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .users-head {
@@ -732,6 +867,9 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
 
 .table-wrap {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  min-width: 0;
 }
 
 .exec-table {
@@ -993,5 +1131,157 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
 
 .pw-toggle-btn:hover {
   color: var(--wl-ink-strong);
+}
+
+/* ── Related Company Section ── */
+.user-company-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--slate-200, #e2e8f0);
+}
+
+.company-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--slate-700, #334155);
+}
+
+.comp-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--primary-700, #147d92);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.comp-link:hover {
+  text-decoration: underline;
+}
+
+.company-info-card {
+  background: var(--slate-50, #f8fafc);
+  border: 1px solid var(--slate-200, #e2e8f0);
+  border-radius: var(--radius-md, 8px);
+  padding: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.company-info-head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.company-icon-box {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: #e0f2fe;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.company-meta-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.company-name-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--slate-900, #0f172a);
+}
+
+.badge-chip {
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  font-weight: 700;
+  background: var(--slate-200, #e2e8f0);
+  color: var(--slate-700, #334155);
+}
+
+.badge-chip--success {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--emerald-700, #047857);
+}
+
+.badge-chip--warning {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--amber-700, #b45309);
+}
+
+.company-grid-props {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--slate-200, #e2e8f0);
+}
+
+.prop-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.prop-label {
+  font-size: 10px;
+  color: var(--slate-500, #64748b);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.prop-value {
+  font-weight: 600;
+  color: var(--slate-800, #1e293b);
+  word-break: break-word;
+}
+
+.company-empty-box {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 0.85rem;
+  background: #fffbeb;
+  border: 1px solid #fef3c7;
+  border-radius: 6px;
+  color: #92400e;
+}
+
+.company-loading-card {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+}
+
+@media (max-width: 640px) {
+  .users-head {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  .toolbar-card {
+    padding: 0.75rem 0.85rem;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .search-input-wrap {
+    width: 100%;
+  }
+  .prop-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

@@ -5,6 +5,7 @@ import { t, locale } from '../../i18n'
 import { authService, salesService, commerceService, companyService } from '../../di/container'
 import AccountNav from '../../components/account/AccountNav.vue'
 import StatCard from '../../components/ui/StatCard.vue'
+import AppImage from '../../components/ui/AppImage.vue'
 import StatusPill from '../../components/ui/StatusPill.vue'
 import SkeletonLoader from '../../components/ui/SkeletonLoader.vue'
 import ErrorState from '../../components/ui/ErrorState.vue'
@@ -143,7 +144,12 @@ onMounted(loadDashboard)
       <div v-if="myCompany" class="org-company-card">
         <div class="company-card__top">
           <div class="company-card__avatar">
-            <span class="material-symbols-outlined">domain</span>
+            <AppImage
+              :src="myCompany.imageName"
+              placeholder-type="company"
+              :alt="myCompany.name"
+              class="company-card__logo"
+            />
           </div>
           <div class="company-card__meta">
             <span class="mono company-card__role">{{ t('account.verifiedBuyer') }}</span>
@@ -494,16 +500,13 @@ onMounted(loadDashboard)
 }
 
 .org-title {
+  font-family: var(--wl-font-display, system-ui);
   font-size: clamp(1.8rem, 3.2vw, 2.5rem);
   font-weight: 800;
   letter-spacing: -0.03em;
-  line-height: 1.1;
+  line-height: 1.15;
   margin: 0 0 0.5rem;
-  background: var(--wl-gradient-gold);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  filter: var(--wl-gold-text-filter);
+  color: var(--wl-ink-strong);
 }
 
 .org-desc {
@@ -549,6 +552,13 @@ onMounted(loadDashboard)
   display: grid;
   place-items: center;
   font-size: var(--step-1);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.company-card__logo {
+  width: 100%;
+  height: 100%;
 }
 
 .company-card__meta {
@@ -672,7 +682,7 @@ onMounted(loadDashboard)
 
     .pipeline-stepper {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: var(--space-3);
     }
 
@@ -767,7 +777,7 @@ onMounted(loadDashboard)
     }
     .dash-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: var(--space-4);
       margin-bottom: var(--space-6);
     }
@@ -973,7 +983,7 @@ onMounted(loadDashboard)
 
     .bento-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: var(--space-4);
     }
 
@@ -1078,17 +1088,17 @@ onMounted(loadDashboard)
 
     @media (max-width: 1080px) {
       .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: var(--space-4);
       }
 
       .pipeline-stepper {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: var(--space-3);
       }
 
       .bento-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: var(--space-3);
       }
     }
@@ -1118,7 +1128,7 @@ onMounted(loadDashboard)
       }
 
       .pipeline-stepper {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
 

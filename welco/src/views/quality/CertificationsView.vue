@@ -518,8 +518,10 @@ const goPage = (p: number) => {
 
 .cert-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 1.25rem;
+  justify-items: center;
+  justify-content: center;
 }
 
 .cert-card {

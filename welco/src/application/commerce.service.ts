@@ -23,12 +23,12 @@ export class CommerceService {
     this.repo = repo
   }
 
-  async loadOrders(params: { status?: string; searchTerm?: string; page?: number; pageSize?: number } = {}): Promise<void> {
+  async loadOrders(params: { status?: string; searchTerm?: string; page?: number; pageSize?: number; companyId?: string } = {}): Promise<void> {
     this.loading.value = true
     try {
       const pageNumber = params.page ?? this.page.value
       const pSize = params.pageSize ?? this.pageSize.value
-      const res = await this.repo.getOrders({ pageNumber, pageSize: pSize, status: params.status, searchTerm: params.searchTerm })
+      const res = await this.repo.getOrders({ pageNumber, pageSize: pSize, status: params.status, searchTerm: params.searchTerm, companyId: params.companyId })
       this.orders.value = Array.isArray(res?.data) ? res.data : []
       this.totalCount.value = res?.totalCount ?? this.orders.value.length
       this.totalPages.value = res?.totalPages || Math.ceil((this.totalCount.value) / pSize) || 1

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { t } from '../../i18n'
 
 const props = withDefaults(
@@ -22,7 +22,6 @@ const props = withDefaults(
 
 const emit = defineEmits<{ complete: []; dismiss: [] }>()
 
-const route = useRoute()
 const router = useRouter()
 
 const isVisible = ref(props.show)
@@ -34,6 +33,7 @@ const logoSize = computed(() => {
     case 'sm': return 80
     case 'md': return 120
     case 'lg': return 180
+    default: return 120
   }
 })
 
@@ -42,6 +42,7 @@ const containerSize = computed(() => {
     case 'sm': return 140
     case 'md': return 200
     case 'lg': return 280
+    default: return 200
   }
 })
 

@@ -34,11 +34,10 @@ const sections = computed<DashboardNavSection[]>(() => [
     key: 'sales',
     label: t('admin.commerce'),
     collapsible: true,
-    links: [
-      { to: '/admin/sales', icon: 'request_quote', label: t('admin.sales') },
-      { to: '/admin/orders', icon: 'local_shipping', label: t('admin.orders') },
-      { to: '/admin/companies', icon: 'apartment', label: t('admin.companies'), visible: canManageCompanies.value },
-    ],
+      links: [
+        { to: '/admin/orders', icon: 'local_shipping', label: t('admin.orders') },
+        { to: '/admin/companies', icon: 'apartment', label: t('admin.companies'), visible: canManageCompanies.value },
+      ],
   },
   {
     key: 'catalog',
@@ -47,7 +46,7 @@ const sections = computed<DashboardNavSection[]>(() => [
     links: [
       { to: '/admin/categories', icon: 'category', label: t('admin.categoriesTitle'), visible: isAdmin.value },
       { to: '/admin/certifications', icon: 'verified', label: t('certifications.title'), visible: canManageCertifications.value },
-      { to: '/admin/pages', icon: 'web', label: t('admin.pages') },
+      { to: '/admin/about', icon: 'info', label: t('nav.about') },
     ],
   },
   {
@@ -65,10 +64,9 @@ const sections = computed<DashboardNavSection[]>(() => [
 
 const mobileLinks = computed<DashboardNavLink[]>(() => [
   { to: '/admin', label: t('admin.dashboard'), icon: 'dashboard', exact: true },
-  { to: '/admin/sales', label: t('admin.sales'), icon: 'request_quote' },
   { to: '/admin/orders', label: t('admin.orders'), icon: 'local_shipping' },
   { to: '/admin/categories', label: t('admin.categoriesTitle'), icon: 'category', visible: isAdmin.value },
-  { to: '/admin/pages', label: t('admin.pages'), icon: 'web' },
+  { to: '/admin/about', label: t('nav.about'), icon: 'info' },
   { to: '/admin/companies', label: t('admin.companies'), icon: 'apartment', visible: canManageCompanies.value },
   { to: '/admin/countries', label: t('admin.countries'), icon: 'public', visible: canManageTerritory.value },
   { to: '/admin/users', label: t('admin.users'), icon: 'group', visible: canManageUsers.value },

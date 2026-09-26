@@ -302,6 +302,10 @@ const router = createRouter({
       redirect: '/provider/quotes',
     },
     {
+      path: '/provider/dashboard',
+      redirect: '/provider/quotes',
+    },
+    {
       path: '/provider/quotes',
       name: 'provider-quotes',
       component: () => import('../views/provider/ProviderQuotesView.vue'),
@@ -338,10 +342,14 @@ const router = createRouter({
       meta: { titleKey: 'certifications.title', requiresAuth: true, requiresAdmin: true },
     },
     {
+      path: '/admin/about',
+      name: 'admin-about',
+      component: () => import('../views/admin/AboutAdminView.vue'),
+      meta: { titleKey: 'nav.about', requiresAuth: true, requiresAdmin: true },
+    },
+    {
       path: '/admin/pages',
-      name: 'admin-pages',
-      component: () => import('../views/admin/PagesAdminView.vue'),
-      meta: { titleKey: 'admin.pages', requiresAuth: true, requiresAdmin: true },
+      redirect: '/admin/about',
     },
     {
       path: '/admin/help',
@@ -382,32 +390,35 @@ router.beforeEach(async (to) => {
     isAuthenticated = auth.isAuthenticated
   }
 
-  const isSeller = auth.isAdmin.value || auth.isSales.value
+  const isStaff = auth.isAdmin.value
+  const isProvider = auth.isProvider.value
+  const isClient = auth.isClient.value
 
-  if (isAuthenticated && isSeller && (to.name === 'home' || to.path === '/')) {
+  if (isAuthenticated && isStaff && (to.name === 'home' || to.path === '/')) {
     return { name: 'admin-dashboard' }
   }
-  if (isAuthenticated && isSeller && (to.path.startsWith('/account') || to.name === 'help-my-tickets')) {
+  if (isAuthenticated && isProvider && (to.name === 'home' || to.path === '/')) {
+    return { name: 'provider-quotes' }
+  }
+  if (isAuthenticated && isStaff && (to.path.startsWith('/account') || to.name === 'help-my-tickets')) {
     return { name: 'admin-dashboard' }
   }
-  // Sellers don't see the buyer-facing catalog / marketplace
-  const marketplacePaths = ['/marketplace', '/cart', '/checkout', '/wishlist', '/catalog']
-  if (isAuthenticated && isSeller && marketplacePaths.some((p) => to.path === p || to.path.startsWith(p + '/'))) {
-    return { name: 'admin-dashboard' }
+  if (isAuthenticated && isProvider && to.path.startsWith('/account')) {
+    return { name: 'provider-quotes' }
   }
-  // Sales don't see provider catalog
-  if (isAuthenticated && auth.isSales.value && to.path.startsWith('/provider')) {
-    return { name: 'admin-dashboard' }
+  const buyerCommercePaths = ['/cart', '/checkout', '/wishlist']
+  if (isAuthenticated && (isStaff || isProvider) && buyerCommercePaths.some((p) => to.path === p || to.path.startsWith(p + '/'))) {
+    return isStaff ? { name: 'admin-dashboard' } : { name: 'provider-quotes' }
   }
-  if (isAuthenticated && !isSeller && to.path.startsWith('/admin')) {
+  if (isAuthenticated && !isStaff && to.path.startsWith('/admin')) {
     return { name: 'home' }
   }
-  if (isAuthenticated && auth.isClient.value && to.path.startsWith('/provider')) {
+  if (isAuthenticated && isClient && !isProvider && to.path.startsWith('/provider')) {
     return { name: 'account' }
   }
   if (isAuthenticated && auth.isOrganizationUser.value) {
     const user = auth.user.value
-    const hasCompany = !!(user?.companyId)
+    const hasCompany = !!(user?.companyId || user?.company?.id)
     const buyerGuarded = to.path.startsWith('/account') || to.path === '/cart' || to.path === '/checkout' || to.path === '/wishlist'
     if (!hasCompany && buyerGuarded && isPendingOrg(user?.email)) {
       await auth.loadProfile().catch(() => null)
@@ -420,14 +431,14 @@ router.beforeEach(async (to) => {
   if (to.meta.requiresAuth && !isAuthenticated) {
     return { name: 'login', query: { redirect: to.fullPath } }
   }
-  if (to.meta.requiresProvider && !auth.isProvider.value && !auth.isAdmin.value) {
+  if (to.meta.requiresProvider && !isProvider && !auth.isAdmin.value) {
     return { name: 'home' }
   }
   if (to.meta.guestOnly && isAuthenticated) {
     return { name: auth.getDashboardRouteName() }
   }
   if (to.meta.requiresAdmin) {
-    if (!isSeller) return { name: 'home' }
+    if (!isStaff) return { name: 'home' }
     const adminOnly = [
       '/admin/users',
       '/admin/companies',

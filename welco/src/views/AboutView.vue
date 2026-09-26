@@ -378,7 +378,7 @@ const pillars = computed(() => [
 
 .hero-grid {
   display: grid;
-  grid-template-columns: 1.35fr 1fr;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
   gap: var(--space-8);
   align-items: center;
 }
@@ -606,7 +606,7 @@ const pillars = computed(() => [
 /* Pillars Grid */
 .pillars-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--space-4);
   margin-top: var(--space-6);
 }
@@ -690,7 +690,7 @@ const pillars = computed(() => [
 /* Cross-links Teasers */
 .cross-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-4);
 }
 
@@ -873,7 +873,7 @@ const pillars = computed(() => [
     text-align: center;
   }
   .pillars-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -896,7 +896,7 @@ const pillars = computed(() => [
   }
   .stats-strip {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .stat-divider {
     display: none;

@@ -14,4 +14,5 @@ export interface AttachmentRepository {
   uploadMultiple(payload: UploadMultiplePayload, onProgress?: UploadProgressHandler): Promise<string[]>
   replaceFile(payload: ReplaceFilePayload, onProgress?: UploadProgressHandler): Promise<string>
   downloadFile(place: number, fileName: string): Promise<FileResponseDto>
+  deleteFile(name: string, place?: number, fileType?: number): Promise<boolean>
 }

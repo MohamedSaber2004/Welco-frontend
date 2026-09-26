@@ -9,6 +9,7 @@ export interface CommerceQuery {
   pageSize?: number
   status?: string
   searchTerm?: string
+  companyId?: string
 }
 
 export interface CommerceRepository {

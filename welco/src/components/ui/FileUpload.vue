@@ -22,6 +22,7 @@ const props = withDefaults(
     hint?: string
     disabled?: boolean
     isEditable?: boolean
+    multiple?: boolean
   }>(),
   {
     modelValue: null,
@@ -34,14 +35,17 @@ const props = withDefaults(
     hint: undefined,
     disabled: false,
     isEditable: false,
+    multiple: false,
   },
 )
 
 const emit = defineEmits<{
   'update:modelValue': [value: string | null]
   uploaded: [storedName: string]
+  'file-uploaded': [file: File, storedName: string]
   removed: []
   replaced: [storedName: string]
+  'file-selected': [files: FileList | File[]]
 }>()
 
 const fileInput = ref<HTMLInputElement | null>(null)
@@ -161,54 +165,64 @@ async function handleFile(file: File) {
     const name = res.data
     emit('update:modelValue', name)
     emit('uploaded', name)
+    emit('file-uploaded', file, name)
   } else {
     error.value = t('attachment.uploadFailed')
   }
 }
 
-async function replaceFile(file: File) {
-  error.value = ''
-  const invalid = validate(file)
-  if (invalid) {
-    error.value = invalid
-    return
-  }
-  uploading.value = true
-  progress.value = 0
-  const mt = effectiveFileType.value ?? guessMediaTypeFromFile(file)
-  try {
-    const res = await attachmentService.replace({ name: props.modelValue ?? '', file, place: props.place, fileType: mt })
-    if (res.ok) {
-      emit('replaced', res.data)
-      emit('update:modelValue', res.data)
-    } else {
-      error.value = t('attachment.uploadFailed')
-    }
-  } catch (e) {
-    error.value = t('attachment.uploadFailed')
-  } finally {
-    uploading.value = false
-    progress.value = 0
-  }
-}
-
 function onInput(e: Event) {
   const input = e.target as HTMLInputElement
-  const file = input.files?.[0]
-  if (file) void handleFile(file)
+  const files = input.files
+  if (!files || files.length === 0) return
+  emit('file-selected', files)
+  uploading.value = true
+  const fileArray = Array.from(files)
+  const processNext = () => {
+    if (fileArray.length === 0) {
+      uploading.value = false
+      return
+    }
+    const file = fileArray[0]
+    fileArray.shift()
+    handleFile(file).finally(processNext)
+  }
+  processNext()
   input.value = ''
 }
 
 function onDrop(e: DragEvent) {
   e.preventDefault()
-  const file = e.dataTransfer?.files?.[0]
-  if (file) void handleFile(file)
+  const files = e.dataTransfer?.files
+  if (!files || files.length === 0) return
+  emit('file-selected', files)
+  uploading.value = true
+  const fileArray = Array.from(files)
+  const processNext = () => {
+    if (fileArray.length === 0) {
+      uploading.value = false
+      return
+    }
+    const file = fileArray[0]
+    fileArray.shift()
+    handleFile(file).finally(processNext)
+  }
+  processNext()
 }
 
-function remove() {
+async function remove() {
   showInlinePdf.value = false
+  const oldName = props.modelValue
   emit('update:modelValue', null)
   emit('removed')
+  if (oldName) {
+    try {
+      const mt = effectiveFileType.value ?? 0
+      await attachmentService.delete(oldName, props.place, mt)
+    } catch {
+      // quiet fallback
+    }
+  }
 }
 
 function triggerPick() {
@@ -238,7 +252,7 @@ function onLightboxTouchStart(e: TouchEvent) {
   }
 }
 
-function onLightboxTouchEnd(e: TouchEvent) {
+function onLightboxTouchEnd() {
   isDragging.value = false
 }
 
@@ -275,7 +289,12 @@ function onZoomWheel(e: WheelEvent) {
 
     <div class="fup__body">
 <!-- Existing image preview -->
-       <div v-if="previewUrl && isImage" class="fup__preview" :style="{ aspectRatio: ratio }" @click="showLightbox = true">
+       <div
+         v-if="previewUrl && isImage"
+         class="fup__preview"
+         :style="ratio && ratio !== '1 / 1' ? { aspectRatio: ratio } : undefined"
+         @click="showLightbox = true"
+       >
          <img
            :src="previewUrl"
            :alt="label ?? t('attachment.preview')"
@@ -283,23 +302,24 @@ function onZoomWheel(e: WheelEvent) {
            @load="onImageLoad"
            @error="onImageError"
          />
-         <div class="fup__overlay">
+         <div class="fup__overlay" @click.stop>
            <a
              :href="previewUrl"
              target="_blank"
              rel="noopener noreferrer"
              class="fup__action fup__action--view"
              :title="t('attachment.preview')"
+             @click.stop
            >
              <span class="material-symbols-outlined">open_in_new</span>
              <span>{{ t('attachment.preview') }}</span>
            </a>
            <button
+             v-if="props.isEditable"
              type="button"
              class="fup__action fup__action--secondary"
              :disabled="uploading || disabled"
-             @click="triggerPick"
-             v-if="props.isEditable"
+             @click.stop="triggerPick"
            >
              <span class="material-symbols-outlined">edit</span>
              {{ t('attachment.edit') }}
@@ -308,7 +328,7 @@ function onZoomWheel(e: WheelEvent) {
              type="button"
              class="fup__action fup__action--danger"
              :disabled="uploading || disabled"
-             @click="remove"
+             @click.stop="remove"
            >
              <span class="material-symbols-outlined">delete</span>
              {{ t('attachment.remove') }}
@@ -395,7 +415,7 @@ function onZoomWheel(e: WheelEvent) {
       <div
         v-else
         class="fup__drop"
-        :style="{ aspectRatio: ratio }"
+        :style="ratio && ratio !== '1 / 1' ? { aspectRatio: ratio } : undefined"
         :class="{ 'fup__drop--busy': uploading }"
         role="button"
         tabindex="0"
@@ -424,6 +444,7 @@ function onZoomWheel(e: WheelEvent) {
         class="fup__input"
         type="file"
         :accept="accept"
+        :multiple="multiple"
         :disabled="disabled || uploading"
         hidden
         @change="onInput"
@@ -478,20 +499,81 @@ function onZoomWheel(e: WheelEvent) {
 
 .fup__body { position: relative; }
 
-.fup__preview { position: relative; border: 1px solid var(--wl-line); background: var(--wl-surface); overflow: hidden; border-radius: var(--wl-radius); cursor: zoom-in; }
-.fup__img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.fup__preview .fup__img { transition: transform 0.3s ease; }
+.fup__preview {
+  position: relative;
+  border: 1px solid var(--wl-border);
+  background: var(--wl-surface-soft);
+  overflow: hidden;
+  border-radius: var(--radius-md, 8px);
+  cursor: zoom-in;
+  width: 100%;
+  max-width: 240px;
+  height: 130px;
+}
+.fup__img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: var(--wl-surface-soft);
+  display: block;
+  transition: transform 0.3s ease;
+}
 .fup__preview:hover .fup__img { transform: scale(1.02); }
-.fup__overlay { position: absolute; inset: auto 0 0 0; display: flex; justify-content: flex-end; align-items: center; gap: 0.4rem; padding: 0.45rem 0.6rem; background: linear-gradient(transparent, rgba(0, 0, 0, 0.65)); opacity: 0; transition: opacity 0.15s; }
+.fup__overlay {
+  position: absolute;
+  inset: auto 0 0 0;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.5rem;
+  background: linear-gradient(transparent, rgba(15, 23, 42, 0.85));
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
 .fup__preview:hover .fup__overlay { opacity: 1; }
-.fup__action { display: inline-flex; align-items: center; gap: 0.3rem; background: rgba(0, 0, 0, 0.75); color: var(--wl-ink-strong); border: 1px solid rgba(255, 255, 255, 0.25); padding: 0.35rem 0.7rem; font-size: 0.75rem; font-weight: 600; cursor: pointer; border-radius: 6px; text-decoration: none; transition: all 0.15s ease; }
-.fup__action:hover { background: var(--wl-ink-strong); color: var(--wl-ink-strong); border-color: rgba(255, 255, 255, 0.5); }
-.fup__action--view { background: rgba(20, 125, 146, 0.85); }
-.fup__action--view:hover { background: var(--secondary, #147D92); }
-.fup__action--secondary { background: rgba(255, 255, 255, 0.9); }
-.fup__action--secondary:hover { background: var(--wl-primary); color: var(--wl-on-primary); }
-.fup__action--danger:hover { background: var(--color-danger-600, #BA1A1A); }
-.fup__action .material-symbols-outlined { font-size: 15px; }
+.fup__action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: rgba(15, 23, 42, 0.85);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 0.25rem 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 5px;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+.fup__action:hover {
+  background: #0f172a;
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-1px);
+}
+.fup__action--view { background: rgba(14, 116, 144, 0.9); }
+.fup__action--view:hover { background: #0e7490; }
+.fup__action--secondary {
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--wl-ink-strong);
+  border-color: rgba(0, 0, 0, 0.15);
+}
+.fup__action--secondary:hover {
+  background: var(--wl-primary);
+  color: #ffffff;
+  border-color: var(--wl-primary);
+}
+.fup__action--danger {
+  background: rgba(220, 38, 38, 0.9);
+  color: #ffffff;
+}
+.fup__action--danger:hover {
+  background: #b91c1c;
+  border-color: #b91c1c;
+}
+.fup__action .material-symbols-outlined { font-size: 14px; }
 
 /* Document & PDF Card */
 .fup__file-card {
@@ -649,15 +731,18 @@ function onZoomWheel(e: WheelEvent) {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.45rem;
+  gap: 0.35rem;
   cursor: pointer;
-  transition: border-color 0.22s var(--wl-ease-spring),
-              background-color 0.22s var(--wl-ease-spring),
-              box-shadow 0.22s var(--wl-ease-spring),
+  transition: border-color 0.2s var(--wl-ease-spring),
+              background-color 0.2s var(--wl-ease-spring),
+              box-shadow 0.2s var(--wl-ease-spring),
               transform 0.18s ease;
-  border-radius: 12px;
-  min-height: 100px;
-  padding: 1rem;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 260px;
+  height: 95px;
+  min-height: 80px;
+  padding: 0.65rem 0.85rem;
 }
 .fup__drop:hover:not(.fup__drop--busy) {
   border-color: var(--wl-primary);
@@ -672,16 +757,16 @@ function onZoomWheel(e: WheelEvent) {
 }
 .fup__drop--busy { cursor: wait; }
 .fup__icon {
-  font-size: 28px;
+  font-size: 24px;
   color: var(--wl-primary);
   transition: transform 0.2s var(--wl-ease-spring);
 }
 .fup__drop:hover:not(.fup__drop--busy) .fup__icon {
-  transform: scale(1.12) translateY(-2px);
+  transform: scale(1.1) translateY(-1px);
 }
-.fup__meta { font-size: 0.76rem; font-weight: 600; color: var(--wl-ink-strong); }
-.fup__hint-mono { font-size: 0.68rem; color: var(--wl-muted); }
-.fup__progress { width: 70%; height: 6px; background: var(--wl-line); border-radius: 999px; overflow: hidden; }
+.fup__meta { font-size: 0.74rem; font-weight: 600; color: var(--wl-ink-strong); }
+.fup__hint-mono { font-size: 0.64rem; color: var(--wl-muted); }
+.fup__progress { width: 70%; height: 5px; background: var(--wl-line); border-radius: 999px; overflow: hidden; }
 .fup__bar { height: 100%; background: var(--wl-primary); transition: width 0.15s ease; }
 
 .fup__error { font-size: 0.78rem; font-weight: 600; color: var(--wl-danger); margin: 0; }

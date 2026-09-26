@@ -282,6 +282,9 @@ onMounted(() => {
 
 .table-wrap {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  min-width: 0;
 }
 
 .exec-table {
@@ -440,6 +443,18 @@ onMounted(() => {
 }
 
 .clear-filters-btn:hover { background: var(--color-danger-100, #FFDAD6); }
+
+@media (max-width: 640px) {
+  .filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .search-wrap {
+    max-width: 100%;
+    min-width: 0;
+    width: 100%;
+  }
+}
 </style>
 
 

@@ -301,6 +301,9 @@ onMounted(() => {
 
 .table-wrap {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  min-width: 0;
 }
 
 .exec-table {
@@ -510,6 +513,18 @@ onMounted(() => {
   padding: 0.1rem 0.35rem;
   border-radius: 4px;
   align-self: flex-start;
+}
+
+@media (max-width: 640px) {
+  .filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .search-wrap {
+    max-width: 100%;
+    min-width: 0;
+    width: 100%;
+  }
 }
 </style>
 

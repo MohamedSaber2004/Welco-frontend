@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { authService, locationService } from '../../di/container'
 import { t, locale } from '../../i18n'
 import { toastService } from '../../infrastructure/feedback/toast.service'
+import { startGlobalLoading, stopGlobalLoading } from '../../application/route-loading'
 import AuthShell from '../../components/auth/AuthShell.vue'
 import PhoneInput from '../../components/ui/PhoneInput.vue'
 import { AppLanguage, UserType } from '../../domain/models/user'
@@ -22,6 +23,7 @@ const companyType = ref<CompanyType | ''>('')
 const companyEmail = ref('')
 const distributorCountryId = ref('')
 const salesVolumeBand = ref('')
+const categoryInterest = ref('')
 const website = ref('')
 const accountType = ref<'customer' | 'organization'>('customer')
 const loading = ref(false)
@@ -32,11 +34,13 @@ const loadingCountries = ref(false)
 
 onMounted(async () => {
   loadingCountries.value = true
+  startGlobalLoading()
   try {
     await locationService.loadCountries()
     countries.value = [...locationService.countries.value]
   } finally {
     loadingCountries.value = false
+    stopGlobalLoading()
   }
 })
 
@@ -73,6 +77,8 @@ const handleRegister = async () => {
     error.value = t('auth.errEmailInvalid')
     return
   }
+
+  let cleanWebsite = website.value.trim()
   if (accountType.value === 'organization') {
     if (!companyName.value.trim()) {
       error.value = t('auth.errCompanyRequired')
@@ -94,11 +100,17 @@ const handleRegister = async () => {
       error.value = t('auth.errEmailInvalid')
       return
     }
-    if (website.value && website.value.trim() && !/^https?:\/\/.+/i.test(website.value.trim())) {
-      error.value = t('auth.errWebsiteInvalid')
-      return
+    if (cleanWebsite) {
+      if (!/^https?:\/\//i.test(cleanWebsite)) {
+        cleanWebsite = `https://${cleanWebsite}`
+      }
+      if (!/^https?:\/\/.+/i.test(cleanWebsite)) {
+        error.value = t('auth.errWebsiteInvalid')
+        return
+      }
     }
   }
+
   if (password.value !== confirmPassword.value) {
     error.value = t('auth.errPasswordMismatch')
     return
@@ -109,6 +121,7 @@ const handleRegister = async () => {
   }
 
   loading.value = true
+  startGlobalLoading()
   const phoneCountryId = phoneCountry.value?.id
   const userType = accountType.value === 'customer' ? UserType.Client : UserType.OrganizationUser
   const payload = {
@@ -127,25 +140,33 @@ const handleRegister = async () => {
       companyEmail: companyEmail.value.trim() || undefined,
       distributorCountryId: distributorCountryId.value,
       salesVolumeBand: salesVolumeBand.value,
-      website: website.value.trim() || undefined,
+      categoryInterest: categoryInterest.value.trim() || undefined,
+      website: cleanWebsite || undefined,
     }),
   } as Parameters<typeof authService.register>[0]
 
-  const res = await authService.register(payload)
-  loading.value = false
+  try {
+    const res = await authService.register(payload)
+    if (res.ok) {
+      if (userType === UserType.OrganizationUser) {
+        setPendingOrg(payload.email)
+        toastService.info(t('distributor.pendingApproval'))
+        await router.push({ name: 'login', query: { registered: 'provider', email: payload.email } })
+        return
+      }
 
-  if (res.ok) {
-    try {
-      sessionStorage.setItem('welco-pending-email', payload.email)
-      sessionStorage.setItem('welco-pending-register', JSON.stringify(payload))
-    } catch {}
-    if (userType === UserType.OrganizationUser) {
-      setPendingOrg(payload.email)
+      try {
+        sessionStorage.setItem('welco-pending-email', payload.email)
+        sessionStorage.setItem('welco-pending-register', JSON.stringify(payload))
+      } catch {}
+      toastService.success(t('auth.registrationSuccess'))
+      await router.push({ name: 'verify-email', query: { email: payload.email } })
+    } else {
+      error.value = res.error
     }
-    toastService.success(t('auth.registrationSuccess'))
-    await router.push({ name: 'verify-email', query: { email: payload.email } })
-  } else {
-    error.value = res.error
+  } finally {
+    loading.value = false
+    stopGlobalLoading()
   }
 }
 </script>
@@ -153,275 +174,297 @@ const handleRegister = async () => {
 <template>
   <AuthShell :title="t('auth.registerTitle')" :subtitle="accountType === 'organization' ? t('auth.registerSubtitle') : t('auth.registerAsCustomerSubtitle')" :wide="true">
     <form class="reg-form" @submit.prevent="handleRegister" novalidate>
-      <section class="reg-card">
-        <header class="reg-card-head">
-          <span class="reg-card-step mono">1</span>
-          <div>
-            <h3 class="reg-card-title">{{ t('auth.registerStep1Title') }}</h3>
-            <p class="reg-card-subtitle">{{ t('auth.registerStep1Subtitle') }}</p>
-          </div>
-        </header>
+      <div v-if="loading" class="form-busy-indicator" aria-hidden="true">
+        <div class="form-busy-bar"></div>
+      </div>
 
-        <div class="reg-grid">
-          <div class="form-group">
-            <label class="form-label mono" for="reg-fullname">
-              {{ t('auth.fullName') }} <span class="req">*</span>
-            </label>
-            <div class="input-wrap">
-              <span class="material-symbols-outlined input-icon">person</span>
-              <input
-                id="reg-fullname"
-                v-model="fullName"
-                required
-                autocomplete="name"
-                :placeholder="t('auth.fullNamePlaceholder')"
-                class="vip-input"
-              />
+      <fieldset :disabled="loading" class="reg-fieldset">
+        <!-- Step 1: Account Classification -->
+        <section class="reg-card">
+          <header class="reg-card-head">
+            <span class="reg-card-step mono">1</span>
+            <div>
+              <h3 class="reg-card-title">{{ t('auth.registerStepAccountType') }}</h3>
+              <p class="reg-card-subtitle">{{ t('auth.registerStepAccountTypeDesc') }}</p>
             </div>
-          </div>
+          </header>
 
-          <div class="form-group">
-            <label class="form-label mono" for="reg-email">
-              {{ t('auth.email') }} <span class="req">*</span>
-            </label>
-            <div class="input-wrap input-wrap--ltr">
-              <span class="material-symbols-outlined input-icon">mail</span>
-              <input
-                id="reg-email"
-                v-model="email"
-                type="email"
-                required
-                autocomplete="email"
-                :placeholder="t('auth.emailPlaceholder')"
-                class="vip-input"
-              />
+          <div class="reg-choice-grid">
+            <button
+              type="button"
+              class="reg-choice-card"
+              :class="{ 'reg-choice-card--active': accountType === 'customer' }"
+              @click="accountType = 'customer'"
+            >
+              <span class="material-symbols-outlined reg-choice-icon">person</span>
+              <span class="reg-choice-title">{{ t('auth.registerAsCustomer') }}</span>
+              <span class="reg-choice-desc">{{ t('auth.registerAsCustomerDesc') }}</span>
+            </button>
+            <button
+              type="button"
+              class="reg-choice-card"
+              :class="{ 'reg-choice-card--active': accountType === 'organization' }"
+              @click="accountType = 'organization'"
+            >
+              <span class="material-symbols-outlined reg-choice-icon">business</span>
+              <span class="reg-choice-title">{{ t('auth.registerAsOrganization') }}</span>
+              <span class="reg-choice-desc">{{ t('auth.registerAsOrganizationDesc') }}</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- Step 2: Practitioner & Authorized Contact Credentials -->
+        <section class="reg-card">
+          <header class="reg-card-head">
+            <span class="reg-card-step mono">2</span>
+            <div>
+              <h3 class="reg-card-title">{{ t('auth.registerStep1Title') }}</h3>
+              <p class="reg-card-subtitle">{{ t('auth.registerStep1Subtitle') }}</p>
             </div>
-            <p v-if="!emailValid" class="field-error-text">{{ t('auth.errEmailInvalid') }}</p>
-          </div>
+          </header>
 
-          <div class="form-group col-span-2">
-            <PhoneInput v-model="phoneNumber" :label="t('auth.phoneNumber')" :placeholder="t('auth.phonePlaceholder')" />
-            <p v-if="phoneCountryLabel" class="phone-hint mono">
-              ↳ {{ t('locations.phoneCode') }} {{ phoneCountry?.phoneCode }} — {{ phoneCountryLabel }} ({{ phoneCountry?.code }})
-            </p>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label mono" for="reg-password">
-              {{ t('auth.password') }} <span class="req">*</span>
-            </label>
-            <div class="input-wrap">
-              <span class="material-symbols-outlined input-icon">lock</span>
-              <input
-                id="reg-password"
-                v-model="password"
-                :type="showPassword ? 'text' : 'password'"
-                required
-                autocomplete="new-password"
-                :placeholder="t('auth.passwordPlaceholder')"
-                class="vip-input vip-input--with-toggle"
-              />
-              <button
-                type="button"
-                class="pwd-toggle-btn"
-                :aria-label="showPassword ? t('auth.hidePassword') : t('auth.showPassword')"
-                @click="showPassword = !showPassword"
-              >
-                <span class="material-symbols-outlined">{{ showPassword ? 'visibility_off' : 'visibility' }}</span>
-              </button>
-            </div>
-
-            <div class="strength-bar">
-              <div class="strength-segments">
-                <span
-                  v-for="i in 4"
-                  :key="i"
-                  class="seg"
-                  :class="{
-                    'seg--weak': i <= strength && strength === 1,
-                    'seg--fair': i <= strength && strength === 2,
-                    'seg--good': i <= strength && strength === 3,
-                    'seg--strong': i <= strength && strength === 4,
-                  }"
-                ></span>
+          <div class="reg-grid">
+            <div class="form-group">
+              <label class="form-label mono" for="reg-fullname">
+                {{ t('auth.fullName') }} <span class="req">*</span>
+              </label>
+              <div class="input-wrap">
+                <span class="material-symbols-outlined input-icon">person</span>
+                <input
+                  id="reg-fullname"
+                  v-model="fullName"
+                  required
+                  autocomplete="name"
+                  :placeholder="t('auth.fullNamePlaceholder')"
+                  class="vip-input"
+                />
               </div>
-              <span class="strength-label mono">
-                {{ strength <= 1 ? t('auth.passwordWeak') : strength === 2 ? t('auth.passwordFair') : strength === 3 ? t('auth.passwordGood') : t('auth.passwordStrong') }}
-              </span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label mono" for="reg-email">
+                {{ t('auth.email') }} <span class="req">*</span>
+              </label>
+              <div class="input-wrap input-wrap--ltr">
+                <span class="material-symbols-outlined input-icon">mail</span>
+                <input
+                  id="reg-email"
+                  v-model="email"
+                  type="email"
+                  required
+                  autocomplete="email"
+                  :placeholder="t('auth.emailPlaceholder')"
+                  class="vip-input"
+                />
+              </div>
+              <p v-if="!emailValid" class="field-error-text">{{ t('auth.errEmailInvalid') }}</p>
+            </div>
+
+            <div class="form-group col-span-2">
+              <PhoneInput v-model="phoneNumber" :label="t('auth.phoneNumber')" :placeholder="t('auth.phonePlaceholder')" />
+              <p v-if="phoneCountryLabel" class="phone-hint mono">
+                ↳ {{ t('locations.phoneCode') }} {{ phoneCountry?.phoneCode }} — {{ phoneCountryLabel }} ({{ phoneCountry?.code }})
+              </p>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label mono" for="reg-password">
+                {{ t('auth.password') }} <span class="req">*</span>
+              </label>
+              <div class="input-wrap">
+                <span class="material-symbols-outlined input-icon">lock</span>
+                <input
+                  id="reg-password"
+                  v-model="password"
+                  :type="showPassword ? 'text' : 'password'"
+                  required
+                  autocomplete="new-password"
+                  :placeholder="t('auth.passwordPlaceholder')"
+                  class="vip-input vip-input--with-toggle"
+                />
+                <button
+                  type="button"
+                  class="pwd-toggle-btn"
+                  :aria-label="showPassword ? t('auth.hidePassword') : t('auth.showPassword')"
+                  @click="showPassword = !showPassword"
+                >
+                  <span class="material-symbols-outlined">{{ showPassword ? 'visibility_off' : 'visibility' }}</span>
+                </button>
+              </div>
+
+              <div class="strength-bar">
+                <div class="strength-segments">
+                  <span
+                    v-for="i in 4"
+                    :key="i"
+                    class="seg"
+                    :class="{
+                      'seg--weak': i <= strength && strength === 1,
+                      'seg--fair': i <= strength && strength === 2,
+                      'seg--good': i <= strength && strength === 3,
+                      'seg--strong': i <= strength && strength === 4,
+                    }"
+                  ></span>
+                </div>
+                <span class="strength-label mono">
+                  {{ strength <= 1 ? t('auth.passwordWeak') : strength === 2 ? t('auth.passwordFair') : strength === 3 ? t('auth.passwordGood') : t('auth.passwordStrong') }}
+                </span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label mono" for="reg-confirm">
+                {{ t('auth.confirmPassword') }} <span class="req">*</span>
+              </label>
+              <div class="input-wrap">
+                <span class="material-symbols-outlined input-icon">lock</span>
+                <input
+                  id="reg-confirm"
+                  v-model="confirmPassword"
+                  :type="showPassword ? 'text' : 'password'"
+                  required
+                  autocomplete="new-password"
+                  :placeholder="t('auth.passwordPlaceholder')"
+                  class="vip-input vip-input--with-toggle"
+                  :class="{ 'is-invalid': confirmPassword && password !== confirmPassword }"
+                />
+              </div>
+              <p v-if="confirmPassword && password !== confirmPassword" class="field-error-text">
+                {{ t('auth.errPasswordMismatch') }}
+              </p>
             </div>
           </div>
+        </section>
 
-          <div class="form-group">
-            <label class="form-label mono" for="reg-confirm">
-              {{ t('auth.confirmPassword') }} <span class="req">*</span>
-            </label>
-            <div class="input-wrap">
-              <span class="material-symbols-outlined input-icon">lock</span>
+        <!-- Step 3: Institutional Facility (Organization only) -->
+        <section v-if="accountType === 'organization'" class="reg-card">
+          <header class="reg-card-head">
+            <span class="reg-card-step mono">3</span>
+            <div>
+              <h3 class="reg-card-title">{{ t('auth.registerStep3Title') }}</h3>
+              <p class="reg-card-subtitle">{{ t('auth.registerStep3Subtitle') }}</p>
+            </div>
+          </header>
+
+          <div class="reg-grid">
+            <div class="form-group col-span-2">
+              <label class="form-label mono" for="reg-company">
+                {{ t('distributor.companyName') }} <span class="req">*</span>
+              </label>
               <input
-                id="reg-confirm"
-                v-model="confirmPassword"
-                :type="showPassword ? 'text' : 'password'"
+                id="reg-company"
+                v-model="companyName"
+                :placeholder="t('distributor.companyNamePlaceholder')"
+                class="vip-input"
                 required
-                autocomplete="new-password"
-                :placeholder="t('auth.passwordPlaceholder')"
-                class="vip-input vip-input--with-toggle"
-                :class="{ 'is-invalid': confirmPassword && password !== confirmPassword }"
               />
             </div>
-            <p v-if="confirmPassword && password !== confirmPassword" class="field-error-text">
-              {{ t('auth.errPasswordMismatch') }}
-            </p>
-          </div>
-        </div>
-      </section>
 
-      <section class="reg-card">
-        <header class="reg-card-head">
-          <span class="reg-card-step mono">2</span>
-          <div>
-            <h3 class="reg-card-title">{{ t('auth.registerStep2Title') }}</h3>
-            <p class="reg-card-subtitle">{{ t('auth.registerStep2Subtitle') }}</p>
-          </div>
-        </header>
+            <div class="form-group">
+              <label class="form-label mono" for="reg-company-email">
+                {{ t('distributor.email') }}
+              </label>
+              <div class="input-wrap input-wrap--ltr">
+                <span class="material-symbols-outlined input-icon">mail</span>
+                <input
+                  id="reg-company-email"
+                  v-model="companyEmail"
+                  type="email"
+                  autocomplete="email"
+                  :placeholder="t('distributor.emailPh')"
+                  class="vip-input"
+                />
+              </div>
+              <p v-if="companyEmail && !companyEmailValid" class="field-error-text">{{ t('auth.errEmailInvalid') }}</p>
+            </div>
 
-        <div class="reg-choice-grid">
-          <button
-            type="button"
-            class="reg-choice-card"
-            :class="{ 'reg-choice-card--active': accountType === 'customer' }"
-            @click="accountType = 'customer'"
-          >
-            <span class="material-symbols-outlined reg-choice-icon">person</span>
-            <span class="reg-choice-title">{{ t('auth.registerAsCustomer') }}</span>
-            <span class="reg-choice-desc">{{ t('auth.registerAsCustomerDesc') }}</span>
-          </button>
-          <button
-            type="button"
-            class="reg-choice-card"
-            :class="{ 'reg-choice-card--active': accountType === 'organization' }"
-            @click="accountType = 'organization'"
-          >
-            <span class="material-symbols-outlined reg-choice-icon">business</span>
-            <span class="reg-choice-title">{{ t('auth.registerAsOrganization') }}</span>
-            <span class="reg-choice-desc">{{ t('auth.registerAsOrganizationDesc') }}</span>
-          </button>
-        </div>
-      </section>
+            <div class="form-group">
+              <label class="form-label mono" for="reg-company-type">
+                {{ t('auth.companyType') }} <span class="req">*</span>
+              </label>
+              <select id="reg-company-type" v-model="companyType" required class="vip-input vip-select">
+                <option value="" disabled>{{ t('auth.companyType') }}</option>
+                <option :value="CompanyType.Hospital">{{ t('providers.hospital') }}</option>
+                <option :value="CompanyType.Distributor">{{ t('providers.distributor') }}</option>
+                <option :value="CompanyType.Clinic">{{ t('providers.clinic') }}</option>
+                <option :value="CompanyType.Supplier">{{ t('providers.supplier') }}</option>
+              </select>
+            </div>
 
-      <section v-if="accountType === 'organization'" class="reg-card">
-        <header class="reg-card-head">
-          <span class="reg-card-step mono">2</span>
-          <div>
-            <h3 class="reg-card-title">{{ t('auth.registerStep2Title') }}</h3>
-            <p class="reg-card-subtitle">{{ t('auth.registerStep2Subtitle') }}</p>
-          </div>
-        </header>
+            <div class="form-group">
+              <label class="form-label mono" for="reg-country">
+                {{ t('distributor.country') }} <span class="req">*</span>
+              </label>
+              <select id="reg-country" v-model="distributorCountryId" required class="vip-input vip-select">
+                <option value="" disabled>{{ loadingCountries ? t('common.loading') : t('distributor.country') }}</option>
+                <option v-for="c in countries" :key="c.id" :value="c.id">
+                  {{ localized(c.nameEn, c.nameAr) }} — {{ c.code }}
+                </option>
+              </select>
+            </div>
 
-        <div class="reg-grid">
-          <div class="form-group col-span-2">
-            <label class="form-label mono" for="reg-company">
-              {{ t('distributor.companyName') }} <span class="req">*</span>
-            </label>
-            <input
-              id="reg-company"
-              v-model="companyName"
-              :placeholder="t('distributor.companyNamePlaceholder')"
-              class="vip-input"
-              required
-            />
-          </div>
+            <div class="form-group">
+              <label class="form-label mono" for="reg-volume">
+                {{ t('distributor.salesVolume') }} <span class="req">*</span>
+              </label>
+              <select id="reg-volume" v-model="salesVolumeBand" required class="vip-input vip-select">
+                <option value="" disabled>{{ t('distributor.salesVolume') }}</option>
+                <option value="Under 100k USD">{{ t('distributor.volume1') }}</option>
+                <option value="100k – 250k USD">{{ t('distributor.volume2') }}</option>
+                <option value="250k – 500k USD">{{ t('distributor.volume3') }}</option>
+                <option value="Over 500k USD">{{ t('distributor.volume4') }}</option>
+              </select>
+            </div>
 
-          <div class="form-group">
-            <label class="form-label mono" for="reg-company-email">
-              {{ t('distributor.email') }}
-            </label>
-            <div class="input-wrap input-wrap--ltr">
-              <span class="material-symbols-outlined input-icon">mail</span>
+            <div class="form-group">
+              <label class="form-label mono" for="reg-category-interest">
+                {{ t('distributor.categoryInterest') }}
+              </label>
               <input
-                id="reg-company-email"
-                v-model="companyEmail"
-                type="email"
-                autocomplete="email"
-                :placeholder="t('distributor.emailPh')"
+                id="reg-category-interest"
+                v-model="categoryInterest"
+                :placeholder="t('distributor.categoryInterestPlaceholder')"
                 class="vip-input"
               />
             </div>
-            <p v-if="companyEmail && !companyEmailValid" class="field-error-text">{{ t('auth.errEmailInvalid') }}</p>
-          </div>
 
-          <div class="form-group">
-            <label class="form-label mono" for="reg-company-type">
-              {{ t('auth.companyType') }} <span class="req">*</span>
-            </label>
-            <select id="reg-company-type" v-model="companyType" required class="vip-input vip-select">
-              <option value="" disabled>{{ t('auth.companyType') }}</option>
-              <option :value="CompanyType.Hospital">{{ t('providers.hospital') }}</option>
-              <option :value="CompanyType.Distributor">{{ t('providers.distributor') }}</option>
-              <option :value="CompanyType.Clinic">{{ t('providers.clinic') }}</option>
-            </select>
+            <div class="form-group">
+              <label class="form-label mono" for="reg-website">
+                {{ t('distributor.website') }}
+              </label>
+              <input
+                id="reg-website"
+                v-model="website"
+                type="url"
+                :placeholder="t('distributor.websitePlaceholder')"
+                class="vip-input"
+              />
+            </div>
           </div>
+        </section>
 
-          <div class="form-group">
-            <label class="form-label mono" for="reg-country">
-              {{ t('distributor.country') }} <span class="req">*</span>
-            </label>
-            <select id="reg-country" v-model="distributorCountryId" required class="vip-input vip-select">
-              <option value="" disabled>{{ loadingCountries ? t('common.loading') : t('distributor.country') }}</option>
-              <option v-for="c in countries" :key="c.id" :value="c.id">
-                {{ localized(c.nameEn, c.nameAr) }} — {{ c.code }}
-              </option>
-            </select>
-          </div>
+        <p v-if="accountType === 'organization'" class="reg-provider-note mono">
+          {{ t('auth.providerApprovalNote') }}
+        </p>
 
-          <div class="form-group">
-            <label class="form-label mono" for="reg-volume">
-              {{ t('distributor.salesVolume') }} <span class="req">*</span>
-            </label>
-            <select id="reg-volume" v-model="salesVolumeBand" required class="vip-input vip-select">
-              <option value="" disabled>{{ t('distributor.salesVolume') }}</option>
-              <option value="Under 100k USD">{{ t('distributor.volume1') }}</option>
-              <option value="100k – 250k USD">{{ t('distributor.volume2') }}</option>
-              <option value="250k – 500k USD">{{ t('distributor.volume3') }}</option>
-              <option value="Over 500k USD">{{ t('distributor.volume4') }}</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label mono" for="reg-website">
-              {{ t('distributor.website') }}
-            </label>
-            <input
-              id="reg-website"
-              v-model="website"
-              type="url"
-              :placeholder="t('distributor.websitePlaceholder')"
-              class="vip-input"
-            />
-</div>
+        <div v-if="error" class="form-error-banner" role="alert">
+          <span class="material-symbols-outlined text-[18px]">error</span>
+          <span>{{ error }}</span>
         </div>
-      </section>
 
-      <p v-if="accountType === 'organization'" class="reg-provider-note mono">
-        {{ t('auth.providerApprovalNote') }}
-      </p>
+        <button type="submit" :disabled="loading" class="vip-submit-btn" :class="{ 'is-loading': loading }">
+          <span v-if="loading" class="btn-spinner" aria-hidden="true"></span>
+          <span>{{ loading ? t('auth.registering') : t('auth.register') }}</span>
+          <span v-if="!loading" class="material-symbols-outlined text-[18px] icon--directional">arrow_forward</span>
+        </button>
 
-      <div v-if="error" class="form-error-banner" role="alert">
-        <span class="material-symbols-outlined text-[18px]">error</span>
-        <span>{{ error }}</span>
-      </div>
-
-      <button type="submit" :disabled="loading" class="vip-submit-btn">
-        <span v-if="!loading">{{ t('auth.register') }}</span>
-        <span v-else>{{ t('auth.registering') }}</span>
-        <span class="material-symbols-outlined text-[18px] icon--directional">arrow_forward</span>
-      </button>
-
-      <div class="auth-switch mono">
-        <span>{{ t('auth.hasAccount') }}</span>
-        <router-link to="/auth/login" class="switch-link">
-          {{ t('auth.login') }}
-        </router-link>
-      </div>
+        <div class="auth-switch mono">
+          <span>{{ t('auth.hasAccount') }}</span>
+          <router-link to="/auth/login" class="switch-link">
+            {{ t('auth.login') }}
+          </router-link>
+        </div>
+      </fieldset>
     </form>
   </AuthShell>
 </template>
@@ -431,6 +474,61 @@ const handleRegister = async () => {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  position: relative;
+}
+
+.form-busy-indicator {
+  width: 100%;
+  height: 3px;
+  background: color-mix(in srgb, var(--wl-primary) 15%, transparent);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  position: relative;
+  margin-bottom: -0.75rem;
+}
+
+.form-busy-bar {
+  width: 45%;
+  height: 100%;
+  background: var(--wl-primary);
+  border-radius: var(--radius-pill);
+  position: absolute;
+  animation: reg-indeterminate 1.1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes reg-indeterminate {
+  0% { left: -45%; }
+  100% { left: 100%; }
+}
+
+.reg-fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  transition: opacity 0.2s ease;
+}
+
+.reg-fieldset:disabled {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.btn-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: reg-spin 0.7s linear infinite;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+@keyframes reg-spin {
+  to { transform: rotate(360deg); }
 }
 
 .reg-card {

@@ -118,6 +118,17 @@ onMounted(async () => {
             <span class="mono item-chip">{{ t('account.itemsCount', { count: rfq.items.length }) }}</span>
           </div>
 
+          <!-- Currency Conversion Summary Banner -->
+          <div v-if="rfq.baseCurrency && rfq.requestedCurrency && rfq.baseCurrency !== rfq.requestedCurrency" class="currency-conversion-banner mono">
+            <span class="material-symbols-outlined text-[20px] text-indigo-600">currency_exchange</span>
+            <div>
+              <strong class="text-indigo-900">{{ t('sales.rfqCurrencyTitle') }}</strong>
+              <p class="text-xs text-indigo-700">
+                {{ t('sales.requestedCurrency') }}: <strong>{{ rfq.requestedCurrency }}</strong> · {{ t('sales.convertedFromBase') }}: <strong>{{ rfq.baseCurrency }}</strong>
+              </p>
+            </div>
+          </div>
+
           <div class="items-stack">
             <article v-for="it in rfq.items" :key="it.id" class="rfq-item-card">
               <div class="thumb-box" :style="{ background: it.imageGradient || 'var(--wl-surface-soft)' }">
@@ -133,7 +144,16 @@ onMounted(async () => {
 
               <div class="rfq-item-details">
                 <h3 class="rfq-item-name">{{ localized(it.productNameEn, it.productNameAr || it.productNameEn) }}</h3>
-                <div class="rfq-item-qty mono">{{ t('account.qtyUnits', { count: it.quantity }) }} · {{ formatPrice(it.unitPrice ?? 0, locale) }} USD {{ t('account.perUnitShort') }}</div>
+                <div class="rfq-item-qty mono">
+                  <span>{{ t('account.qtyUnits', { count: it.quantity }) }}</span>
+                  <span>·</span>
+                  <span class="font-semibold text-indigo-700">
+                    {{ formatPrice(it.unitPrice ?? 0, locale) }} {{ it.requestedCurrency || rfq.requestedCurrency || rfq.currency || 'USD' }} {{ t('account.perUnitShort') }}
+                  </span>
+                  <span v-if="it.basePrice != null && (it.baseCurrency || 'USD') !== (it.requestedCurrency || rfq.requestedCurrency || rfq.currency)" class="text-xs text-muted">
+                    ({{ t('sales.baseCurrency') }}: {{ formatPrice(it.basePrice, locale) }} {{ it.baseCurrency || 'USD' }})
+                  </span>
+                </div>
                 <div v-if="it.notes" class="rfq-item-notes mono">
                   <span class="font-bold">{{ t('account.specLabel') }}</span> {{ it.notes }}
                 </div>
@@ -171,7 +191,7 @@ onMounted(async () => {
             <h2 class="side-title mono">{{ t('commerce.total') }}</h2>
             <div class="amount-val-box">
               <span class="mono amount-label">{{ t('sales.amount') }}</span>
-              <strong class="mono amount-big">${{ formatPrice(rfq.total ?? 0, locale) }} USD</strong>
+              <strong class="mono amount-big">{{ formatPrice(rfq.total ?? 0, locale) }} {{ rfq.requestedCurrency || rfq.currency || 'USD' }}</strong>
             </div>
           </section>
 
@@ -331,7 +351,7 @@ onMounted(async () => {
 /* Detail 2-Column Grid */
 .detail-grid {
   display: grid;
-  grid-template-columns: 1fr 340px;
+  grid-template-columns: minmax(0, 1fr) 340px;
   gap: var(--wl-page-gap, 1.5rem);
   align-items: start;
 }
@@ -614,6 +634,17 @@ onMounted(async () => {
 .btn-create-rfq:hover {
   background: var(--primary, #0F3D56);
   color: #ffffff;
+}
+
+.currency-conversion-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+  border-radius: var(--radius-md, 8px);
+  margin-bottom: 16px;
 }
 
 @media (max-width: 900px) {

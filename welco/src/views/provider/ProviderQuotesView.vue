@@ -10,12 +10,60 @@ import { salesService, companyService } from '../../di/container'
 import { toastService } from '../../infrastructure/feedback/toast.service'
 import { confirmService } from '../../infrastructure/feedback/confirm.service'
 import { t, locale } from '../../i18n'
-import type { RfqDto, QuoteDto } from '../../domain/models/sales'
+import type { RfqDto, QuoteDto, RfqItemDto } from '../../domain/models/sales'
 import { parseNegotiationNote } from '../../utils/negotiation'
 import { formatPrice } from '../../utils/format'
 
 const localized = (en?: string | null, ar?: string | null) =>
   locale.value === 'ar' ? ar || en || '' : en || ar || ''
+
+const getItemRequestedCurrency = (it: Partial<RfqItemDto>, rfq?: RfqDto | null): string => {
+  return it.requestedCurrency || rfq?.requestedCurrency || rfq?.currency || 'USD'
+}
+
+const getItemBaseCurrency = (it: Partial<RfqItemDto>, rfq?: RfqDto | null): string => {
+  return it.baseCurrency || rfq?.baseCurrency || 'USD'
+}
+
+const getItemRequestedUnitPrice = (it: RfqItemDto): number => {
+  if (it.requestedPrice != null && it.requestedPrice > 0) return it.requestedPrice
+  return it.unitPrice || 0
+}
+
+const getItemBaseUnitPrice = (it: RfqItemDto): number => {
+  if (it.basePrice != null && it.basePrice > 0) return it.basePrice
+  return it.unitPrice || 0
+}
+
+const getItemRequestedTotal = (it: RfqItemDto): number => {
+  return getItemRequestedUnitPrice(it) * (it.quantity || 1)
+}
+
+const getItemBaseTotal = (it: RfqItemDto): number => {
+  return getItemBaseUnitPrice(it) * (it.quantity || 1)
+}
+
+const hasConversion = (rfq?: RfqDto | null): boolean => {
+  if (!rfq) return false
+  const rCur = rfq.requestedCurrency || rfq.currency
+  return Boolean(rfq.baseCurrency && rCur && rfq.baseCurrency !== rCur)
+}
+
+const hasItemConversion = (it: RfqItemDto, rfq?: RfqDto | null): boolean => {
+  const bCur = getItemBaseCurrency(it, rfq)
+  const rCur = getItemRequestedCurrency(it, rfq)
+  return Boolean(bCur && rCur && bCur !== rCur)
+}
+
+const selectedRfqTotal = computed(() => {
+  if (!selectedRfq.value?.items || !selectedRfq.value.items.length) return selectedRfq.value?.total || 0
+  return selectedRfq.value.items.reduce((sum, it) => sum + getItemRequestedTotal(it), 0)
+})
+
+const selectedRfqBaseTotal = computed(() => {
+  if (!selectedRfq.value?.items || !selectedRfq.value.items.length) return 0
+  return selectedRfq.value.items.reduce((sum, it) => sum + getItemBaseTotal(it), 0)
+})
 
 const rfqs = salesService.rfqs
 const quotes = salesService.quotes
@@ -31,6 +79,15 @@ const pageSize = 10
 const acting = ref('')
 const selectedRfq = ref<RfqDto | null>(null)
 const showDetailModal = ref(false)
+
+// Quote detail modal
+const selectedQuote = ref<QuoteDto | null>(null)
+const showQuoteDetailModal = ref(false)
+
+const openQuoteDetails = (q: QuoteDto) => {
+  selectedQuote.value = q
+  showQuoteDetailModal.value = true
+}
 
 // Counter-offer modal
 const showCounterModal = ref(false)
@@ -306,7 +363,7 @@ const handleDecline = async (rfq: RfqDto) => {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="q in quotes" :key="q.id">
+                  <tr v-for="q in quotes" :key="q.id" class="table-row-clickable" @click="openQuoteDetails(q)">
                     <td>
                       <strong class="mono">{{ q.quoteNumber }}</strong>
                     </td>
@@ -314,7 +371,7 @@ const handleDecline = async (rfq: RfqDto) => {
                       {{ q.createdAt ? new Date(q.createdAt).toLocaleDateString() : '—' }}
                     </td>
                     <td>
-                      <strong class="mono text-primary">{{ formatPrice(q.amount, q.currency || 'USD') }}</strong>
+                      <strong class="mono text-primary">{{ formatPrice(q.amount, locale) }} {{ q.currency || 'USD' }}</strong>
                     </td>
                     <td class="mono text-sm">
                       {{ q.validUntil ? new Date(q.validUntil).toLocaleDateString() : '—' }}
@@ -322,8 +379,15 @@ const handleDecline = async (rfq: RfqDto) => {
                     <td>
                       <StatusPill :status="q.status" />
                     </td>
-                    <td class="text-end">
-                      <span class="mono text-sm text-muted">{{ q.currency || 'USD' }}</span>
+                    <td class="text-end" @click.stop>
+                      <button
+                        type="button"
+                        class="action-btn btn-view"
+                        :title="t('common.details')"
+                        @click="openQuoteDetails(q)"
+                      >
+                        <span class="material-symbols-outlined text-[16px]">visibility</span>
+                      </button>
                     </td>
                   </tr>
                 </tbody>
@@ -345,6 +409,9 @@ const handleDecline = async (rfq: RfqDto) => {
               :placeholder="t('common.searchPlaceholder')"
               class="search-input"
             />
+            <button v-if="search" type="button" class="clear-search-btn" @click="search = ''; page = 1" :aria-label="t('common.clearInput')">
+              <span class="material-symbols-outlined text-[16px]">close</span>
+            </button>
           </div>
 
           <div class="filter-actions">
@@ -373,7 +440,13 @@ const handleDecline = async (rfq: RfqDto) => {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="rfq in paginatedRfqs" :key="rfq.id" :class="{ 'row-negotiation': rfq.negotiation.isNegotiation }">
+                  <tr
+                    v-for="rfq in paginatedRfqs"
+                    :key="rfq.id"
+                    class="table-row-clickable"
+                    :class="{ 'row-negotiation': rfq.negotiation.isNegotiation }"
+                    @click="openDetails(rfq)"
+                  >
                     <!-- RFQ Number & Negotiation Tag -->
                     <td>
                       <div class="rfq-id-cell">
@@ -426,12 +499,22 @@ const handleDecline = async (rfq: RfqDto) => {
                             <strong class="target-val">{{ rfq.negotiation.targetTotal }}</strong>
                           </div>
                           <span v-if="rfq.total" class="original-price-striked">
-                            {{ t('commerce.subtotal') }}: {{ formatPrice(rfq.total, 'USD') }}
+                            {{ t('commerce.subtotal') }}: {{ formatPrice(rfq.total, locale) }} {{ rfq.requestedCurrency || rfq.currency || 'USD' }}
                           </span>
                         </template>
                         <template v-else>
-                          <strong class="regular-total">{{ formatPrice(rfq.total || 0, 'USD') }}</strong>
+                          <strong class="regular-total">
+                            {{ formatPrice(rfq.total || 0, locale) }} {{ rfq.requestedCurrency || rfq.currency || 'USD' }}
+                          </strong>
                         </template>
+                        <span
+                          v-if="hasConversion(rfq)"
+                          class="conversion-tag mono"
+                          :title="`${t('sales.baseCurrency')}: ${rfq.baseCurrency} → ${t('sales.requestedCurrency')}: ${rfq.requestedCurrency || rfq.currency}`"
+                        >
+                          <span class="material-symbols-outlined text-[12px]">currency_exchange</span>
+                          <span>{{ rfq.baseCurrency }} → {{ rfq.requestedCurrency || rfq.currency }}</span>
+                        </span>
                       </div>
                     </td>
 
@@ -441,7 +524,7 @@ const handleDecline = async (rfq: RfqDto) => {
                     </td>
 
                     <!-- Actions -->
-                    <td class="text-end">
+                    <td class="text-end" @click.stop>
                       <div class="action-btn-group">
                         <!-- If price negotiation pending -->
                         <template v-if="rfq.negotiation.isNegotiation && rfq.status === 'Pending'">
@@ -516,12 +599,16 @@ const handleDecline = async (rfq: RfqDto) => {
       </template>
 
       <!-- RFQ Detail Modal -->
-      <BaseModal v-model="showDetailModal" :title="`${t('sales.rfqDetail')} · ${selectedRfq?.rfqNumber || ''}`" size="lg">
+      <BaseModal
+        v-model="showDetailModal"
+        :title="`${t('sales.rfqDetail')} · ${selectedRfq?.rfqNumber || ''}`"
+        size="lg"
+      >
         <div v-if="selectedRfq" class="detail-modal-body">
           <!-- Negotiation Banner if present -->
           <div v-if="parseNegotiationNote(selectedRfq.note).isNegotiation" class="negotiation-banner">
-            <span class="material-symbols-outlined text-[20px] text-emerald-600">handshake</span>
-            <div>
+            <span class="material-symbols-outlined text-[22px] text-emerald-600">handshake</span>
+            <div class="banner-content">
               <strong class="banner-title">{{ t('provider.negotiationRequests') }}</strong>
               <p class="banner-desc">
                 {{ t('provider.proposedTargetPrice') }}:
@@ -550,47 +637,130 @@ const handleDecline = async (rfq: RfqDto) => {
               <span class="lbl">{{ t('commerce.status') }}</span>
               <StatusPill :status="selectedRfq.status" />
             </div>
+            <div class="detail-item">
+              <span class="lbl">{{ t('sales.requestedCurrency') }}</span>
+              <strong class="val text-indigo-700">
+                {{ selectedRfq.requestedCurrency || selectedRfq.currency || 'USD' }}
+                <span v-if="hasConversion(selectedRfq)" class="conversion-sub-badge">
+                  ({{ t('sales.convertedFromBase') }}: {{ selectedRfq.baseCurrency }})
+                </span>
+              </strong>
+            </div>
           </div>
 
           <!-- Line Items Table -->
           <div class="line-items-section">
-            <h3 class="section-sub mono">{{ t('sales.lineItems') }}</h3>
-            <table class="line-items-table mono">
-              <thead>
-                <tr>
-                  <th>{{ t('marketplace.products') }}</th>
-                  <th class="text-center">{{ t('marketplace.quantity') }}</th>
-                  <th class="text-end">{{ t('admin.quoteUnitPrice') }}</th>
-                  <th class="text-end">{{ t('sales.amount') }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(it, idx) in selectedRfq.items || []" :key="idx">
-                  <td>
-                    <strong>{{ localized(it.productNameEn, it.productNameAr) }}</strong>
-                    <div class="text-xs text-muted">{{ it.productId }}</div>
-                  </td>
-                  <td class="text-center">{{ it.quantity }}</td>
-                  <td class="text-end">{{ formatPrice(it.unitPrice || 0, 'USD') }}</td>
-                  <td class="text-end"><strong>{{ formatPrice((it.unitPrice || 0) * (it.quantity || 1), 'USD') }}</strong></td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="line-items-header-row">
+              <h3 class="section-sub mono">{{ t('sales.lineItems') }} ({{ selectedRfq.items?.length || 0 }})</h3>
+              <span v-if="hasConversion(selectedRfq)" class="conversion-summary-pill mono">
+                <span class="material-symbols-outlined text-[13px]">currency_exchange</span>
+                <span>{{ selectedRfq.baseCurrency }} → {{ selectedRfq.requestedCurrency || selectedRfq.currency }}</span>
+              </span>
+            </div>
+
+            <div class="line-items-table-wrap">
+              <table class="line-items-table mono">
+                <thead>
+                  <tr>
+                    <th>{{ t('marketplace.products') }}</th>
+                    <th class="text-center">{{ t('marketplace.quantity') }}</th>
+                    <th class="text-end">{{ t('sales.baseUnitPrice') }}</th>
+                    <th class="text-end">{{ t('sales.requestedUnitPrice') }}</th>
+                    <th class="text-end">{{ t('sales.amount') }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(it, idx) in selectedRfq.items || []" :key="idx">
+                    <td>
+                      <strong class="item-name">{{ localized(it.productNameEn, it.productNameAr) }}</strong>
+                      <div class="text-xs text-muted item-sku">{{ it.productId }}</div>
+                      <div v-if="it.exchangeRate" class="exchange-rate-badge mono">
+                        <span class="material-symbols-outlined text-[12px]">info</span>
+                        <span>1 {{ getItemBaseCurrency(it, selectedRfq) }} = {{ it.exchangeRate }} {{ getItemRequestedCurrency(it, selectedRfq) }}</span>
+                      </div>
+                    </td>
+                    <td class="text-center item-qty">{{ it.quantity }}</td>
+                    <td class="text-end item-base-price text-muted">
+                      {{ formatPrice(getItemBaseUnitPrice(it), locale) }} {{ getItemBaseCurrency(it, selectedRfq) }}
+                    </td>
+                    <td class="text-end item-req-price font-semibold text-indigo-700">
+                      {{ formatPrice(getItemRequestedUnitPrice(it), locale) }} {{ getItemRequestedCurrency(it, selectedRfq) }}
+                    </td>
+                    <td class="text-end item-amount">
+                      <strong class="font-bold text-indigo-700 block">
+                        {{ formatPrice(getItemRequestedTotal(it), locale) }} {{ getItemRequestedCurrency(it, selectedRfq) }}
+                      </strong>
+                      <span v-if="hasItemConversion(it, selectedRfq)" class="text-xs text-muted block sub-amount">
+                        ({{ formatPrice(getItemBaseTotal(it), locale) }} {{ getItemBaseCurrency(it, selectedRfq) }})
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr class="line-items-total-row">
+                    <td colspan="4" class="text-end font-bold">{{ t('commerce.total') }}:</td>
+                    <td class="text-end">
+                      <strong class="total-requested-val text-indigo-700 font-extrabold text-base block">
+                        {{ formatPrice(selectedRfqTotal, locale) }} {{ getItemRequestedCurrency(selectedRfq.items?.[0] || {}, selectedRfq) }}
+                      </strong>
+                      <span v-if="hasConversion(selectedRfq)" class="text-xs text-muted block">
+                        ({{ formatPrice(selectedRfqBaseTotal, locale) }} {{ selectedRfq.baseCurrency }})
+                      </span>
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
           </div>
 
           <!-- Note -->
           <div v-if="parseNegotiationNote(selectedRfq.note).cleanNote" class="detail-note">
-            <span class="mono text-xs text-muted">{{ t('sales.notes') }}:</span>
-            <p>{{ parseNegotiationNote(selectedRfq.note).cleanNote }}</p>
+            <span class="mono text-xs text-muted font-bold block mb-1">{{ t('sales.notes') }}:</span>
+            <p class="detail-note-text">{{ parseNegotiationNote(selectedRfq.note).cleanNote }}</p>
           </div>
         </div>
+
+        <template #footer>
+          <div v-if="selectedRfq" class="modal-footer-actions">
+            <BaseButton variant="ghost" @click="showDetailModal = false">{{ t('common.close') }}</BaseButton>
+            <template v-if="selectedRfq.status === 'Pending'">
+              <BaseButton
+                v-if="parseNegotiationNote(selectedRfq.note).isNegotiation"
+                variant="primary"
+                class="btn-accept-negotiation"
+                :loading="acting === selectedRfq.id"
+                @click="showDetailModal = false; handleAcceptNegotiation(selectedRfq as any)"
+              >
+                <span class="material-symbols-outlined text-[16px]">check_circle</span>
+                <span>{{ t('provider.acceptNegotiation') }}</span>
+              </BaseButton>
+
+              <BaseButton
+                variant="primary"
+                @click="showDetailModal = false; openCounterModal(selectedRfq as any)"
+              >
+                <span class="material-symbols-outlined text-[16px]">rate_review</span>
+                <span>{{ t('provider.counterOffer') }}</span>
+              </BaseButton>
+            </template>
+          </div>
+        </template>
       </BaseModal>
 
       <!-- Counter-Offer Modal -->
       <BaseModal v-model="showCounterModal" :title="t('provider.counterOffer')" size="md">
         <div v-if="counterRfq" class="counter-modal-body">
+          <div v-if="hasConversion(counterRfq)" class="currency-reminder-box mono">
+            <span class="material-symbols-outlined text-[16px] text-indigo-600">currency_exchange</span>
+            <div>
+              <span class="text-xs text-muted">{{ t('provider.clientRequestedCurrency') }}:</span>
+              <strong class="text-xs text-indigo-700"> {{ counterRfq.requestedCurrency || counterRfq.currency }}</strong>
+              <span class="text-xs text-muted"> ({{ t('sales.convertedFromBase') }}: {{ counterRfq.baseCurrency }})</span>
+            </div>
+          </div>
+
           <div class="form-group">
-            <label class="form-lbl mono">{{ t('provider.counterAmount') }} (USD) *</label>
+            <label class="form-lbl mono">{{ t('provider.counterAmount') }} ({{ counterRfq.requestedCurrency || counterRfq.currency || 'USD' }}) *</label>
             <input
               v-model.number="counterAmount"
               type="number"
@@ -621,14 +791,86 @@ const handleDecline = async (rfq: RfqDto) => {
               :placeholder="t('provider.counterNote')"
             ></textarea>
           </div>
+        </div>
 
-          <div class="modal-actions">
+        <template #footer>
+          <div class="modal-footer-actions">
             <BaseButton variant="ghost" @click="showCounterModal = false">{{ t('common.cancel') }}</BaseButton>
             <BaseButton variant="primary" :loading="submittingCounter" @click="submitCounterOffer">
               {{ t('provider.counterOffer') }}
             </BaseButton>
           </div>
+        </template>
+      </BaseModal>
+
+      <!-- Quote Detail Modal -->
+      <BaseModal
+        v-model="showQuoteDetailModal"
+        :title="`${t('sales.quoteTitle')} · ${selectedQuote?.quoteNumber || ''}`"
+        size="lg"
+      >
+        <div v-if="selectedQuote" class="detail-modal-body">
+          <div class="detail-grid mono">
+            <div class="detail-item">
+              <span class="lbl">{{ t('sales.quoteTitle') }}</span>
+              <strong class="val">{{ selectedQuote.quoteNumber }}</strong>
+            </div>
+            <div class="detail-item">
+              <span class="lbl">{{ t('sales.requestDate') }}</span>
+              <strong class="val">{{ selectedQuote.createdAt ? new Date(selectedQuote.createdAt).toLocaleDateString() : '—' }}</strong>
+            </div>
+            <div class="detail-item">
+              <span class="lbl">{{ t('sales.validThrough') }}</span>
+              <strong class="val">{{ selectedQuote.validUntil ? new Date(selectedQuote.validUntil).toLocaleDateString() : '—' }}</strong>
+            </div>
+            <div class="detail-item">
+              <span class="lbl">{{ t('commerce.status') }}</span>
+              <StatusPill :status="selectedQuote.status" />
+            </div>
+          </div>
+
+          <!-- Line items -->
+          <div v-if="selectedQuote.items && selectedQuote.items.length" class="line-items-section">
+            <h3 class="section-sub mono">{{ t('sales.lineItems') }}</h3>
+            <div class="line-items-table-wrap">
+              <table class="line-items-table mono">
+                <thead>
+                  <tr>
+                    <th>{{ t('marketplace.products') }}</th>
+                    <th class="text-center">{{ t('marketplace.quantity') }}</th>
+                    <th class="text-end">{{ t('admin.quoteUnitPrice') }}</th>
+                    <th class="text-end">{{ t('admin.quoteSubtotal') }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(it, idx) in selectedQuote.items" :key="idx">
+                    <td>
+                      <strong>{{ localized(it.productNameEn, it.productNameAr) }}</strong>
+                      <div class="text-xs text-muted">{{ it.productId }}</div>
+                    </td>
+                    <td class="text-center">{{ it.quantity }}</td>
+                    <td class="text-end">{{ formatPrice(it.unitPrice || 0, locale) }} {{ selectedQuote.currency || 'USD' }}</td>
+                    <td class="text-end"><strong>{{ formatPrice((it.unitPrice || 0) * (it.quantity || 1), locale) }} {{ selectedQuote.currency || 'USD' }}</strong></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Total Summary -->
+          <div class="order-summary-box mono">
+            <span class="summary-lbl">{{ t('commerce.total') }}:</span>
+            <strong class="summary-val text-primary">{{ formatPrice(selectedQuote.amount, locale) }} {{ selectedQuote.currency || 'USD' }}</strong>
+          </div>
         </div>
+
+        <template #footer>
+          <div class="modal-footer-actions">
+            <BaseButton variant="secondary" type="button" @click="showQuoteDetailModal = false">
+              {{ t('common.close') }}
+            </BaseButton>
+          </div>
+        </template>
       </BaseModal>
     </div>
   </ProviderLayout>
@@ -637,6 +879,8 @@ const handleDecline = async (rfq: RfqDto) => {
 <style scoped>
 .provider-quotes-view {
   width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .view-header {
@@ -672,7 +916,7 @@ const handleDecline = async (rfq: RfqDto) => {
 /* KPI Cards */
 .kpi-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
   gap: var(--space-4);
   margin-bottom: var(--space-6);
 }
@@ -775,13 +1019,27 @@ const handleDecline = async (rfq: RfqDto) => {
   width: 100%;
   height: 40px;
   padding-inline-start: 36px;
-  padding-inline-end: 12px;
+  padding-inline-end: 36px;
   border: 1px solid var(--wl-border);
   border-radius: var(--radius-md);
   background: var(--wl-surface);
   color: var(--wl-ink-strong);
   font-size: var(--step-0);
   outline: none;
+}
+
+.clear-search-btn {
+  position: absolute;
+  inset-inline-end: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--wl-muted);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  padding: 4px;
 }
 
 .filter-select {
@@ -816,6 +1074,9 @@ const handleDecline = async (rfq: RfqDto) => {
 
 .table-wrap {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  min-width: 0;
 }
 
 .data-table {
@@ -829,6 +1090,36 @@ const handleDecline = async (rfq: RfqDto) => {
   border-bottom: 1px solid var(--wl-border);
   text-align: start;
   vertical-align: middle;
+}
+
+.table-row-clickable {
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.table-row-clickable:hover {
+  background-color: var(--wl-surface-soft);
+}
+
+.order-summary-box {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: var(--wl-surface-soft);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--wl-border);
+}
+
+.summary-lbl {
+  font-size: var(--step-0);
+  color: var(--wl-muted);
+}
+
+.summary-val {
+  font-size: 1.25rem;
+  font-weight: 800;
 }
 
 .data-table th {
@@ -958,6 +1249,30 @@ const handleDecline = async (rfq: RfqDto) => {
   color: var(--wl-ink-strong);
 }
 
+.conversion-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  color: var(--wl-primary, #4338ca);
+  background: var(--wl-primary-soft, #eef2ff);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm, 4px);
+  margin-top: 3px;
+  width: fit-content;
+}
+
+.currency-reminder-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: var(--radius-md, 8px);
+  background: var(--wl-primary-soft, #eef2ff);
+  border: 1px solid var(--wl-primary-border, #c7d2fe);
+  margin-bottom: 12px;
+}
+
 /* Actions */
 .action-btn-group {
   display: inline-flex;
@@ -1026,32 +1341,39 @@ const handleDecline = async (rfq: RfqDto) => {
 }
 
 /* Detail Modal */
+/* Detail Modal */
 .detail-modal-body {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-4, 16px);
+  padding: 0;
 }
 
 .negotiation-banner {
   display: flex;
   align-items: flex-start;
-  gap: var(--space-3);
+  gap: var(--space-3, 12px);
   background: #ecfdf5;
   border: 1px solid #a7f3d0;
-  border-radius: var(--radius-md);
-  padding: var(--space-3);
+  border-radius: var(--radius-md, 8px);
+  padding: var(--space-3, 12px) var(--space-4, 16px);
+}
+
+.banner-content {
+  flex: 1;
 }
 
 .banner-title {
   color: #065f46;
   font-size: var(--step-0);
   display: block;
+  font-weight: 700;
 }
 
 .banner-desc {
   font-size: var(--step--1);
   color: #047857;
-  margin: 2px 0;
+  margin: 3px 0 0;
 }
 
 .banner-reason {
@@ -1062,21 +1384,26 @@ const handleDecline = async (rfq: RfqDto) => {
 
 .detail-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-3);
-  padding: var(--space-3);
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-3, 12px);
+  padding: var(--space-3, 12px) var(--space-4, 16px);
   background: var(--wl-surface-soft);
-  border-radius: var(--radius-md);
+  border: 1px solid var(--wl-border);
+  border-radius: var(--radius-md, 8px);
 }
 
 .detail-item {
   display: flex;
   flex-direction: column;
+  gap: 2px;
 }
 
 .detail-item .lbl {
   font-size: 11px;
   color: var(--wl-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 600;
 }
 
 .detail-item .val {
@@ -1084,41 +1411,149 @@ const handleDecline = async (rfq: RfqDto) => {
   color: var(--wl-ink-strong);
 }
 
+.conversion-sub-badge {
+  display: block;
+  font-size: 11px;
+  color: var(--wl-muted);
+  font-weight: 500;
+  margin-top: 1px;
+}
+
 .line-items-section {
   display: flex;
   flex-direction: column;
+  gap: var(--space-2, 8px);
+}
+
+.line-items-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: var(--space-2);
 }
 
-.section-sub {
-  font-size: var(--step--1);
-  color: var(--wl-muted);
-  text-transform: uppercase;
+.conversion-summary-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #4338ca;
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.line-items-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--wl-border);
+  border-radius: var(--radius-md, 8px);
+  background: var(--wl-surface);
 }
 
 .line-items-table {
   width: 100%;
   border-collapse: collapse;
   font-size: var(--step--1);
+  min-width: 580px;
 }
 
 .line-items-table th,
 .line-items-table td {
-  padding: var(--space-2) var(--space-3);
+  padding: 10px 14px;
   border-bottom: 1px solid var(--wl-border);
+  vertical-align: middle;
 }
 
 .line-items-table th {
   background: var(--wl-surface-soft);
   color: var(--wl-muted);
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.item-name {
+  color: var(--wl-ink-strong);
+  font-size: var(--step--1);
+}
+
+.item-sku {
+  margin-top: 2px;
+}
+
+.exchange-rate-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10.5px;
+  color: #4338ca;
+  background: #eef2ff;
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-top: 4px;
+}
+
+.item-base-price {
+  font-size: 12px;
+}
+
+.item-req-price {
+  font-size: 13px;
+}
+
+.item-amount {
+  font-size: 13px;
+}
+
+.sub-amount {
+  margin-top: 2px;
+  font-size: 11px;
+}
+
+.line-items-total-row td {
+  background: var(--wl-surface-soft);
+  font-weight: 700;
+  border-bottom: none;
+  padding: 12px 14px;
+}
+
+.total-requested-val {
+  font-size: var(--step-0);
 }
 
 .detail-note {
   background: var(--wl-surface-soft);
-  padding: var(--space-3);
+  padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-md);
+  border: 1px solid var(--wl-border);
   font-size: var(--step--1);
   color: var(--wl-ink-strong);
+}
+
+.detail-note-text {
+  margin: 0;
+  white-space: pre-wrap;
+  line-height: 1.45;
+}
+
+.modal-footer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+.btn-accept-negotiation {
+  background: #059669 !important;
+  color: #fff !important;
+}
+.btn-accept-negotiation:hover {
+  background: #047857 !important;
 }
 
 /* Counter Modal */
@@ -1157,13 +1592,6 @@ const handleDecline = async (rfq: RfqDto) => {
   box-shadow: var(--wl-focus-ring);
 }
 
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--space-2);
-  margin-top: var(--space-3);
-}
-
 @media (max-width: 768px) {
   .view-header {
     flex-direction: column;
@@ -1171,6 +1599,19 @@ const handleDecline = async (rfq: RfqDto) => {
   .filter-bar {
     flex-direction: column;
     align-items: stretch;
+  }
+  .kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2);
+  }
+  .kpi-card {
+    padding: var(--space-3);
+  }
+}
+
+@media (max-width: 440px) {
+  .kpi-grid {
+    grid-template-columns: 1fr;
   }
 }
 </style>

@@ -1,23 +1,18 @@
 <script setup lang="ts">
 import { onMounted, onActivated, onUnmounted, ref, computed } from 'vue'
 import AdminLayout from '../../components/layout/AdminLayout.vue'
-import SkeletonLoader from '../../components/ui/SkeletonLoader.vue'
 import BaseButton from '../../components/ui/BaseButton.vue'
 import BaseModal from '../../components/ui/BaseModal.vue'
 import BaseInput from '../../components/ui/BaseInput.vue'
 import StatCard from '../../components/ui/StatCard.vue'
 import FileUpload from '../../components/ui/FileUpload.vue'
 import { ATTACHMENT_PLACE, MEDIA_TYPE } from '../../config/api.config'
-import { authService as authSvc, services, locationRepository, userRepository, locationService, companyRepository, marketplaceRepository } from '../../di/container'
+import { services, locationRepository, userRepository, locationService, companyRepository, marketplaceRepository } from '../../di/container'
 import { toastService } from '../../infrastructure/feedback/toast.service'
-import StatusPill from '../../components/ui/StatusPill.vue'
 import { useUserLookup } from '../../composables/useUserLookup'
 import type { AuditLogDto } from '../../domain/models/audit-log'
 import type { CategoryDto, CreateCategoryPayload } from '../../domain/models/marketplace'
 import { t, locale } from '../../i18n'
-import { formatPrice } from '../../utils/format'
-
-const isSalesOnly = computed(() => authSvc.isSales.value && !authSvc.isAdmin.value)
 
 const { getUserInfo, resolveLogsUsers, getRoleBadgeClass } = useUserLookup()
 
@@ -32,27 +27,6 @@ const liveCounts = computed(() => ({
   zones: locationService.zones.value.length || stats.value.zones,
 }))
 
-const staffMetrics = computed(() => {
-  const rfqs = services.salesService.rfqs.value
-  const orders = services.commerceService.orders.value
-  const tickets = services.contentService.tickets.value
-
-  const pendingRfqs = rfqs.filter((r) => r.status === 'Pending')
-  const pendingOrders = orders.filter((o) => o.status === 'Pending' || o.status === 'Confirmed')
-  const openTickets = tickets.filter((t) => t.status !== 'Closed')
-
-  return {
-    rfqTotal: services.salesService.rfqTotalCount.value || rfqs.length,
-    pendingRfqsCount: pendingRfqs.length,
-    urgentRfqs: pendingRfqs.slice(0, 5),
-    orderTotal: services.commerceService.totalCount.value || orders.length,
-    pendingOrdersCount: pendingOrders.length,
-    activeOrders: pendingOrders.slice(0, 5),
-    openTicketsCount: openTickets.length,
-    urgentTickets: openTickets.slice(0, 5),
-  }
-})
-
 // Real monthly activity aggregated dynamically from API entities (no hardcoded data)
 const dynamicThroughput = computed(() => {
   const months: { month: string; ym: string; value: number }[] = []
@@ -64,11 +38,10 @@ const dynamicThroughput = computed(() => {
     months.push({ month, ym, value: 0 })
   }
 
-  // Aggregate real events from orders, RFQs, and audit logs (audit logs for admin only)
+  // Aggregate real events from orders and audit logs (audit logs for admin only)
   const allDates = [
     ...services.commerceService.orders.value.map((o) => o.createdAt),
-    ...services.salesService.rfqs.value.map((r) => r.createdAt),
-    ...(!isSalesOnly.value ? recentAuditLogs.value.map((l) => l.createdAt) : []),
+    ...recentAuditLogs.value.map((l) => l.createdAt),
   ]
 
   for (const iso of allDates) {
@@ -228,30 +201,24 @@ const load = async () => {
   }
   loading.value = true
   try {
-    const isStaff = isSalesOnly.value
     const [countries, cities, zones, usersPage, appsPage, productsPage, categoriesList] = await Promise.all([
-      !isStaff ? locationRepository.getCountries().catch(() => []) : Promise.resolve([]),
-      !isStaff ? locationRepository.getCities().catch(() => []) : Promise.resolve([]),
-      !isStaff ? locationRepository.getZones().catch(() => []) : Promise.resolve([]),
-      !isStaff ? userRepository.getUsers({ pageNumber: 1, pageSize: 1 }).catch(() => null) : Promise.resolve(null),
-      !isStaff ? companyRepository.getDistributorApplications({ pageNumber: 1, pageSize: 1, status: 1 }).catch(() => null) : Promise.resolve(null),
+      locationRepository.getCountries().catch(() => []),
+      locationRepository.getCities().catch(() => []),
+      locationRepository.getZones().catch(() => []),
+      userRepository.getUsers({ pageNumber: 1, pageSize: 1 }).catch(() => null),
+      companyRepository.getDistributorApplications({ pageNumber: 1, pageSize: 1, status: 1 }).catch(() => null),
       marketplaceRepository.getProducts({ page: 1, pageSize: 1 }).catch(() => null),
       marketplaceRepository.getCategories().catch(() => []),
-      services.salesService.loadRfqs({ pageNumber: 1, pageSize: 10 }).catch(() => null),
       services.commerceService.loadOrders({ page: 1, pageSize: 10 }).catch(() => null),
       services.contentService.loadTickets().catch(() => []),
-      !isStaff ? services.contentService.loadDocuments().catch(() => []) : Promise.resolve([]),
-      !isStaff ? services.contentService.loadSupportContact().catch(() => null) : Promise.resolve(null),
-      !isStaff ? services.auditLogService.loadLogs({ pageSize: 6 }).catch(() => null) : Promise.resolve(null),
+      services.contentService.loadDocuments().catch(() => []),
+      services.contentService.loadSupportContact().catch(() => null),
+      services.auditLogService.loadLogs({ pageSize: 6 }).catch(() => null),
     ])
 
-    if (!isStaff) {
-      recentAuditLogs.value = services.auditLogService.logs.value.slice(0, 6)
-      if (recentAuditLogs.value.length > 0) {
-        void resolveLogsUsers(recentAuditLogs.value)
-      }
-    } else {
-      recentAuditLogs.value = []
+    recentAuditLogs.value = services.auditLogService.logs.value.slice(0, 6)
+    if (recentAuditLogs.value.length > 0) {
+      void resolveLogsUsers(recentAuditLogs.value)
     }
 
     const extractCount = (res: unknown): number => {
@@ -276,11 +243,9 @@ const load = async () => {
       products: extractCount(productsPage),
       categories: Array.isArray(categoriesList) ? categoriesList.length : 0,
     }
-    if (!isStaff) {
-      if (Array.isArray(countries)) locationService.countries.value = countries as never
-      if (Array.isArray(cities)) locationService.cities.value = cities as never
-      if (Array.isArray(zones)) locationService.zones.value = zones as never
-    }
+    if (Array.isArray(countries)) locationService.countries.value = countries as never
+    if (Array.isArray(cities)) locationService.cities.value = cities as never
+    if (Array.isArray(zones)) locationService.zones.value = zones as never
   } finally {
     loading.value = false
   }
@@ -404,89 +369,32 @@ onUnmounted(_removeListeners)
       <div>
         <div class="dash-eyebrow mono">
           <span class="live-dot" aria-hidden="true"></span>
-          <span>{{ isSalesOnly ? t('admin.salesConsole') : t('admin.dashboard') }}</span>
+          <span>{{ t('admin.dashboard') }}</span>
         </div>
-        <h1 class="dash-title">{{ isSalesOnly ? t('admin.fulfillmentHub') : t('admin.dashboard') }}</h1>
+        <h1 class="dash-title">{{ t('admin.dashboard') }}</h1>
         <p class="dash-head__desc">
-          {{ isSalesOnly ? t('admin.salesConsoleDesc') : t('admin.overviewDesc') }}
+          {{ t('admin.overviewDesc') }}
         </p>
       </div>
 
       <div class="dash-head__actions">
-        <div v-if="!isSalesOnly" class="status-badge mono">
+        <div class="status-badge mono">
           <span class="live-dot" aria-hidden="true"></span>
           <span>{{ t('admin.gatewayActive') }}</span>
         </div>
-        <template v-if="isSalesOnly">
-          <BaseButton variant="primary" size="sm" @click="$router.push('/admin/sales')">
-            <span class="material-symbols-outlined text-[16px]">receipt_long</span>
-            <span>{{ t('admin.issueQuotation') }}</span>
-          </BaseButton>
-          <BaseButton variant="outline" size="sm" @click="$router.push('/admin/orders')">
-            <span class="material-symbols-outlined text-[16px]">local_shipping</span>
-            <span>{{ t('admin.processOrders') }}</span>
-          </BaseButton>
-        </template>
-        <template v-else>
-          <BaseButton variant="outline" size="sm" @click="openContactModal">
-            <span class="material-symbols-outlined text-[16px]">contact_support</span>
-            <span>{{ t('admin.supportChannels') }}</span>
-          </BaseButton>
-          <BaseButton variant="primary" size="sm" @click="$router.push('/admin/categories')">
-            <span class="material-symbols-outlined text-[16px]">category</span>
-            <span>{{ t('admin.categoriesTitle') }}</span>
-          </BaseButton>
-        </template>
+        <BaseButton variant="outline" size="sm" @click="openContactModal">
+          <span class="material-symbols-outlined text-[16px]">contact_support</span>
+          <span>{{ t('admin.supportChannels') }}</span>
+        </BaseButton>
+        <BaseButton variant="primary" size="sm" @click="$router.push('/admin/categories')">
+          <span class="material-symbols-outlined text-[16px]">category</span>
+          <span>{{ t('admin.categoriesTitle') }}</span>
+        </BaseButton>
       </div>
     </header>
 
-    <SkeletonLoader v-if="loading" type="stats-grid" :count="isSalesOnly ? 4 : 6" gap="1rem" />
-
-    <!-- Staff Metrics Cards Grid (Focused, high-impact operational counters) -->
-    <div v-else-if="isSalesOnly" class="stats-grid stats-grid--staff">
-      <StatCard
-        :label="t('admin.openRfqQueue')"
-        :value="staffMetrics.rfqTotal"
-        to="/admin/sales"
-        tone="amber"
-        icon-only
-      >
-        <template #icon><span class="material-symbols-outlined text-[18px]">request_quote</span></template>
-      </StatCard>
-
-      <StatCard
-        :label="t('admin.fulfillmentOrders')"
-        :value="staffMetrics.orderTotal"
-        to="/admin/orders"
-        tone="indigo"
-        icon-only
-      >
-        <template #icon><span class="material-symbols-outlined text-[18px]">local_shipping</span></template>
-      </StatCard>
-
-      <StatCard
-        :label="t('admin.supportInquiries')"
-        :value="staffMetrics.openTicketsCount"
-        to="/admin/tickets"
-        tone="amber"
-        icon-only
-      >
-        <template #icon><span class="material-symbols-outlined text-[18px]">support_agent</span></template>
-      </StatCard>
-
-      <StatCard
-        :label="t('admin.productsTitle')"
-        :value="stats.products"
-        to="/marketplace"
-        tone="emerald"
-        icon-only
-      >
-        <template #icon><span class="material-symbols-outlined text-[18px]">inventory_2</span></template>
-      </StatCard>
-    </div>
-
     <!-- Admin Metrics Cards Grid (Real API counts without fake sparklines/trends) -->
-    <div v-else class="stats-grid">
+    <div class="stats-grid">
       <StatCard
         :label="t('admin.totalCountries')"
         :value="liveCounts.countries"
@@ -541,154 +449,15 @@ onUnmounted(_removeListeners)
         :label="t('admin.productsTitle')"
         :value="stats.products"
         to="/marketplace"
-        tone="emerald"
+        tone="teal"
         icon-only
       >
         <template #icon><span class="material-symbols-outlined text-[18px]">inventory_2</span></template>
       </StatCard>
-
     </div>
 
-    <!-- Staff Operational Triage Queues (Exclusive to Welco Staff) -->
-    <section v-if="isSalesOnly" class="sales-operations-section">
-      <div class="sales-queues-grid">
-        <!-- Queue 1: Urgent RFQ Queue -->
-        <div class="card sales-queue-card">
-          <div class="queue-card__head">
-            <div class="queue-card__title-group">
-              <div class="queue-icon queue-icon--amber">
-                <span class="material-symbols-outlined text-[18px]">receipt_long</span>
-              </div>
-              <div>
-                <h3 class="queue-title">{{ t('admin.urgentRfqQueue') }}</h3>
-                <span class="mono queue-sub">{{ staffMetrics.pendingRfqsCount }} {{ t('admin.awaitingQuotation') }}</span>
-              </div>
-            </div>
-            <router-link to="/admin/sales" class="queue-link mono">
-              <span>{{ t('common.viewAll') }}</span>
-              <span class="material-symbols-outlined text-[14px] icon--directional">arrow_forward</span>
-            </router-link>
-          </div>
-
-          <div v-if="!staffMetrics.urgentRfqs.length" class="empty-list-dash">
-            <span class="material-symbols-outlined text-[20px] text-muted">task_alt</span>
-            <span class="mono text-xs text-muted">{{ t('admin.allQuoted') }}</span>
-          </div>
-
-          <div v-else class="dash-mini-list">
-            <div
-              v-for="rfq in staffMetrics.urgentRfqs"
-              :key="rfq.id"
-              class="dash-mini-item"
-              @click="$router.push('/admin/sales')"
-            >
-              <div class="dash-mini-main">
-                <div class="flex items-center gap-2">
-                  <strong class="dash-mini-id mono">{{ rfq.rfqNumber }}</strong>
-                  <span class="priority-chip mono text-[10px]">RFQ</span>
-                </div>
-                <span class="dash-mini-sub mono">{{ rfq.companyName || t('admin.institutionalClientFallback') }} · {{ t('account.itemsCount', { count: rfq.items.length }) }}</span>
-              </div>
-              <div class="dash-mini-action">
-                <StatusPill :status="rfq.status" />
-                <span class="material-symbols-outlined text-[16px] text-muted icon--directional">chevron_right</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Queue 2: Active Orders Fulfillment Queue -->
-        <div class="card sales-queue-card">
-          <div class="queue-card__head">
-            <div class="queue-card__title-group">
-              <div class="queue-icon queue-icon--indigo">
-                <span class="material-symbols-outlined text-[18px]">local_shipping</span>
-              </div>
-              <div>
-                <h3 class="queue-title">{{ t('admin.activeOrdersQueue') }}</h3>
-                <span class="mono queue-sub">{{ staffMetrics.pendingOrdersCount }} {{ t('admin.awaitingFulfillment') }}</span>
-              </div>
-            </div>
-            <router-link to="/admin/orders" class="queue-link mono">
-              <span>{{ t('common.viewAll') }}</span>
-              <span class="material-symbols-outlined text-[14px] icon--directional">arrow_forward</span>
-            </router-link>
-          </div>
-
-          <div v-if="!staffMetrics.activeOrders.length" class="empty-list-dash">
-            <span class="material-symbols-outlined text-[20px] text-muted">task_alt</span>
-            <span class="mono text-xs text-muted">{{ t('admin.allOrdersFulfilled') }}</span>
-          </div>
-
-          <div v-else class="dash-mini-list">
-            <div
-              v-for="order in staffMetrics.activeOrders"
-              :key="order.id"
-              class="dash-mini-item"
-              @click="$router.push('/admin/orders')"
-            >
-              <div class="dash-mini-main">
-                <div class="flex items-center gap-2">
-                  <strong class="dash-mini-id mono">{{ order.orderNumber }}</strong>
-                  <span class="priority-chip priority-chip--order mono text-[10px]">{{ order.currencySymbol || '$' }}{{ formatPrice(order.totalAmount ?? 0, locale) }}</span>
-                </div>
-                <span class="dash-mini-sub mono">{{ t('account.lineItemsCount', { count: order.items?.length || 0 }) }}</span>
-              </div>
-              <div class="dash-mini-action">
-                <StatusPill :status="order.status" />
-                <span class="material-symbols-outlined text-[16px] text-muted icon--directional">chevron_right</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Queue 3: Support Inquiries Queue -->
-        <div class="card sales-queue-card">
-          <div class="queue-card__head">
-            <div class="queue-card__title-group">
-              <div class="queue-icon queue-icon--emerald">
-                <span class="material-symbols-outlined text-[18px]">support_agent</span>
-              </div>
-              <div>
-                <h3 class="queue-title">{{ t('admin.supportQueue') }}</h3>
-                <span class="mono queue-sub">{{ staffMetrics.openTicketsCount }} {{ t('admin.awaitingReply') }}</span>
-              </div>
-            </div>
-            <router-link to="/admin/tickets" class="queue-link mono">
-              <span>{{ t('common.viewAll') }}</span>
-              <span class="material-symbols-outlined text-[14px] icon--directional">arrow_forward</span>
-            </router-link>
-          </div>
-
-          <div v-if="!staffMetrics.urgentTickets.length" class="empty-list-dash">
-            <span class="material-symbols-outlined text-[20px] text-muted">task_alt</span>
-            <span class="mono text-xs text-muted">{{ t('admin.allTicketsResolved') }}</span>
-          </div>
-
-          <div v-else class="dash-mini-list">
-            <div
-              v-for="tk in staffMetrics.urgentTickets"
-              :key="tk.id"
-              class="dash-mini-item"
-              @click="$router.push('/admin/tickets')"
-            >
-              <div class="dash-mini-main">
-                <div class="flex items-center gap-2">
-                  <strong class="dash-mini-id mono truncate max-w-[170px]">{{ tk.subject }}</strong>
-                </div>
-              </div>
-              <div class="dash-mini-action">
-                <StatusPill :status="tk.status" />
-                <span class="material-symbols-outlined text-[16px] text-muted icon--directional">chevron_right</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Admin Charts & Visualizations Section (Admin Only) -->
-    <section v-else class="chart-section">
+    <!-- Admin Charts & Visualizations Section -->
+    <section class="chart-section">
       <div class="chart-grid">
         <!-- Smooth Curve Activity / Real Dynamic Throughput Chart -->
         <div class="card chart-card chart-card--wide">
@@ -909,7 +678,7 @@ onUnmounted(_removeListeners)
     </section>
 
     <!-- Real-Time Audit Activity Trail in Overview (Admin Only - Live API Data) -->
-    <section v-if="!isSalesOnly" class="card audit-overview-card">
+    <section class="card audit-overview-card">
       <div class="audit-overview-head">
         <div>
           <div class="dash-eyebrow mono">
@@ -967,55 +736,11 @@ onUnmounted(_removeListeners)
       <div class="bento-card__head">
         <div>
           <h3>{{ t('admin.quickActions') }}</h3>
-          <span class="mono text-xs text-muted">{{ isSalesOnly ? t('admin.salesShortcuts') : t('admin.adminShortcuts') }}</span>
+          <span class="mono text-xs text-muted">{{ t('admin.adminShortcuts') }}</span>
         </div>
       </div>
 
-      <!-- Staff Quick Actions -->
-      <div v-if="isSalesOnly" class="quick-actions-grid">
-        <button type="button" class="quick-btn" @click="$router.push('/admin/sales')">
-          <span class="material-symbols-outlined quick-btn__icon" style="color:var(--wl-warning)">receipt_long</span>
-          <div class="quick-btn__text">
-            <strong>{{ t('admin.issueQuotation') }}</strong>
-            <span>{{ t('admin.salesRfqQueue') }}</span>
-          </div>
-        </button>
-
-        <button type="button" class="quick-btn" @click="$router.push('/admin/orders')">
-          <span class="material-symbols-outlined quick-btn__icon" style="color:var(--wl-primary)">local_shipping</span>
-          <div class="quick-btn__text">
-            <strong>{{ t('admin.orderFulfillment') }}</strong>
-            <span>{{ t('admin.orderFulfillmentSub') }}</span>
-          </div>
-        </button>
-
-        <button type="button" class="quick-btn" @click="$router.push('/marketplace')">
-          <span class="material-symbols-outlined quick-btn__icon" style="color:var(--wl-success)">inventory_2</span>
-          <div class="quick-btn__text">
-            <strong>{{ t('admin.catalogProducts') }}</strong>
-            <span>{{ t('admin.catalogProductsSub') }}</span>
-          </div>
-        </button>
-
-        <button type="button" class="quick-btn" @click="$router.push('/admin/tickets')">
-          <span class="material-symbols-outlined quick-btn__icon" style="color:var(--wl-accent)">support_agent</span>
-          <div class="quick-btn__text">
-            <strong>{{ t('admin.supportTickets') }}</strong>
-            <span>{{ t('admin.supportTicketsSub') }}</span>
-          </div>
-        </button>
-
-        <button type="button" class="quick-btn" @click="$router.push('/marketplace')">
-          <span class="material-symbols-outlined quick-btn__icon" style="color:var(--wl-muted)">storefront</span>
-          <div class="quick-btn__text">
-            <strong>{{ t('admin.storefront') }}</strong>
-            <span>{{ t('admin.storefrontSub') }}</span>
-          </div>
-        </button>
-      </div>
-
-      <!-- Admin Quick Actions -->
-      <div v-else class="quick-actions-grid">
+      <div class="quick-actions-grid">
         <button type="button" class="quick-btn" @click="$router.push('/marketplace')">
           <span class="material-symbols-outlined quick-btn__icon">add_circle</span>
           <div class="quick-btn__text">
@@ -1056,27 +781,18 @@ onUnmounted(_removeListeners)
           </div>
         </button>
 
-<button type="button" class="quick-btn" @click="openContactModal">
+        <button type="button" class="quick-btn" @click="openContactModal">
           <span class="material-symbols-outlined quick-btn__icon" style="color:var(--wl-teal)">contact_support</span>
           <div class="quick-btn__text">
             <strong>{{ t('admin.supportChannels') }}</strong>
             <span>{{ t('admin.supportChannelsSub') }}</span>
           </div>
         </button>
-
-        <button type="button" class="quick-btn" @click="$router.push('/marketplace')">
-          <span class="material-symbols-outlined quick-btn__icon">storefront</span>
-          <div class="quick-btn__text">
-            <strong>{{ t('admin.storefront') }}</strong>
-            <span>{{ t('admin.storefrontSub') }}</span>
-          </div>
-        </button>
       </div>
     </div>
 
-    <!-- Support Contact Channels Modal (Admin Only) -->
+    <!-- Support Contact Channels Modal -->
     <BaseModal
-      v-if="!isSalesOnly"
       v-model="showContactModal"
       :title="t('admin.supportChannelsModalTitle')"
       max-width="520px"
@@ -1127,7 +843,6 @@ onUnmounted(_removeListeners)
 
     <!-- Admin quick-add Category (create-only) -->
     <BaseModal
-      v-if="!isSalesOnly"
       v-model="showCategoryModal"
       :title="t('admin.newCategory')"
       max-width="640px"
@@ -1209,9 +924,10 @@ onUnmounted(_removeListeners)
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  gap: var(--space-5);
+  gap: var(--space-4);
   margin-bottom: var(--space-6);
   flex-wrap: wrap;
+  align-items: center;
 }
 
 .dash-eyebrow {
@@ -1230,15 +946,11 @@ onUnmounted(_removeListeners)
 .dash-title {
   font-family: var(--wl-font-display);
   font-size: 1.85rem;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: -0.025em;
-  line-height: 1.05;
+  line-height: 1.15;
   margin: 0;
-  background: var(--wl-gradient-gold);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  filter: var(--wl-gold-text-filter);
+  color: var(--fg-heading);
 }
 
 .dash-head__desc {
@@ -1253,6 +965,7 @@ onUnmounted(_removeListeners)
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  flex-wrap: wrap;
 }
 
 .status-badge {
@@ -1280,7 +993,7 @@ onUnmounted(_removeListeners)
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
   gap: var(--space-4);
   margin-bottom: var(--space-6);
 }
@@ -1479,16 +1192,16 @@ onUnmounted(_removeListeners)
 .chart-tooltip {
   position: absolute;
   transform: translate(-50%, -125%);
-  background: rgba(0, 10, 25, 0.92);
+  background: rgba(8, 36, 52, 0.96);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  color: var(--wl-ink-strong);
+  color: #ffffff;
   padding: 0.55rem 0.85rem;
   border-radius: 10px;
   font-size: 12px;
   pointer-events: none;
-  box-shadow: 0 10px 25px -5px rgba(0, 10, 25, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 10px 25px -5px rgba(0, 10, 25, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   white-space: nowrap;
   z-index: 20;
   display: flex;
@@ -1501,20 +1214,20 @@ onUnmounted(_removeListeners)
   justify-content: space-between;
   align-items: center;
   gap: 0.75rem;
-  font-size: 9.5px;
-  color: var(--wl-muted-soft);
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.75);
   letter-spacing: 0.06em;
 }
 
 .tooltip-pct {
-  color: var(--secondary, #147D92);
+  color: #28A7A1;
   font-weight: 700;
 }
 
 .tooltip-val {
   font-weight: 700;
-  font-size: 12.5px;
-  color: var(--wl-ink-strong);
+  font-size: 13px;
+  color: #ffffff;
 }
 
 /* Territory Lineage Architecture */
@@ -1822,186 +1535,12 @@ onUnmounted(_removeListeners)
   color: var(--wl-muted);
 }
 
-/* Staff Operational Triage Section */
-.sales-operations-section {
-  margin-bottom: 1.5rem;
-}
-
-.sales-queues-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.25rem;
-}
-
-.sales-queue-card {
-  padding: 1.25rem 1.4rem;
-  background: var(--wl-surface);
-  border: 1px solid var(--wl-border);
-  border-radius: var(--radius-lg);
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  overflow: hidden;
-  box-shadow: var(--shadow-sm);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.sales-queue-card:hover {
-  border-color: var(--wl-primary-soft);
-  box-shadow: var(--shadow-md);
-}
-
-.queue-card__head {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid var(--wl-border);
-}
-
-.queue-card__title-group {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.queue-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.queue-icon--amber {
-  background: rgba(245, 158, 11, 0.12);
-  color: var(--wl-warning);
-}
-
-.queue-icon--indigo {
-  background: rgba(105, 169, 255, 0.12);
-  color: var(--wl-primary);
-}
-
-.queue-icon--emerald {
-  background: var(--wl-success-soft);
-  color: var(--wl-success);
-}
-
-.queue-title {
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--wl-ink-strong);
-  margin: 0;
-  line-height: 1.2;
-}
-
-.queue-sub {
-  font-size: 11px;
-  color: var(--wl-muted);
-}
-
-.queue-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--wl-primary);
-  text-decoration: none;
-  transition: opacity 0.15s ease;
-  white-space: nowrap;
-}
-
-.queue-link:hover {
-  opacity: 0.8;
-  text-decoration: underline;
-}
-
-.priority-chip {
-  padding: 0.1rem 0.4rem;
-  border-radius: 4px;
-  font-weight: 600;
-  background: rgba(245, 158, 11, 0.12);
-  color: var(--wl-warning);
-  border: 1px solid rgba(245, 158, 11, 0.25);
-}
-
-.priority-chip--order {
-  background: var(--wl-primary-soft);
-  color: var(--wl-primary);
-  border-color: var(--wl-primary-soft);
-}
-
-.dash-link {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--wl-primary);
-  text-decoration: none;
-}
-
-.dash-link:hover {
-  text-decoration: underline;
-}
-
 .empty-list-dash {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
   padding: 2.5rem 1rem;
-}
-
-.dash-mini-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-}
-
-.dash-mini-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.65rem 0.85rem;
-  border: 1px solid var(--wl-border);
-  border-radius: 8px;
-  background: var(--wl-surface-soft);
-  cursor: pointer;
-  transition: all 0.15s ease;
-  gap: 0.75rem;
-}
-
-.dash-mini-item:hover {
-  background: var(--wl-surface);
-  border-color: var(--wl-border-strong);
-  transform: translateY(-1px);
-}
-
-.dash-mini-main {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-}
-
-.dash-mini-id {
-  font-size: 12.5px;
-  color: var(--wl-ink-strong);
-}
-
-.dash-mini-sub {
-  font-size: 10.5px;
-  color: var(--wl-muted);
-}
-
-.dash-mini-action {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
 }
 
 /* Real-Time Audit Overview Card */
@@ -2173,16 +1712,12 @@ onUnmounted(_removeListeners)
 
 @media (max-width: 980px) {
   .stats-grid {
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: var(--space-4);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr));
+    gap: var(--space-3);
     margin-bottom: var(--space-5);
   }
-  .sales-queues-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
   .quick-actions-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
     gap: 0.75rem;
   }
 }
@@ -2264,10 +1799,9 @@ onUnmounted(_removeListeners)
 }
 
 @media (max-width: 480px) {
-  .stats-grid,
-  .stats-grid--staff {
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: var(--space-3);
+  .stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr));
+    gap: var(--space-2);
   }
   .chart-card,
   .audit-overview-card,

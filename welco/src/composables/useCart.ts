@@ -6,6 +6,8 @@ import { services } from '../di/container'
 import { buildCreateCartPayload } from '../application/commerce.service'
 import { toastService } from '../infrastructure/feedback/toast.service'
 import { t } from '../i18n'
+import router from '../router'
+import { formatRfqCurrencyNote } from '../utils/rfq-currency'
 
 const items = ref<CartItem[]>([])
 const quoteNote = ref('')
@@ -63,8 +65,8 @@ function resolveCurrencyId(): string | undefined {
 async function syncToServer(): Promise<void> {
   if (typeof window === 'undefined') return
   const auth = services.authService
-  // Never sync customer carts for admins, sales staff, or providers
-  if (auth.isAdmin.value || auth.isSales.value || auth.isProvider.value) {
+  // Never sync customer carts for admins or providers
+  if (auth.isAdmin.value || auth.isProvider.value) {
     serverCartId.value = null
     try { localStorage.removeItem('welco-cart-id') } catch {}
     return
@@ -178,12 +180,30 @@ let serverTotalSeq = 0
 let serverTotalTimer: ReturnType<typeof setTimeout> | null = null
 
 /**
+ * Checks if the current page is the cart or checkout page.
+ * Exchange rates should only be loaded/converted in cart context, never on Home page or other pages.
+ */
+function isCartOrCheckoutActive(): boolean {
+  if (typeof window === 'undefined') return false
+  const routePath = (router.currentRoute?.value?.path || '').toLowerCase()
+  const locPath = (window.location?.pathname || '').toLowerCase()
+  return (
+    routePath.startsWith('/cart') ||
+    routePath.startsWith('/checkout') ||
+    locPath.includes('/cart') ||
+    locPath.includes('/checkout')
+  )
+}
+
+/**
  * Price each cart item in the target currency using the public /convert
  * endpoint (from / to / amount). Totals are computed here from the returned
  * converted amounts; no backend cart-total quote is used.
+ * Runs ONLY when the user is on the cart or checkout page.
  */
-async function refreshServerTotal(): Promise<void> {
+async function refreshServerTotal(force = false): Promise<void> {
   if (typeof window === 'undefined' || import.meta.env?.MODE === 'test') return
+  if (!force && !isCartOrCheckoutActive()) return
   if (!items.value.length) {
     serverTotal.value = null
     serverTotalLoading.value = false
@@ -233,6 +253,7 @@ async function refreshServerTotal(): Promise<void> {
 
 function scheduleServerTotal(): void {
   if (typeof window === 'undefined' || import.meta.env?.MODE === 'test') return
+  if (!isCartOrCheckoutActive()) return
   if (serverTotalTimer) clearTimeout(serverTotalTimer)
   serverTotalTimer = setTimeout(() => {
     serverTotalTimer = null
@@ -244,7 +265,15 @@ if (typeof window !== 'undefined') loadFromStorage()
 
 watch(targetCurrency, persistTarget)
 
-watch([items, targetCurrency], () => { scheduleServerTotal() }, { deep: true, immediate: true })
+watch(
+  [items, targetCurrency],
+  () => {
+    if (isCartOrCheckoutActive()) {
+      scheduleServerTotal()
+    }
+  },
+  { deep: true },
+)
 
 export function useCart() {
   const count = computed(() => items.value.reduce((s, i) => s + i.quantity, 0))
@@ -263,7 +292,9 @@ export function useCart() {
     const upper = code.trim().toUpperCase()
     if (!upper) return
     targetCurrency.value = upper
-    scheduleServerTotal()
+    if (isCartOrCheckoutActive()) {
+      scheduleServerTotal()
+    }
   }
 
   /** Native database unit price — the only unit price used client-side. */
@@ -317,7 +348,29 @@ export function useCart() {
   }
 
   function toRfqItems(): CreateRfqItemPayload[] {
-    return items.value.map(i => ({ productId: i.product.id, quantity: i.quantity, unitPrice: Math.ceil(getServerLine(i.product.id)?.convertedUnit ?? i.product.price) }))
+    return items.value.map((i) => {
+      const fromCurrency = (i.product.currencyCode || i.product.currency || 'USD').toUpperCase()
+      const tCur = targetCurrency.value.toUpperCase()
+      const nativePrice = Number(i.product.price)
+      const serverLine = getServerLine(i.product.id)
+      const convertedUnit = serverLine?.convertedUnit != null ? Math.ceil(serverLine.convertedUnit) : nativePrice
+      const rate = serverLine?.rate
+
+      const currencyNote = formatRfqCurrencyNote({
+        baseCurrency: fromCurrency,
+        requestedCurrency: tCur,
+        basePrice: nativePrice,
+        requestedPrice: convertedUnit,
+        rate,
+      })
+
+      return {
+        productId: i.product.id,
+        quantity: i.quantity,
+        unitPrice: convertedUnit,
+        notes: currencyNote,
+      }
+    })
   }
 
   function toDisplayCurrency(): string {
@@ -339,9 +392,9 @@ export function useCart() {
       const auth = services.authService
       const isBuyerRole = () => {
         if (!auth.isAuthenticated) return false
-        return !auth.isAdmin.value && !auth.isSales.value && !auth.isProvider.value
+        return !auth.isAdmin.value && !auth.isProvider.value
       }
-      if (auth.isAdmin.value || auth.isSales.value || auth.isProvider.value) {
+      if (auth.isAdmin.value || auth.isProvider.value) {
         serverCartId.value = null
         try { localStorage.removeItem('welco-cart-id') } catch {}
       } else if (isBuyerRole()) {
@@ -350,7 +403,7 @@ export function useCart() {
       watch(
         () => auth.user.value?.id,
         (id, prev) => {
-          if (auth.isAdmin.value || auth.isSales.value || auth.isProvider.value) {
+          if (auth.isAdmin.value || auth.isProvider.value) {
             serverCartId.value = null
             try { localStorage.removeItem('welco-cart-id') } catch {}
           } else if (id && id !== prev && isBuyerRole()) {

@@ -3,14 +3,13 @@ import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { authService } from '../../di/container'
 import { confirmService } from '../../infrastructure/feedback/confirm.service'
-import { toastService } from '../../infrastructure/feedback/toast.service'
 import { t } from '../../i18n'
 import AuthShell from '../../components/auth/AuthShell.vue'
-import { isPendingOrg } from '../../utils/pending-org-marker'
+import { clearPendingOrg } from '../../utils/pending-org-marker'
 
 const router = useRouter()
 const route = useRoute()
-const email = ref('')
+const email = ref((route.query.email as string) || '')
 const password = ref('')
 const loading = ref(false)
 const error = ref('')
@@ -31,16 +30,9 @@ const handleLogin = async () => {
   }
   if (res.ok) {
     await authService.loadProfile().catch(() => null)
+    clearPendingOrg(authService.user.value?.email)
   }
   if (res.ok) {
-    if (authService.isOrganizationUser.value && !authService.user.value?.companyId) {
-      if (isPendingOrg(authService.user.value?.email)) {
-        await authService.logout().catch(() => {})
-        toastService.info(t('distributor.pendingApproval'))
-        error.value = t('distributor.pendingApproval')
-        return
-      }
-    }
     const redirect = (route.query.redirect as string) || ''
     if (redirect && authService.canAccessPath(redirect)) await router.replace(redirect)
     else await router.replace({ name: authService.getDashboardRouteName() })
@@ -67,6 +59,11 @@ const handleLogin = async () => {
 <template>
   <AuthShell :title="t('auth.loginTitle')" :subtitle="t('auth.loginSubtitle')">
     <form class="auth-form-body" @submit.prevent="handleLogin" novalidate>
+      <div v-if="route.query.registered === 'provider'" class="form-info-banner" role="status">
+        <span class="material-symbols-outlined text-[18px]">verified_user</span>
+        <span>{{ t('distributor.pendingApproval') }}</span>
+      </div>
+
       <div class="form-group">
         <label class="form-label mono" for="login-email">{{ t('auth.email') }}</label>
         <div class="input-wrap input-wrap--ltr">
@@ -240,6 +237,20 @@ const handleLogin = async () => {
 
 .pwd-toggle-btn:hover {
   color: var(--wl-primary);
+}
+
+.form-info-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.85rem 1.1rem;
+  background: color-mix(in srgb, var(--wl-primary) 8%, var(--wl-surface));
+  border: 1.5px solid color-mix(in srgb, var(--wl-primary) 35%, var(--wl-border));
+  border-radius: var(--radius-md);
+  color: var(--wl-ink-strong);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.45;
 }
 
 .form-error-banner {

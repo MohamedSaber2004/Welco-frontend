@@ -12,7 +12,7 @@ import { distinctCurrenciesFromAddresses } from '../../utils/country-currency-ma
 import { formatPrice } from '../../utils/format'
 
 const router = useRouter()
-const { items, displayTotal, targetCurrency, count, toDisplayCurrency, quoteNote, clear, getServerLine, setTargetCurrency, unconvertedIds, refreshServerTotal } = useCart()
+const { items, displayTotal, targetCurrency, count, toDisplayCurrency, quoteNote, clear, getServerLine, setTargetCurrency, unconvertedIds, refreshServerTotal, toRfqItems } = useCart()
 /** Backend totals only — no client-side math. Null until quoted. */
 const fmtQuote = (v: number | null) =>
   v == null ? '…' : v.toLocaleString(locale.value === 'ar' ? 'ar-EG' : 'en-US')
@@ -84,10 +84,15 @@ async function convertToQuote() {
   if (!company) { toastService.info(t('distributor.pendingApproval')); return }
   submittingRfq.value = true
   try {
+    const tCur = targetCurrency.value.toUpperCase()
+    const firstProductCurrency = (items.value[0]?.product.currencyCode || items.value[0]?.product.currency || 'USD').toUpperCase()
+    const currencyHeaderPrefix = `[REQUESTED_CURRENCY: ${tCur} (Base: ${firstProductCurrency})]`
+    const finalNote = quoteNote.value ? `${currencyHeaderPrefix}\n\n${quoteNote.value}` : currencyHeaderPrefix
+
     const res = await salesService.createRfq({
       companyId: company.id,
-      note: quoteNote.value || undefined,
-      items: items.value.map(i => ({ productId: i.product.id, quantity: i.quantity, unitPrice: i.product.price })),
+      note: finalNote,
+      items: toRfqItems(),
     })
     if (res.ok && res.rfq) {
       clear()
@@ -361,7 +366,7 @@ async function convertToQuote() {
 /* Layout */
 .checkout-layout {
   display: grid;
-  grid-template-columns: 1fr 390px;
+  grid-template-columns: minmax(0, 1fr) 380px;
   gap: var(--space-8);
   align-items: start;
 }

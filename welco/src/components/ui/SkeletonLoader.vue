@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import DataState from './DataState.vue'
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     type?: 'text' | 'card' | 'circle' | 'table-row' | 'custom'
       | 'product-card' | 'catalog-grid' | 'category-grid' | 'stats-grid'
@@ -22,21 +21,6 @@ const props = withDefaults(
     count: 6,
   },
 )
-
-const gridCount = computed(() => {
-  const t = props.type
-  if (t === 'catalog-grid') return props.count ?? 6
-  if (t === 'category-grid') return props.count ?? 8
-  if (t === 'stats-grid') return props.count ?? 4
-  if (t === 'location-grid') return props.count ?? 3
-  if (t === 'pills') return props.count ?? 6
-  if (t === 'provider-grid') return props.count ?? 4
-  if (t === 'provider-cards') return props.count ?? 6
-  if (t === 'cert-grid') return props.count ?? 4
-  if (t === 'help-grid') return props.count ?? 6
-  if (t === 'address-grid') return props.count ?? 4
-  return props.count ?? 1
-})
 </script>
 
 <template>

@@ -30,7 +30,7 @@
   --ink: var(--fg-body);
   --ink-strong: var(--fg-heading);
   --ink-soft: var(--fg-muted);
-  --muted: var(--fg-subtle);
+  --muted: var(--fg-muted);
   --muted-soft: var(--fg-placeholder);
   --line: var(--border);
   --line-strong: var(--border-strong);
@@ -213,4 +213,17 @@
   --wl-gradient-modal: var(--bg-surface);
   --wl-gradient-secondary: var(--bg-surface);
   --wl-dir-sign: var(--flip);
+}
+
+@media (max-width: 768px) {
+  :root {
+    --wl-page-padding-top: var(--space-4);
+    --wl-page-padding-bottom: var(--space-8);
+    --wl-section: var(--space-10);
+    --wl-section-gap: var(--space-6);
+    --wl-card-padding: var(--space-4);
+    --wl-card-padding-lg: var(--space-5);
+    --wl-modal-padding: var(--space-4);
+    --wl-page-gap: var(--space-4);
+  }
 }

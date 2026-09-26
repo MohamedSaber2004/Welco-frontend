@@ -26,9 +26,10 @@ const toggleLang = async () => {
 
 const isAuthed = computed(() => authService.isAuthenticated)
 const isAdmin = computed(() => authService.isAdmin.value)
-const isSales = computed(() => authService.isSales.value && !isAdmin.value)
-const isSeller = computed(() => authService.isAdmin.value || authService.isSales.value)
-const isBuyer = computed(() => authService.isOrganizationUser.value)
+const isStaff = computed(() => authService.isAdmin.value)
+const isProvider = computed(() => authService.isProvider.value)
+const isBuyer = computed(() => authService.isClient.value)
+const isSeller = computed(() => isStaff.value)
 const user = computed(() => authService.user.value)
 
 const { count: cartCount } = useCart()
@@ -68,7 +69,6 @@ const handleLogout = async () => {
 const userRoleLabel = computed(() => {
   if (!user.value) return ''
   if (isAdmin.value) return t('admin.roleAdmin')
-  if (isSales.value) return t('admin.roleSales')
   return t(`admin.${authService.resolveBusinessRoleKey()}`)
 })
 
@@ -106,14 +106,14 @@ const isPathActive = (path: string, exact = false) => {
           <span class="tab-label">{{ t('admin.dashboard') }}</span>
         </router-link>
 
-        <router-link to="/admin/sales" class="bar-tab" :class="{ 'is-active': isPathActive('/admin/sales') }">
-          <span class="material-symbols-outlined tab-icon">request_quote</span>
-          <span class="tab-label">{{ t('admin.sales') }}</span>
-        </router-link>
-
         <router-link to="/admin/orders" class="bar-tab" :class="{ 'is-active': isPathActive('/admin/orders') }">
           <span class="material-symbols-outlined tab-icon">local_shipping</span>
           <span class="tab-label">{{ t('admin.orders') }}</span>
+        </router-link>
+
+        <router-link to="/admin/users" class="bar-tab" :class="{ 'is-active': isPathActive('/admin/users') }">
+          <span class="material-symbols-outlined tab-icon">group</span>
+          <span class="tab-label">{{ t('admin.users') }}</span>
         </router-link>
 
         <router-link to="/marketplace" class="bar-tab" :class="{ 'is-active': isPathActive('/marketplace') }">
@@ -122,26 +122,26 @@ const isPathActive = (path: string, exact = false) => {
         </router-link>
       </template>
 
-      <!-- Sales Mode Tabs -->
-      <template v-else-if="isSales">
-        <router-link to="/admin" class="bar-tab" :class="{ 'is-active': isPathActive('/admin', true) }">
-          <span class="material-symbols-outlined tab-icon">dashboard</span>
-          <span class="tab-label">{{ t('admin.dashboard') }}</span>
-        </router-link>
-
-        <router-link to="/admin/sales" class="bar-tab" :class="{ 'is-active': isPathActive('/admin/sales') }">
+      <!-- Provider Mode Tabs -->
+      <template v-else-if="isProvider && isAuthed">
+        <router-link to="/provider/quotes" class="bar-tab" :class="{ 'is-active': isPathActive('/provider/quotes') }">
           <span class="material-symbols-outlined tab-icon">request_quote</span>
-          <span class="tab-label">{{ t('admin.sales') }}</span>
+          <span class="tab-label">{{ t('provider.quotes') }}</span>
         </router-link>
 
-        <router-link to="/admin/orders" class="bar-tab" :class="{ 'is-active': isPathActive('/admin/orders') }">
+        <router-link to="/provider/orders" class="bar-tab" :class="{ 'is-active': isPathActive('/provider/orders') }">
           <span class="material-symbols-outlined tab-icon">local_shipping</span>
-          <span class="tab-label">{{ t('admin.orders') }}</span>
+          <span class="tab-label">{{ t('provider.orders') }}</span>
         </router-link>
 
-        <router-link to="/admin/tickets" class="bar-tab" :class="{ 'is-active': isPathActive('/admin/tickets') }">
-          <span class="material-symbols-outlined tab-icon">support_agent</span>
-          <span class="tab-label">{{ t('help.tickets') }}</span>
+        <router-link to="/provider/catalog" class="bar-tab" :class="{ 'is-active': isPathActive('/provider/catalog') }">
+          <span class="material-symbols-outlined tab-icon">inventory_2</span>
+          <span class="tab-label">{{ t('provider.myCatalog') }}</span>
+        </router-link>
+
+        <router-link to="/provider/support" class="bar-tab" :class="{ 'is-active': isPathActive('/provider/support') }">
+          <span class="material-symbols-outlined tab-icon">contact_support</span>
+          <span class="tab-label">{{ t('provider.support') }}</span>
         </router-link>
       </template>
 
@@ -245,6 +245,62 @@ const isPathActive = (path: string, exact = false) => {
 
         <!-- Categorized Nav Grid of All Allowed Pages -->
         <div class="sheet-body">
+          <!-- Section: Provider Console (for authenticated providers) -->
+          <div v-if="isAuthed && isProvider" class="sheet-section">
+            <div class="sheet-section-title mono">{{ t('provider.dashboard').toUpperCase() }}</div>
+            <div class="sheet-grid">
+              <button type="button" class="sheet-item" @click="navigateTo('/provider/quotes')">
+                <span class="sheet-icon-box sheet-icon--amber">
+                  <span class="material-symbols-outlined">request_quote</span>
+                </span>
+                <span class="sheet-item__text">
+                  <strong>{{ t('provider.quotes') }}</strong>
+                  <small>{{ locale === 'ar' ? 'عروض الأسعار والطلبات' : 'Quotes & RFQs' }}</small>
+                </span>
+              </button>
+
+              <button type="button" class="sheet-item" @click="navigateTo('/provider/orders')">
+                <span class="sheet-icon-box sheet-icon--indigo">
+                  <span class="material-symbols-outlined">local_shipping</span>
+                </span>
+                <span class="sheet-item__text">
+                  <strong>{{ t('provider.orders') }}</strong>
+                  <small>{{ locale === 'ar' ? 'تنفيذ وشحن الطلبات' : 'Orders & shipping' }}</small>
+                </span>
+              </button>
+
+              <button type="button" class="sheet-item" @click="navigateTo('/provider/catalog')">
+                <span class="sheet-icon-box sheet-icon--primary">
+                  <span class="material-symbols-outlined">inventory_2</span>
+                </span>
+                <span class="sheet-item__text">
+                  <strong>{{ t('provider.myCatalog') }}</strong>
+                  <small>{{ locale === 'ar' ? 'كتالوج المنتجات والأسعار' : 'Products & inventory' }}</small>
+                </span>
+              </button>
+
+              <button type="button" class="sheet-item" @click="navigateTo('/provider/categories')">
+                <span class="sheet-icon-box sheet-icon--teal">
+                  <span class="material-symbols-outlined">category</span>
+                </span>
+                <span class="sheet-item__text">
+                  <strong>{{ t('provider.categories') }}</strong>
+                  <small>{{ locale === 'ar' ? 'فئات وتصنيفات المنتجات' : 'Product categories' }}</small>
+                </span>
+              </button>
+
+              <button type="button" class="sheet-item" @click="navigateTo('/provider/support')">
+                <span class="sheet-icon-box sheet-icon--slate">
+                  <span class="material-symbols-outlined">contact_support</span>
+                </span>
+                <span class="sheet-item__text">
+                  <strong>{{ t('provider.support') }}</strong>
+                  <small>{{ locale === 'ar' ? 'الدعم والمساعدة' : 'Provider support' }}</small>
+                </span>
+              </button>
+            </div>
+          </div>
+
           <!-- Section: Admin & Staff Management (strictly for authenticated sellers) -->
           <div v-if="isAuthed && isSeller" class="sheet-section">
             <div class="sheet-section-title mono">{{ locale === 'ar' ? 'لوحة التحكم والعمليات' : 'CONSOLE & OPERATIONS' }}</div>
@@ -256,16 +312,6 @@ const isPathActive = (path: string, exact = false) => {
                 <span class="sheet-item__text">
                   <strong>{{ t('admin.dashboard') }}</strong>
                   <small>{{ locale === 'ar' ? 'نظرة عامة والقياسات' : 'Overview & telemetry' }}</small>
-                </span>
-              </button>
-
-              <button type="button" class="sheet-item" @click="navigateTo('/admin/sales')">
-                <span class="sheet-icon-box sheet-icon--amber">
-                  <span class="material-symbols-outlined">request_quote</span>
-                </span>
-                <span class="sheet-item__text">
-                  <strong>{{ t('admin.sales') }}</strong>
-                  <small>{{ locale === 'ar' ? 'مسار عروض الأسعار والطلبات' : 'RFQ & Quote pipeline' }}</small>
                 </span>
               </button>
 
@@ -431,7 +477,7 @@ const isPathActive = (path: string, exact = false) => {
                 </span>
               </button>
 
-              <button v-if="!isSeller" type="button" class="sheet-item" @click="navigateTo('/cart')">
+              <button v-if="!isStaff && !isProvider" type="button" class="sheet-item" @click="navigateTo('/cart')">
                 <span class="sheet-icon-box sheet-icon--amber">
                   <span class="material-symbols-outlined">shopping_bag</span>
                 </span>
@@ -442,7 +488,7 @@ const isPathActive = (path: string, exact = false) => {
                 </span>
               </button>
 
-              <button v-if="!isSeller && isAuthed" type="button" class="sheet-item" @click="navigateTo('/wishlist')">
+              <button v-if="!isStaff && !isProvider && isAuthed" type="button" class="sheet-item" @click="navigateTo('/wishlist')">
                 <span class="sheet-icon-box sheet-icon--rose">
                   <span class="material-symbols-outlined">favorite</span>
                 </span>

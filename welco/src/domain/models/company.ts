@@ -5,6 +5,8 @@ export enum CompanyType {
   Supplier = 4,
 }
 
+import type { UserType } from './user'
+
 export enum CompanyStatus {
   Pending = 1,
   Approved = 2,
@@ -42,6 +44,23 @@ export interface UpdateCompanyPayload extends CreateCompanyPayload {
   isActive?: boolean
 }
 
+/**
+ * Provider-owned subset of a company record, used by the profile
+ * "organization details" self-service form.
+ *
+ * The admin-controlled fields (status, type, account manager, active /
+ * provider flags) are intentionally absent: the backend copies those
+ * straight through from the stored record so a provider cannot
+ * self-approve or re-classify its own organization.
+ */
+export interface UpdateMyCompanyPayload {
+  name: string
+  email?: string | null
+  countryId: string
+  /** Stored attachment name. An empty string clears the logo. */
+  imageName?: string | null
+}
+
 export interface DistributorApplicationPayload {
   companyName: string
   countryId: string
@@ -63,6 +82,18 @@ export interface DistributorApplicationDto extends DistributorApplicationPayload
   contactEmail?: string
   createdAt: string
   updatedAt?: string | null
+  applicantUser?: ApplicantUserDto | null
+}
+
+export interface ApplicantUserDto {
+  id: string
+  fullName: string
+  email: string
+  phoneNumber?: string | null
+  userType: UserType
+  isActive: boolean
+  emailConfirmed: boolean
+  createdAt: string
 }
 
 export interface OemService {

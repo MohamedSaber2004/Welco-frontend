@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import DataState from './DataState.vue'
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     title?: string
     description?: string

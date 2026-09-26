@@ -5,6 +5,7 @@ import type {
   DistributorApplicationPayload,
   OemInquiryPayload,
   OemService,
+  UpdateMyCompanyPayload,
 } from '../domain/models/company'
 import type {
   CompanyAddressDto,
@@ -44,12 +45,50 @@ export class CompanyService {
     this.loading.value = true
     try {
       this.myCompany.value = await this.repo.getMyCompany()
+      // Only cache success — marking a failure as "loaded" would leave
+      // `myCompany` permanently null for every non-forced caller (e.g. the
+      // account dashboard) even after the request would have succeeded later.
       this.loadedCompany = true
     } catch (e) {
       if (import.meta.env.DEV) console.warn('[company] loadMyCompany failed', e)
-      this.loadedCompany = true
+      this.loadedCompany = false
     } finally {
       this.loading.value = false
+    }
+  }
+
+  /**
+   * Self-service update of the signed-in user's own company.
+   *
+   * Only the fields a provider legitimately owns are sent. Admin-controlled
+   * ones (status, accountManagerId, isActive, isProvider, type) are not part
+   * of the request contract at all, so the backend keeps its stored values and
+   * a provider cannot self-approve or re-classify its own organization.
+   */
+  async updateMyCompany(input: UpdateMyCompanyPayload): Promise<CompanyResult & { data?: CompanyDto }> {
+    const current = this.myCompany.value
+    if (!current) return { ok: false, error: t('profile.noCompanyLinked') }
+
+    const name = input.name.trim()
+    if (!name) return { ok: false, error: t('auth.errCompanyRequired') }
+    if (!input.countryId) return { ok: false, error: t('admin.errCountry') }
+    if (input.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.email.trim())) {
+      return { ok: false, error: t('auth.errEmailInvalid') }
+    }
+
+    try {
+      const updated = await this.repo.updateMyCompany({
+        name,
+        email: input.email?.trim() || null,
+        countryId: input.countryId,
+        imageName: (input.imageName ?? '').trim(),
+      })
+      this.myCompany.value = updated
+      toastService.success(t('admin.companyUpdated'))
+      return { ok: true, data: updated }
+    } catch (err) {
+      if (import.meta.env.DEV) console.warn('[company] updateMyCompany failed', err)
+      return { ok: false, error: err instanceof Error ? err.message : t('common.error') }
     }
   }
 

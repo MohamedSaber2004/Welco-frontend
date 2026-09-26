@@ -1,17 +1,35 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, watch, nextTick } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch, nextTick } from 'vue'
 import { t } from '../../i18n'
+
+export type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full'
 
 const props = withDefaults(
   defineProps<{
     modelValue: boolean
     title?: string
     maxWidth?: string
+    size?: ModalSize
   }>(),
   {
-    maxWidth: '520px',
+    maxWidth: '',
+    size: 'md',
   },
 )
+
+const sizeMap: Record<ModalSize, string> = {
+  sm: '440px',
+  md: '560px',
+  lg: '840px',
+  xl: '1020px',
+  '2xl': '1200px',
+  full: '95vw',
+}
+
+const effectiveMaxWidth = computed(() => {
+  if (props.maxWidth) return props.maxWidth
+  return sizeMap[props.size || 'md'] || '560px'
+})
 
 const emit = defineEmits<{
   'update:modelValue': [value: boolean]
@@ -93,7 +111,7 @@ onUnmounted(() => {
   <Teleport to="body">
     <Transition name="modal-fade">
       <div v-if="modelValue" class="modal-backdrop" @click.self="handleClose">
-        <div class="modal-container" :style="{ maxWidth }" ref="modalContainer" role="dialog" aria-modal="true" tabindex="-1">
+        <div class="modal-container" :style="{ maxWidth: effectiveMaxWidth }" ref="modalContainer" role="dialog" aria-modal="true" tabindex="-1">
           <div class="modal-card">
             <div v-if="title || $slots.header" class="modal-header">
               <slot name="header">
@@ -122,21 +140,22 @@ onUnmounted(() => {
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: var(--bg-overlay);
+  background: var(--bg-overlay, rgba(15, 23, 42, 0.6));
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-4);
-  z-index: var(--z-overlay);
-  }
+  padding: var(--space-4, 16px);
+  z-index: var(--z-overlay, 1000);
+}
 
-  .modal-container {
+.modal-container {
   width: 100%;
   max-height: 90vh;
   display: flex;
   flex-direction: column;
+  margin: auto;
 }
 
 .modal-card {

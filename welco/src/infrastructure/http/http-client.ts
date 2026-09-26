@@ -6,8 +6,8 @@ import type { TokenStore } from './token-store'
 import type { AuthBridge } from './auth-bridge'
 import type { ModalService } from '../feedback/modal.service'
 
-export function normalizeEnvelope<T>(raw: any): T {
-  if (raw && typeof raw === 'object' && 'data' in raw && 'isSuccess' in raw) return raw.data as T;
+export function normalizeEnvelope<T>(raw: unknown): T {
+  if (raw && typeof raw === 'object' && 'data' in raw && 'isSuccess' in raw) return (raw as ApiEnvelope).data as T;
   return raw as T;
 }
 
@@ -96,6 +96,10 @@ export class HttpClient {
 
   del<T>(path: string, options?: RequestOptions): Promise<T> {
     return this.request<T>(path, 'DELETE', undefined, options)
+  }
+
+  delete<T>(path: string, options?: RequestOptions): Promise<T> {
+    return this.del<T>(path, options)
   }
 
   private resolveUrl(path: string): string {

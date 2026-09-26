@@ -33,8 +33,9 @@ describe('AdminLayout dashboard shell', () => {
       a.getAttribute('href'),
     )
     expect(hrefs).toContain('/admin')
-    expect(hrefs).toContain('/admin/sales')
     expect(hrefs).toContain('/admin/orders')
+    expect(hrefs).toContain('/admin/about')
+    expect(hrefs).not.toContain('/admin/sales')
   })
 
   it('renders page content inside the shell main area', async () => {
@@ -46,6 +47,6 @@ describe('AdminLayout dashboard shell', () => {
     const el = await mountLayout()
     const pills = [...el.querySelectorAll('.admin-mobile-pill')]
     expect(pills.length).toBeGreaterThan(0)
-    expect(pills.map((a) => a.getAttribute('href'))).toContain('/admin/sales')
+    expect(pills.map((a) => a.getAttribute('href'))).toContain('/admin/orders')
   })
 })

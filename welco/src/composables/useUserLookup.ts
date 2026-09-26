@@ -20,34 +20,39 @@ const isGuid = (val?: string | null): boolean => {
 }
 
 /**
- * 4-role model: Admin, Sales, Provider / Distributor, Client.
- */
+   * 3-role model: Admin, Provider / Distributor, Client.
+   */
 const formatRole = (
   user: UserDto | UserDetailsDto,
   company?: { id?: string | null } | null,
 ): { role: string; roleKey: string } => {
-  const hasCompany = !!company?.id
+  const hasCompany = !!company?.id || !!user.companyId || !!user.company?.id
   if (user.roles && user.roles.length > 0) {
     const rawRole = user.roles[0] ?? ''
-    if (rawRole.toLowerCase().includes('admin')) return { role: 'Admin', roleKey: 'roleAdmin' }
-    if (rawRole.toLowerCase().includes('staff') || rawRole.toLowerCase().includes('sales')) return { role: 'Sales', roleKey: 'roleSales' }
-    if (rawRole.toLowerCase().includes('org') || rawRole.toLowerCase().includes('user')) {
-      return hasCompany
-        ? { role: 'Provider / Distributor', roleKey: 'roleProvider' }
-        : { role: 'Client', roleKey: 'roleClient' }
+    const lower = rawRole.toLowerCase()
+    if (lower.includes('admin')) return { role: 'Admin', roleKey: 'roleAdmin' }
+    if (lower.includes('staff')) return { role: 'Admin', roleKey: 'roleAdmin' }
+    if (lower.includes('provider') || lower.includes('distributor') || lower.includes('org')) {
+      return { role: 'Provider / Distributor', roleKey: 'roleProvider' }
+    }
+    if (lower.includes('client') || lower.includes('buyer') || lower.includes('customer')) {
+      return { role: 'Client', roleKey: 'roleClient' }
     }
     return { role: rawRole, roleKey: rawRole }
   }
 
   if (user.userType === UserType.Admin) return { role: 'Admin', roleKey: 'roleAdmin' }
-  if (user.userType === UserType.WelcoStaff) return { role: 'Sales', roleKey: 'roleSales' }
+  if (user.userType === UserType.WelcoStaff) return { role: 'Admin', roleKey: 'roleAdmin' }
   if (user.userType === UserType.OrganizationUser) {
-    return hasCompany
-      ? { role: 'Provider / Distributor', roleKey: 'roleProvider' }
-      : { role: 'Client', roleKey: 'roleClient' }
+    return { role: 'Provider / Distributor', roleKey: 'roleProvider' }
+  }
+  if (user.userType === UserType.Client) {
+    return { role: 'Client', roleKey: 'roleClient' }
   }
 
-  return { role: 'User', roleKey: 'roleUser' }
+  return hasCompany
+    ? { role: 'Provider / Distributor', roleKey: 'roleProvider' }
+    : { role: 'Client', roleKey: 'roleClient' }
 }
 
 export function useUserLookup() {

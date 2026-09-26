@@ -6,11 +6,12 @@ import DataState from '../../components/ui/DataState.vue'
 import AppPagination from '../../components/ui/AppPagination.vue'
 import BaseModal from '../../components/ui/BaseModal.vue'
 import BaseButton from '../../components/ui/BaseButton.vue'
-import { commerceService } from '../../di/container'
+import { commerceService, companyRepository } from '../../di/container'
 import { toastService } from '../../infrastructure/feedback/toast.service'
 import { t, locale } from '../../i18n'
 import type { OrderDto } from '../../domain/models/commerce'
 import { ORDER_STATUSES } from '../../domain/models/commerce'
+import type { CompanyDto } from '../../domain/models/company'
 import { formatPrice } from '../../utils/format'
 
 const orders = commerceService.orders
@@ -19,8 +20,11 @@ const fetchError = ref('')
 const acting = ref('')
 const searchQuery = ref('')
 const statusFilter = ref('')
+const providerFilter = ref('')
 const localPage = ref(1)
 const pageSize = 10
+
+const providersList = ref<CompanyDto[]>([])
 
 const NEXT: Record<string, string> = {
   Pending: 'Confirmed',
@@ -28,11 +32,87 @@ const NEXT: Record<string, string> = {
   Shipped: 'Delivered',
 }
 
+async function fetchProviders() {
+  try {
+    const res = await companyRepository.getProvidersDirectory({ pageSize: 50 }).catch(() => null)
+    const list = Array.isArray(res?.data) ? res.data : []
+    const allComps = await companyRepository.getCompanies({ pageSize: 50 }).catch(() => null)
+    const compList = Array.isArray(allComps?.data) ? allComps.data : []
+    const map = new Map<string, CompanyDto>()
+    for (const c of [...list, ...compList]) {
+      if (c && c.id) map.set(c.id, c)
+    }
+    providersList.value = Array.from(map.values())
+  } catch {
+    // Non-blocking
+  }
+}
+
+const providerMap = computed(() => {
+  const map = new Map<string, CompanyDto>()
+  for (const p of providersList.value) {
+    if (p?.id) map.set(p.id, p)
+  }
+  return map
+})
+
+function getOrderProviderId(o: OrderDto | null): string | null {
+  if (!o) return null
+  if (o.companyId) return o.companyId
+  const anyO = o as unknown as Record<string, unknown>
+  if (anyO.providerId) return String(anyO.providerId)
+  if (Array.isArray(o.items)) {
+    for (const it of o.items) {
+      const anyIt = it as unknown as Record<string, unknown>
+      if (anyIt.companyId) return String(anyIt.companyId)
+      if (anyIt.providerId) return String(anyIt.providerId)
+    }
+  }
+  return null
+}
+
+function getOrderProviderName(o: OrderDto | null): string {
+  if (!o) return ''
+  const anyO = o as unknown as Record<string, unknown>
+  if (anyO.providerName) return String(anyO.providerName)
+  if (anyO.companyName) return String(anyO.companyName)
+  const pid = getOrderProviderId(o)
+  if (pid && providerMap.value.has(pid)) {
+    const comp = providerMap.value.get(pid)!
+    return comp.name
+  }
+  if (Array.isArray(o.items)) {
+    for (const it of o.items) {
+      const anyIt = it as unknown as Record<string, unknown>
+      if (anyIt.providerName) return String(anyIt.providerName)
+      if (anyIt.companyName) return String(anyIt.companyName)
+    }
+  }
+  return ''
+}
+
+const providerOptions = computed(() => {
+  const map = new Map<string, { id: string; name: string }>()
+  for (const p of providersList.value) {
+    if (p?.id && p?.name) {
+      map.set(p.id, { id: p.id, name: p.name })
+    }
+  }
+  for (const o of orders.value) {
+    const pid = getOrderProviderId(o)
+    const pname = getOrderProviderName(o)
+    if (pid && pname && !map.has(pid)) {
+      map.set(pid, { id: pid, name: pname })
+    }
+  }
+  return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name))
+})
+
 async function fetchOrders() {
   loading.value = true
   fetchError.value = ''
   try {
-    await commerceService.loadOrders({ page: 1, pageSize: 50 })
+    await commerceService.loadOrders({ page: 1, pageSize: 50, companyId: providerFilter.value || undefined })
   } catch (e) {
     fetchError.value = e instanceof Error ? e.message : t('common.error')
   } finally {
@@ -46,12 +126,21 @@ const filteredOrders = computed(() => {
   if (statusFilter.value) {
     list = list.filter((o) => o && String(o.status || '').toLowerCase() === String(statusFilter.value).toLowerCase())
   }
+  if (providerFilter.value) {
+    const pf = providerFilter.value.toLowerCase()
+    list = list.filter((o) => {
+      const pid = getOrderProviderId(o)?.toLowerCase()
+      const pname = getOrderProviderName(o).toLowerCase()
+      return pid === pf || pname.includes(pf)
+    })
+  }
   if (searchQuery.value.trim()) {
     const q = searchQuery.value.trim().toLowerCase()
     list = list.filter((o) => {
       if (!o) return false
       const matchNum = o.orderNumber ? String(o.orderNumber).toLowerCase().includes(q) : false
       const matchId = o.id ? String(o.id).toLowerCase().includes(q) : false
+      const matchProvider = getOrderProviderName(o).toLowerCase().includes(q)
       const matchItems = Array.isArray(o.items) && o.items.some((it) => {
         if (!it) return false
         const en = it.productNameEn ? String(it.productNameEn).toLowerCase().includes(q) : false
@@ -59,7 +148,7 @@ const filteredOrders = computed(() => {
         const pid = it.productId ? String(it.productId).toLowerCase().includes(q) : false
         return en || ar || pid
       })
-      return matchNum || matchId || matchItems
+      return matchNum || matchId || matchProvider || matchItems
     })
   }
   return list
@@ -79,11 +168,12 @@ function onSearch() {
 function clearFilters() {
   searchQuery.value = ''
   statusFilter.value = ''
+  providerFilter.value = ''
   localPage.value = 1
 }
 
 onMounted(async () => {
-  await fetchOrders()
+  await Promise.all([fetchOrders(), fetchProviders()])
 })
 
 async function advance(o: OrderDto) {
@@ -173,7 +263,13 @@ function goPage(p: number) {
           <option value="">{{ t('common.all') }} {{ t('commerce.status') }}</option>
           <option v-for="s in ORDER_STATUSES" :key="s" :value="s">{{ s }}</option>
         </select>
-        <button v-if="searchQuery || statusFilter" type="button" class="clear-filters-btn mono" @click="clearFilters">
+        <select v-model="providerFilter" class="filter-select mono" @change="onSearch">
+          <option value="">{{ t('common.all') }} {{ t('nav.providers') }}</option>
+          <option v-for="p in providerOptions" :key="p.id" :value="p.id">
+            {{ p.name }}
+          </option>
+        </select>
+        <button v-if="searchQuery || statusFilter || providerFilter" type="button" class="clear-filters-btn mono" @click="clearFilters">
           <span class="material-symbols-outlined text-[14px]">filter_alt_off</span>
           {{ t('common.clearFilters') }}
         </button>
@@ -184,9 +280,9 @@ function goPage(p: number) {
         :loading="loading && !orders.length"
         :error="fetchError && !orders.length ? fetchError : null"
         :empty="!filteredOrders.length && !loading && !fetchError"
-        :empty-title="searchQuery || statusFilter ? t('common.noResults') : t('admin.noOrdersYet')"
-        :empty-description="searchQuery || statusFilter ? t('common.searchResults') : t('commerce.noOrdersDesc')"
-        :empty-variant="searchQuery || statusFilter ? 'search' : 'default'"
+        :empty-title="searchQuery || statusFilter || providerFilter ? t('common.noResults') : t('admin.noOrdersYet')"
+        :empty-description="searchQuery || statusFilter || providerFilter ? t('common.searchResults') : t('commerce.noOrdersDesc')"
+        :empty-variant="searchQuery || statusFilter || providerFilter ? 'search' : 'default'"
         skeleton-type="table"
         :skeleton-count="6"
         min-height="320px"
@@ -199,6 +295,7 @@ function goPage(p: number) {
                 <tr>
                   <th>{{ t('commerce.orderNumber') }}</th>
                   <th>{{ t('commerce.placed') }}</th>
+                  <th>{{ t('nav.providers') }}</th>
                   <th>{{ t('commerce.total') }}</th>
                   <th>{{ t('commerce.status') }}</th>
                   <th class="text-end">{{ t('admin.viewDetails') }}</th>
@@ -211,6 +308,13 @@ function goPage(p: number) {
                     <strong class="mono order-num">{{ o.orderNumber || '—' }}</strong>
                   </td>
                   <td class="mono text-xs text-slate-500">{{ new Date(o.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</td>
+                  <td>
+                    <div v-if="getOrderProviderName(o)" class="provider-cell">
+                      <span class="material-symbols-outlined text-[15px] text-teal-600">storefront</span>
+                      <strong class="mono text-xs text-slate-800">{{ getOrderProviderName(o) }}</strong>
+                    </div>
+                    <span v-else class="mono text-xs text-muted">—</span>
+                  </td>
                   <td>
                     <strong class="mono amount-num">
                       {{ formatPrice(o.totalAmount, locale) }} {{ o.currencyCode }}
@@ -303,6 +407,10 @@ function goPage(p: number) {
                 {{ selectedOrder.currencyCode }}</strong
               >
             </div>
+            <div class="detail-item">
+              <span class="detail-k mono">{{ t('nav.providers') }}</span>
+              <strong class="detail-v mono">{{ getOrderProviderName(selectedOrder) || '—' }}</strong>
+            </div>
           </div>
 
           <div class="items-wrap">
@@ -350,6 +458,9 @@ function goPage(p: number) {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 /* ── Search & Filter Bar ── */
@@ -511,6 +622,9 @@ function goPage(p: number) {
 
 .table-wrap {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  min-width: 0;
 }
 
 .exec-table {
@@ -800,6 +914,41 @@ function goPage(p: number) {
   flex-wrap: wrap;
 }
 
+.provider-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--slate-50, #f8fafc);
+  padding: 0.25rem 0.55rem;
+  border-radius: 6px;
+  border: 1px solid var(--slate-200, #e2e8f0);
+}
+
+@media (max-width: 640px) {
+  .search-filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .search-wrap {
+    max-width: 100%;
+    min-width: 0;
+    width: 100%;
+  }
+  .status-select {
+    width: 100%;
+  }
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+  .order-status-bar {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .order-date {
+    margin-inline-start: 0;
+    width: 100%;
+  }
+}
 </style>
 
 

@@ -13,6 +13,7 @@ import SkeletonLoader from '../components/ui/SkeletonLoader.vue'
 import BaseModal from '../components/ui/BaseModal.vue'
 import BaseButton from '../components/ui/BaseButton.vue'
 import AppImage from '../components/ui/AppImage.vue'
+import ImageViewer from '../components/ui/ImageViewer.vue'
 import { formatPrice } from '../utils/format'
 import { useCart } from '../composables/useCart'
 
@@ -31,6 +32,21 @@ const providers = ref<CompanyDto[]>([])
 const mostSellingProducts = ref<ProductDto[]>([])
 const mostSellingLoading = ref(true)
 const loading = ref(true)
+
+const imageViewer = ref({
+  isOpen: false,
+  src: null as string | null,
+  alt: '',
+})
+
+function openImageViewer(src: string | null | undefined, alt: string) {
+  if (!src) return
+  imageViewer.value = { isOpen: true, src, alt }
+}
+
+function closeImageViewer() {
+  imageViewer.value = { isOpen: false, src: null, alt: '' }
+}
 
 const handleAddToQuote = (id: string) => {
   const p = mostSellingProducts.value.find((x) => x.id === id)
@@ -78,7 +94,7 @@ watch(tileProductPage, () => { void fetchTilePage() })
 
 const explorerCatId = ref<string | null>(null)
 const explorerProviderPage = ref(1)
-const EXPLORER_PROVIDER_PAGE_SIZE = 4
+const EXPLORER_PROVIDER_PAGE_SIZE = 5
 
 const explorerProviders = ref<CompanyDto[]>([])
 const explorerProviderTotal = ref(0)
@@ -110,9 +126,6 @@ const fetchExplorerProviders = async () => {
   }
 }
 
-const openCategoryProviders = (catId: string) => {
-  void router.push({ name: 'category-providers', params: { id: catId } })
-}
 const selectExplorerCat = (id: string) => {
   explorerCatId.value = id
   explorerProviderPage.value = 1
@@ -126,8 +139,6 @@ const openProviderStorefront = (id: string) => {
   })
 }
 watch(explorerProviderPage, () => { void fetchExplorerProviders() })
-
-const FOUNDING_YEAR = 1994
 
 onMounted(async () => {
   loading.value = true
@@ -145,13 +156,13 @@ onMounted(async () => {
         })
         .catch(() => null),
       companyRepository
-        .getProvidersDirectory({ pageNumber: 1, pageSize: 8 })
+        .getProvidersDirectory({ pageNumber: 1, pageSize: 50 })
         .then((p) => {
-          // Handle 401 in guest mode - backend doesn't allow public access
+          // Directory endpoint now filters active+approved+isProvider on server side
           if (p?.statusCode === 401 || !p?.data?.length) {
             providers.value = []
           } else {
-            providers.value = p.data.filter((c) => c.isActive !== false).slice(0, 8)
+            providers.value = p.data.slice(0, 8)
           }
         })
         .catch(() => {
@@ -436,13 +447,14 @@ const navigateToOemFromModal = () => {
         <DataState :loading="loading && !cats.length" :empty="!cats.length && !loading" skeleton-type="category-grid" :skeleton-count="8" min-height="160px">
           <div class="cat-grid">
             <router-link v-for="c in cats" :key="c.id" :to="{ name: 'category-providers', params: { id: c.id } }" class="cat-card">
-              <div class="cat-media">
+              <div class="cat-media" @click.stop="openImageViewer(c.imageName, localized(c.nameEn, c.nameAr))">
                 <AppImage
                   :src="c.imageName"
                   placeholder-type="category"
                   :placeholder-text="''"
                   :alt="localized(c.nameEn, c.nameAr)"
                   class="cat-media__img"
+                  loading="eager"
                 />
               </div>
               <div class="cat-body">
@@ -487,7 +499,7 @@ const navigateToOemFromModal = () => {
             </div>
             <Transition name="explorer-fade" mode="out-in">
               <div v-if="explorerProvidersLoading" key="loading" role="status" aria-label="Loading providers" class="cat-explorer__loading-wrap">
-                <SkeletonLoader type="provider-cards" :count="4" />
+                <SkeletonLoader type="provider-cards" :count="5" />
               </div>
               <div v-else-if="!explorerProviders.length" key="empty" class="mono cat-explorer__empty">
                 {{ t('provider.noProvidersHere') }}
@@ -544,12 +556,12 @@ const navigateToOemFromModal = () => {
         <DataState :loading="loading && !certifications.length" :empty="!certifications.length && !loading" skeleton-type="cert-grid" :skeleton-count="4" min-height="300px">
           <div class="home-certs-grid">
             <article
-              v-for="c in certifications.filter(c => c.isActive).slice(0, 3)"
+              v-for="c in certifications.filter(c => c.isActive).slice(0, 4)"
               :key="c.id"
               class="home-cert-card"
               @click="router.push('/certifications')"
             >
-              <div class="home-cert-card__media">
+              <div class="home-cert-card__media" @click.stop="openImageViewer(c.certificationImageName, c.title)">
                 <AppImage
                   :src="c.certificationImageName"
                   placeholder-type="document"
@@ -557,6 +569,7 @@ const navigateToOemFromModal = () => {
                   :alt="c.title"
                   aspect-ratio="16/10"
                   fit="contain"
+                  loading="eager"
                 />
               </div>
               <div class="home-cert-card__body">
@@ -694,6 +707,16 @@ const navigateToOemFromModal = () => {
         </div>
       </form>
     </BaseModal>
+
+    <ImageViewer
+      v-model:modelValue="imageViewer.isOpen"
+      :src="imageViewer.src"
+      :alt="imageViewer.alt"
+      :show-minimize="false"
+      :show-maximize="false"
+      :show-fullscreen="true"
+      @close="closeImageViewer"
+    />
   </div>
 </template>
 
@@ -1611,11 +1634,13 @@ const navigateToOemFromModal = () => {
 .home-certs-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: var(--space-4);
+  gap: var(--space-2);
   max-width: var(--wl-max-width);
   margin-inline: auto;
+  justify-items: center;
 }
 
+/* Responsive breakpoints for home cert cards */
 @media (max-width: 1024px) {
   .home-certs-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -2449,8 +2474,7 @@ const navigateToOemFromModal = () => {
   background: radial-gradient(circle at 78% 24%, rgba(214, 243, 106, .26), transparent 20rem), linear-gradient(135deg, transparent 0 55%, rgba(255,255,255,.08) 55% 56%, transparent 56%);
   opacity: 1;
 }
-.home .hero::after { height: 4px; background: var(--platform-lime); opacity: .85; }
-.home .hero__inner { max-width: 1320px; min-height: min(700px, 76vh); grid-template-columns: minmax(0, 1.05fr) minmax(360px, .8fr); gap: clamp(2rem, 6vw, 7rem); padding-block: clamp(3.5rem, 8vw, 7rem); }
+.home .hero__inner { max-width: 1320px; min-height: min(700px, 76vh); grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: clamp(2rem, 5vw, 6rem); padding-block: clamp(3rem, 6vw, 6rem); }
 .home .hero__copy { position: relative; z-index: 1; }
 .home .hero h1 { max-width: 760px; margin-top: .45rem; color: #f7fffe; font-size: clamp(2.65rem, 5.8vw, 5.7rem); line-height: .98; letter-spacing: -.065em; }
 .home .hero h1 em { color: var(--platform-lime) !important; background: none; }
@@ -2621,15 +2645,35 @@ const navigateToOemFromModal = () => {
 }
 .home .section--clinical .cat-grid,
 .home section[aria-labelledby="cat-heading"] .cat-grid {
+  grid-template-columns: repeat(4, 1fr);
   margin-inline: 0;
   gap: clamp(0.85rem, 2vw, 1.25rem);
 }
+@media (max-width: 1100px) {
+  .home .section--clinical .cat-grid,
+  .home section[aria-labelledby="cat-heading"] .cat-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (max-width: 768px) {
+  .home .section--clinical .cat-grid,
+  .home section[aria-labelledby="cat-heading"] .cat-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.875rem;
+  }
+}
+@media (max-width: 440px) {
+  .home .section--clinical .cat-grid,
+  .home section[aria-labelledby="cat-heading"] .cat-grid {
+    grid-template-columns: 1fr;
+  }
+}
 
-@media (max-width: 760px) {
+@media (max-width: 900px) {
   .home .hero, .home .hero__inner { min-height: auto; }
   .home .hero__inner { grid-template-columns: 1fr; gap: 2.5rem; }
   .home .hero__logo-box { min-height: 230px; max-width: 520px; transform: rotate(0); }
-  .home .hero h1 { font-size: clamp(2.7rem, 13vw, 4.4rem); }
+  .home .hero h1 { font-size: clamp(2.4rem, 10vw, 3.8rem); }
 }
 </style>
 

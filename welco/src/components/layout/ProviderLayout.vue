@@ -36,7 +36,6 @@ const sections = computed<DashboardNavSection[]>(() => [
     collapsible: false,
     links: [
       { to: '/profile', icon: 'apartment', label: t('nav.profile') },
-      { to: '/marketplace', icon: 'storefront', label: t('nav.marketplace') },
     ],
   },
 ])

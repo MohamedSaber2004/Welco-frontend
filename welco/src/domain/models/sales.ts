@@ -13,6 +13,11 @@ export interface RfqItemDto {
   quantity: number
   notes?: string | null
   unitPrice?: number
+  baseCurrency?: string
+  requestedCurrency?: string
+  basePrice?: number
+  requestedPrice?: number
+  exchangeRate?: number
   imageGradient?: string
   /** stored attachment name resolved via `/files/{name}` — see ATTACHMENT-INTEGRATION.md */
   imageName?: string | null
@@ -29,6 +34,8 @@ export interface RfqDto {
   items: RfqItemDto[]
   total?: number
   currency?: string
+  requestedCurrency?: string
+  baseCurrency?: string
   note?: string
   createdAt: string
 }

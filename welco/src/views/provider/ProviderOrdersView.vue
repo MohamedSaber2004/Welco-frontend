@@ -9,7 +9,6 @@ import BaseButton from '../../components/ui/BaseButton.vue'
 import StatusPill from '../../components/ui/StatusPill.vue'
 import { commerceService, companyService } from '../../di/container'
 import { toastService } from '../../infrastructure/feedback/toast.service'
-import { confirmService } from '../../infrastructure/feedback/confirm.service'
 import { t, locale } from '../../i18n'
 import type { OrderDto } from '../../domain/models/commerce'
 import { ORDER_STATUSES } from '../../domain/models/commerce'
@@ -28,7 +27,6 @@ const page = ref(1)
 const pageSize = 10
 
 // Action states
-const acting = ref('')
 const selectedOrder = ref<OrderDto | null>(null)
 const showDetailModal = ref(false)
 
@@ -96,6 +94,28 @@ const paginatedOrders = computed(() =>
 const openDetails = (order: OrderDto) => {
   selectedOrder.value = order
   showDetailModal.value = true
+}
+
+const openStatusModalFromDetails = (order: OrderDto) => {
+  showDetailModal.value = false
+  openStatusModal(order)
+}
+
+const copyTracking = async (num: string) => {
+  try {
+    await navigator.clipboard.writeText(num)
+    toastService.success(locale.value === 'ar' ? 'تم النسخ إلى الحافظة' : 'Copied to clipboard')
+  } catch {
+    toastService.info(num)
+  }
+}
+
+const getTimelineStepIndex = (status?: string | null): number => {
+  const s = (status || '').toLowerCase()
+  if (['delivered', 'completed'].includes(s)) return 3
+  if (['shipped'].includes(s)) return 2
+  if (['confirmed', 'processing'].includes(s)) return 1
+  return 0 // pending
 }
 
 const openStatusModal = (order: OrderDto) => {
@@ -197,6 +217,9 @@ const submitStatusUpdate = async () => {
             :placeholder="t('common.searchPlaceholder')"
             class="search-input"
           />
+          <button v-if="search" type="button" class="clear-search-btn" @click="search = ''; page = 1" :aria-label="t('common.clearInput')">
+            <span class="material-symbols-outlined text-[16px]">close</span>
+          </button>
         </div>
 
         <div class="filter-actions">
@@ -223,7 +246,12 @@ const submitStatusUpdate = async () => {
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="order in paginatedOrders" :key="order.id">
+                <tr
+                  v-for="order in paginatedOrders"
+                  :key="order.id"
+                  class="table-row-clickable"
+                  @click="openDetails(order)"
+                >
                   <td>
                     <div class="order-id-cell">
                       <strong class="mono order-num">{{ order.orderNumber }}</strong>
@@ -252,14 +280,14 @@ const submitStatusUpdate = async () => {
                   </td>
 
                   <td>
-                    <strong class="mono total-fig">{{ formatPrice(order.totalAmount, order.currencyCode || 'USD') }}</strong>
+                    <strong class="mono total-fig">{{ formatPrice(order.totalAmount, locale) }} {{ order.currencyCode || 'USD' }}</strong>
                   </td>
 
                   <td>
                     <StatusPill :status="order.status" />
                   </td>
 
-                  <td class="text-end">
+                  <td class="text-end" @click.stop>
                     <div class="action-btn-group">
                       <button
                         type="button"
@@ -296,6 +324,56 @@ const submitStatusUpdate = async () => {
       <!-- Order Detail Modal -->
       <BaseModal v-model="showDetailModal" :title="`${t('commerce.orderDetailTitle')} · ${selectedOrder?.orderNumber || ''}`" size="lg">
         <div v-if="selectedOrder" class="detail-modal-body">
+          <!-- Fulfillment Progress Timeline -->
+          <div class="order-timeline-card">
+            <div class="order-timeline-steps">
+              <div class="timeline-step" :class="{ 'is-complete': getTimelineStepIndex(selectedOrder.status) >= 0, 'is-current': getTimelineStepIndex(selectedOrder.status) === 0 }">
+                <div class="step-dot">
+                  <span class="material-symbols-outlined text-[14px]">receipt_long</span>
+                </div>
+                <span class="step-label mono">{{ t('account.pipeStatusPending') }}</span>
+              </div>
+              <div class="step-line" :class="{ 'is-active': getTimelineStepIndex(selectedOrder.status) >= 1 }"></div>
+              <div class="timeline-step" :class="{ 'is-complete': getTimelineStepIndex(selectedOrder.status) >= 1, 'is-current': getTimelineStepIndex(selectedOrder.status) === 1 }">
+                <div class="step-dot">
+                  <span class="material-symbols-outlined text-[14px]">check_circle</span>
+                </div>
+                <span class="step-label mono">{{ t('account.processing') }}</span>
+              </div>
+              <div class="step-line" :class="{ 'is-active': getTimelineStepIndex(selectedOrder.status) >= 2 }"></div>
+              <div class="timeline-step" :class="{ 'is-complete': getTimelineStepIndex(selectedOrder.status) >= 2, 'is-current': getTimelineStepIndex(selectedOrder.status) === 2 }">
+                <div class="step-dot">
+                  <span class="material-symbols-outlined text-[14px]">local_shipping</span>
+                </div>
+                <span class="step-label mono">{{ locale === 'ar' ? 'تم الشحن' : 'Shipped' }}</span>
+              </div>
+              <div class="step-line" :class="{ 'is-active': getTimelineStepIndex(selectedOrder.status) >= 3 }"></div>
+              <div class="timeline-step" :class="{ 'is-complete': getTimelineStepIndex(selectedOrder.status) >= 3, 'is-current': getTimelineStepIndex(selectedOrder.status) === 3 }">
+                <div class="step-dot">
+                  <span class="material-symbols-outlined text-[14px]">verified</span>
+                </div>
+                <span class="step-label mono">{{ t('account.stepDelivered') }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tracking Number Banner if present -->
+          <div v-if="(selectedOrder as any).trackingNumber" class="tracking-banner">
+            <span class="material-symbols-outlined text-primary text-[22px]">local_shipping</span>
+            <div class="tracking-text">
+              <span class="tracking-label mono text-xs text-muted">{{ t('commerce.trackingTitle') }}</span>
+              <strong class="tracking-val mono">{{ (selectedOrder as any).trackingNumber }}</strong>
+            </div>
+            <button
+              type="button"
+              class="copy-tracking-btn mono"
+              @click="copyTracking((selectedOrder as any).trackingNumber)"
+            >
+              <span class="material-symbols-outlined text-[15px]">content_copy</span>
+              <span>{{ locale === 'ar' ? 'نسخ' : 'Copy' }}</span>
+            </button>
+          </div>
+
           <div class="detail-grid mono">
             <div class="detail-item">
               <span class="lbl">{{ t('commerce.orderNumber') }}</span>
@@ -314,33 +392,35 @@ const submitStatusUpdate = async () => {
           <!-- Line items -->
           <div class="line-items-section">
             <h3 class="section-sub mono">{{ t('sales.lineItems') }}</h3>
-            <table class="line-items-table mono">
-              <thead>
-                <tr>
-                  <th>{{ t('marketplace.products') }}</th>
-                  <th class="text-center">{{ t('marketplace.quantity') }}</th>
-                  <th class="text-end">{{ t('admin.quoteUnitPrice') }}</th>
-                  <th class="text-end">{{ t('admin.quoteSubtotal') }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(it, idx) in selectedOrder.items || []" :key="idx">
-                  <td>
-                    <strong>{{ localized(it.productNameEn, it.productNameAr) }}</strong>
-                    <div class="text-xs text-muted">{{ it.productId }}</div>
-                  </td>
-                  <td class="text-center">{{ it.quantity }}</td>
-                  <td class="text-end">{{ formatPrice(it.unitPrice || 0, selectedOrder.currencyCode || 'USD') }}</td>
-                  <td class="text-end"><strong>{{ formatPrice((it.unitPrice || 0) * (it.quantity || 1), selectedOrder.currencyCode || 'USD') }}</strong></td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="table-wrap">
+              <table class="line-items-table mono">
+                <thead>
+                  <tr>
+                    <th>{{ t('marketplace.products') }}</th>
+                    <th class="text-center">{{ t('marketplace.quantity') }}</th>
+                    <th class="text-end">{{ t('admin.quoteUnitPrice') }}</th>
+                    <th class="text-end">{{ t('admin.quoteSubtotal') }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(it, idx) in selectedOrder.items || []" :key="idx">
+                    <td>
+                      <strong>{{ localized(it.productNameEn, it.productNameAr) }}</strong>
+                      <div class="text-xs text-muted">{{ it.productId }}</div>
+                    </td>
+                    <td class="text-center">{{ it.quantity }}</td>
+                    <td class="text-end">{{ formatPrice(it.unitPrice || 0, locale) }} {{ selectedOrder.currencyCode || 'USD' }}</td>
+                    <td class="text-end"><strong>{{ formatPrice((it.unitPrice || 0) * (it.quantity || 1), locale) }} {{ selectedOrder.currencyCode || 'USD' }}</strong></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
 
           <!-- Total Summary -->
           <div class="order-summary-box mono">
             <span class="summary-lbl">{{ t('commerce.total') }}:</span>
-            <strong class="summary-val">{{ formatPrice(selectedOrder.totalAmount, selectedOrder.currencyCode || 'USD') }}</strong>
+            <strong class="summary-val">{{ formatPrice(selectedOrder.totalAmount, locale) }} {{ selectedOrder.currencyCode || 'USD' }}</strong>
           </div>
 
           <!-- Escalation Notice -->
@@ -350,6 +430,17 @@ const submitStatusUpdate = async () => {
               <span>{{ t('provider.supportDesc') }}</span>
               <router-link to="/provider/support" class="callout-link mono">{{ t('provider.contactAdmin') }} →</router-link>
             </div>
+          </div>
+
+          <!-- Modal Action Footer -->
+          <div class="order-details-modal-footer">
+            <BaseButton variant="secondary" type="button" @click="showDetailModal = false">
+              {{ t('common.close') }}
+            </BaseButton>
+            <BaseButton variant="primary" type="button" @click="openStatusModalFromDetails(selectedOrder)">
+              <span class="material-symbols-outlined text-[16px]">tune</span>
+              <span>{{ t('common.edit') }} ({{ t('commerce.status') }})</span>
+            </BaseButton>
           </div>
         </div>
       </BaseModal>
@@ -389,6 +480,8 @@ const submitStatusUpdate = async () => {
 <style scoped>
 .provider-orders-view {
   width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .view-header {
@@ -429,7 +522,7 @@ const submitStatusUpdate = async () => {
 /* KPI Cards */
 .kpi-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
   gap: var(--space-4);
   margin-bottom: var(--space-6);
 }
@@ -514,13 +607,27 @@ const submitStatusUpdate = async () => {
   width: 100%;
   height: 40px;
   padding-inline-start: 36px;
-  padding-inline-end: 12px;
+  padding-inline-end: 36px;
   border: 1px solid var(--wl-border);
   border-radius: var(--radius-md);
   background: var(--wl-surface);
   color: var(--wl-ink-strong);
   font-size: var(--step-0);
   outline: none;
+}
+
+.clear-search-btn {
+  position: absolute;
+  inset-inline-end: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--wl-muted);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  padding: 4px;
 }
 
 .filter-select {
@@ -544,6 +651,9 @@ const submitStatusUpdate = async () => {
 
 .table-wrap {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  min-width: 0;
 }
 
 .data-table {
@@ -557,6 +667,15 @@ const submitStatusUpdate = async () => {
   border-bottom: 1px solid var(--wl-border);
   text-align: start;
   vertical-align: middle;
+}
+
+.table-row-clickable {
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.table-row-clickable:hover {
+  background-color: var(--wl-surface-soft);
 }
 
 .data-table th {
@@ -768,8 +887,124 @@ const submitStatusUpdate = async () => {
   font-weight: 700;
   text-decoration: none;
 }
-.callout-link:hover {
-  text-decoration: underline;
+/* Order Fulfillment Timeline */
+.order-timeline-card {
+  background: var(--wl-surface-soft);
+  border: 1px solid var(--wl-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+}
+
+.order-timeline-steps {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+.timeline-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  z-index: 1;
+}
+
+.step-dot {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--wl-surface);
+  border: 2px solid var(--wl-border);
+  color: var(--wl-muted);
+  transition: all 0.2s ease;
+}
+
+.timeline-step.is-complete .step-dot {
+  background: #ecfdf5;
+  border-color: #10b981;
+  color: #059669;
+}
+
+.timeline-step.is-current .step-dot {
+  background: var(--wl-primary-soft);
+  border-color: var(--wl-primary);
+  color: var(--wl-primary);
+  box-shadow: 0 0 0 3px rgba(179, 139, 45, 0.18);
+}
+
+.step-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--wl-muted);
+}
+
+.timeline-step.is-complete .step-label,
+.timeline-step.is-current .step-label {
+  color: var(--wl-ink-strong);
+}
+
+.step-line {
+  flex: 1;
+  height: 2px;
+  background: var(--wl-border);
+  margin: 0 var(--space-2);
+  margin-bottom: 20px;
+  transition: background 0.2s ease;
+}
+
+.step-line.is-active {
+  background: #10b981;
+}
+
+/* Tracking Banner */
+.tracking-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--wl-primary-soft, #eef2ff);
+  border: 1px solid var(--wl-primary-border, #c7d2fe);
+  border-radius: var(--radius-md);
+}
+
+.tracking-text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.copy-tracking-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--wl-surface);
+  border: 1px solid var(--wl-border);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--wl-ink-strong);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.copy-tracking-btn:hover {
+  border-color: var(--wl-primary);
+  color: var(--wl-primary);
+}
+
+.order-details-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--wl-border);
 }
 
 /* Status Modal */
@@ -813,5 +1048,25 @@ const submitStatusUpdate = async () => {
   justify-content: flex-end;
   gap: var(--space-2);
   margin-top: var(--space-3);
+}
+
+@media (max-width: 768px) {
+  .view-header {
+    flex-direction: column;
+  }
+  .filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2);
+  }
+}
+
+@media (max-width: 440px) {
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

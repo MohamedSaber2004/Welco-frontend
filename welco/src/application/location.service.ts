@@ -26,7 +26,6 @@ export class LocationService {
         this.countries.value = await this.repo.getCountries()
         this.loadedCountries = true
       } catch {
-        // repo now returns fallback instead of throwing for 404, but keep guard
         if (!this.countries.value.length) this.loadedCountries = true
       } finally {
         this.loading.value = false

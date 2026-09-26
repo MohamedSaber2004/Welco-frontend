@@ -18,6 +18,7 @@ export interface RegisterPayload {
   companyEmail?: string
   distributorCountryId?: string
   salesVolumeBand?: string
+  categoryInterest?: string
   website?: string
 }
 

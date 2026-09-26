@@ -71,11 +71,11 @@ export function useUsers() {
         rawUsers.value = (res as unknown as { data: UserDto[] }).data
       } else if (Array.isArray(res as unknown as UserDto[])) {
         rawUsers.value = res as unknown as UserDto[]
-      } else if (data && Array.isArray(data.data)) {
-        rawUsers.value = data.data as UserDto[]
-      } else {
-        rawUsers.value = []
-      }
+} else if (data && Array.isArray(data.data)) {
+      rawUsers.value = (data.data as UserDto[])
+    } else {
+      rawUsers.value = []
+    }
     } catch (e) {
       const message = e instanceof Error && e.message ? e.message : t('common.loadFailed')
       error.value = message

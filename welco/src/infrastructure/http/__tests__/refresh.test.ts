@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { TokenStore } from '../token-store';
 describe('TokenStore refresh', () => {
   it('reports expiring token within 5 min window', () => {

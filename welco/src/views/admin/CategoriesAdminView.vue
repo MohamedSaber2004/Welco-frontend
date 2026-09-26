@@ -51,7 +51,6 @@ const loadAll = async () => {
   }
 }
 
-/* ── Add / edit form ── */
 const showModal = ref(false)
 const editing = ref<CategoryDto | null>(null)
 const formLoading = ref(false)

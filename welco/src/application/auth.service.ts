@@ -19,7 +19,6 @@ import { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE, SESSION_COOKIE } from '../in
 import type { AuthBridge } from '../infrastructure/http/auth-bridge'
 import type { AttachmentService } from './attachment.service'
 import {
-  isSalesRole,
   resolveBusinessRole as resolveBusinessRoleFn,
   resolveBusinessRoleKey as resolveBusinessRoleKeyFn,
 } from '../domain/models/business-role'
@@ -57,6 +56,7 @@ const nameToUser = (raw: AuthResponseDto | UserProfileDto): User => {
     createdAt: 'createdAt' in raw ? String((raw as UserProfileDto).createdAt) : new Date().toISOString(),
     roles: raw.roles ?? [],
     companyId: (raw as AuthResponseDto).companyId ?? (raw as UserProfileDto).companyId ?? null,
+    company: (raw as UserProfileDto).company ?? null,
     tint: TINTS[seed % TINTS.length] ?? '#0ea5e9',
   }
 }
@@ -229,24 +229,52 @@ export class AuthService {
     return u.roles.map((r) => r.toLowerCase()).includes('admin') || u.userType === 1
   })
 
-  /** OrganizationUser — the B2B buyer / company user (UserType 2). */
   readonly isOrganizationUser = computed(() => {
     const u = this.user.value
     if (!u) return false
-    return u.roles.map((r) => r.toLowerCase()).includes('organizationuser') || u.userType === 2
+    return (
+      u.roles.some((r) => ['organizationuser', 'provider', 'distributor', 'supplier'].includes(r.toLowerCase())) ||
+      u.userType === 2
+    )
   })
 
-  /** Sales/Internal Staff — internal operations roles (UserType 3), treated identically. */
-  readonly isSales = computed(() => {
+  /** Provider / Distributor — the seller supplying goods on the platform. */
+  readonly isProvider = computed(() => {
     const u = this.user.value
     if (!u) return false
-    return u.roles.some((r) => isSalesRole(r)) || u.userType === 3
+    if (this.isAdmin.value) return false
+    return (
+      this.isOrganizationUser.value ||
+      u.roles.some((r) => ['provider', 'distributor', 'supplier'].includes(r.toLowerCase())) ||
+      !!u.companyId ||
+      !!u.company
+    )
   })
 
+  /** Client — the buyer purchasing products on the site. */
+  readonly isClient = computed(() => {
+    const u = this.user.value
+    if (!u) return false
+    if (this.isAdmin.value || this.isProvider.value) return false
+    return (
+      u.userType === 4 ||
+      u.roles.some((r) => ['client', 'buyer', 'customer'].includes(r.toLowerCase())) ||
+      true
+    )
+  })
+
+  /** Buyer = Client */
+  readonly isBuyer = computed(() => this.isClient.value)
+
+  /** Seller = Provider (supplies goods to the platform) */
+  readonly isSeller = computed(() => this.isProvider.value)
+
+  /** Staff = Admin or Sales (internal platform management) */
+  readonly isStaff = computed(() => this.isAdmin.value)
+
   /**
-   * 4 business roles derived on top of the 3 backend UserTypes:
-   * Admin, Provider/Distributor (OrgUser + company), Client (OrgUser without company), Sales (internal staff). The Provider IS the Company
-   * of a distributor / organization user (see business-role.ts).
+   * 4 business roles derived on top of the backend UserTypes:
+   * Admin, Sales, Provider (Seller), Client (Buyer).
    */
   private toBusinessCtx(company?: { id?: string | null; type?: number; status?: unknown } | null) {
     const u = this.user.value
@@ -255,33 +283,30 @@ export class AuthService {
       roles: u?.roles ?? [],
       companyId: u?.companyId ?? null,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      company: (company ?? null) as any,
+      company: (company ?? u?.company ?? null) as any,
     }
   }
 
-  /** Seller = internal roles that live in /admin console. */
-  readonly isSeller = computed(() => this.isAdmin.value || this.isSales.value)
-
   /** Suitable landing dashboard per role. Single source of truth for post-login + guestOnly redirects. */
   getDashboardRouteName(): string {
-    if (this.isSeller.value) return 'admin-dashboard'
-    if (this.isProvider.value) return 'provider-catalog'
-    if (this.isOrganizationUser.value) return 'account'
+    if (this.isAdmin.value) return 'admin-dashboard'
+    if (this.isProvider.value) return 'provider-quotes'
+    if (this.isClient.value) return 'account'
     return 'home'
   }
 
   /**
    * Validate a `?redirect=` target against the current role so login never
-   * pushes a buyer into /admin (or a seller into /account) just to bounce.
+   * pushes a buyer into /admin or /provider (or a seller into /account) just to bounce.
    * Mirrors the guards in `src/router/index.ts`.
    */
   canAccessPath(path: string): boolean {
     if (!path || !path.startsWith('/')) return false
     const clean = path.split('?')[0]?.split('#')[0] ?? '/'
-    if (clean.startsWith('/admin')) return this.isSeller.value
+    if (clean.startsWith('/admin')) return this.isAdmin.value
     if (clean.startsWith('/provider')) return this.isProvider.value || this.isAdmin.value
-    if (clean.startsWith('/account') || clean === '/wishlist') return this.isOrganizationUser.value && this.isAuthenticated
-    if (clean === '/cart' || clean === '/checkout') return this.isOrganizationUser.value
+    if (clean.startsWith('/account') || clean === '/wishlist') return this.isClient.value && this.isAuthenticated
+    if (clean === '/cart' || clean === '/checkout') return this.isClient.value
     return true
   }
 
@@ -291,23 +316,8 @@ export class AuthService {
     return !!u && this.isOrganizationUser.value && !u.companyId && isPendingOrg(u.email)
   }
 
-  /** Provider/Distributor — OrganizationUser with company. */
-  readonly isProvider = computed(() => {
-    const u = this.user.value
-    if (!u) return false
-    if (this.isAdmin.value || this.isSales.value) return false
-    return this.isOrganizationUser.value && !!u.companyId
-  })
-
-  /** Client — OrganizationUser without company (buyer). */
-  readonly isClient = computed(() => {
-    const u = this.user.value
-    if (!u) return false
-    return this.isOrganizationUser.value && !u.companyId
-  })
-
   /** Whether the signed-in user already has a linked provider company. */
-  readonly hasLinkedCompany = computed(() => !!this.user.value?.companyId)
+  readonly hasLinkedCompany = computed(() => !!(this.user.value?.companyId || this.user.value?.company?.id))
 
   /** Precise business role once the company detail is known (pass myCompany). */
   resolveBusinessRole(company?: { id?: string | null; type?: number; status?: unknown } | null) {

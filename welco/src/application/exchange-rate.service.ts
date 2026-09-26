@@ -1,105 +1,73 @@
 import { ref } from 'vue'
-import type { ConversionResultDto, ConvertCartTotalRequest, ConvertCartTotalResult, ExchangeRateDto } from '../domain/models/exchange-rate'
+import type { ConversionResultDto, ConvertCartTotalRequest, ConvertCartTotalResult } from '../domain/models/exchange-rate'
 import type { ExchangeRateRepository } from '../domain/ports/exchange-rate-repository'
-
 
 export class ExchangeRateService {
   readonly latestRates = ref<Map<string, number>>(new Map())
   readonly lastUpdated = ref<string | null>(null)
-  /** 'live' | null — lets UI badge whether backend rates are loaded. */
+  /** 'live' | null — reflects whether live backend rates are currently loaded. */
   readonly lastUpdatedSource = ref<'live' | null>(null)
   readonly loading = ref(false)
 
   constructor(private readonly repo: ExchangeRateRepository) {}
 
-  private classify(_rates: ExchangeRateDto[]): 'live' {
-    // Live only — every rate comes from the Welco backend (FastForex fetch-one).
-    return 'live'
-  }
-
-  /** Live daily rates. No cache — every call hits the backend (FastForex fetch-one). */
+  /** Daily rates loaded directly from backend endpoints with no fallback. */
   async loadLatest(base = 'USD'): Promise<Map<string, number>> {
     this.loading.value = true
     try {
       const rates = await this.repo.getLatest(base)
-      if (rates.length) {
-        const map = new Map<string, number>()
-        for (const r of rates) map.set(r.targetCurrency.toUpperCase(), r.rate)
-        const source = this.classify(rates)
-        this.latestRates.value = map
-        this.lastUpdated.value = new Date().toISOString()
-        this.lastUpdatedSource.value = source
-        return map
+      const map = new Map<string, number>()
+      for (const r of rates) {
+        if (r && r.targetCurrency && typeof r.rate === 'number') {
+          map.set(r.targetCurrency.toUpperCase(), r.rate)
+        }
       }
-      this.latestRates.value = new Map()
-      this.lastUpdated.value = ''
-      this.lastUpdatedSource.value = null
-      return this.latestRates.value
-    } catch {
-      this.latestRates.value = new Map()
-      this.lastUpdated.value = ''
-      this.lastUpdatedSource.value = null
-      return this.latestRates.value
+      this.latestRates.value = map
+      this.lastUpdated.value = new Date().toISOString()
+      this.lastUpdatedSource.value = map.size > 0 ? 'live' : null
+      return map
     } finally {
       this.loading.value = false
     }
   }
 
-  // Live conversion using fresh latest rates (no cache — extra API call each time)
+  /** Conversion using latest loaded backend rates. */
   async convertLocal(amount: number, from: string, to: string, base = 'USD'): Promise<number> {
     from = from.toUpperCase().trim()
     to = to.toUpperCase().trim()
     base = base.toUpperCase().trim()
     if (from === to) return amount
-    if (from === base) {
-      const map = await this.loadLatest(base)
-      const toRate = map.get(to)
-      if (toRate == null) throw new Error(`Missing rate ${base}->${to}`)
-      return amount * toRate
+
+    const map = this.latestRates.value.size > 0 ? this.latestRates.value : await this.loadLatest(base)
+    const fromRate = from === base ? 1 : map.get(from)
+    const toRate = to === base ? 1 : map.get(to)
+    if (fromRate != null && toRate != null && fromRate > 0) {
+      return amount * (toRate / fromRate)
     }
-    if (to === base) {
-      const map = await this.loadLatest(base)
-      const fromRate = map.get(from)
-      if (fromRate == null) throw new Error(`Missing rate ${base}->${from}`)
-      return amount * (1 / fromRate)
-    }
-    const map = await this.loadLatest(base)
-    const fromRate = map.get(from)
-    const toRate = map.get(to)
-    if (fromRate == null || toRate == null) throw new Error(`Missing rate ${from} or ${to}`)
-    return amount * (toRate / fromRate)
+    throw new Error(`Unable to convert from ${from} to ${to}: live exchange rate not available`)
   }
 
-  /** Live convert via backend (FastForex fetch-one). No cache — every call hits the API. */
+  /** Convert via backend endpoint. */
   async convert(amount: number, from: string, to: string): Promise<ConversionResultDto> {
-    try {
-      return await this.repo.convert(amount, from, to)
-    } catch {
-      // fallback to live calc (still hits the API, no cache)
-      const converted = await this.convertLocal(amount, from, to)
-      return {
-        amount,
-        fromCurrency: from.toUpperCase(),
-        toCurrency: to.toUpperCase(),
-        rate: amount === 0 ? 1 : converted / amount,
-        convertedAmount: converted,
-        rateDate: new Date().toISOString().slice(0, 10),
-        source: 'live',
-      }
-    }
+    return await this.repo.convert(amount, from, to)
   }
 
-  /** Backend cart total: live rates for every line + ceiling total. No fallback here — caller decides. */
+  /** Backend cart total: live rates for every line + ceiling total. */
   async convertCartTotal(payload: ConvertCartTotalRequest): Promise<ConvertCartTotalResult> {
     return await this.repo.convertCartTotal(payload)
   }
 
   async getRate(from: string, to: string): Promise<number> {
-    const res = await this.convert(1, from, to)
+    const f = from.toUpperCase().trim()
+    const tt = to.toUpperCase().trim()
+    if (f === tt) return 1
+    const pair = await this.repo.getPair(f, tt)
+    if (pair) return pair.rate
+    const res = await this.convert(1, f, tt)
     return res.rate
   }
 
-  /** Kept for callers (e.g. CartView refresh) — just resets live state, no cache to clear. */
+  /** Resets live state. */
   clearCache(): void {
     this.latestRates.value = new Map()
     this.lastUpdated.value = null

@@ -43,10 +43,14 @@ async function load(s: string) {
     const found = await contentRepository.getLandingPageBySlug(s).catch(() => null)
     if (found) {
       page.value = found
-      const [list, prodRes] = await Promise.allSettled([
+      const [list, prodRes, catRes] = await Promise.allSettled([
         contentRepository.getLandingPages({ pageNumber: 1, pageSize: 50 }),
         found.categoryId ? marketplaceRepository.getProducts({ categoryId: found.categoryId, page: 1, pageSize: 8 }).catch(() => ({ data: [] as ProductDto[] })) : Promise.resolve({ data: [] as ProductDto[] }),
+        marketplaceRepository.getCategories().catch(() => [] as CategoryDto[]),
       ])
+      if (catRes.status === 'fulfilled' && Array.isArray(catRes.value)) {
+        categories.value = catRes.value as CategoryDto[]
+      }
       if (list.status === 'fulfilled' && list.value?.data) {
         relatedPages.value = (list.value.data as LandingPageDto[]).filter((p: LandingPageDto) => p.slug !== s && p.type === 'Specialty').slice(0, 4)
       }

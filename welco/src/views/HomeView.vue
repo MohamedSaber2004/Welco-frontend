@@ -180,7 +180,7 @@ onMounted(async () => {
           mostSellingLoading.value = false
         }),
     ])
-    if (svc.categories.value.length) cats.value = svc.categories.value.slice(0, 8)
+    if (svc.categories.value.length) cats.value = [...svc.categories.value]
     certifications.value = services.certificationService.certifications.value
   } finally {
     loading.value = false
@@ -1429,10 +1429,10 @@ const navigateToOemFromModal = () => {
 }
 .cat-explorer__pills {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5rem;
-  overflow-x: auto;
+  overflow-x: visible;
   padding: 0.25rem 0.15rem 0.85rem;
-  scrollbar-width: none;
   border-bottom: 1px solid #f1f5f9;
 }
 .cat-explorer__pills::-webkit-scrollbar {

@@ -7,7 +7,7 @@ import type { AuthBridge } from './auth-bridge'
 import type { ModalService } from '../feedback/modal.service'
 
 export function normalizeEnvelope<T>(raw: unknown): T {
-  if (raw && typeof raw === 'object' && 'data' in raw && 'isSuccess' in raw) return (raw as ApiEnvelope).data as T;
+  if (raw && typeof raw === 'object' && 'data' in raw && 'isSuccess' in raw) return raw.data as T;
   return raw as T;
 }
 

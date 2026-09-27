@@ -179,12 +179,11 @@ function onInput(e: Event) {
   uploading.value = true
   const fileArray = Array.from(files)
   const processNext = () => {
-    if (fileArray.length === 0) {
+    const file = fileArray.shift()
+    if (!file) {
       uploading.value = false
       return
     }
-    const file = fileArray[0]
-    fileArray.shift()
     handleFile(file).finally(processNext)
   }
   processNext()
@@ -199,12 +198,11 @@ function onDrop(e: DragEvent) {
   uploading.value = true
   const fileArray = Array.from(files)
   const processNext = () => {
-    if (fileArray.length === 0) {
+    const file = fileArray.shift()
+    if (!file) {
       uploading.value = false
       return
     }
-    const file = fileArray[0]
-    fileArray.shift()
     handleFile(file).finally(processNext)
   }
   processNext()

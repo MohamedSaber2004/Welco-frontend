@@ -60,7 +60,7 @@ async function load(s: string) {
         contentRepository.getLandingPages({ pageNumber: 1, pageSize: 8 }).catch(() => ({ data: [] as LandingPageDto[] })),
       ])
       if (catRes.status === 'fulfilled' && Array.isArray(catRes.value)) {
-        categories.value = (catRes.value as CategoryDto[]).slice(0, 8) as CategoryDto[]
+        categories.value = catRes.value as CategoryDto[]
         const matched = (catRes.value as CategoryDto[]).find((c) => c.slug === s || c.nameEn?.toLowerCase().replace(/\s+/g, '-') === s.toLowerCase())
         if (matched) {
           const byCat = await marketplaceRepository.getProducts({ categoryId: matched.id, page: 1, pageSize: 12 }).catch(() => ({ data: [] as ProductDto[] }))
@@ -183,7 +183,7 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
         </section>
       </DataState>
 
-      <section v-if="!page && categories.length" class="lp-related-section" style="margin-top:1.5rem">
+      <section v-if="categories.length" class="lp-related-section" style="margin-top:1.5rem">
         <h3 class="section-title" style="font-size:1.15rem;margin-bottom:1rem">{{ t('marketplace.categoriesTitle') }}</h3>
 <div class="related-grid">
            <router-link v-for="(c, i) in categories" :key="c.id" :to="{ name: 'marketplace', query: { categoryId: c.id } }" class="cat-card anim-fade-in-up"

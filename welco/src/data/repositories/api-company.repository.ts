@@ -225,6 +225,14 @@ export class ApiCompanyRepository implements CompanyRepository {
     await this.http.del<void>(COMPANY_ROUTES.oemInquiryById(id), { showFeedback: false })
   }
 
+  async acceptOemInquiry(id: string): Promise<OemInquiryDto> {
+    return await this.http.put<OemInquiryDto>(COMPANY_ROUTES.acceptOemInquiry(id), {}, { showFeedback: false })
+  }
+
+  async deleteProviderWithCascade(id: string): Promise<void> {
+    await this.http.del<void>(COMPANY_ROUTES.deleteProviderWithCascade(id), { showFeedback: false })
+  }
+
 
   private extractCompanyAddrArray(raw: unknown): CompanyAddressDto[] {
     if (Array.isArray(raw)) return raw as CompanyAddressDto[]

@@ -235,6 +235,25 @@ const confirmDeleteOem = async (inquiry: OemInquiryDto) => {
     oemDeletePendingId.value = null
   }
 }
+
+const oemAcceptPendingId = ref<string | null>(null)
+
+const acceptOemInquiry = async (inquiry: OemInquiryDto) => {
+  oemAcceptPendingId.value = inquiry.id
+  try {
+    const result = await companyService.acceptOemInquiry(inquiry.id)
+    if (result.ok) {
+      toastService.success(t('admin.oemInquiryAccepted'))
+      if (selectedOem.value?.id === inquiry.id) {
+        closeOemDetails()
+      }
+    }
+  } catch (e) {
+    toastService.error(e instanceof Error ? e.message : t('common.error'))
+  } finally {
+    oemAcceptPendingId.value = null
+  }
+}
 </script>
 
 <template>
@@ -561,40 +580,50 @@ const confirmDeleteOem = async (inquiry: OemInquiryDto) => {
 <tbody>
                      <tr v-for="(o, i) in paginatedOem" :key="o.id" class="exec-row anim-fade-in-up"
                          :style="{ animationDelay: `${i * 30}ms` }">
-                      <td>
-                        <strong class="company-name">{{ o.fullName }}</strong>
-                      </td>
-                      <td>{{ o.companyName }}</td>
-                      <td>
-                        <span class="vol-pill mono">{{ o.serviceType }}</span>
-                      </td>
-                      <td class="mono text-xs">{{ o.email }}</td>
-                      <td class="mono text-xs">{{ new Date(o.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</td>
-                      <td class="text-end">
-                        <div class="row-actions">
-                          <button
-                            type="button"
-                            class="row-action-btn"
-                            :title="t('admin.viewDetails')"
-                            :aria-label="t('admin.viewDetails')"
-                            @click="openOemDetails(o)"
-                          >
-                            <span class="material-symbols-outlined text-[18px]">visibility</span>
-                          </button>
-                          <button
-                            type="button"
-                            class="row-action-btn row-action-btn--danger"
-                            :title="t('common.delete')"
-                            :aria-label="t('common.delete')"
-                            :disabled="oemDeletePendingId === o.id"
-                            @click="confirmDeleteOem(o)"
-                          >
-                            <span class="material-symbols-outlined text-[18px]">delete</span>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
+                       <td>
+                         <strong class="company-name">{{ o.fullName }}</strong>
+                       </td>
+                       <td>{{ o.companyName }}</td>
+                       <td>
+                         <span class="vol-pill mono">{{ o.serviceType }}</span>
+                       </td>
+                       <td class="mono text-xs">{{ o.email }}</td>
+                       <td class="mono text-xs">{{ new Date(o.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</td>
+                       <td class="text-end">
+                         <div class="row-actions">
+                           <button
+                             type="button"
+                             class="row-action-btn"
+                             :title="t('admin.viewDetails')"
+                             :aria-label="t('admin.viewDetails')"
+                             @click="openOemDetails(o)"
+                           >
+                             <span class="material-symbols-outlined text-[18px]">visibility</span>
+                           </button>
+                           <button
+                             type="button"
+                             class="row-action-btn row-action-btn--success"
+                             :title="t('admin.accept')"
+                             :aria-label="t('admin.accept')"
+                             :disabled="oemAcceptPendingId === o.id"
+                             @click="acceptOemInquiry(o)"
+                           >
+                             <span class="material-symbols-outlined text-[18px]">check_circle</span>
+                           </button>
+                           <button
+                             type="button"
+                             class="row-action-btn row-action-btn--danger"
+                             :title="t('common.delete')"
+                             :aria-label="t('common.delete')"
+                             :disabled="oemDeletePendingId === o.id"
+                             @click="confirmDeleteOem(o)"
+                           >
+                             <span class="material-symbols-outlined text-[18px]">delete</span>
+                           </button>
+                         </div>
+                       </td>
+                     </tr>
+                   </tbody>
                 </table>
               </div>
 
@@ -708,6 +737,13 @@ const confirmDeleteOem = async (inquiry: OemInquiryDto) => {
             <p class="detail-v--pre">{{ selectedOem.message }}</p>
           </div>
           <div class="modal-foot">
+            <BaseButton
+              variant="success"
+              :loading="oemAcceptPendingId === selectedOem.id"
+              @click="selectedOem && acceptOemInquiry(selectedOem)"
+            >
+              {{ t('admin.accept') }}
+            </BaseButton>
             <BaseButton
               variant="secondary"
               :loading="oemDeletePendingId === selectedOem.id"

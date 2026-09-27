@@ -164,6 +164,8 @@ export const COMPANY_ROUTES = {
   rejectDistributorApplication: (id: string) => `/api/v1/user-management/distributor-applications/${id}/reject`,
   oemInquiries: '/api/v1/oem-inquiries',
   oemInquiryById: (id: string) => `/api/v1/oem-inquiries/${id}`,
+  acceptOemInquiry: (id: string) => `/api/v1/oem-inquiries/${id}/accept`,
+  deleteProviderWithCascade: (id: string) => `/api/v1/user-management/companies/${id}/delete-with-cascade`,
   auditLogs: '/api/v1/user-management/audit-logs',
   auditLogById: (id: string) => `/api/v1/user-management/audit-logs/${id}`,
 } as const

@@ -251,6 +251,12 @@ table thead th.text-center {
   background: var(--color-danger-100);
 }
 
+.row-action-btn--success:hover {
+  color: var(--fg-success);
+  border-color: var(--fg-success);
+  background: var(--color-success-100);
+}
+
 .row-action-btn--activate:hover {
   color: var(--fg-success);
   border-color: var(--fg-success);

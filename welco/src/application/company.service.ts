@@ -198,6 +198,32 @@ export class CompanyService {
     }
   }
 
+  async acceptOemInquiry(id: string): Promise<CompanyResult & { data?: OemInquiryDto }> {
+    try {
+      const accepted = await this.repo.acceptOemInquiry(id)
+      const idx = this.oemInquiries.value.findIndex((q) => q.id === id)
+      if (idx !== -1) {
+        this.oemInquiries.value[idx] = accepted
+      }
+      toastService.success(t('admin.oemInquiryAccepted'))
+      return { ok: true, data: accepted }
+    } catch (err) {
+      return { ok: false, error: err instanceof Error ? err.message : t('common.error') }
+    }
+  }
+
+  async deleteProviderWithCascade(id: string): Promise<CompanyResult> {
+    try {
+      await this.repo.deleteProviderWithCascade(id)
+      // Remove from local companies list if present
+      // This will be refreshed by the caller
+      toastService.success(t('admin.providerDeletedWithCascade'))
+      return { ok: true }
+    } catch (err) {
+      return { ok: false, error: err instanceof Error ? err.message : t('common.error') }
+    }
+  }
+
   // ── Company Addresses (supports many addresses same country or across countries) ──
 
   async loadCompanyAddresses(companyId?: string): Promise<CompanyResult & { data?: CompanyAddressDto[] }> {

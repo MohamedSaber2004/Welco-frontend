@@ -224,6 +224,27 @@ const confirmDeleteCompany = async (c: CompanyDto) => {
   }
 }
 
+const confirmDeleteProviderWithCascade = async (c: CompanyDto) => {
+  const ok = await confirmService.confirm({
+    title: t('admin.deleteProviderCascadeTitle'),
+    message: `${t('admin.deleteProviderCascadeConfirm')}\n${c.name}`,
+    variant: 'danger',
+    confirmText: t('admin.deleteWithCascade'),
+    cancelText: t('common.cancel'),
+  })
+  if (!ok) return
+  companyActionPendingId.value = c.id
+  try {
+    await companyService.deleteProviderWithCascade(c.id)
+    toastService.success(t('admin.providerDeletedWithCascade'))
+    await loadCompanies()
+  } catch (e) {
+    toastService.error(e instanceof Error ? e.message : t('common.error'))
+  } finally {
+    companyActionPendingId.value = null
+  }
+}
+
 const showCompanyDetails = ref(false)
 const selectedCompany = ref<CompanyDto | null>(null)
 
@@ -667,6 +688,17 @@ watch([applicationSearch, statusFilter, typeFilter], () => {
                           @click="confirmDeleteCompany(c)"
                         >
                           <span class="material-symbols-outlined text-[18px]">delete</span>
+                        </button>
+                        <button
+                          v-if="c.isProvider || c.type === 4"
+                          type="button"
+                          class="row-action-btn row-action-btn--danger"
+                          :title="t('admin.deleteWithCascade')"
+                          :aria-label="t('admin.deleteWithCascade')"
+                          :disabled="companyActionPendingId === c.id"
+                          @click="confirmDeleteProviderWithCascade(c)"
+                        >
+                          <span class="material-symbols-outlined text-[18px]">delete_forever</span>
                         </button>
                       </div>
                     </td>

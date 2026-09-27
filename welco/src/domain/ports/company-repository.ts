@@ -65,6 +65,7 @@ export interface CompanyRepository {
    */
   updateMyCompany(payload: UpdateMyCompanyPayload): Promise<CompanyDto>
   deleteCompany(id: string): Promise<void>
+  deleteProviderWithCascade(id: string): Promise<void>
   submitDistributorApplication(payload: DistributorApplicationPayload): Promise<DistributorApplicationDto>
   getDistributorApplications(query?: DistributorApplicationQuery): Promise<PaginatedResult<DistributorApplicationDto>>
   getDistributorApplicationById(id: string): Promise<DistributorApplicationDto>
@@ -75,6 +76,7 @@ export interface CompanyRepository {
   getOemInquiries(query?: OemInquiryQuery): Promise<PaginatedResult<OemInquiryDto>>
   getOemInquiryById(id: string): Promise<OemInquiryDto>
   deleteOemInquiry(id: string): Promise<void>
+  acceptOemInquiry(id: string): Promise<OemInquiryDto>
 
   getCompanyAddresses(companyId: string): Promise<CompanyAddressDto[]>
   createCompanyAddress(payload: CreateCompanyAddressPayload): Promise<CompanyAddressDto>

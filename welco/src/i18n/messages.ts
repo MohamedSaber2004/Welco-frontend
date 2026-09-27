@@ -592,12 +592,15 @@ export type Messages = {
     oemInquiries: string
     oemInquiryDeleted: string
     oemInquiryDeletedConfirm: string
+    oemInquiryAccepted: string
     pendingAppsCount: string
     approveApplication: string
     rejectApplication: string
+    accept: string
     approveSuccess: string
     approvedSuccessfully: string
     rejectSuccess: string
+    providerDeletedWithCascade: string
     noApplications: string
     emptyApplicationsDesc: string
     applicant: string
@@ -624,6 +627,9 @@ export type Messages = {
     newProduct: string
     newCategory: string
     editProduct: string
+    deleteProviderCascadeTitle: string
+    deleteProviderCascadeConfirm: string
+    deleteWithCascade: string
     editImage: string
     editCategory: string
     productNameEn: string

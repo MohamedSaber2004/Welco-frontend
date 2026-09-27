@@ -477,4 +477,35 @@
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand, #0F3D56) 18%, transparent), var(--shadow-sm);
 }
 
+/* --------------------------------------------------------------------------
+   14. Motion Layer (v-reveal + layout reflow)
+   -------------------------------------------------------------------------- */
+
+/* The hidden state is applied ONLY by the directive at runtime. No rule here may
+   hide an element unconditionally, or a JS failure yields an invisible page.
+   See docs/specs/2026-09-27-site-motion-system-design.md section 5. */
+.reveal-pending {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.reveal-pending.is-revealed {
+  animation: wlFadeInUp var(--duration-base, 180ms) var(--ease-out) forwards;
+  animation-delay: calc(min(var(--stagger-i, 0), 8) * 40ms);
+}
+
+/* FLIP timing for <TransitionGroup>; Vue supplies the measurement. */
+.anim-move {
+  transition: transform var(--duration-base, 180ms) var(--ease-out);
+}
+
+/* Safety net: never leave content hidden when motion is reduced. */
+@media (prefers-reduced-motion: reduce) {
+  .reveal-pending {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+}
+
 

@@ -1,6 +1,9 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { createApp, h, nextTick, withDirectives, type App } from 'vue'
-import { vReveal, REVEAL_PENDING, REVEAL_DONE, __resetObserver } from '../reveal'
+import { readFileSync } from 'node:fs'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { vReveal, REVEAL_PENDING, REVEAL_DONE, STAGGER_PROP, __resetObserver } from '../reveal'
 
 class StubObserver {
   readonly root = null
@@ -109,5 +112,32 @@ describe('vReveal', () => {
   it('omits the stagger custom property when the value is zero', async () => {
     const el = await mountReveal(0)
     expect(el.style.getPropertyValue('--stagger-i')).toBe('')
+  })
+})
+
+describe('motion stylesheet contract', () => {
+  // Vite's asset transform rewrites the literal `new URL('./x', import.meta.url)`
+  // pattern into a dev-server URL (http://localhost/...), which fileURLToPath
+  // rejects as a non-file scheme. Resolve from the decoded file path instead.
+  const here = dirname(fileURLToPath(import.meta.url))
+  const css = readFileSync(resolve(here, '../../assets/design-tokens.css'), 'utf8')
+
+  it('styles the exact class the directive adds', () => {
+    expect(css).toContain(`.${REVEAL_PENDING} {`)
+    expect(css).toContain(`.${REVEAL_PENDING}.${REVEAL_DONE} {`)
+  })
+
+  it('caps the stagger delay in CSS', () => {
+    expect(css).toContain('min(var(--stagger-i, 0), 8)')
+  })
+
+  it('uses the same stagger property name as the directive', () => {
+    // Closes the loop between the TS constant and the stylesheet literal. If
+    // STAGGER_PROP is ever renamed without updating the CSS, this fails.
+    expect(css).toContain(`var(${STAGGER_PROP}, 0)`)
+  })
+
+  it('force-restores visibility under reduced motion', () => {
+    expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.reveal-pending[\s\S]*?opacity: 1 !important/)
   })
 })

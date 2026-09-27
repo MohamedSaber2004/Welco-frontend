@@ -738,7 +738,7 @@ const acceptOemInquiry = async (inquiry: OemInquiryDto) => {
           </div>
           <div class="modal-foot">
             <BaseButton
-              variant="success"
+              variant="primary"
               :loading="oemAcceptPendingId === selectedOem.id"
               @click="selectedOem && acceptOemInquiry(selectedOem)"
             >

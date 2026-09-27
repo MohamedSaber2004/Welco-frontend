@@ -921,7 +921,8 @@ watch([applicationSearch, statusFilter, typeFilter], () => {
                     <th>{{ t('admin.submittedDate') }}</th>
                     <th class="text-end">{{ t('admin.actions') }}</th>
                   </tr>
-<tbody>
+                </thead>
+                <tbody>
                     <tr v-for="(app, i) in paginatedApplications" :key="app.id" class="exec-row anim-fade-in-up"
                        :style="{ animationDelay: `${(i % 10) * 50}ms` }">
                      <td>

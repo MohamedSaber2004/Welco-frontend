@@ -71,8 +71,9 @@ export const useReveal = (elementRef: Ref<HTMLElement | null>, options?: Interse
   onMounted(() => {
     if (!elementRef.value) return
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
+      (entries) => {
+        const entry = entries[0]
+        if (entry && entry.isIntersecting) {
           isVisible.value = true
           observer.unobserve(entry.target)
         }

@@ -1,5 +1,5 @@
+<script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
-import { useAnimation } from '../../composables/useAnimation'
 import ProviderLayout from '../../components/layout/ProviderLayout.vue'
 import DataState from '../../components/ui/DataState.vue'
 import AppPagination from '../../components/ui/AppPagination.vue'
@@ -68,8 +68,6 @@ const getCurrencyCode = (currId?: string | null): string => {
   const c = currencies.value.find((x) => x.id === currId)
   return c ? c.code : ''
 }
-
-const { fadeIn } = useAnimation()
 
 const loadAll = async () => {
   loading.value = true
@@ -571,7 +569,7 @@ onMounted(() => { void loadAll() })
         :empty-description="t('provider.noProductsDesc')"
         @retry="loadAll"
       >
-        <table-card>
+        <div class="table-card">
           <div class="table-wrap" tabindex="0" role="region" :aria-label="t('admin.productsTitle')">
             <table class="table">
               <thead>
@@ -675,7 +673,7 @@ onMounted(() => { void loadAll() })
             :page-size="pageSize"
             variant="table"
           />
-        </table-card>
+        </div>
       </DataState>
     </div>
 

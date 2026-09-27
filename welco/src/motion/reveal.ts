@@ -16,7 +16,7 @@ function getObserver(): IntersectionObserver {
     (entries) => {
       for (const entry of entries) {
         if (!entry.isIntersecting) continue
-        const el = entry.target as HTMLElement
+        const el = entry.target
         el.classList.add(REVEAL_DONE)
         observer?.unobserve(el)
       }
@@ -39,7 +39,7 @@ export const vReveal: Directive<HTMLElement, number | undefined> = {
   },
 }
 
-/** Test seam: inject or clear the shared observer. */
-export function __setObserver(next: IntersectionObserver | null): void {
-  observer = next
+/** Test seam: drop the cached observer so the next mount constructs a fresh one. */
+export function __resetObserver(): void {
+  observer = null
 }

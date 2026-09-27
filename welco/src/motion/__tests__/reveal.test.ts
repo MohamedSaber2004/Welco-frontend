@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { createApp, h, nextTick, withDirectives, type App } from 'vue'
-import { vReveal, REVEAL_PENDING, REVEAL_DONE, __setObserver } from '../reveal'
+import { vReveal, REVEAL_PENDING, REVEAL_DONE, __resetObserver } from '../reveal'
 
 class StubObserver {
   readonly root = null
@@ -75,7 +75,7 @@ beforeEach(() => {
 afterEach(() => {
   app?.unmount()
   host?.remove()
-  __setObserver(null)
+  __resetObserver()
   app = null
   host = null
   vi.unstubAllGlobals()

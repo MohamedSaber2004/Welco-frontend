@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
+import { useAnimation } from '../../composables/useAnimation'
 import AdminLayout from '../../components/layout/AdminLayout.vue'
 import DataState from '../../components/ui/DataState.vue'
 import AppPagination from '../../components/ui/AppPagination.vue'
@@ -11,10 +12,12 @@ import { confirmService } from '../../infrastructure/feedback/confirm.service'
 import { toastService } from '../../infrastructure/feedback/toast.service'
 import { t, locale } from '../../i18n'
 import type {
-  LandingPageDto,
-  CreateLandingPagePayload,
-  UpdateLandingPagePayload,
+   LandingPageDto,
+   CreateLandingPagePayload,
+   UpdateLandingPagePayload,
 } from '../../domain/models/content'
+
+useAnimation()
 
 const ABOUT_US_SLUG = 'about-us'
 
@@ -324,7 +327,8 @@ onMounted(load)
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="p in paginated" :key="p.id" class="exec-row">
+                <tr v-for="(p, i) in paginated" :key="p.id" class="exec-row anim-fade-in-up"
+                    :style="{ animationDelay: `${i * 30}ms` }">
                   <td>
                     <div class="page-cell">
                       <div class="page-icon-box">

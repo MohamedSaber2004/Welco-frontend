@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+import { useAnimation } from '../../composables/useAnimation'
 import AdminLayout from '../../components/layout/AdminLayout.vue'
 import DataState from '../../components/ui/DataState.vue'
 import AppPagination from '../../components/ui/AppPagination.vue'
@@ -13,10 +14,12 @@ import { confirmService } from '../../infrastructure/feedback/confirm.service'
 import { toastService } from '../../infrastructure/feedback/toast.service'
 import { t, locale } from '../../i18n'
 import type {
-  CategoryDto,
-  CreateCategoryPayload,
-  UpdateCategoryPayload,
+   CategoryDto,
+   CreateCategoryPayload,
+   UpdateCategoryPayload,
 } from '../../domain/models/marketplace'
+
+useAnimation()
 
 const localized = (en?: string, ar?: string) => (locale.value === 'ar' ? ar || en || '' : en || ar || '')
 

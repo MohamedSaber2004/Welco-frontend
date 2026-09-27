@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, computed } from 'vue'
+import { useAnimation } from '../../composables/useAnimation'
 import { t } from '../../i18n'
 import { contentService } from '../../di/container'
 import AdminLayout from '../../components/layout/AdminLayout.vue'
@@ -11,6 +12,8 @@ import { confirmService } from '../../infrastructure/feedback/confirm.service'
 import { toastService } from '../../infrastructure/feedback/toast.service'
 import { resolveFileUrl, isStoredFileName, PLACEHOLDER } from '../../utils/file-url'
 import type { FaqItemDto, HelpArticleDto, HelpCategoryDto } from '../../domain/models/content'
+
+useAnimation()
 
 const activeTab = ref<'categories' | 'articles' | 'faqs' | 'contact'>('categories')
 const loading = ref(true)
@@ -593,8 +596,9 @@ const closeFaqDetails = () => {
                     <th class="text-end">{{ t('common.actions') }}</th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr v-for="c in paginatedCategories" :key="c.id" class="exec-row">
+<tbody>
+                   <tr v-for="(c, i) in paginatedCategories" :key="c.id" class="exec-row anim-fade-in-up"
+                       :style="{ animationDelay: `${i * 30}ms` }">
                     <td class="w-12">
                       <div class="cat-icon-frame">
                         <img
@@ -723,8 +727,9 @@ const closeFaqDetails = () => {
                     <th class="text-end">{{ t('common.actions') }}</th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr v-for="a in paginatedArticles" :key="a.id" class="exec-row">
+<tbody>
+                   <tr v-for="(a, i) in paginatedArticles" :key="a.id" class="exec-row anim-fade-in-up"
+                       :style="{ animationDelay: `${i * 30}ms` }">
                     <td>
                       <strong class="article-title-text">{{ a.title }}</strong>
                     </td>
@@ -832,7 +837,8 @@ const closeFaqDetails = () => {
 
           <!-- FAQ Cards Stack -->
           <div class="faq-cards-stack">
-            <article v-for="f in paginatedFaqs" :key="f.id" class="card faq-item-card">
+            <article v-for="(f, i) in paginatedFaqs" :key="f.id" class="card faq-item-card anim-fade-in-up"
+               :style="{ animationDelay: `${i * 30}ms` }">
               <div class="faq-item-head">
                 <div class="faq-q-line">
                   <span class="material-symbols-outlined text-[18px] text-indigo-600">help</span>

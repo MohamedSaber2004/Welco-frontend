@@ -1,3 +1,1 @@
-:56304/api/v1/user-management/companies/my:1  Failed to load resource: the server responded with a status of 401 (Unauthorized)
-:56304/api/v1/user-management/companies/my:1  Failed to load resource: the server responded with a status of 401 (Unauthorized)
-:56304/api/v1/user-management/users/c26cb852-73c1-43ef-9218-08df069086cf:1  Failed to load resource: the server responded with a status of 401 (Unauthorized)
+when the provider or company deleted then want to deleted all related entities also hard remove related and only keep a provider as soft delete. and i want to fix the empty container table in catalog table container in catalog page in provider dashboard fix that. and i want to make a pretty moved animation in all site and want to apply it

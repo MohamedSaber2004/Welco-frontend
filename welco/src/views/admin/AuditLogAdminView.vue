@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
+import { useAnimation } from '../../composables/useAnimation'
 import AdminLayout from '../../components/layout/AdminLayout.vue'
 import BaseModal from '../../components/ui/BaseModal.vue'
 import DataState from '../../components/ui/DataState.vue'
@@ -8,6 +9,8 @@ import { auditLogService } from '../../di/container'
 import { useUserLookup } from '../../composables/useUserLookup'
 import { t, locale } from '../../i18n'
 import type { AuditLogDto, AuditAction } from '../../domain/models/audit-log'
+
+useAnimation()
 
 const { getUserInfo, resolveLogsUsers, getRoleBadgeClass } = useUserLookup()
 
@@ -212,7 +215,8 @@ watch([() => filters.value.entity, () => filters.value.action, () => filters.val
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="log in paginatedLogs" :key="log.id" class="exec-row">
+                <tr v-for="(log, i) in paginatedLogs" :key="log.id" class="exec-row anim-fade-in-up"
+                    :style="{ animationDelay: `${i * 30}ms` }">
                   <td class="mono text-xs text-slate-500">{{ formatTime(log.createdAt) }}</td>
                   <td>
                     <span class="entity-pill mono">{{ log.entityName }}</span>

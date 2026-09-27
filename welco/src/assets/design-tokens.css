@@ -508,4 +508,29 @@
   }
 }
 
+/* Page Transition Animations */
+.page-enter-active,
+.page-leave-active {
+  transition: opacity var(--duration-base, 180ms) var(--ease-out),
+              transform var(--duration-base, 180ms) var(--ease-out);
+}
+
+.page-enter-from,
+.page-leave-to {
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-enter-active,
+  .page-leave-active {
+    transition: none;
+  }
+  .page-enter-from,
+  .page-leave-to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 

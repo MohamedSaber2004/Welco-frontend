@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, computed, watch } from 'vue'
+import { useAnimation } from '../../composables/useAnimation'
 import AdminLayout from '../../components/layout/AdminLayout.vue'
 import DataState from '../../components/ui/DataState.vue'
 import AppPagination from '../../components/ui/AppPagination.vue'
@@ -10,6 +11,8 @@ import { confirmService } from '../../infrastructure/feedback/confirm.service'
 import { toastService } from '../../infrastructure/feedback/toast.service'
 import { t, locale } from '../../i18n'
 import type { ZoneDto, CityDto } from '../../domain/models/location'
+
+useAnimation()
 
 const zones = ref<ZoneDto[]>([])
 const cities = ref<CityDto[]>([])
@@ -264,7 +267,8 @@ const closeDetails = () => {
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="z in paginated" :key="z.id" class="exec-row">
+                <tr v-for="(z, i) in paginated" :key="z.id" class="exec-row anim-fade-in-up"
+                    :style="{ animationDelay: `${i * 30}ms` }">
                   <td>
                     <div class="zone-cell">
                       <span class="material-symbols-outlined zone-icon">map</span>

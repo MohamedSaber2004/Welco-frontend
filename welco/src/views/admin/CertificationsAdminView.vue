@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAnimation } from '../../composables/useAnimation'
 import AdminLayout from '../../components/layout/AdminLayout.vue'
 import DataState from '../../components/ui/DataState.vue'
 import AppPagination from '../../components/ui/AppPagination.vue'
@@ -14,6 +15,8 @@ import { toastService } from '../../infrastructure/feedback/toast.service'
 import { t } from '../../i18n'
 import { resolveFileUrl } from '../../utils/file-url'
 import type { CertificationDto } from '../../domain/models/certification'
+
+useAnimation()
 
 const router = useRouter()
 
@@ -326,8 +329,9 @@ onMounted(async () => {
                     <th class="text-end">{{ t('common.actions') }}</th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr v-for="c in paginatedCerts" :key="c.id" class="exec-row">
+<tbody>
+                   <tr v-for="(c, i) in paginatedCerts" :key="c.id" class="exec-row anim-fade-in-up"
+                       :style="{ animationDelay: `${i * 30}ms` }">
                     <td>
                       <div class="cert-cell">
                         <div class="cert-icon-circle">

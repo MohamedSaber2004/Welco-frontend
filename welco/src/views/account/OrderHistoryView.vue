@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAnimation } from '../../composables/useAnimation'
 import { t, locale } from '../../i18n'
 import { commerceService } from '../../di/container'
 import AccountNav from '../../components/account/AccountNav.vue'
@@ -10,6 +11,8 @@ import BackButton from '../../components/ui/BackButton.vue'
 import AppPagination from '../../components/ui/AppPagination.vue'
 import { ORDER_STATUSES } from '../../domain/models/commerce'
 import { formatPrice } from '../../utils/format'
+
+useAnimation()
 
 const router = useRouter()
 const orders = commerceService.orders
@@ -158,9 +161,10 @@ onMounted(() => {
             </thead>
             <tbody>
               <tr
-                v-for="o in paginatedOrders"
+                v-for="(o, i) in paginatedOrders"
                 :key="o.id"
-                class="exec-row"
+                class="exec-row anim-fade-in-up"
+                :style="{ animationDelay: `${i * 30}ms` }"
                 @click="router.push({ name: 'account-order-detail', params: { id: o.id } })"
               >
                 <td>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAnimation } from '../../composables/useAnimation'
 import { t, locale } from '../../i18n'
 import { useCart } from '../../composables/useCart'
 import { salesService, companyService, authService, services, locationService } from '../../di/container'
@@ -12,10 +13,12 @@ import type { CurrencyDto } from '../../domain/models/marketplace'
 import BackButton from '../../components/ui/BackButton.vue'
 import AppImage from '../../components/ui/AppImage.vue'
 import {
-  distinctCurrenciesFromAddresses,
-  resolveCurrencyCountry,
-  currencyDisplaySymbol,
+   distinctCurrenciesFromAddresses,
+   resolveCurrencyCountry,
+   currencyDisplaySymbol,
 } from '../../utils/country-currency-map'
+
+useAnimation()
 
 const router = useRouter()
 const {
@@ -549,7 +552,8 @@ const submitRfq = async () => {
           </div>
 
           <div class="cart-lines-list">
-            <article v-for="it in items" :key="it.product.id" class="cart-line">
+            <article v-for="(it, i) in items" :key="it.product.id" class="cart-line anim-fade-in-up"
+               :style="{ animationDelay: `${i * 30}ms` }">
               <div class="cart-line__media">
                 <div class="cart-thumb" :style="{ background: it.product.imageGradient || 'var(--wl-surface-soft)' }">
                   <AppImage

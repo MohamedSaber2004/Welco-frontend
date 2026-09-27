@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, computed } from 'vue'
+import { useAnimation } from '../../composables/useAnimation'
 import AdminLayout from '../../components/layout/AdminLayout.vue'
 import StatusPill from '../../components/ui/StatusPill.vue'
 import DataState from '../../components/ui/DataState.vue'
@@ -13,6 +14,8 @@ import type { OrderDto } from '../../domain/models/commerce'
 import { ORDER_STATUSES } from '../../domain/models/commerce'
 import type { CompanyDto } from '../../domain/models/company'
 import { formatPrice } from '../../utils/format'
+
+useAnimation()
 
 const orders = commerceService.orders
 const loading = ref(true)
@@ -303,7 +306,8 @@ function goPage(p: number) {
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="o in paginatedOrders" :key="o.id" class="exec-row">
+                <tr v-for="(o, i) in paginatedOrders" :key="o.id" class="exec-row anim-fade-in-up"
+                    :style="{ animationDelay: `${i * 30}ms` }">
                   <td>
                     <strong class="mono order-num">{{ o.orderNumber || '—' }}</strong>
                   </td>

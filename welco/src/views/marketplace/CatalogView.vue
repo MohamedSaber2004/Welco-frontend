@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useAnimation } from '../../composables/useAnimation'
 import { t, locale } from '../../i18n'
 import { useMarketplace } from '../../composables/useMarketplace'
 import { useCart } from '../../composables/useCart'
@@ -12,6 +13,8 @@ import BackButton from '../../components/ui/BackButton.vue'
 import AppPagination from '../../components/ui/AppPagination.vue'
 import AppImage from '../../components/ui/AppImage.vue'
 import { formatPrice } from '../../utils/format'
+
+useAnimation()
 
 const route = useRoute()
 const router = useRouter()
@@ -319,7 +322,9 @@ const filteredSidebarCategories = computed(() => {
             <span>{{ activeCategoryName }} · {{ totalCount }} {{ t('catalog.showing', { count: String(products.length), total: String(totalCount), page: String(page), totalPages: String(totalPages) } as never).split('·')[0] }}</span>
           </div>
           <div class="products-grid">
-            <article v-for="p in products" :key="p.id" class="card catalog-card" @click="router.push({ name: 'marketplace-product', params: { id: p.id } })">
+            <article v-for="(p, i) in products" :key="p.id" class="card catalog-card anim-fade-in-up"
+               :style="{ animationDelay: `${i * 30}ms` }"
+               @click="router.push({ name: 'marketplace-product', params: { id: p.id } })">
               <div class="catalog-card__media" :style="{ background: productMediaUrl(p.imageName, p.imageGradient).background }">
                 <AppImage
                   :src="p.imageName"

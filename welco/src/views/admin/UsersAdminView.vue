@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import { useAnimation } from '../../composables/useAnimation'
 import AdminLayout from '../../components/layout/AdminLayout.vue'
 import DataState from '../../components/ui/DataState.vue'
 import AppPagination from '../../components/ui/AppPagination.vue'
@@ -40,6 +41,8 @@ const {
   handleSubmit,
   handleDelete,
 } = useUsers()
+
+useAnimation()
 
 // --- Details modal & Company data loading ---
 const showDetailsModal = ref(false)
@@ -293,7 +296,8 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="u in users" :key="u.id" class="exec-row">
+                <tr v-for="(u, i) in users" :key="u.id" class="exec-row anim-fade-in-up"
+                   :style="{ animationDelay: `${i * 30}ms` }">
                   <td>
                     <div class="user-cell">
                       <div class="user-avatar-wrap">

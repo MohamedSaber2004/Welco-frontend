@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+import { useAnimation } from '../../composables/useAnimation'
 import ProviderLayout from '../../components/layout/ProviderLayout.vue'
 import BaseButton from '../../components/ui/BaseButton.vue'
 import BaseModal from '../../components/ui/BaseModal.vue'
@@ -11,6 +12,8 @@ import { companyService, contentService } from '../../di/container'
 import { t, locale } from '../../i18n'
 import type { OemInquiryDto } from '../../domain/ports/company-repository'
 import type { SupportTicketDto, FaqItemDto } from '../../domain/models/content'
+
+useAnimation()
 
 /* ── Active Tab ── */
 const activeTab = ref<'support' | 'oem'>('support')
@@ -439,9 +442,10 @@ const confirmDeleteOem = async (inquiry: OemInquiryDto) => {
 
             <div v-else class="tickets-list">
               <div
-                v-for="tk in myTickets"
+                v-for="(tk, i) in myTickets"
                 :key="tk.id"
-                class="ticket-list-item"
+                class="ticket-list-item anim-fade-in-up"
+                :style="{ animationDelay: `${i * 30}ms` }"
                 @click="openTicketDetails(tk)"
               >
                 <div class="ticket-item-top">
@@ -484,10 +488,11 @@ const confirmDeleteOem = async (inquiry: OemInquiryDto) => {
           </div>
           <div class="faqs-grid">
             <div
-              v-for="faq in faqs"
+              v-for="(faq, i) in faqs"
               :key="faq.id"
-              class="faq-card"
+              class="faq-card anim-fade-in-up"
               :class="{ 'faq-card--open': expandedFaqId === faq.id }"
+              :style="{ animationDelay: `${i * 30}ms` }"
               @click="toggleFaq(faq.id)"
             >
               <div class="faq-question-row">
@@ -553,8 +558,9 @@ const confirmDeleteOem = async (inquiry: OemInquiryDto) => {
                       <th class="text-end">{{ t('admin.actions') }}</th>
                     </tr>
                   </thead>
-                  <tbody>
-                    <tr v-for="o in paginatedOem" :key="o.id" class="exec-row">
+<tbody>
+                     <tr v-for="(o, i) in paginatedOem" :key="o.id" class="exec-row anim-fade-in-up"
+                         :style="{ animationDelay: `${i * 30}ms` }">
                       <td>
                         <strong class="company-name">{{ o.fullName }}</strong>
                       </td>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useAnimation } from '../../composables/useAnimation'
 import AdminLayout from '../../components/layout/AdminLayout.vue'
 import DataState from '../../components/ui/DataState.vue'
 import AppPagination from '../../components/ui/AppPagination.vue'
@@ -22,6 +23,8 @@ import { AppLanguage } from '../../domain/models/user'
 
 const route = useRoute()
 const router = useRouter()
+
+useAnimation()
 
 const activeTab = ref<'companies' | 'applications'>(
   (route.query.tab as string) === 'applications' ? 'applications' : 'companies',
@@ -599,8 +602,9 @@ watch([applicationSearch, statusFilter, typeFilter], () => {
                     <th class="text-end">{{ t('common.actions') }}</th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr v-for="c in paginatedCompanies" :key="c.id" class="exec-row">
+<tbody>
+                   <tr v-for="(c, i) in paginatedCompanies" :key="c.id" class="exec-row anim-fade-in-up"
+                       :style="{ animationDelay: `${(i % 10) * 50}ms` }">
                     <td>
                       <strong class="company-name">{{ c.name }}</strong>
                     </td>
@@ -885,10 +889,10 @@ watch([applicationSearch, statusFilter, typeFilter], () => {
                     <th>{{ t('admin.submittedDate') }}</th>
                     <th class="text-end">{{ t('admin.actions') }}</th>
                   </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="app in paginatedApplications" :key="app.id" class="exec-row">
-                    <td>
+<tbody>
+                    <tr v-for="(app, i) in paginatedApplications" :key="app.id" class="exec-row anim-fade-in-up"
+                       :style="{ animationDelay: `${(i % 10) * 50}ms` }">
+                     <td>
                       <div class="company-cell">
                         <div class="company-badge-icon" :class="companyTypeClass(app.type)">
                           <span class="material-symbols-outlined">{{ companyTypeIcon(app.type) }}</span>

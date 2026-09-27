@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useAnimation } from '../../composables/useAnimation'
 import { t, locale } from '../../i18n'
 import { contentRepository, marketplaceRepository } from '../../di/container'
 import SkeletonLoader from '../../components/ui/SkeletonLoader.vue'
@@ -15,6 +16,8 @@ import type { LandingPageDto } from '../../domain/models/content'
 import type { ProductDto, CategoryDto } from '../../domain/models/marketplace'
 import { productMediaUrl } from '../../utils/file-url'
 import { formatPrice } from '../../utils/format'
+
+useAnimation()
 
 const route = useRoute()
 const router = useRouter()
@@ -154,7 +157,9 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
             <button class="view-all-btn" type="button" @click="router.push({ name: 'marketplace' })">{{ t('common.next') }} <span class="icon--directional">→</span></button>
           </div>
           <div class="product-grid">
-            <article v-for="p in products" :key="p.id" class="product-card" @click="router.push({ name: 'marketplace-product', params: { id: p.id } })">
+            <article v-for="(p, i) in products" :key="p.id" class="product-card anim-fade-in-up"
+               :style="{ animationDelay: `${i * 30}ms` }"
+               @click="router.push({ name: 'marketplace-product', params: { id: p.id } })">
               <div class="product-card__media" :style="{ background: productMediaUrl(p.imageName, p.imageGradient).background }">
                 <AppImage
                   :src="p.imageName"
@@ -180,8 +185,9 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
 
       <section v-if="!page && categories.length" class="lp-related-section" style="margin-top:1.5rem">
         <h3 class="section-title" style="font-size:1.15rem;margin-bottom:1rem">{{ t('marketplace.categoriesTitle') }}</h3>
-        <div class="related-grid">
-          <router-link v-for="c in categories" :key="c.id" :to="{ name: 'marketplace', query: { categoryId: c.id } }" class="cat-card">
+<div class="related-grid">
+           <router-link v-for="(c, i) in categories" :key="c.id" :to="{ name: 'marketplace', query: { categoryId: c.id } }" class="cat-card anim-fade-in-up"
+               :style="{ animationDelay: `${i * 30}ms` }">
             <div class="cat-media">
               <AppImage
                 :src="c.imageName"

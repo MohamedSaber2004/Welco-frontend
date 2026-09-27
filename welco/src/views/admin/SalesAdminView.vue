@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useAnimation } from '../../composables/useAnimation'
 import AdminLayout from '../../components/layout/AdminLayout.vue'
 import BaseButton from '../../components/ui/BaseButton.vue'
 import BaseModal from '../../components/ui/BaseModal.vue'
@@ -15,6 +16,8 @@ import type { QuoteDto, RfqDto } from '../../domain/models/sales'
 import { RFQ_STATUSES, QUOTE_STATUSES } from '../../domain/models/sales'
 import { formatPrice } from '../../utils/format'
 import { parseNegotiationNote } from '../../utils/negotiation'
+
+useAnimation()
 
 const route = useRoute()
 const router = useRouter()
@@ -477,7 +480,8 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="r in paginatedRfqs" :key="r.id" class="exec-row">
+                <tr v-for="(r, i) in paginatedRfqs" :key="r.id" class="exec-row anim-fade-in-up"
+                    :style="{ animationDelay: `${i * 30}ms` }">
                   <td>
                     <div style="display: flex; flex-direction: column; gap: 4px;">
                       <strong class="mono rfq-num">{{ r.rfqNumber || '—' }}</strong>
@@ -641,7 +645,8 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="q in paginatedQuotes" :key="q.id" class="exec-row">
+                <tr v-for="(q, i) in paginatedQuotes" :key="q.id" class="exec-row anim-fade-in-up"
+                    :style="{ animationDelay: `${i * 30}ms` }">
                   <td>
                     <strong class="mono rfq-num">{{ q.quoteNumber }}</strong>
                   </td>

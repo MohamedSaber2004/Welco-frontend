@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAnimation } from '../../composables/useAnimation'
 import { t, locale } from '../../i18n'
 import { wishlistService, authService } from '../../di/container'
 import { confirmService } from '../../infrastructure/feedback/confirm.service'
@@ -11,6 +12,8 @@ import EmptyState from '../../components/ui/EmptyState.vue'
 import BackButton from '../../components/ui/BackButton.vue'
 import AppImage from '../../components/ui/AppImage.vue'
 import { formatPrice } from '../../utils/format'
+
+useAnimation()
 
 const router = useRouter()
 const { add } = useCart()
@@ -127,7 +130,9 @@ const goDetail = (id: string) => {
 
     <!-- Saved instruments -->
     <div v-else class="product-grid">
-      <article v-for="p in items" :key="p.id" class="product-card" @click="goDetail(p.id)">
+      <article v-for="(p, i) in items" :key="p.id" class="product-card anim-fade-in-up"
+         :style="{ animationDelay: `${i * 30}ms` }"
+         @click="goDetail(p.id)">
         <div class="product-media" :style="{ background: p.imageGradient || 'var(--wl-surface-soft)' }">
           <AppImage
             :src="p.imageName"

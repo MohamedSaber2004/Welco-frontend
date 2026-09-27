@@ -47,7 +47,7 @@ jsdom does not implement `IntersectionObserver`, and `window.matchMedia` is abse
 ```ts
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { createApp, h, nextTick, withDirectives, type App } from 'vue'
-import { vReveal, REVEAL_PENDING, REVEAL_DONE, __setObserver } from '../reveal'
+import { vReveal, REVEAL_PENDING, REVEAL_DONE, __resetObserver } from '../reveal'
 
 class StubObserver {
   readonly root = null
@@ -75,9 +75,26 @@ let app: App | null = null
 let host: HTMLDivElement | null = null
 let observer: StubObserver | null = null
 
+/**
+ * Records the observers the directive actually constructs.
+ *
+ * Do NOT pre-inject a stub via a test seam before mounting. `getObserver()` starts
+ * with `if (observer) return observer`, so an injected instance short-circuits
+ * construction and the real callback — the closure that adds REVEAL_DONE — is never
+ * created. An injected stand-in carries the *injector's* callback, so the
+ * "revealed on intersection" assertion would then run against a no-op and pass
+ * vacuously. Capture the real instance via the global stub instead.
+ */
+const created: StubObserver[] = []
+
+class RecordingObserver extends StubObserver {
+  constructor(callback: IntersectionObserverCallback) {
+    super(callback)
+    created.push(this)
+  }
+}
+
 const mountReveal = async (value?: number): Promise<HTMLElement> => {
-  observer = new StubObserver(() => {})
-  __setObserver(observer as unknown as IntersectionObserver)
   host = document.createElement('div')
   document.body.appendChild(host)
   app = createApp({
@@ -87,12 +104,14 @@ const mountReveal = async (value?: number): Promise<HTMLElement> => {
   })
   app.mount(host)
   await nextTick()
+  observer = created[created.length - 1] ?? null
   return host.querySelector('.target') as HTMLElement
 }
 
 beforeEach(() => {
   reduced = false
-  vi.stubGlobal('IntersectionObserver', StubObserver)
+  created.length = 0
+  vi.stubGlobal('IntersectionObserver', RecordingObserver)
   vi.stubGlobal(
     'matchMedia',
     vi.fn((query: string) => ({
@@ -107,7 +126,7 @@ beforeEach(() => {
 afterEach(() => {
   app?.unmount()
   host?.remove()
-  __setObserver(null)
+  __resetObserver()
   app = null
   host = null
   vi.unstubAllGlobals()
@@ -155,7 +174,7 @@ function getObserver(): IntersectionObserver {
     (entries) => {
       for (const entry of entries) {
         if (!entry.isIntersecting) continue
-        const el = entry.target as HTMLElement
+        const el = entry.target
         el.classList.add(REVEAL_DONE)
         observer?.unobserve(el)
       }
@@ -178,9 +197,15 @@ export const vReveal: Directive<HTMLElement, number | undefined> = {
   },
 }
 
-/** Test seam: inject or clear the shared observer. */
-export function __setObserver(next: IntersectionObserver | null): void {
-  observer = next
+/**
+ * Test seam: drop the cached observer so the next mount constructs a fresh one.
+ *
+ * Deliberately reset-only. An injection capability would short-circuit
+ * `getObserver()` and hand the directive a callback that never adds REVEAL_DONE,
+ * which makes the intersection test pass without exercising anything.
+ */
+export function __resetObserver(): void {
+  observer = null
 }
 ```
 

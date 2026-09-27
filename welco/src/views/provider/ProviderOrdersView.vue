@@ -164,66 +164,96 @@ const submitStatusUpdate = async () => {
         </div>
       </header>
 
-      <!-- KPI Metrics -->
-      <div class="kpi-grid">
-        <div class="kpi-card" :class="{ 'is-active': statusFilter === 'all' }" @click="statusFilter = 'all'">
+      <!-- KPI Metrics — double as status filters -->
+      <div class="kpi-grid" role="radiogroup" :aria-label="t('commerce.ordersTitle')">
+        <button
+          type="button"
+          class="kpi-card"
+          role="radio"
+          :aria-checked="statusFilter === 'all'"
+          :class="{ 'is-active': statusFilter === 'all' }"
+          @click="statusFilter = 'all'"
+        >
           <div class="kpi-icon-box bg-primary-soft">
-            <span class="material-symbols-outlined text-primary">local_shipping</span>
+            <span class="material-symbols-outlined text-primary" aria-hidden="true">local_shipping</span>
           </div>
           <div class="kpi-info">
             <span class="kpi-label mono">{{ t('commerce.ordersTitle') }}</span>
             <strong class="kpi-value mono">{{ totalOrdersCount }}</strong>
           </div>
-        </div>
+        </button>
 
-        <div class="kpi-card" :class="{ 'is-active': statusFilter === 'Pending' }" @click="statusFilter = 'Pending'">
+        <button
+          type="button"
+          class="kpi-card"
+          role="radio"
+          :aria-checked="statusFilter === 'Pending'"
+          :class="{ 'is-active': statusFilter === 'Pending' }"
+          @click="statusFilter = 'Pending'"
+        >
           <div class="kpi-icon-box bg-amber-soft">
-            <span class="material-symbols-outlined text-amber-600">hourglass_top</span>
+            <span class="material-symbols-outlined text-amber-600" aria-hidden="true">hourglass_top</span>
           </div>
           <div class="kpi-info">
             <span class="kpi-label mono">{{ t('account.pipeStatusPending') }}</span>
             <strong class="kpi-value mono text-amber-600">{{ pendingCount }}</strong>
           </div>
-        </div>
+        </button>
 
-        <div class="kpi-card" :class="{ 'is-active': statusFilter === 'Confirmed' }" @click="statusFilter = 'Confirmed'">
+        <button
+          type="button"
+          class="kpi-card"
+          role="radio"
+          :aria-checked="statusFilter === 'Confirmed'"
+          :class="{ 'is-active': statusFilter === 'Confirmed' }"
+          @click="statusFilter = 'Confirmed'"
+        >
           <div class="kpi-icon-box bg-blue-soft">
-            <span class="material-symbols-outlined text-blue-600">sync</span>
+            <span class="material-symbols-outlined text-blue-600" aria-hidden="true">sync</span>
           </div>
           <div class="kpi-info">
             <span class="kpi-label mono">{{ t('account.processing') }}</span>
             <strong class="kpi-value mono text-blue-600">{{ processingCount }}</strong>
           </div>
-        </div>
+        </button>
 
-        <div class="kpi-card" :class="{ 'is-active': statusFilter === 'Delivered' }" @click="statusFilter = 'Delivered'">
+        <button
+          type="button"
+          class="kpi-card"
+          role="radio"
+          :aria-checked="statusFilter === 'Delivered'"
+          :class="{ 'is-active': statusFilter === 'Delivered' }"
+          @click="statusFilter = 'Delivered'"
+        >
           <div class="kpi-icon-box bg-emerald-soft">
-            <span class="material-symbols-outlined text-emerald-600">check_circle</span>
+            <span class="material-symbols-outlined text-emerald-600" aria-hidden="true">check_circle</span>
           </div>
           <div class="kpi-info">
             <span class="kpi-label mono">{{ t('account.stepDelivered') }}</span>
             <strong class="kpi-value mono text-emerald-600">{{ completedCount }}</strong>
           </div>
-        </div>
+        </button>
       </div>
 
       <!-- Filter Controls -->
       <div class="filter-bar">
         <div class="search-input-wrap">
-          <span class="material-symbols-outlined search-ic">search</span>
+          <span class="material-symbols-outlined search-ic" aria-hidden="true">search</span>
+          <label class="sr-only" for="orders-search">{{ t('common.searchPlaceholder') }}</label>
           <input
+            id="orders-search"
             v-model="search"
             type="search"
             :placeholder="t('common.searchPlaceholder')"
             class="search-input"
           />
           <button v-if="search" type="button" class="clear-search-btn" @click="search = ''; page = 1" :aria-label="t('common.clearInput')">
-            <span class="material-symbols-outlined text-[16px]">close</span>
+            <span class="material-symbols-outlined text-[16px]" aria-hidden="true">close</span>
           </button>
         </div>
 
         <div class="filter-actions">
-          <select v-model="statusFilter" class="filter-select mono">
+          <select v-model="statusFilter" class="filter-select mono" :aria-label="t('commerce.status')">
             <option value="all">{{ t('common.all') }} {{ t('commerce.status') }}</option>
             <option v-for="st in ORDER_STATUSES" :key="st" :value="st">{{ st }}</option>
           </select>
@@ -232,7 +262,7 @@ const submitStatusUpdate = async () => {
 
       <!-- Orders Table -->
       <div class="table-card">
-        <DataState :loading="loading" :error="fetchError" :empty="!paginatedOrders.length" :empty-text="t('commerce.noOrders')" @retry="loadOrders">
+        <DataState :loading="loading" :error="fetchError" :empty="!paginatedOrders.length" :empty-title="t('commerce.noOrders')" @retry="loadOrders">
           <div class="table-wrap">
             <table class="data-table">
               <thead>
@@ -316,7 +346,7 @@ const submitStatusUpdate = async () => {
 
           <!-- Pagination -->
           <div v-if="totalPages > 1" class="pagination-footer">
-            <AppPagination :current-page="page" :total-pages="totalPages" @update:current-page="page = $event" />
+            <AppPagination v-model:page="page" :total-pages="totalPages" />
           </div>
         </DataState>
       </div>
@@ -537,6 +567,15 @@ const submitStatusUpdate = async () => {
   border-radius: var(--radius-md);
   cursor: pointer;
   transition: all 0.18s ease;
+  /* Reset native button chrome so the card keeps its div appearance */
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  text-align: start;
+}
+.kpi-card:focus-visible {
+  outline: 2px solid var(--wl-primary);
+  outline-offset: 2px;
 }
 
 .kpi-card:hover {

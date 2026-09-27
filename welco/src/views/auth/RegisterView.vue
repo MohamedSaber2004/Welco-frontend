@@ -155,9 +155,11 @@ const handleRegister = async () => {
         return
       }
 
+      // Only the email is retained: the verification code is re-issued by the
+      // resend endpoint, so there is no reason to park the password (or the
+      // rest of the payload) in sessionStorage where any script could read it.
       try {
         sessionStorage.setItem('welco-pending-email', payload.email)
-        sessionStorage.setItem('welco-pending-register', JSON.stringify(payload))
       } catch {}
       toastService.success(t('auth.registrationSuccess'))
       await router.push({ name: 'verify-email', query: { email: payload.email } })

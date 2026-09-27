@@ -29,6 +29,7 @@ export const AUTH_ROUTES = {
   login: '/api/v1/auth/login',
   logout: '/api/v1/auth/logout',
   verifyEmailOtp: '/api/v1/auth/verify-register-otp',
+  resendRegisterOtp: '/api/v1/auth/resend-register-otp',
   forgotPassword: '/api/v1/auth/forgot-password',
   verifyPasswordOtp: '/api/v1/auth/verify-password-otp',
   resetPassword: '/api/v1/auth/reset-password',

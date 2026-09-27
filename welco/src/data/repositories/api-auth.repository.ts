@@ -6,6 +6,7 @@ import type {
   LogoutPayload,
   RefreshTokenPayload,
   RegisterPayload,
+  ResendRegisterOtpPayload,
   ResetPasswordPayload,
   UpdateProfilePayload,
   VerifyEmailOtpPayload,
@@ -35,6 +36,10 @@ export class ApiAuthRepository implements AuthRepository {
 
   verifyEmailOtp(payload: VerifyEmailOtpPayload): Promise<AuthResponseDto> {
     return this.http.post<AuthResponseDto>(AUTH_ROUTES.verifyEmailOtp, payload, { showFeedback: false })
+  }
+
+  resendRegisterOtp(payload: ResendRegisterOtpPayload): Promise<string> {
+    return this.http.post<string>(AUTH_ROUTES.resendRegisterOtp, payload, { showFeedback: false })
   }
 
   forgotPassword(payload: ForgotPasswordPayload): Promise<string> {

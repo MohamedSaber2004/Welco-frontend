@@ -7,6 +7,9 @@ withDefaults(
     disabled?: boolean
     type?: 'button' | 'submit' | 'reset'
     block?: boolean
+    /** Material Symbols ligature rendered before the label. */
+    icon?: string
+    iconPosition?: 'start' | 'end'
   }>(),
   {
     variant: 'primary',
@@ -15,6 +18,8 @@ withDefaults(
     disabled: false,
     type: 'button',
     block: false,
+    icon: undefined,
+    iconPosition: 'start',
   },
 )
 </script>
@@ -27,7 +32,17 @@ withDefaults(
     :class="['btn', `btn--${variant}`, `btn--${size}`, { 'btn--block': block, 'is-loading': loading }]"
   >
     <span v-if="loading" class="btn__spinner" aria-hidden="true" />
+    <span
+      v-else-if="icon && iconPosition === 'start'"
+      class="material-symbols-outlined btn__icon"
+      aria-hidden="true"
+    >{{ icon }}</span>
     <slot />
+    <span
+      v-if="!loading && icon && iconPosition === 'end'"
+      class="material-symbols-outlined btn__icon"
+      aria-hidden="true"
+    >{{ icon }}</span>
   </button>
 </template>
 
@@ -52,6 +67,12 @@ withDefaults(
   text-decoration: none;
 }
 .btn:hover { text-decoration: none; }
+
+.btn__icon {
+  font-size: 1.15em;
+  line-height: 1;
+  flex-shrink: 0;
+}
 
 .btn:active:not(:disabled) {
   transform: translateY(1px);

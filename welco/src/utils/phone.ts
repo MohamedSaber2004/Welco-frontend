@@ -82,6 +82,28 @@ export function combinePhone(dial: string, national: string): string {
   return `${d} ${n}`.trim()
 }
 
+/**
+ * Canonicalise a phone number for the API: digits only, a single leading "+",
+ * and a "00" international prefix rewritten to "+". Mirrors the backend's
+ * PhoneNumberNormalizer so the uniqueness check compares like with like.
+ * Returns undefined when there are no digits.
+ */
+export function normalizePhoneForServer(phone?: string | null): string | undefined {
+  if (!phone) return undefined
+  const trimmed = phone.trim()
+  if (!trimmed) return undefined
+
+  const hasPlus = trimmed.startsWith('+')
+  let digits = trimmed.replace(/[^\d+]/g, '').replace(/\+/g, '')
+
+  if (!digits) return undefined
+  if (digits.startsWith('00')) {
+    digits = digits.slice(2)
+    return digits ? `+${digits}` : undefined
+  }
+  return hasPlus ? `+${digits}` : digits
+}
+
 /** Resolve which Country a phone's dial belongs to (API-aware) */
 export function resolveCountryForPhone(fullPhone: string, countries: CountryDto[]): CountryDto | undefined {
   const dial = extractDial(fullPhone)

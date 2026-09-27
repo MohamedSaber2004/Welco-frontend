@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import ProviderLayout from '../../components/layout/ProviderLayout.vue'
 import DataState from '../../components/ui/DataState.vue'
 import AppPagination from '../../components/ui/AppPagination.vue'
@@ -330,53 +330,59 @@ onMounted(() => { void loadAll() })
       </div>
     </div>
 
-    <!-- KPI Summary Cards -->
-    <section class="kpi-grid" aria-label="Catalog Key Metrics">
-      <div
+    <!-- KPI Summary Cards — first three double as stock filters -->
+    <section class="kpi-grid" role="group" :aria-label="t('admin.productsTitle')">
+      <button
+        type="button"
         class="kpi-card"
+        :aria-pressed="stockFilter === 'all' && categoryFilter === 'all'"
         :class="{ 'is-active': stockFilter === 'all' && categoryFilter === 'all' }"
         @click="stockFilter = 'all'; categoryFilter = 'all'"
       >
         <div class="kpi-icon-box bg-primary-soft">
-          <span class="material-symbols-outlined text-primary">inventory_2</span>
+          <span class="material-symbols-outlined text-primary" aria-hidden="true">inventory_2</span>
         </div>
         <div class="kpi-info">
           <span class="kpi-label mono">{{ t('admin.productsTitle') }}</span>
           <strong class="kpi-value mono">{{ products.length }}</strong>
         </div>
-      </div>
+      </button>
 
-      <div
+      <button
+        type="button"
         class="kpi-card"
+        :aria-pressed="stockFilter === 'inStock'"
         :class="{ 'is-active': stockFilter === 'inStock' }"
         @click="stockFilter = stockFilter === 'inStock' ? 'all' : 'inStock'"
       >
         <div class="kpi-icon-box bg-emerald-soft">
-          <span class="material-symbols-outlined text-emerald-600">check_circle</span>
+          <span class="material-symbols-outlined text-emerald-600" aria-hidden="true">check_circle</span>
         </div>
         <div class="kpi-info">
           <span class="kpi-label mono">{{ t('admin.inStock') }}</span>
           <strong class="kpi-value mono text-emerald-600">{{ inStockCount }}</strong>
         </div>
-      </div>
+      </button>
 
-      <div
+      <button
+        type="button"
         class="kpi-card"
+        :aria-pressed="stockFilter === 'outOfStock'"
         :class="{ 'is-active': stockFilter === 'outOfStock' }"
         @click="stockFilter = stockFilter === 'outOfStock' ? 'all' : 'outOfStock'"
       >
         <div class="kpi-icon-box bg-rose-soft">
-          <span class="material-symbols-outlined text-rose-600">warning</span>
+          <span class="material-symbols-outlined text-rose-600" aria-hidden="true">warning</span>
         </div>
         <div class="kpi-info">
           <span class="kpi-label mono">{{ t('admin.outOfStock') }}</span>
           <strong class="kpi-value mono text-rose-600">{{ outOfStockCount }}</strong>
         </div>
-      </div>
+      </button>
 
       <div class="kpi-card kpi-card--stat">
         <div class="kpi-icon-box bg-indigo-soft">
-          <span class="material-symbols-outlined text-indigo-600">category</span>
+          <span class="material-symbols-outlined text-indigo-600" aria-hidden="true">category</span>
         </div>
         <div class="kpi-info">
           <span class="kpi-label mono">{{ t('provider.categories') }}</span>
@@ -1027,6 +1033,15 @@ onMounted(() => { void loadAll() })
   border-radius: var(--radius-lg);
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  /* Reset native button chrome so the card keeps its div appearance */
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  text-align: start;
+}
+.kpi-card:focus-visible {
+  outline: 2px solid var(--wl-primary);
+  outline-offset: 2px;
 }
 
 .kpi-card:hover {

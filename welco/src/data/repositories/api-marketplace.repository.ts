@@ -1,5 +1,5 @@
 import { COMPANY_ROUTES, MARKETPLACE_ROUTES } from '../../config/api.config'
-import type { MarketplaceRepository, MarketplaceQuery } from '../../domain/ports/marketplace-repository'
+import type { MarketplaceRepository, MarketplaceQuery, CategoryQuery } from '../../domain/ports/marketplace-repository'
 import type { PaginatedResult } from '../../domain/models/location'
 import type {
   CategoryDto,
@@ -322,6 +322,45 @@ export class ApiMarketplaceRepository implements MarketplaceRepository {
       }
       return list.map(normalizeCategory)
     }
+  }
+
+  async getCategoriesPaginated(query: CategoryQuery = {}): Promise<PaginatedResult<CategoryDto>> {
+    const pageNumber = query.pageNumber ?? 1
+    const pageSize = query.pageSize ?? 10
+    const params = new URLSearchParams()
+    params.set('pageNumber', String(pageNumber))
+    params.set('pageSize', String(pageSize))
+    if (query.searchTerm?.trim()) params.set('searchTerm', query.searchTerm.trim())
+    if (typeof query.isActive === 'boolean') params.set('isActive', String(query.isActive))
+
+    const raw = await this.http.get<unknown>(`${MARKETPLACE_ROUTES.categories}?${params.toString()}`, {
+      showFeedback: false,
+    })
+
+    const build = (list: CategoryDto[], totalCount: number, totalPages: number): PaginatedResult<CategoryDto> => ({
+      isSuccess: true,
+      data: list.map(normalizeCategory),
+      totalCount,
+      pageNumber,
+      pageSize,
+      totalPages,
+      hasPreviousPage: pageNumber > 1,
+      hasNextPage: pageNumber < totalPages,
+      message: '',
+      statusCode: 200,
+    })
+
+    if (Array.isArray(raw)) {
+      const list = raw as CategoryDto[]
+      return build(list, list.length, 1)
+    }
+    const paginated = toPaginated<CategoryDto>(raw)
+    if (paginated) {
+      return { ...paginated, data: paginated.data.map(normalizeCategory) }
+    }
+    const obj = (raw ?? {}) as Record<string, unknown>
+    const list = (Array.isArray(obj.data) ? obj.data : Array.isArray(obj.Data) ? obj.Data : []) as CategoryDto[]
+    return build(list, list.length, 1)
   }
 
   async getFeaturedProducts(): Promise<ProductDto[]> {

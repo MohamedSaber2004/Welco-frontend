@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import { useAnimation } from '../../composables/useAnimation'
 import ProviderLayout from '../../components/layout/ProviderLayout.vue'
 import BaseButton from '../../components/ui/BaseButton.vue'
@@ -17,6 +17,24 @@ useAnimation()
 
 /* ── Active Tab ── */
 const activeTab = ref<'support' | 'oem'>('support')
+
+/* Roving-tabindex keyboard support for the support/oem tablist. */
+const onSupportTabKeydown = (e: KeyboardEvent, current: 'support' | 'oem') => {
+  const order: Array<'support' | 'oem'> = ['support', 'oem']
+  let next = -1
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = (order.indexOf(current) + 1) % order.length
+  else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = (order.indexOf(current) - 1 + order.length) % order.length
+  else if (e.key === 'Home') next = 0
+  else if (e.key === 'End') next = order.length - 1
+  if (next < 0) return
+  e.preventDefault()
+  const target = order[next]
+  if (!target) return
+  activeTab.value = target
+  void nextTick(() => {
+    document.getElementById(target === 'support' ? 'support-tab-support' : 'support-tab-oem')?.focus()
+  })
+}
 
 /* ── Live Data Loading ── */
 const loading = ref(true)
@@ -278,16 +296,20 @@ const acceptOemInquiry = async (inquiry: OemInquiryDto) => {
       </header>
 
       <!-- View Navigation Tabs -->
-      <div class="support-tabs-bar" role="tablist">
+      <div class="support-tabs-bar" role="tablist" :aria-label="t('provider.support')">
         <button
           type="button"
           class="tab-btn"
           :class="{ 'tab-btn--active': activeTab === 'support' }"
           role="tab"
+          id="support-tab-support"
+          aria-controls="support-panel-support"
           :aria-selected="activeTab === 'support'"
+          :tabindex="activeTab === 'support' ? 0 : -1"
           @click="activeTab = 'support'"
+          @keydown="onSupportTabKeydown($event, 'support')"
         >
-          <span class="material-symbols-outlined text-[18px]">support_agent</span>
+          <span class="material-symbols-outlined text-[18px]" aria-hidden="true">support_agent</span>
           <span>{{ t('provider.support') }} &amp; {{ t('help.tickets') }}</span>
           <span v-if="myTickets.length" class="tab-badge mono">{{ myTickets.length }}</span>
         </button>
@@ -296,17 +318,28 @@ const acceptOemInquiry = async (inquiry: OemInquiryDto) => {
           class="tab-btn"
           :class="{ 'tab-btn--active': activeTab === 'oem' }"
           role="tab"
+          id="support-tab-oem"
+          aria-controls="support-panel-oem"
           :aria-selected="activeTab === 'oem'"
+          :tabindex="activeTab === 'oem' ? 0 : -1"
           @click="activeTab = 'oem'"
+          @keydown="onSupportTabKeydown($event, 'oem')"
         >
-          <span class="material-symbols-outlined text-[18px]">precision_manufacturing</span>
+          <span class="material-symbols-outlined text-[18px]" aria-hidden="true">precision_manufacturing</span>
           <span>{{ t('admin.oemInquiries') }}</span>
           <span v-if="filteredOem.length" class="tab-badge mono">{{ filteredOem.length }}</span>
         </button>
       </div>
 
       <!-- TAB 1: Support & Escalation -->
-      <div v-show="activeTab === 'support'" class="tab-pane">
+      <div
+        v-show="activeTab === 'support'"
+        id="support-panel-support"
+        class="tab-pane"
+        role="tabpanel"
+        aria-labelledby="support-tab-support"
+        tabindex="0"
+      >
         <!-- Direct Dynamic Contact Channels Hub -->
         <div class="channels-grid">
           <!-- Hotline Card -->
@@ -506,30 +539,45 @@ const acceptOemInquiry = async (inquiry: OemInquiryDto) => {
             <h3 class="faqs-title">{{ t('help.faq') || 'Frequently Asked Questions' }}</h3>
           </div>
           <div class="faqs-grid">
-            <div
+            <button
               v-for="(faq, i) in faqs"
+              :id="`faq-btn-${faq.id}`"
               :key="faq.id"
+              type="button"
               class="faq-card anim-fade-in-up"
               :class="{ 'faq-card--open': expandedFaqId === faq.id }"
               :style="{ animationDelay: `${i * 30}ms` }"
+              :aria-expanded="expandedFaqId === faq.id"
+              :aria-controls="`faq-panel-${faq.id}`"
               @click="toggleFaq(faq.id)"
             >
-              <div class="faq-question-row">
+              <span class="faq-question-row">
                 <strong class="faq-q">{{ faq.question }}</strong>
-                <span class="material-symbols-outlined faq-toggle-icon">
+                <span class="material-symbols-outlined faq-toggle-icon" aria-hidden="true">
                   {{ expandedFaqId === faq.id ? 'expand_less' : 'expand_more' }}
                 </span>
-              </div>
-              <p v-show="expandedFaqId === faq.id" class="faq-a">
+              </span>
+              <span
+                v-show="expandedFaqId === faq.id"
+                :id="`faq-panel-${faq.id}`"
+                class="faq-a"
+              >
                 {{ faq.answer }}
-              </p>
-            </div>
+              </span>
+            </button>
           </div>
         </div>
       </div>
 
       <!-- TAB 2: OEM Inquiries Management -->
-      <div v-show="activeTab === 'oem'" class="tab-pane">
+      <div
+        v-show="activeTab === 'oem'"
+        id="support-panel-oem"
+        class="tab-pane"
+        role="tabpanel"
+        aria-labelledby="support-tab-oem"
+        tabindex="0"
+      >
         <div class="oem-card">
           <div class="oem-card-head">
             <div>
@@ -1327,6 +1375,15 @@ const acceptOemInquiry = async (inquiry: OemInquiryDto) => {
   padding: var(--space-3);
   cursor: pointer;
   transition: all 0.15s ease;
+  display: block;
+  width: 100%;
+  text-align: start;
+  font: inherit;
+  color: inherit;
+}
+.faq-card:focus-visible {
+  outline: 2px solid var(--wl-primary);
+  outline-offset: 2px;
 }
 
 .faq-card:hover {

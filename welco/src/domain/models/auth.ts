@@ -36,6 +36,10 @@ export interface VerifyEmailOtpPayload {
   otpCode: string
 }
 
+export interface ResendRegisterOtpPayload {
+  email: string
+}
+
 export interface ForgotPasswordPayload {
   email: string
 }

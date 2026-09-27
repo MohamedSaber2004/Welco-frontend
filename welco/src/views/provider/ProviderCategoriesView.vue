@@ -197,53 +197,59 @@ onMounted(() => { void loadAll() })
         </div>
       </header>
 
-      <!-- KPI Summary Cards -->
-      <section class="kpi-grid" aria-label="Category Key Metrics">
-        <div
+      <!-- KPI Summary Cards — first three double as filters -->
+      <section class="kpi-grid" role="group" :aria-label="t('provider.categories')">
+        <button
+          type="button"
           class="kpi-card"
+          :aria-pressed="statusFilter === 'all' && hierarchyFilter === 'all'"
           :class="{ 'is-active': statusFilter === 'all' && hierarchyFilter === 'all' }"
           @click="statusFilter = 'all'; hierarchyFilter = 'all'"
         >
           <div class="kpi-icon-box bg-primary-soft">
-            <span class="material-symbols-outlined text-primary">category</span>
+            <span class="material-symbols-outlined text-primary" aria-hidden="true">category</span>
           </div>
           <div class="kpi-info">
             <span class="kpi-label mono">{{ t('provider.categories') }}</span>
             <strong class="kpi-value mono">{{ totalCount }}</strong>
           </div>
-        </div>
+        </button>
 
-        <div
+        <button
+          type="button"
           class="kpi-card"
+          :aria-pressed="statusFilter === 'active'"
           :class="{ 'is-active': statusFilter === 'active' }"
           @click="statusFilter = statusFilter === 'active' ? 'all' : 'active'"
         >
           <div class="kpi-icon-box bg-emerald-soft">
-            <span class="material-symbols-outlined text-emerald-600">check_circle</span>
+            <span class="material-symbols-outlined text-emerald-600" aria-hidden="true">check_circle</span>
           </div>
           <div class="kpi-info">
             <span class="kpi-label mono">{{ t('admin.active') }}</span>
             <strong class="kpi-value mono text-emerald-600">{{ activeCount }}</strong>
           </div>
-        </div>
+        </button>
 
-        <div
+        <button
+          type="button"
           class="kpi-card"
+          :aria-pressed="hierarchyFilter === 'root'"
           :class="{ 'is-active': hierarchyFilter === 'root' }"
           @click="hierarchyFilter = hierarchyFilter === 'root' ? 'all' : 'root'"
         >
           <div class="kpi-icon-box bg-indigo-soft">
-            <span class="material-symbols-outlined text-indigo-600">account_tree</span>
+            <span class="material-symbols-outlined text-indigo-600" aria-hidden="true">account_tree</span>
           </div>
           <div class="kpi-info">
-            <span class="kpi-label mono">{{ locale === 'ar' ? 'الفئات الرئيسية' : 'Main Categories' }}</span>
+            <span class="kpi-label mono">{{ t('marketplace.mainCategory') }}</span>
             <strong class="kpi-value mono text-indigo-600">{{ rootCount }}</strong>
           </div>
-        </div>
+        </button>
 
         <div class="kpi-card kpi-card--stat">
           <div class="kpi-icon-box bg-amber-soft">
-            <span class="material-symbols-outlined text-amber-600">inventory_2</span>
+            <span class="material-symbols-outlined text-amber-600" aria-hidden="true">inventory_2</span>
           </div>
           <div class="kpi-info">
             <span class="kpi-label mono">{{ t('admin.productsTitle') }}</span>
@@ -267,15 +273,17 @@ onMounted(() => { void loadAll() })
       <!-- Search & Filters Toolbar -->
       <div class="toolbar">
         <div class="toolbar__search">
-          <span class="material-symbols-outlined search-icon">search</span>
+          <span class="material-symbols-outlined search-icon" aria-hidden="true">search</span>
+          <label class="sr-only" for="pc-search">{{ t('provider.searchCategoriesPlaceholder') }}</label>
           <input
+            id="pc-search"
             v-model="search"
             type="search"
             class="search-input"
-            :placeholder="locale === 'ar' ? 'البحث في الفئات...' : 'Search categories...'"
+            :placeholder="t('provider.searchCategoriesPlaceholder')"
           />
           <button v-if="search" type="button" class="search-clear-btn" @click="search = ''" :aria-label="t('common.clearInput')">
-            <span class="material-symbols-outlined">close</span>
+            <span class="material-symbols-outlined" aria-hidden="true">close</span>
           </button>
         </div>
 
@@ -286,36 +294,44 @@ onMounted(() => { void loadAll() })
             <option value="inactive">{{ t('admin.inactive') }}</option>
           </select>
 
-          <select v-model="hierarchyFilter" class="filter-select mono" :aria-label="locale === 'ar' ? 'المستوى' : 'Level'">
-            <option value="all">{{ locale === 'ar' ? 'كافة الفئات' : 'All Levels' }}</option>
-            <option value="root">{{ locale === 'ar' ? 'الفئات الرئيسية' : 'Main Categories' }}</option>
-            <option value="sub">{{ locale === 'ar' ? 'الفئات الفرعية' : 'Subcategories' }}</option>
+          <select v-model="hierarchyFilter" class="filter-select mono" :aria-label="t('provider.level')">
+            <option value="all">{{ t('provider.allLevels') }}</option>
+            <option value="root">{{ t('marketplace.mainCategory') }}</option>
+            <option value="sub">{{ t('marketplace.subcategories') }}</option>
           </select>
 
           <!-- View Mode Toggle -->
-          <div class="view-toggle-group" role="radiogroup" :aria-label="locale === 'ar' ? 'طريقة العرض' : 'View Mode'">
+          <div class="view-toggle-group" role="radiogroup" :aria-label="t('provider.viewMode')">
             <button
               type="button"
               class="view-toggle-btn"
               :class="{ 'is-active': viewMode === 'grid' }"
-              :aria-pressed="viewMode === 'grid'"
-              :title="locale === 'ar' ? 'عرض شبكي' : 'Grid View'"
+              role="radio"
+              :aria-checked="viewMode === 'grid'"
+              :title="t('provider.gridView')"
+              :aria-label="t('provider.gridView')"
               @click="viewMode = 'grid'"
             >
-              <span class="material-symbols-outlined">grid_view</span>
+              <span class="material-symbols-outlined" aria-hidden="true">grid_view</span>
             </button>
             <button
               type="button"
               class="view-toggle-btn"
               :class="{ 'is-active': viewMode === 'table' }"
-              :aria-pressed="viewMode === 'table'"
-              :title="locale === 'ar' ? 'عرض جدول' : 'Table View'"
+              role="radio"
+              :aria-checked="viewMode === 'table'"
+              :title="t('provider.tableView')"
+              :aria-label="t('provider.tableView')"
               @click="viewMode = 'table'"
             >
-              <span class="material-symbols-outlined">view_list</span>
+              <span class="material-symbols-outlined" aria-hidden="true">view_list</span>
             </button>
           </div>
         </div>
+
+        <p class="toolbar__count mono" role="status" aria-live="polite">
+          {{ t('provider.categoriesFound', { shown: filtered.length, total: totalCount }) }}
+        </p>
       </div>
 
       <!-- Main Data View -->
@@ -719,6 +735,15 @@ onMounted(() => { void loadAll() })
   border-radius: var(--radius-lg);
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  /* Reset native button chrome so the card keeps its div appearance */
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  text-align: start;
+}
+.kpi-card:focus-visible {
+  outline: 2px solid var(--wl-primary);
+  outline-offset: 2px;
 }
 
 .kpi-card:hover {
@@ -828,6 +853,8 @@ onMounted(() => { void loadAll() })
 /* Toolbar */
 .toolbar {
   display: flex;
+  /* base.css sets .toolbar to column; this toolbar is an inline row */
+  flex-direction: row;
   justify-content: space-between;
   align-items: center;
   gap: var(--space-3);
@@ -890,8 +917,16 @@ onMounted(() => { void loadAll() })
   flex-wrap: wrap;
 }
 
+.toolbar__count {
+  font-size: var(--step--1);
+  color: var(--wl-muted);
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
 .filter-select {
   padding: 8px 12px;
+  min-height: 40px;
   border: 1px solid var(--wl-border);
   border-radius: var(--radius-md);
   background: var(--wl-surface);
@@ -903,6 +938,7 @@ onMounted(() => { void loadAll() })
 
 .filter-select:focus {
   border-color: var(--wl-primary);
+  box-shadow: var(--wl-focus-ring);
 }
 
 .view-toggle-group {
@@ -915,8 +951,8 @@ onMounted(() => { void loadAll() })
 }
 
 .view-toggle-btn {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   border: none;
   background: transparent;
   color: var(--wl-muted);
@@ -929,6 +965,11 @@ onMounted(() => { void loadAll() })
 
 .view-toggle-btn:hover {
   color: var(--wl-ink-strong);
+}
+
+.view-toggle-btn:focus-visible {
+  outline: 2px solid var(--wl-primary);
+  outline-offset: -2px;
 }
 
 .view-toggle-btn.is-active {
@@ -1154,12 +1195,21 @@ onMounted(() => { void loadAll() })
 .table-wrap {
   width: 100%;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .table {
   width: 100%;
+  /* 7 columns (incl. both name languages) must scroll, not crush, on mobile */
+  min-width: 860px;
   border-collapse: collapse;
   text-align: start;
+}
+
+.table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 .table th {
@@ -1479,6 +1529,17 @@ onMounted(() => { void loadAll() })
   }
   .toolbar__filters {
     justify-content: space-between;
+  }
+  /* Each control gets its own row so nothing is crushed on small screens */
+  .toolbar__filters .filter-select {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+  .toolbar__filters .view-toggle-group {
+    justify-content: center;
+  }
+  .toolbar__count {
+    text-align: start;
   }
   .two-cols {
     grid-template-columns: 1fr;

@@ -6,6 +6,7 @@ import type { AuthRepository } from '../domain/ports/auth-repository'
 import type {
   LoginPayload,
   RegisterPayload,
+  ResendRegisterOtpPayload,
   VerifyEmailOtpPayload,
   ForgotPasswordPayload,
   VerifyPasswordOtpPayload,
@@ -13,6 +14,7 @@ import type {
   UpdateProfilePayload,
 } from '../domain/models/auth'
 import { toastService } from '../infrastructure/feedback/toast.service'
+import { normalizePhoneForServer } from '../utils/phone'
 import { ApiError } from '../infrastructure/http/api-error'
 import type { TokenStore } from '../infrastructure/http/token-store'
 import { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE, SESSION_COOKIE } from '../infrastructure/http/token-store'
@@ -52,6 +54,11 @@ const nameToUser = (raw: AuthResponseDto | UserProfileDto): User => {
     userType: raw.userType,
     language: raw.language,
     themeMode: normalizeThemeMode((raw as { themeMode?: unknown }).themeMode ?? (raw as { ThemeMode?: unknown }).ThemeMode ?? null),
+    // AuthResponseDto carries no verification flag, and the backend only issues
+    // a session from /login (which rejects unconfirmed accounts) and
+    // /verify-register-otp (which rejects a wrong code). So reaching this branch
+    // means the address is confirmed. The profile fetch later carries the real
+    // value.
     isEmailConfirmed: 'isEmailConfirmed' in raw ? Boolean((raw as UserProfileDto).isEmailConfirmed) : true,
     createdAt: 'createdAt' in raw ? String((raw as UserProfileDto).createdAt) : new Date().toISOString(),
     roles: raw.roles ?? [],
@@ -445,9 +452,28 @@ export class AuthService {
 
   async register(payload: RegisterPayload): Promise<AuthResult> {
     try {
-      await this.authRepository.register(payload)
+      // Send the canonical phone form so the backend's uniqueness check matches
+      // regardless of how the number was typed ("+971 50 123 4567" vs "00971...").
+      const normalized: RegisterPayload = {
+        ...payload,
+        phoneNumber: normalizePhoneForServer(payload.phoneNumber),
+      }
+      await this.authRepository.register(normalized)
       return { ok: true }
     } catch (err) {
+      return { ok: false, error: toErrorMessage(err, 'auth.errGeneric') }
+    }
+  }
+
+  async resendRegisterOtp(payload: ResendRegisterOtpPayload): Promise<AuthResult> {
+    try {
+      await this.authRepository.resendRegisterOtp(payload)
+      toastService.success(t('auth.codeSent'))
+      return { ok: true }
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 404) {
+        return { ok: false, error: t('auth.errEmailNotFound') }
+      }
       return { ok: false, error: toErrorMessage(err, 'auth.errGeneric') }
     }
   }

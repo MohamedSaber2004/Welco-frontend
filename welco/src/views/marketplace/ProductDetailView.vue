@@ -227,13 +227,6 @@ function toggleRfqList() {
   localStorage.setItem('welco-rfq-list', JSON.stringify(rfqListIds.value))
 }
 
-function copyShareLink() {
-  if (typeof window !== 'undefined') {
-    void navigator.clipboard.writeText(window.location.href)
-    toastService.success(t('common.operationDone'))
-  }
-}
-
 async function sendInquiry() {
   if (!inquiryName.value.trim() || !inquiryMsg.value.trim()) {
     toastService.error(t('common.error'))
@@ -685,11 +678,6 @@ const resolvedDescription = computed(() => {
                 {{ isSaved(product.id) ? 'favorite' : 'favorite_border' }}
               </span>
               <span>{{ isSaved(product.id) ? t('marketplace.removeFromWishlist') : t('marketplace.wishlistTitle') }}</span>
-            </button>
-
-            <button type="button" class="tert-link tert-link--share mono" @click="copyShareLink">
-              <span class="material-symbols-outlined text-[16px]">share</span>
-              <span>Share</span>
             </button>
           </div>
         </div>

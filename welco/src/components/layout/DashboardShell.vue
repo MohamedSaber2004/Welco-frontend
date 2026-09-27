@@ -487,11 +487,15 @@ const toggleLang = async () => {
     white-space: nowrap;
     text-decoration: none;
     transition: all 0.12s ease;
-    min-height: 32px;
+    min-height: 44px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+  }
+  .admin-mobile-pill:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
   }
   .admin-mobile-pill.is-active {
     background: var(--brand);

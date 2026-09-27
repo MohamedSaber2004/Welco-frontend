@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, onMounted, watch } from 'vue'
+import { computed, ref, onMounted, watch, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { authService, services, contentRepository, companyRepository } from '../di/container'
 import { t, locale } from '../i18n'
@@ -103,10 +103,102 @@ const explorerProviderTotalPages = computed(() =>
   Math.max(1, Math.ceil(explorerProviderTotal.value / EXPLORER_PROVIDER_PAGE_SIZE)),
 )
 
-watch(cats, (list) => {
-  const first = list[0]
-  if (!explorerCatId.value && first) void selectExplorerCat(first.id)
+/* ══ Section 1 — Browse by Category: server-paginated (GET /categories) ══ */
+const CAT_PAGE_SIZE = 8
+const catsLoading = ref(false)
+const catsTotal = ref(0)
+const catPage = ref(1)
+const catTotalPages = computed(() => Math.max(1, Math.ceil(catsTotal.value / CAT_PAGE_SIZE)))
+
+const loadCats = async (page = 1) => {
+  catsLoading.value = true
+  try {
+    const res = await services.marketplaceRepository.getCategoriesPaginated({
+      pageNumber: page,
+      pageSize: CAT_PAGE_SIZE,
+    })
+    cats.value = Array.isArray(res?.data) ? res.data : []
+    catsTotal.value = res?.totalCount ?? cats.value.length
+  } catch {
+    cats.value = []
+    catsTotal.value = 0
+  } finally {
+    catsLoading.value = false
+  }
+}
+watch(catPage, (p) => { void loadCats(p) })
+
+/* ══ Section 2 — Browse by Clinical Specialty: all categories, filters providers ══ */
+const SPECIALTY_PREVIEW_COUNT = 8
+const allCats = ref<CategoryDto[]>([])
+const specialtyQuery = ref('')
+const showAllSpecialties = ref(false)
+
+const specialtySearchActive = computed(() => specialtyQuery.value.trim().length > 0)
+
+const loadAllCats = async () => {
+  try {
+    allCats.value = await services.marketplaceRepository.getCategories()
+  } catch {
+    allCats.value = []
+  }
+}
+
+/* Filtered client-side: the full set is already loaded for this filter. */
+const matchingSpecialties = computed(() => {
+  const q = specialtyQuery.value.trim().toLowerCase()
+  if (!q) return allCats.value
+  return allCats.value.filter((c) =>
+    [c.nameEn, c.nameAr, c.slug].some((v) => (v ? String(v).toLowerCase().includes(q) : false)),
+  )
 })
+
+/* Show a preview of 8; searching reveals every match without expanding. */
+const visibleSpecialties = computed(() =>
+  specialtySearchActive.value || showAllSpecialties.value
+    ? matchingSpecialties.value
+    : matchingSpecialties.value.slice(0, SPECIALTY_PREVIEW_COUNT),
+)
+
+const canExpandSpecialties = computed(
+  () => !showAllSpecialties.value && matchingSpecialties.value.length > SPECIALTY_PREVIEW_COUNT,
+)
+
+const toggleShowAllSpecialties = () => {
+  showAllSpecialties.value = !showAllSpecialties.value
+}
+
+const clearSpecialtySearch = () => {
+  specialtyQuery.value = ''
+}
+
+/* Keep the provider explorer on a specialty the user can still see. */
+watch(matchingSpecialties, (list) => {
+  const first = list[0]
+  if (!first) return
+  if (!explorerCatId.value || !list.some((c) => c.id === explorerCatId.value)) {
+    void selectExplorerCat(first.id)
+  }
+})
+
+/* Roving-tabindex keyboard support for the tablist. */
+const onCatExplorerKeydown = (e: KeyboardEvent, index: number) => {
+  const list = visibleSpecialties.value
+  if (!list.length) return
+  let next = -1
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = (index + 1) % list.length
+  else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = (index - 1 + list.length) % list.length
+  else if (e.key === 'Home') next = 0
+  else if (e.key === 'End') next = list.length - 1
+  if (next < 0) return
+  e.preventDefault()
+  const target = list[next]
+  if (!target) return
+  void selectExplorerCat(target.id)
+  void nextTick(() => {
+    document.querySelector<HTMLButtonElement>(`[data-cat-pill="${target.id}"]`)?.focus()
+  })
+}
 
 const fetchExplorerProviders = async () => {
   if (!explorerCatId.value) return
@@ -142,10 +234,10 @@ watch(explorerProviderPage, () => { void fetchExplorerProviders() })
 
 onMounted(async () => {
   loading.value = true
-  const svc = services.marketplaceService
   try {
     await Promise.allSettled([
-      svc.loadCategories(),
+      loadCats(1),
+      loadAllCats(),
       services.certificationService.load(),
       services.contentService.loadSupport(),
       contentRepository.getLandingPages({ pageNumber: 1, pageSize: 20 }).then((p) => (landingPages.value = p.data)).catch(() => []),
@@ -180,7 +272,6 @@ onMounted(async () => {
           mostSellingLoading.value = false
         }),
     ])
-    if (svc.categories.value.length) cats.value = [...svc.categories.value]
     certifications.value = services.certificationService.certifications.value
   } finally {
     loading.value = false
@@ -432,11 +523,11 @@ const navigateToOemFromModal = () => {
   </div>
 </section>
 
-    <section class="section section--clinical" aria-labelledby="cat-heading">
+    <section class="section section--category" aria-labelledby="cat-heading">
       <div class="section__inner">
         <div class="section-head">
           <div>
-            <div class="mono section__eyebrow">{{ t('home.browseClinicalSpecialty') }}</div>
+            <div class="mono section__eyebrow">{{ t('home.browseByCategory') }}</div>
             <h2 id="cat-heading" class="section-title">{{ t('marketplace.categoriesTitle') }}</h2>
           </div>
           <router-link to="/categories" class="btn btn-ghost btn-sm view-all-btn">
@@ -444,9 +535,21 @@ const navigateToOemFromModal = () => {
             <span class="icon--directional">→</span>
           </router-link>
         </div>
-        <DataState :loading="loading && !cats.length" :empty="!cats.length && !loading" skeleton-type="category-grid" :skeleton-count="8" min-height="160px">
+
+        <DataState
+          :loading="catsLoading && !cats.length"
+          :empty="!cats.length && !catsLoading"
+          skeleton-type="category-grid"
+          :skeleton-count="8"
+          min-height="160px"
+        >
           <div class="cat-grid">
-            <router-link v-for="c in cats" :key="c.id" :to="{ name: 'category-providers', params: { id: c.id } }" class="cat-card">
+            <router-link
+              v-for="c in cats"
+              :key="c.id"
+              :to="{ name: 'category-providers', params: { id: c.id } }"
+              class="cat-card"
+            >
               <div class="cat-media" @click.stop="openImageViewer(c.imageName, localized(c.nameEn, c.nameAr))">
                 <AppImage
                   :src="c.imageName"
@@ -466,30 +569,122 @@ const navigateToOemFromModal = () => {
           </div>
         </DataState>
 
-        <div v-if="cats.length" class="cat-explorer card">
-          <div class="cat-explorer__intro">
+        <div v-if="catTotalPages > 1" class="cat-pager">
+          <button
+            type="button"
+            class="page-btn"
+            :disabled="catPage <= 1 || catsLoading"
+            :aria-label="t('common.prev')"
+            @click="catPage--"
+          >‹</button>
+          <span class="mono cat-pager__num">{{ catPage }} / {{ catTotalPages }}</span>
+          <button
+            type="button"
+            class="page-btn"
+            :disabled="catPage >= catTotalPages || catsLoading"
+            :aria-label="t('common.next')"
+            @click="catPage++"
+          >›</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--clinical" aria-labelledby="specialty-heading">
+      <div class="section__inner">
+        <div class="section-head">
+          <div>
+            <div class="mono section__eyebrow">{{ t('home.browseClinicalSpecialty') }}</div>
+            <h2 id="specialty-heading" class="section-title">{{ t('marketplace.filterBySpecialty') }}</h2>
+          </div>
+        </div>
+
+        <div class="cat-explorer card">
+          <div class="cat-filter">
+            <div class="cat-filter__field">
+              <span class="material-symbols-outlined cat-filter__icon" aria-hidden="true">search</span>
+              <label class="sr-only" for="specialty-filter-input">{{ t('home.searchSpecialties') }}</label>
+              <input
+                id="specialty-filter-input"
+                v-model="specialtyQuery"
+                type="search"
+                class="cat-filter__input mono"
+                :placeholder="t('home.searchSpecialties')"
+                autocomplete="off"
+                aria-describedby="specialty-filter-count"
+              />
+              <button
+                v-if="specialtySearchActive"
+                type="button"
+                class="cat-filter__clear"
+                :aria-label="t('home.clearSpecialtySearch')"
+                @click="clearSpecialtySearch"
+              >
+                <span class="material-symbols-outlined" aria-hidden="true">close</span>
+              </button>
+            </div>
+            <p id="specialty-filter-count" class="cat-filter__count mono" role="status" aria-live="polite">
+              {{ t('home.specialtiesFound', { shown: visibleSpecialties.length, total: matchingSpecialties.length }) }}
+            </p>
+          </div>
+
+          <div v-if="specialtySearchActive && !matchingSpecialties.length" class="cat-no-results">
+            <span class="material-symbols-outlined cat-no-results__icon" aria-hidden="true">search_off</span>
+            <p class="cat-no-results__text">
+              {{ t('home.noSpecialtiesMatch', { q: specialtyQuery.trim() }) }}
+            </p>
+            <button type="button" class="btn btn-ghost btn-sm" @click="clearSpecialtySearch">
+              {{ t('home.clearSpecialtySearch') }}
+            </button>
+          </div>
+
+          <div v-else class="cat-explorer__intro">
             <div>
-              <span class="mono cat-explorer__eyebrow">{{ t('home.browseClinicalSpecialty') }}</span>
               <h3 class="cat-explorer__heading">{{ t('provider.providersInCategory') }}</h3>
             </div>
           </div>
-          <div class="cat-explorer__pills" role="tablist" :aria-label="t('marketplace.categoriesTitle')">
+          <div v-if="visibleSpecialties.length" class="cat-explorer__pills" role="tablist" :aria-label="t('marketplace.filterBySpecialty')">
               <button
-                v-for="(c, index) in cats"
+                v-for="(c, index) in visibleSpecialties"
+                :id="`cat-tab-${c.id}`"
                 :key="c.id"
+                :data-cat-pill="c.id"
                 type="button"
                 role="tab"
                 class="pill cat-explorer__pill"
                 :aria-label="`${localized(c.nameEn, c.nameAr)} · ${index + 1}`"
               :class="{ 'pill--active': explorerCatId === c.id }"
-              :aria-selected="explorerCatId === c.id"
-              @click="selectExplorerCat(c.id)"
+                :aria-selected="explorerCatId === c.id"
+                :aria-controls="'cat-tabpanel'"
+                :tabindex="explorerCatId === c.id ? 0 : -1"
+                @click="selectExplorerCat(c.id)"
+                @keydown="onCatExplorerKeydown($event, index)"
             >
               {{ localized(c.nameEn, c.nameAr) }}
             </button>
           </div>
 
-          <div v-if="explorerCatId" class="cat-explorer__body">
+          <div v-if="canExpandSpecialties || showAllSpecialties" class="cat-expand">
+            <button
+              type="button"
+              class="btn btn-ghost btn-sm"
+              :aria-expanded="showAllSpecialties"
+              @click="toggleShowAllSpecialties"
+            >
+              <span>{{ showAllSpecialties ? t('home.showFewerSpecialties') : t('home.showAllSpecialties', { count: matchingSpecialties.length }) }}</span>
+              <span class="material-symbols-outlined icon--directional" aria-hidden="true">
+                {{ showAllSpecialties ? 'expand_less' : 'expand_more' }}
+              </span>
+            </button>
+          </div>
+
+          <div
+            v-if="explorerCatId"
+            id="cat-tabpanel"
+            class="cat-explorer__body"
+            role="tabpanel"
+            :aria-labelledby="`cat-tab-${explorerCatId}`"
+            tabindex="0"
+          >
             <div class="cat-explorer__head">
               <h3 class="cat-explorer__title">{{ t('provider.providersInCategory') }}</h3>
               <router-link :to="{ name: 'category-providers', params: { id: explorerCatId } }" class="provider-viewall mono">
@@ -1086,11 +1281,11 @@ const navigateToOemFromModal = () => {
   border-bottom: 1px solid var(--wl-border);
 }
 
-/* Browse by Clinical Specialty — explicit pure white canvas */
+/* Browse by Category + Browse by Clinical Specialty — banded canvases.
+   Background/border treatment is defined together further down. */
+.section--category,
 .section--clinical {
-  background: #ffffff;
   border-top: 1px solid var(--wl-border);
-  border-bottom: 1px solid var(--wl-border);
 }
 
 .section__inner {
@@ -1443,6 +1638,9 @@ const navigateToOemFromModal = () => {
 }
 .cat-explorer__pill {
   flex-shrink: 0;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
   padding: 0.5rem 1.15rem;
   border-radius: 9999px;
   border: 1px solid #e2e8f0;
@@ -1741,6 +1939,114 @@ const navigateToOemFromModal = () => {
   letter-spacing: -0.02em;
   color: var(--fg-heading);
   margin: 0;
+}
+
+/* ── Specialty filter (browse by clinical specialty) ── */
+.cat-filter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+.cat-filter__field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1 1 260px;
+  min-width: 0;
+  max-width: 420px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 9999px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.cat-filter__field:focus-within {
+  border-color: var(--wl-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--wl-primary) 18%, transparent);
+}
+.cat-filter__icon {
+  font-size: 18px;
+  color: #64748b;
+  margin-inline-start: 0.75rem;
+  pointer-events: none;
+}
+.cat-filter__input {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  padding: 0.55rem 0.6rem;
+  font-size: 0.9rem;
+  color: #0f172a;
+}
+.cat-filter__input:focus {
+  outline: none;
+  box-shadow: none;
+}
+.cat-filter__clear {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin-inline-end: 0.25rem;
+  border: 0;
+  border-radius: 9999px;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.cat-filter__clear:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+.cat-filter__clear .material-symbols-outlined {
+  font-size: 18px;
+}
+.cat-filter__count {
+  font-size: 0.75rem;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+.cat-no-results {
+  display: grid;
+  justify-items: center;
+  gap: 0.6rem;
+  padding: 2rem 1rem;
+  text-align: center;
+  border: 1px dashed #cbd5e1;
+  border-radius: var(--wl-radius-lg);
+  background: #f8fafc;
+}
+.cat-no-results__icon {
+  font-size: 30px;
+  color: #94a3b8;
+}
+.cat-no-results__text {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #475569;
+}
+
+.cat-expand {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.cat-pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+.cat-pager__num {
+  font-size: 0.8rem;
+  color: #64748b;
 }
 
 /* Categories Grid */
@@ -2609,62 +2915,64 @@ const navigateToOemFromModal = () => {
   .home .hero__search-bar input:focus::placeholder { animation: none; }
 }
 
-/* Browse by clinical specialty: white background, contained, balanced margins/paddings */
-.home .section--clinical,
-.home section[aria-labelledby="cat-heading"] {
-  background: #ffffff;
+/* Browse by category + browse by clinical specialty: two distinct bands */
+.home .section--category,
+.home .section--clinical {
   border-top: 1px solid #f1f5f9;
-  border-bottom: 1px solid #f1f5f9;
-  padding-block: clamp(3.5rem, 6vw, 5.5rem);
+  padding-block: clamp(3rem, 5.5vw, 4.5rem);
 }
-.home .section--clinical .section__inner,
-.home section[aria-labelledby="cat-heading"] .section__inner {
+.home .section--category {
+  background: #ffffff;
+  border-bottom: 0;
+}
+.home .section--clinical {
+  background: var(--wl-surface-soft, #f8fafc);
+  border-bottom: 1px solid #f1f5f9;
+}
+.home .section--category .section__inner,
+.home .section--clinical .section__inner {
   max-width: 1320px;
   margin-inline: auto;
   padding-inline: clamp(1rem, 4vw, 2.75rem);
 }
-.home .section--clinical .section-head,
-.home section[aria-labelledby="cat-heading"] .section-head {
+.home .section--category .section-head,
+.home .section--clinical .section-head {
   margin-bottom: clamp(1.5rem, 3.5vw, 2.25rem);
 }
-.home .section--clinical .section__eyebrow,
-.home section[aria-labelledby="cat-heading"] .section__eyebrow {
+.home .section--category .section__eyebrow,
+.home .section--clinical .section__eyebrow {
   color: var(--platform-teal) !important;
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
-.home .section--clinical .section-title,
-.home section[aria-labelledby="cat-heading"] .section-title {
+.home .section--category .section-title,
+.home .section--clinical .section-title {
   color: var(--platform-ink);
   font-size: clamp(1.85rem, 3.8vw, 2.6rem);
   font-weight: 800;
   letter-spacing: -0.035em;
   line-height: 1.15;
 }
-.home .section--clinical .cat-grid,
-.home section[aria-labelledby="cat-heading"] .cat-grid {
+.home .section--category .cat-grid {
   grid-template-columns: repeat(4, 1fr);
   margin-inline: 0;
   gap: clamp(0.85rem, 2vw, 1.25rem);
 }
 @media (max-width: 1100px) {
-  .home .section--clinical .cat-grid,
-  .home section[aria-labelledby="cat-heading"] .cat-grid {
+  .home .section--category .cat-grid {
     grid-template-columns: repeat(3, 1fr);
   }
 }
 @media (max-width: 768px) {
-  .home .section--clinical .cat-grid,
-  .home section[aria-labelledby="cat-heading"] .cat-grid {
+  .home .section--category .cat-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 0.875rem;
   }
 }
 @media (max-width: 440px) {
-  .home .section--clinical .cat-grid,
-  .home section[aria-labelledby="cat-heading"] .cat-grid {
+  .home .section--category .cat-grid {
     grid-template-columns: 1fr;
   }
 }

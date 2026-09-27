@@ -506,6 +506,24 @@
     transform: none !important;
     animation: none !important;
   }
+  /* Entrance/stagger utilities: render immediately, no motion. */
+  .anim-fade-in,
+  .anim-fade-in-up,
+  .anim-scale-in,
+  .anim-move {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .anim-card-hover,
+  .interactive-lift {
+    transition: none !important;
+  }
+  .anim-card-hover:hover,
+  .interactive-lift:hover {
+    transform: none !important;
+  }
 }
 
 /* Page Transition Animations */

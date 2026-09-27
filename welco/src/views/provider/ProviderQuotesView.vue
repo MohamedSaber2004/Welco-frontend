@@ -308,38 +308,59 @@ const handleDecline = async (rfq: RfqDto) => {
         </div>
       </header>
 
-      <!-- KPI Summary Cards -->
-      <div class="kpi-grid">
-        <div class="kpi-card" :class="{ 'is-active': tab === 'all' }" @click="tab = 'all'">
+      <!-- KPI Summary Cards — double as tabs -->
+      <div class="kpi-grid" role="radiogroup" :aria-label="t('sales.rfqTitle')">
+        <button
+          type="button"
+          class="kpi-card"
+          role="radio"
+          :aria-checked="tab === 'all'"
+          :class="{ 'is-active': tab === 'all' }"
+          @click="tab = 'all'"
+        >
           <div class="kpi-icon-box bg-primary-soft">
-            <span class="material-symbols-outlined text-primary">request_quote</span>
+            <span class="material-symbols-outlined text-primary" aria-hidden="true">request_quote</span>
           </div>
           <div class="kpi-info">
             <span class="kpi-label mono">{{ t('sales.rfqTitle') }}</span>
             <strong class="kpi-value mono">{{ totalRfqsCount }}</strong>
           </div>
-        </div>
+        </button>
 
-        <div class="kpi-card kpi-card--highlight" :class="{ 'is-active': tab === 'negotiations' }" @click="tab = 'negotiations'">
+        <button
+          type="button"
+          class="kpi-card kpi-card--highlight"
+          role="radio"
+          :aria-checked="tab === 'negotiations'"
+          :class="{ 'is-active': tab === 'negotiations' }"
+          @click="tab = 'negotiations'"
+        >
           <div class="kpi-icon-box bg-emerald-soft">
-            <span class="material-symbols-outlined text-emerald-600">handshake</span>
+            <span class="material-symbols-outlined text-emerald-600" aria-hidden="true">handshake</span>
           </div>
           <div class="kpi-info">
             <span class="kpi-label mono">{{ t('provider.negotiationRequests') }}</span>
             <strong class="kpi-value mono text-emerald-600">{{ negotiationsCount }}</strong>
           </div>
           <span v-if="negotiationsCount > 0" class="negotiation-ping-badge mono">{{ negotiationsCount }}</span>
-        </div>
+        </button>
 
-        <div class="kpi-card" :class="{ 'is-active': tab === 'quotes' }" @click="tab = 'quotes'">
+        <button
+          type="button"
+          class="kpi-card"
+          role="radio"
+          :aria-checked="tab === 'quotes'"
+          :class="{ 'is-active': tab === 'quotes' }"
+          @click="tab = 'quotes'"
+        >
           <div class="kpi-icon-box bg-gold-soft">
-            <span class="material-symbols-outlined text-gold">verified</span>
+            <span class="material-symbols-outlined text-gold" aria-hidden="true">verified</span>
           </div>
           <div class="kpi-info">
             <span class="kpi-label mono">{{ t('sales.quoteTitle') }}</span>
             <strong class="kpi-value mono">{{ quotesCount }}</strong>
           </div>
-        </div>
+        </button>
       </div>
 
       <!-- Quotes List Tab vs RFQ List Tab -->
@@ -349,7 +370,7 @@ const handleDecline = async (rfq: RfqDto) => {
             <h2 class="section-title">{{ t('sales.quoteTitle') }} ({{ quotes.length }})</h2>
           </div>
 
-          <DataState :loading="loading" :error="fetchError" :empty="!quotes.length" :empty-text="t('sales.noQuotes')" @retry="loadData">
+          <DataState :loading="loading" :error="fetchError" :empty="!quotes.length" :empty-title="t('sales.noQuotes')" @retry="loadData">
             <div class="table-wrap">
               <table class="data-table">
                 <thead>
@@ -426,7 +447,7 @@ const handleDecline = async (rfq: RfqDto) => {
 
         <!-- RFQs / Inquiries Table -->
         <div class="table-card">
-          <DataState :loading="loading" :error="fetchError" :empty="!paginatedRfqs.length" :empty-text="t('sales.noRfqs')" @retry="loadData">
+          <DataState :loading="loading" :error="fetchError" :empty="!paginatedRfqs.length" :empty-title="t('sales.noRfqs')" @retry="loadData">
             <div class="table-wrap">
               <table class="data-table">
                 <thead>
@@ -592,7 +613,7 @@ const handleDecline = async (rfq: RfqDto) => {
 
             <!-- Pagination -->
             <div v-if="totalPages > 1" class="pagination-footer">
-              <AppPagination :current-page="page" :total-pages="totalPages" @update:current-page="page = $event" />
+              <AppPagination v-model:page="page" :total-pages="totalPages" />
             </div>
           </DataState>
         </div>
@@ -932,6 +953,15 @@ const handleDecline = async (rfq: RfqDto) => {
   cursor: pointer;
   position: relative;
   transition: all 0.18s ease;
+  /* Reset native button chrome so the card keeps its div appearance */
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  text-align: start;
+}
+.kpi-card:focus-visible {
+  outline: 2px solid var(--wl-primary);
+  outline-offset: 2px;
 }
 
 .kpi-card:hover {

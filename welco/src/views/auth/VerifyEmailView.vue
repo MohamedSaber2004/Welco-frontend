@@ -66,14 +66,9 @@ const handleVerify = async () => {
     if (res.ok) {
       let registeredAsOrg = false
       try {
-        const raw = sessionStorage.getItem('welco-pending-register')
-        if (raw) {
-          registeredAsOrg = true
-        }
         sessionStorage.removeItem('welco-pending-email')
-        sessionStorage.removeItem('welco-pending-register')
       } catch {}
-      if (!registeredAsOrg && isPendingOrg(email.value)) registeredAsOrg = true
+      if (isPendingOrg(email.value)) registeredAsOrg = true
 
       if (registeredAsOrg) {
         if (authService.isAuthenticated) {
@@ -87,9 +82,13 @@ const handleVerify = async () => {
       if (authService.isAuthenticated) {
         toastService.success(t('auth.welcomeBackToast'))
         const redirect = (route.query.redirect as string) || ''
-        if (redirect) await router.push(redirect)
-        else if (authService.isAdmin.value) await router.push({ name: 'admin-dashboard' })
-        else await router.push({ name: 'home' })
+        if (redirect) {
+          await router.push(redirect)
+          return
+        }
+        // Verification issues a session, so land on the account's own dashboard
+        // (admin / provider / client) rather than the public home page.
+        await router.push({ name: authService.getDashboardRouteName() })
       } else {
         toastService.success(t('common.operationDone'))
         await router.push({ name: 'login' })
@@ -113,15 +112,12 @@ const handleResend = async () => {
   resending.value = true
   startGlobalLoading()
   try {
-    const raw = sessionStorage.getItem('welco-pending-register')
-    if (raw) {
-      const payload = JSON.parse(raw)
-      await authService.register(payload)
+    const res = await authService.resendRegisterOtp({ email: email.value.trim() })
+    if (res.ok) {
+      startTimer()
+    } else {
+      error.value = res.error
     }
-    toastService.success(t('auth.codeSent'))
-    startTimer()
-  } catch (e) {
-    toastService.error(e instanceof Error ? e.message : t('auth.errGeneric'))
   } finally {
     resending.value = false
     stopGlobalLoading()

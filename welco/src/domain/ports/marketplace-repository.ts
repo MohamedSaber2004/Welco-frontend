@@ -28,6 +28,13 @@ export interface MarketplaceQuery {
   currencyId?: string
 }
 
+export interface CategoryQuery {
+  pageNumber?: number
+  pageSize?: number
+  searchTerm?: string
+  isActive?: boolean
+}
+
 export interface MarketplaceRepository {
   getProducts(query?: MarketplaceQuery): Promise<PaginatedResult<ProductDto>>
   getProductById(id: string): Promise<ProductDto | null>
@@ -41,6 +48,9 @@ export interface MarketplaceRepository {
   getMyProducts(companyId: string, query?: MarketplaceQuery): Promise<PaginatedResult<ProductDto>>
 
   getCategories(): Promise<CategoryDto[]>
+  /** Server-paginated categories. `searchTerm` is matched server-side against
+   *  NameEn/NameAr, so callers can filter without loading the full set. */
+  getCategoriesPaginated(query?: CategoryQuery): Promise<PaginatedResult<CategoryDto>>
   getCategoryById(id: string): Promise<CategoryDto | null>
   getCategoryProviders(categoryId: string, query?: { page?: number; pageSize?: number }): Promise<PaginatedResult<CompanyDto>>
   getSkuProviders(sku: string): Promise<SkuProviderDto[]>

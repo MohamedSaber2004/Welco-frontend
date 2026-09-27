@@ -191,6 +191,13 @@ export type Messages = {
     whyFast: string
     browseComplete: string
     browseClinicalSpecialty: string
+    browseByCategory: string
+    searchSpecialties: string
+    clearSpecialtySearch: string
+    specialtiesFound: string
+    noSpecialtiesMatch: string
+    showAllSpecialties: string
+    showFewerSpecialties: string
     clinicalHighlights: string
     meetWelco: string
     metricsHeading: string
@@ -1179,6 +1186,13 @@ export type Messages = {
     productsFromProvider: string
     noProvidersHere: string
     noProvidersHereDesc: string
+    searchCategoriesPlaceholder: string
+    categoriesFound: string
+    allLevels: string
+    level: string
+    viewMode: string
+    gridView: string
+    tableView: string
     noProviderProducts: string
     viewAllProducts: string
     providerProducts: string

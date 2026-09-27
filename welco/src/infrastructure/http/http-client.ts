@@ -163,6 +163,7 @@ export class HttpClient {
       await this.waitForRateLimit(path)
       const isRefreshRequest = routingPath.startsWith(AUTH_ROUTES.refreshToken)
       let refreshedOnce = false
+      let refreshFailed = false
 
       for (let attempt = 0; ; attempt++) {
         let response: Response
@@ -192,19 +193,32 @@ export class HttpClient {
             if (newToken) headers['Authorization'] = `Bearer ${newToken}`
             continue
           }
+          // The server rejected our token and we could not mint a new one.
+          refreshFailed = true
         }
 
-        // A 401 against an expired access token means the session is dead →
-        // force logout; the user must sign in again. Anonymous requests (no
-        // stored token) and the login/logout endpoints never trigger this.
-        // A 401 against a still-valid token is an endpoint permission quirk —
-        // surface the error without logging the user out.
-        if (
-          response.status === 401 &&
-          !silentPath &&
-          this.tokenStore.hasAccessToken() &&
-          this.tokenStore.isAccessTokenExpired()
-        ) {
+        // The session is dead when the server rejects a token we hold and we
+        // cannot recover: either it is locally expired, or a refresh was
+        // already attempted and failed / the retried token was rejected too.
+        //
+        // This must not key off the local clock alone. `isAccessTokenExpired()`
+        // returns false when the JWT `exp` claim cannot be parsed, so a token
+        // the server considers invalid could otherwise linger indefinitely:
+        // every request would 401, the empty-envelope fallback below would
+        // blank out each response, and the app would keep rendering a stale
+        // "logged in" shell with no data. The server is authoritative here.
+        //
+        // The second case covers the inverse: the session cookie survived but
+        // the access token is gone, so no Authorization header is sent at all
+        // and every authenticated call is challenged. A lingering refresh token
+        // is the proof that a session was established. Requests with neither
+        // token are anonymous browsing and must never be logged out.
+        const hasAccess = this.tokenStore.hasAccessToken()
+        const hasRefresh = Boolean(this.tokenStore.getRefreshToken())
+        const deadSession = hasAccess
+          ? refreshFailed || refreshedOnce || this.tokenStore.isAccessTokenExpired()
+          : hasRefresh
+        if (response.status === 401 && !silentPath && deadSession) {
           this.tokenStore.clear()
           this.authBridge.onSessionExpired()
         }

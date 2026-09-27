@@ -136,14 +136,20 @@ export class ApiCompanyRepository implements CompanyRepository {
 
   async getMyCompany(): Promise<CompanyDto | null> {
     const raw = await this.http.get<Record<string, unknown> | null>(`${COMPANY_ROUTES.base}/companies/my`, { showFeedback: false })
-    if (!raw || typeof raw !== 'object') return null
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null
     const pick = (...keys: string[]): unknown => {
       for (const k of keys) if (k in raw && raw[k] !== undefined && raw[k] !== null && raw[k] !== '') return raw[k]
       return undefined
     }
+    const id = pick('id', 'Id', 'companyId', 'CompanyId') as string | undefined
+    // On a 401 the HTTP client hands back a list-shaped empty envelope
+    // (`data: []`) instead of throwing. Blindly casting that produced a
+    // non-null "company" with no id and no status, which the profile rendered
+    // as a blank organization card labelled "pending". Require a real record.
+    if (!id) return null
     return {
       ...raw,
-      id: (pick('id', 'Id', 'companyId', 'CompanyId') as string) ?? '',
+      id,
     } as unknown as CompanyDto
   }
 

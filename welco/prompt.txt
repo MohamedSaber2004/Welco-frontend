@@ -1,5 +1,3 @@
-first in provider dashboard remove from sidebar the marketplace. second thing provider can upload with product the video and shows it in product details in
-  videos tab. third thing when call api  endpoints show the message result if success or failed with detailed to enhance user experience. when upload any
-  attachments then activate uploading progress bar to track uploading progress. also replace skeleton loading with the loading spinner untill data or response
-  reutrning from apis. in provider dashboard profile in organization section fix to load real data and the provider has personal image and provider brand image
-  and in providers in home or get all providers page resolve provider brand image to load the provider image.
+:56304/api/v1/user-management/companies/my:1  Failed to load resource: the server responded with a status of 401 (Unauthorized)
+:56304/api/v1/user-management/companies/my:1  Failed to load resource: the server responded with a status of 401 (Unauthorized)
+:56304/api/v1/user-management/users/c26cb852-73c1-43ef-9218-08df069086cf:1  Failed to load resource: the server responded with a status of 401 (Unauthorized)

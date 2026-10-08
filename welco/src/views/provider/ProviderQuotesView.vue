@@ -172,6 +172,20 @@ const openDetails = (rfq: RfqDto) => {
   showDetailModal.value = true
 }
 
+const isValidGuid = (v?: string | null): boolean =>
+  !!v && /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(v)
+
+const buildQuoteLines = (rfq: RfqDto | EnhancedRfq) => {
+  const items = Array.isArray(rfq.items) && rfq.items.length ? rfq.items : []
+  return items
+    .filter((it) => isValidGuid(it.productId))
+    .map((it) => ({
+      productId: it.productId,
+      quantity: it.quantity || 1,
+      unitPrice: getItemRequestedUnitPrice(it as RfqItemDto) || it.unitPrice || 0,
+    }))
+}
+
 const handleAcceptNegotiation = async (rfq: EnhancedRfq) => {
   const targetPriceStr = rfq.negotiation.targetTotal || 'Proposed Price'
   const ok = await confirmService.confirm({
@@ -191,19 +205,58 @@ const handleAcceptNegotiation = async (rfq: EnhancedRfq) => {
     const validUntil = d.toISOString().split('T')[0]
 
     // Create quote reflecting client's negotiated total if items exist
-    const items = Array.isArray(rfq.items) && rfq.items.length ? rfq.items : []
-    const lines = items.map((it) => ({
-      productId: it.productId,
-      quantity: it.quantity || 1,
-      unitPrice: it.unitPrice || 0,
-    }))
+    const lines = buildQuoteLines(rfq)
 
     const targetNum = parseFloat((rfq.negotiation.targetTotal || '').replace(/[^0-9.]/g, '')) || (rfq.total || 0)
+    if (!lines.length) {
+      toastService.error(t('common.error'))
+      return
+    }
     const res = await salesService.createQuote({
       rfqId: rfq.id,
       amount: targetNum,
       validUntil: validUntil || '',
-      items: lines.length ? lines : [{ productId: 'custom', quantity: 1, unitPrice: targetNum }],
+      items: lines,
+    })
+
+    if (res.ok) {
+      toastService.success(t('provider.acceptSuccess'))
+      await loadData()
+    } else {
+      toastService.error(res.error)
+    }
+  } finally {
+    acting.value = ''
+  }
+}
+
+const handleAcceptInquiry = async (rfq: RfqDto | EnhancedRfq) => {
+  const ok = await confirmService.confirm({
+    title: t('provider.acceptNegotiation'),
+    message: t('provider.acceptSuccess'),
+    variant: 'primary',
+    confirmText: t('provider.acceptNegotiation'),
+    cancelText: t('common.cancel'),
+  })
+  if (!ok) return
+
+  acting.value = rfq.id
+  try {
+    const d = new Date()
+    d.setDate(d.getDate() + 14)
+    const validUntil = d.toISOString().split('T')[0]
+
+    const lines = buildQuoteLines(rfq)
+    if (!lines.length) {
+      toastService.error(t('common.error'))
+      return
+    }
+    const amount = lines.reduce((sum, l) => sum + l.unitPrice * l.quantity, 0) || (rfq.total || 0)
+    const res = await salesService.createQuote({
+      rfqId: rfq.id,
+      amount,
+      validUntil: validUntil || '',
+      items: lines,
     })
 
     if (res.ok) {
@@ -240,18 +293,40 @@ const submitCounterOffer = async () => {
     const validUntil = d.toISOString().split('T')[0]
 
     const rfq = counterRfq.value
-    const items = Array.isArray(rfq.items) && rfq.items.length ? rfq.items : []
-    const lines = items.map((it) => ({
-      productId: it.productId,
-      quantity: it.quantity || 1,
-      unitPrice: Math.round(((counterAmount.value || 0) / (items.length || 1)) / (it.quantity || 1)),
-    }))
+    const validItems = (Array.isArray(rfq.items) ? rfq.items : []).filter((it) =>
+      isValidGuid(it.productId),
+    )
+    if (!validItems.length) {
+      toastService.error(t('common.error'))
+      return
+    }
+    const lineTotals = validItems.map(
+      (it) => (getItemRequestedUnitPrice(it as RfqItemDto) || it.unitPrice || 0) * (it.quantity || 1),
+    )
+    const sumOriginal = lineTotals.reduce((s, v) => s + v, 0)
+    const lines = validItems.map((it, idx) => {
+      const qty = it.quantity || 1
+      let unitPrice: number
+      if (sumOriginal > 0) {
+        unitPrice = Math.round((((lineTotals[idx] ?? 0) / sumOriginal) * (counterAmount.value || 0)) / qty * 100) / 100
+      } else {
+        unitPrice = Math.round(((counterAmount.value || 0) / validItems.length / qty) * 100) / 100
+      }
+      return { productId: it.productId, quantity: qty, unitPrice }
+    })
+    // Fix rounding drift on last line so sum(lines) === counter amount
+    const sumLines = lines.reduce((s, l) => s + l.unitPrice * l.quantity, 0)
+    const drift = Math.round(((counterAmount.value || 0) - sumLines) * 100) / 100
+    const last = lines.length ? lines[lines.length - 1] : undefined
+    if (drift !== 0 && last) {
+      last.unitPrice = Math.round((last.unitPrice + drift / last.quantity) * 100) / 100
+    }
 
     const res = await salesService.createQuote({
       rfqId: rfq.id,
       amount: counterAmount.value,
       validUntil: validUntil || '',
-      items: lines.length ? lines : [{ productId: 'custom', quantity: 1, unitPrice: counterAmount.value }],
+      items: lines,
     })
 
     if (res.ok) {
@@ -278,7 +353,7 @@ const handleDecline = async (rfq: RfqDto) => {
 
   acting.value = rfq.id
   try {
-    const res = await salesService.updateRfqStatus(rfq.id, 'Declined')
+    const res = await salesService.updateRfqStatus(rfq.id, 'Cancelled')
     if (res.ok) {
       toastService.success(t('provider.declineSuccess'))
       await loadData()
@@ -576,6 +651,17 @@ const handleDecline = async (rfq: RfqDto) => {
                         <template v-else-if="rfq.status === 'Pending'">
                           <button
                             type="button"
+                            class="action-btn btn-accept"
+                            :title="t('provider.acceptNegotiation')"
+                            :disabled="acting === rfq.id"
+                            @click="handleAcceptInquiry(rfq)"
+                          >
+                            <span class="material-symbols-outlined text-[16px]">check_circle</span>
+                            <span>{{ t('provider.acceptNegotiation') }}</span>
+                          </button>
+
+                          <button
+                            type="button"
                             class="action-btn btn-counter"
                             :title="t('sales.createQuote')"
                             @click="openCounterModal(rfq)"
@@ -751,6 +837,17 @@ const handleDecline = async (rfq: RfqDto) => {
                 class="btn-accept-negotiation"
                 :loading="acting === selectedRfq.id"
                 @click="showDetailModal = false; handleAcceptNegotiation(selectedRfq as any)"
+              >
+                <span class="material-symbols-outlined text-[16px]">check_circle</span>
+                <span>{{ t('provider.acceptNegotiation') }}</span>
+              </BaseButton>
+
+              <BaseButton
+                v-if="!parseNegotiationNote(selectedRfq.note).isNegotiation"
+                variant="primary"
+                class="btn-accept-negotiation"
+                :loading="acting === selectedRfq.id"
+                @click="showDetailModal = false; handleAcceptInquiry(selectedRfq as any)"
               >
                 <span class="material-symbols-outlined text-[16px]">check_circle</span>
                 <span>{{ t('provider.acceptNegotiation') }}</span>

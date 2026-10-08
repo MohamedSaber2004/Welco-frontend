@@ -1,3 +1,3 @@
 1) in provider dashboard: ensure to accept inquires of products from customers in inquiry page in provider dashboard
-2) in browse by clinic speclity ensure to show all categories in filter take get first page only. 
+2) in browse by clinic speclity ensure to show all categories in filter take get first page only.
 3) when delete provider with user account related, then make a hard delete to related except only user related and provider or company make them soft delete

@@ -1,4 +1,4 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import { computed } from 'vue'
 import { t } from '../../i18n'
 
@@ -113,24 +113,24 @@ const sizeClass = computed(() => `field-control--${props.size}`)
 .field {
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
+  gap: 0.4rem;
   text-align: start;
   width: 100%;
 }
 
 .field__label {
   font-family: var(--font-sans);
-  font-size: var(--text-md);
-  font-weight: var(--weight-medium);
-  color: var(--fg-heading);
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: var(--weight-medium, 500);
+  color: var(--fg-heading, #102a43);
   display: flex;
   align-items: center;
   gap: 0.25rem;
 }
 
 .field__req {
-  color: var(--color-danger-500);
-  font-weight: var(--weight-medium);
+  color: var(--color-danger-500, #ef4444);
+  font-weight: var(--weight-medium, 500);
 }
 
 .field-control {
@@ -138,42 +138,43 @@ const sizeClass = computed(() => `field-control--${props.size}`)
   display: flex;
   align-items: center;
   width: 100%;
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm, 4px);
+  background: var(--bg-surface, #ffffff);
+  border: 1px solid var(--border, #d9e2ec);
+  border-radius: var(--radius-md, 6px);
   box-shadow: none;
-  transition: border-color var(--duration-fast) var(--ease-out),
-              box-shadow var(--duration-fast) var(--ease-out);
+  transition: border-color var(--duration-fast, 150ms) var(--ease-out, ease-out),
+              box-shadow var(--duration-fast, 150ms) var(--ease-out, ease-out),
+              background var(--duration-fast, 150ms) var(--ease-out, ease-out);
   overflow: hidden;
 }
 
 .field-control:hover:not(.is-disabled) {
-  border-color: var(--border-strong);
+  border-color: var(--border-strong, #c2c7cd);
 }
 
 .field-control:focus-within {
-  border-color: var(--border-focus);
+  border-color: var(--color-focus, #0ea5e9);
   outline: none;
-  box-shadow: var(--ring-focus) !important;
-  background: var(--bg-surface);
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.12) !important;
+  background: var(--bg-surface, #ffffff);
 }
 
 .field-control--sm {
   min-height: 36px;
   height: 36px;
-  border-radius: var(--radius-xs, 3px);
+  border-radius: var(--radius-sm, 4px);
 }
 
 .field-control--md {
-  min-height: 40px;
-  height: 40px;
-  border-radius: var(--radius-sm, 4px);
+  min-height: 42px;
+  height: 42px;
+  border-radius: var(--radius-md, 6px);
 }
 
 .field-control--lg {
-  min-height: 44px;
-  height: 44px;
-  border-radius: var(--radius-sm, 4px);
+  min-height: 48px;
+  height: 48px;
+  border-radius: var(--radius-lg, 8px);
 }
 
 .field__input {
@@ -182,24 +183,24 @@ const sizeClass = computed(() => `field-control--${props.size}`)
   height: 100%;
   border: none;
   background: transparent;
-  padding: var(--space-2) var(--space-4);
-  color: var(--fg-body);
+  padding: 0 var(--space-4, 1rem);
+  color: var(--fg-body, #42474d);
   font-family: var(--font-body);
-  font-size: var(--text-md);
-  font-weight: var(--weight-regular);
+  font-size: var(--text-md, 0.875rem);
+  font-weight: var(--weight-regular, 400);
   outline: none;
   box-shadow: none !important;
   text-align: start;
 }
 
 .field-control--sm .field__input {
-  font-size: var(--text-sm);
-  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm, 0.75rem);
+  padding: 0 var(--space-3, 0.75rem);
 }
 
 .field-control--lg .field__input {
-  font-size: var(--text-base);
-  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-base, 1rem);
+  padding: 0 var(--space-4, 1rem);
 }
 
 .field-control.has-prefix .field__input {
@@ -211,8 +212,8 @@ const sizeClass = computed(() => `field-control--${props.size}`)
 }
 
 .field__input::placeholder {
-  color: var(--fg-placeholder);
-  font-weight: var(--weight-regular);
+  color: var(--fg-placeholder, #7a90a8);
+  font-weight: var(--weight-regular, 400);
   text-align: start;
 }
 
@@ -220,53 +221,53 @@ const sizeClass = computed(() => `field-control--${props.size}`)
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--fg-placeholder);
+  color: var(--fg-placeholder, #7a90a8);
   flex-shrink: 0;
-  transition: color var(--duration-fast) ease;
+  transition: color var(--duration-fast, 150ms) ease;
 }
 
 .field-control:focus-within .field-icon {
-  color: var(--fg-placeholder);
+  color: var(--brand, #0f3d56);
 }
 
 .field-icon--prefix {
-  padding-inline-start: 0.9rem;
+  padding-inline-start: 0.85rem;
 }
 
 .field-icon--suffix {
-  padding-inline-end: 0.9rem;
+  padding-inline-end: 0.85rem;
 }
 
 .field-clear-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   border: none;
   background: transparent;
-  color: var(--wl-muted);
+  color: var(--fg-muted, #7a90a8);
   cursor: pointer;
   margin-inline-end: 0.5rem;
   transition: all 0.15s ease;
 }
 
 .field-clear-btn:hover {
-  background: var(--bg-subtle);
-  color: var(--fg-heading);
+  background: var(--bg-subtle, #edf4ff);
+  color: var(--fg-heading, #102a43);
 }
 
 .has-error .field-control {
-  border-color: var(--color-danger-500) !important;
-  box-shadow: 0 0 0 3px rgba(240, 67, 95, 0.25) !important;
-  background: var(--bg-surface);
+  border-color: var(--color-danger, #ef4444) !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12) !important;
+  background: var(--bg-surface, #ffffff);
 }
 
 .field-control.is-disabled {
   opacity: 0.55;
-  background: var(--bg-subtle);
-  color: var(--fg-subtle);
+  background: var(--bg-subtle, #f8fafc);
+  color: var(--fg-subtle, #72787d);
   cursor: not-allowed;
 }
 
@@ -279,28 +280,28 @@ const sizeClass = computed(() => `field-control--${props.size}`)
   inset-inline-end: 0.75rem;
   width: 16px;
   height: 16px;
-  border: 2px solid var(--border);
-  border-top-color: var(--brand);
-  border-radius: var(--radius-pill);
+  border: 2px solid var(--border, #d9e2ec);
+  border-top-color: var(--brand, #0f3d56);
+  border-radius: var(--radius-pill, 9999px);
   animation: spin 0.7s linear infinite;
   pointer-events: none;
 }
 
 .field__error {
-  font-size: var(--text-xs);
-  font-weight: var(--weight-regular);
-  color: var(--fg-danger);
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: var(--weight-medium, 500);
+  color: var(--fg-danger, #ef4444);
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-top: 2px;
+  margin-top: 3px;
 }
 
 .error-dot {
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: var(--fg-danger);
+  background: var(--fg-danger, #ef4444);
   flex-shrink: 0;
 }
 

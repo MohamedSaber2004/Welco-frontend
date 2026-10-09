@@ -1631,6 +1631,7 @@ export type Messages = {
     manufactured: string
   }
   footer: {
+    brandTitle: string
     brandDesc: string
     product: string
     account: string
@@ -1643,6 +1644,11 @@ export type Messages = {
     generalSurgery: string
     orthopedicLine: string
     productionOnline: string
+    workingHoursLabel: string
+    workingHours: string
+    badgeIso: string
+    badgeCe: string
+    badgeVerified: string
   }
   attachment: {
     upload: string

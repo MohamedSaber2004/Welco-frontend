@@ -62,7 +62,7 @@ onMounted(async () => {
       <span class="crumb-sep icon--directional">/</span>
       <router-link to="/account/rfqs">{{ t('sales.rfqTitle') }}</router-link>
       <span class="crumb-sep icon--directional">/</span>
-      <span class="crumb-active">{{ rfq?.rfqNumber ?? '…' }}</span>
+      <span class="crumb-active">{{ rfq?.rfqNumber ?? '—' }}</span>
     </nav>
 
     <SkeletonLoader v-if="loading" type="order-detail" />
@@ -87,8 +87,8 @@ onMounted(async () => {
           <h1 class="mono rfq-heading">{{ rfq.rfqNumber }}</h1>
           <p class="mono rfq-sub">
             <span>{{ t('sales.submittedAt') }} {{ new Date(rfq.createdAt).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</span>
-            <span v-if="rfq.companyName">•</span>
-            <span v-if="rfq.companyName">{{ rfq.companyName }}</span>
+            <span v-if="rfq.companyName">&bull;</span>
+            <span v-if="rfq.companyName">&bull;</span>
           </p>
         </div>
 

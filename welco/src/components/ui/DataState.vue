@@ -40,7 +40,7 @@ const props = withDefaults(
     skeletonType?: 'text' | 'card' | 'circle' | 'table-row' | 'custom'
       | 'product-card' | 'catalog-grid' | 'category-grid' | 'stats-grid'
       | 'table' | 'pdp' | 'list' | 'form' | 'location-grid' | 'hero' | 'pills'
-      | 'provider-grid' | 'provider-cards' | 'store-hero' | 'store-rows' | 'ticket' | 'track' | 'cert-grid'
+      | 'provider-grid' | 'provider-cards' | 'cat-provider-grid' | 'provider-mini-grid' | 'store-hero' | 'store-rows' | 'ticket' | 'track' | 'cert-grid'
       | 'address-grid' | 'order-detail' | 'order-confirm' | 'help-grid' | 'profile' | 'about'
     skeletonLines?: number
     skeletonCount?: number
@@ -195,6 +195,8 @@ const gridCount = computed(() => {
   if (t === 'pills') return props.skeletonCount ?? 6
   if (t === 'provider-grid') return props.skeletonCount ?? 4
   if (t === 'provider-cards') return props.skeletonCount ?? 4
+  if (t === 'cat-provider-grid') return props.skeletonCount ?? 5
+  if (t === 'provider-mini-grid') return props.skeletonCount ?? 3
   if (t === 'cert-grid') return props.skeletonCount ?? 4
   if (t === 'help-grid') return props.skeletonCount ?? 6
   if (t === 'address-grid') return props.skeletonCount ?? 4
@@ -249,26 +251,21 @@ const delay = (i: number) => ({ animationDelay: `${-((i % 16) * 90)}ms` })
             <div v-for="i in gridCount" :key="i" class="sk-card" :style="delay(i)">
               <div class="sk-card__media sk" :style="delay(i)">
                 <div class="sk-card__media-badges">
-                  <div class="sk" style="width:68px;height:18px;border-radius:var(--radius-pill)" :style="delay(i+1)"></div>
-                  <div class="sk" style="width:60px;height:18px;border-radius:var(--radius-pill)" :style="delay(i+1)"></div>
+                  <div class="sk" style="width:52px;height:20px;border-radius:var(--radius-pill)" :style="delay(i+1)"></div>
+                  <div class="sk" style="width:82px;height:20px;border-radius:var(--radius-pill);margin-inline-start:auto" :style="delay(i+1)"></div>
                 </div>
-                <div class="sk" style="width:28px;height:28px;border-radius:50%;position:absolute;top:10px;inset-inline-end:10px" :style="delay(i+2)"></div>
               </div>
               <div class="sk-card__body">
-                <div class="sk" style="width:42%;height:10px;border-radius:var(--radius-sm)" :style="delay(i+2)"></div>
-                <div class="sk" style="width:92%;height:15px;border-radius:var(--radius-sm);margin-top:2px" :style="delay(i+3)"></div>
-                <div class="sk" style="width:68%;height:12px;border-radius:var(--radius-sm)" :style="delay(i+4)"></div>
-                <div class="sk" style="width:78%;height:10px;border-radius:var(--radius-sm)" :style="delay(i+5)"></div>
-                <div class="sk-card__foot">
-                  <div style="display:flex;align-items:baseline;gap:6px">
-                    <div class="sk" style="width:72px;height:18px;border-radius:var(--radius-sm)" :style="delay(i+6)"></div>
-                    <div class="sk" style="width:36px;height:10px;border-radius:var(--radius-sm)" :style="delay(i+6)"></div>
-                  </div>
-                  <div class="sk" style="width:42px;height:16px;border-radius:var(--radius-pill)" :style="delay(i+7)"></div>
+                <div class="sk" style="width:36%;height:11px;border-radius:var(--radius-sm)" :style="delay(i+2)"></div>
+                <div class="sk" style="width:88%;height:18px;border-radius:var(--radius-sm);margin:3px 0 2px" :style="delay(i+3)"></div>
+                <div class="sk" style="width:55%;height:12px;border-radius:var(--radius-sm)" :style="delay(i+4)"></div>
+                <div class="sk-card__provider-chip" :style="delay(i+5)">
+                  <div class="sk" style="width:14px;height:14px;border-radius:3px"></div>
+                  <div class="sk" style="width:75px;height:11px;border-radius:var(--radius-sm)"></div>
                 </div>
-                <div class="sk-card__actions">
-                  <div class="sk" style="height:34px;flex:1;border-radius:var(--radius-md)" :style="delay(i+8)"></div>
-                  <div class="sk sk--btn-primary" style="height:34px;flex:1;border-radius:var(--radius-md)" :style="delay(i+9)"></div>
+                <div class="sk-card__foot">
+                  <div class="sk" style="width:84px;height:22px;border-radius:var(--radius-sm)" :style="delay(i+6)"></div>
+                  <div class="sk sk--btn-primary" style="width:118px;height:32px;border-radius:var(--radius-md)" :style="delay(i+7)"></div>
                 </div>
               </div>
             </div>
@@ -277,13 +274,20 @@ const delay = (i: number) => ({ animationDelay: `${-((i % 16) * 90)}ms` })
         <template v-else-if="skeletonType === 'category-grid'">
           <div class="sk-grid sk-grid--category" :style="{ gap: skeletonGap }">
             <div v-for="i in gridCount" :key="i" class="sk-cat" :style="delay(i)">
-              <!-- Image area — mirrors cat-media at 110px -->
-              <div class="sk-cat__media sk" :style="delay(i)"></div>
-              <!-- Body — mirrors cat-body: name + alt + count -->
+              <!-- Media banner: mirrors cat-card__media (140px, 16:10) -->
+              <div class="sk-cat__media sk" :style="delay(i)">
+                <div class="sk" style="position:absolute;top:10px;inset-inline-end:10px;width:58px;height:18px;border-radius:var(--radius-pill)" :style="delay(i+1)"></div>
+              </div>
+              <!-- Body: mirrors cat-card__body -->
               <div class="sk-cat__body">
-                <div class="sk" style="width:70%;height:15px;border-radius:var(--radius-sm)" :style="delay(i+1)"></div>
-                <div class="sk" style="width:45%;height:12px;border-radius:var(--radius-sm);margin-top:5px" :style="delay(i+2)"></div>
-                <div class="sk" style="width:52px;height:11px;border-radius:var(--radius-pill);margin-top:8px" :style="delay(i+3)"></div>
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+                  <div class="sk" style="width:65%;height:16px;border-radius:var(--radius-sm)" :style="delay(i+1)"></div>
+                  <div class="sk" style="width:40px;height:12px;border-radius:var(--radius-sm)" :style="delay(i+2)"></div>
+                </div>
+                <div class="sk" style="width:45%;height:12px;border-radius:var(--radius-sm);margin-top:5px" :style="delay(i+3)"></div>
+                <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--sk-border, #E2E6EA)">
+                  <div class="sk" style="width:100%;height:32px;border-radius:var(--radius-md)" :style="delay(i+4)"></div>
+                </div>
               </div>
             </div>
           </div>
@@ -292,15 +296,36 @@ const delay = (i: number) => ({ animationDelay: `${-((i % 16) * 90)}ms` })
           <div class="sk-grid sk-grid--provider" :style="{ gap: skeletonGap }">
             <div v-for="i in gridCount" :key="i" class="sk-provider" :style="delay(i)">
               <div class="sk-provider__logo sk" :style="delay(i)">
-                <div class="sk" style="position:absolute;top:10px;inset-inline-end:10px;width:96px;height:20px;border-radius:var(--radius-pill)" :style="delay(i+1)"></div>
+                <div class="sk" style="position:absolute;top:10px;inset-inline-end:10px;width:86px;height:22px;border-radius:var(--radius-pill)" :style="delay(i+1)"></div>
               </div>
               <div class="sk-provider__body">
-                <div class="sk" style="width:84px;height:14px;border-radius:var(--radius-pill)" :style="delay(i+2)"></div>
-                <div class="sk" style="width:86%;height:18px;border-radius:var(--radius-sm);margin-top:8px" :style="delay(i+3)"></div>
-                <div class="sk" style="width:52%;height:12px;border-radius:var(--radius-sm);margin-top:6px" :style="delay(i+4)"></div>
-                <div style="margin-top:14px;padding-top:10px;border-top:1px solid var(--border)">
-                  <div class="sk" style="width:100%;height:36px;border-radius:var(--radius-md)" :style="delay(i+5)"></div>
+                <div class="sk" style="width:72px;height:16px;border-radius:var(--radius-pill)" :style="delay(i+2)"></div>
+                <div class="sk" style="width:84%;height:20px;border-radius:var(--radius-sm);margin-top:8px" :style="delay(i+3)"></div>
+                <div class="sk" style="width:50%;height:13px;border-radius:var(--radius-sm);margin-top:6px" :style="delay(i+4)"></div>
+                <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--sk-border, #E2E6EA)">
+                  <div class="sk" style="width:100%;height:38px;border-radius:var(--radius-md)" :style="delay(i+5)"></div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </template>
+        <template v-else-if="skeletonType === 'cat-provider-grid'">
+          <div class="sk-grid sk-grid--cat-provider" :style="{ gap: skeletonGap }">
+            <div v-for="i in gridCount" :key="i" class="sk-cat-provider" :style="delay(i)">
+              <div class="sk sk-cat-provider__img" :style="delay(i)"></div>
+              <div class="sk" style="width:75%;height:15px;border-radius:var(--radius-sm);margin-top:6px" :style="delay(i+1)"></div>
+              <div class="sk" style="width:50%;height:12px;border-radius:var(--radius-sm);margin-top:4px" :style="delay(i+2)"></div>
+              <div class="sk" style="width:86px;height:14px;border-radius:var(--radius-pill);margin-top:auto" :style="delay(i+3)"></div>
+            </div>
+          </div>
+        </template>
+        <template v-else-if="skeletonType === 'provider-mini-grid'">
+          <div class="sk-provider-mini-grid" :style="{ gap: skeletonGap }">
+            <div v-for="i in gridCount" :key="i" class="sk-provider-mini" :style="delay(i)">
+              <div class="sk" style="width:54px;height:54px;border-radius:8px;flex-shrink:0" :style="delay(i)"></div>
+              <div style="flex:1;display:flex;flex-direction:column;gap:5px;min-width:0">
+                <div class="sk" style="width:85%;height:13px;border-radius:var(--radius-sm)" :style="delay(i+1)"></div>
+                <div class="sk" style="width:50%;height:11px;border-radius:var(--radius-sm)" :style="delay(i+2)"></div>
               </div>
             </div>
           </div>
@@ -321,15 +346,16 @@ const delay = (i: number) => ({ animationDelay: `${-((i % 16) * 90)}ms` })
         <template v-else-if="skeletonType === 'cert-grid'">
           <div class="sk-grid sk-grid--cert" :style="{ gap: skeletonGap }">
             <div v-for="i in gridCount" :key="i" class="sk-cert" :style="delay(i)">
-              <div style="display:flex;justify-content:space-between;align-items:center">
-                <div class="sk" style="width:48px;height:48px;border-radius:12px" :style="delay(i)"></div>
-                <div class="sk" style="width:74px;height:22px;border-radius:var(--radius-pill)" :style="delay(i+1)"></div>
+              <div class="sk-cert__media sk" :style="delay(i)">
+                <div class="sk" style="position:absolute;top:10px;inset-inline-end:10px;width:72px;height:20px;border-radius:var(--radius-pill)" :style="delay(i+1)"></div>
               </div>
-              <div class="sk" style="width:82%;height:18px;border-radius:var(--radius-sm);margin-top:12px" :style="delay(i+2)"></div>
-              <div class="sk" style="width:58%;height:12px;border-radius:var(--radius-sm);margin-top:6px" :style="delay(i+3)"></div>
-              <div class="sk" style="width:68%;height:11px;border-radius:var(--radius-sm);margin-top:10px" :style="delay(i+4)"></div>
-              <div style="margin-top:auto;padding-top:12px;border-top:1px solid var(--border)">
-                <div class="sk" style="width:100%;height:34px;border-radius:var(--radius-md)" :style="delay(i+5)"></div>
+              <div class="sk-cert__body">
+                <div class="sk" style="width:84%;height:18px;border-radius:var(--radius-sm)" :style="delay(i+2)"></div>
+                <div class="sk" style="width:96px;height:18px;border-radius:var(--radius-pill);margin-top:6px" :style="delay(i+3)"></div>
+                <div style="display:flex;flex-direction:column;gap:5px;width:100%;margin-top:8px">
+                  <div class="sk" style="width:70%;height:11px;border-radius:var(--radius-sm)" :style="delay(i+4)"></div>
+                  <div class="sk" style="width:60%;height:11px;border-radius:var(--radius-sm)" :style="delay(i+5)"></div>
+                </div>
               </div>
             </div>
           </div>
@@ -377,47 +403,52 @@ const delay = (i: number) => ({ animationDelay: `${-((i % 16) * 90)}ms` })
           <div class="sk-pdp">
             <div class="sk-pdp__visual-stage">
               <div class="sk-pdp__top-badges">
-                <div class="sk" style="width:72px;height:22px;border-radius:var(--radius-pill)" :style="delay(1)"></div>
+                <div class="sk" style="width:78px;height:22px;border-radius:var(--radius-pill)" :style="delay(1)"></div>
                 <div style="display:flex;gap:6px">
-                  <div class="sk" style="width:52px;height:22px;border-radius:var(--radius-pill)" :style="delay(2)"></div>
+                  <div class="sk" style="width:54px;height:22px;border-radius:var(--radius-pill)" :style="delay(2)"></div>
                   <div class="sk" style="width:78px;height:22px;border-radius:var(--radius-pill)" :style="delay(3)"></div>
                 </div>
-                <div class="sk" style="width:34px;height:34px;border-radius:50%;margin-inline-start:auto" :style="delay(4)"></div>
+                <div class="sk" style="width:36px;height:36px;border-radius:50%;margin-inline-start:auto" :style="delay(4)"></div>
               </div>
               <div class="sk-pdp__viewport sk" :style="delay(2)">
-                <div class="sk" style="width:140px;height:140px;border-radius:var(--radius-md);opacity:.7" :style="delay(3)"></div>
+                <div class="sk" style="width:160px;height:160px;border-radius:var(--radius-md);opacity:.6" :style="delay(3)"></div>
               </div>
               <div class="sk-pdp__foot">
-                <div class="sk" style="width:40%;height:11px;border-radius:var(--radius-sm)" :style="delay(4)"></div>
-                <div class="sk" style="width:30%;height:11px;border-radius:var(--radius-sm)" :style="delay(5)"></div>
+                <div class="sk" style="width:40%;height:12px;border-radius:var(--radius-sm)" :style="delay(4)"></div>
+                <div class="sk" style="width:30%;height:12px;border-radius:var(--radius-sm)" :style="delay(5)"></div>
               </div>
             </div>
             <div class="sk-pdp__order-col">
-              <div class="sk" style="width:120px;height:11px;border-radius:var(--radius-sm)" :style="delay(1)"></div>
-              <div class="sk" style="width:90%;height:28px;border-radius:var(--radius-md);margin-top:6px" :style="delay(2)"></div>
+              <div class="sk" style="width:120px;height:12px;border-radius:var(--radius-sm)" :style="delay(1)"></div>
+              <div class="sk" style="width:90%;height:32px;border-radius:var(--radius-md);margin-top:6px" :style="delay(2)"></div>
               <div class="sk" style="width:65%;height:14px;border-radius:var(--radius-sm);margin-top:4px" :style="delay(3)"></div>
+              
+              <!-- Provider chip mirror -->
+              <div style="display:inline-flex;align-items:center;gap:6px;padding:6px 10px;background:#F0F7FF;border:1px solid #BAE3FF;border-radius:6px;width:60%;height:32px;margin-top:6px">
+                <div class="sk" style="width:16px;height:16px;border-radius:4px" :style="delay(4)"></div>
+                <div class="sk" style="width:110px;height:12px;border-radius:var(--radius-sm)" :style="delay(4)"></div>
+              </div>
+
+              <!-- Quick specs strip mirror -->
+              <div class="sk-pdp__specs-strip">
+                <div v-for="s in 4" :key="s" class="sk-pdp__spec-chip" :style="delay(s+3)">
+                  <div class="sk" style="width:45%;height:10px;border-radius:var(--radius-sm)"></div>
+                  <div class="sk" style="width:75%;height:14px;border-radius:var(--radius-sm)"></div>
+                </div>
+              </div>
+
+              <!-- Price card mirror -->
               <div class="sk-pdp__price-card card">
                 <div style="display:flex;justify-content:space-between;align-items:center">
                   <div style="display:flex;flex-direction:column;gap:6px">
-                    <div class="sk" style="width:110px;height:26px;border-radius:var(--radius-sm)" :style="delay(4)"></div>
-                    <div class="sk" style="width:130px;height:10px;border-radius:var(--radius-sm)" :style="delay(5)"></div>
+                    <div class="sk" style="width:120px;height:28px;border-radius:var(--radius-sm)" :style="delay(5)"></div>
+                    <div class="sk" style="width:140px;height:11px;border-radius:var(--radius-sm)" :style="delay(6)"></div>
                   </div>
-                  <div class="sk" style="width:84px;height:22px;border-radius:var(--radius-pill)" :style="delay(5)"></div>
+                  <div class="sk" style="width:88px;height:24px;border-radius:var(--radius-pill)" :style="delay(6)"></div>
                 </div>
                 <div style="display:flex;gap:12px;margin-top:16px">
-                  <div class="sk" style="width:110px;height:42px;border-radius:var(--radius-md)" :style="delay(6)"></div>
-                  <div class="sk" style="height:42px;flex:1;border-radius:var(--radius-md)" :style="delay(7)"></div>
-                </div>
-                <div style="display:flex;gap:10px;margin-top:12px">
-                  <div class="sk" style="height:38px;flex:1;border-radius:var(--radius-pill)" :style="delay(8)"></div>
-                  <div class="sk" style="height:38px;width:130px;border-radius:var(--radius-pill)" :style="delay(9)"></div>
-                </div>
-              </div>
-              <div class="card" style="padding:var(--space-4);margin-top:14px;display:flex;flex-direction:column;gap:10px">
-                <div class="sk" style="width:40%;height:14px;border-radius:var(--radius-sm)" :style="delay(4)"></div>
-                <div v-for="r in 3" :key="r" style="display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid var(--border)">
-                  <div class="sk" style="width:30%;height:12px;border-radius:var(--radius-sm)" :style="delay(r+4)"></div>
-                  <div class="sk" style="width:45%;height:12px;border-radius:var(--radius-sm)" :style="delay(r+5)"></div>
+                  <div class="sk" style="width:110px;height:42px;border-radius:var(--radius-md)" :style="delay(7)"></div>
+                  <div class="sk sk--btn-primary" style="height:42px;flex:1;border-radius:var(--radius-md)" :style="delay(8)"></div>
                 </div>
               </div>
             </div>

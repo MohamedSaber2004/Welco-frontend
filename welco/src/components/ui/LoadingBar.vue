@@ -74,8 +74,8 @@ watch(routeLoading, async (loading) => {
   width: 58px;
   height: 58px;
   border: 5px solid rgba(255,255,255,.28);
-  border-top-color: #d6f36a;
-  border-right-color: #2dd4bf;
+  border-top-color: #28A7A1;
+  border-right-color: #147D92;
   border-bottom-color: rgba(45,212,191,.4);
   border-radius: 50%;
   box-shadow: 0 0 0 8px rgba(214,243,106,.1), 0 10px 28px rgba(2,25,39,.25);

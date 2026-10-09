@@ -739,10 +739,14 @@ hr {
 }
 .table th {
   padding: var(--space-3) var(--space-4);
+  background: var(--color-canvas, #F7F9FB);
   text-align: start;
-  font-weight: var(--weight-medium);
-  color: var(--fg-muted);
-  border-bottom: 1px solid var(--border);
+  font-size: var(--text-xs, 12px);
+  font-weight: 600;
+  color: var(--color-muted, #7A90A8);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--color-border, #D9E2EC);
   white-space: nowrap;
 }
 .table td {
@@ -753,7 +757,7 @@ hr {
 }
 .table tbody tr:last-child td { border-bottom: 0; }
 .table tbody tr { transition: background var(--duration-fast) var(--ease-out); }
-.table tbody tr:hover { background: var(--bg-app); }
+.table tbody tr:hover { background: var(--color-surface-subtle, #F8FAFC); }
 .table .num { text-align: end; font-variant-numeric: tabular-nums; }
 .table__index { width: 40px; color: var(--fg-subtle); }
 .table__name { font-weight: var(--weight-medium); color: var(--fg-heading); }

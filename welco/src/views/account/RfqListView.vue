@@ -122,8 +122,7 @@ onMounted(() => {
           v-model="searchQuery"
           type="text"
           class="search-input mono"
-          :placeholder="t('common.searchPlaceholder') + ' — ' + t('account.rfqNumberCol')"
-          @input="onSearch"
+          :placeholder="t('common.searchPlaceholder') + ' – ' + t('account.rfqNumberCol')" @input="onSearch"
         />
         <button v-if="searchQuery" type="button" class="clear-btn" @click="searchQuery = ''; onSearch()">
           <span class="material-symbols-outlined text-[14px]">close</span>
@@ -188,7 +187,7 @@ onMounted(() => {
                       class="product-name-pill"
                     >
                       {{ locale === 'ar' ? (item?.productNameAr || item?.productNameEn || '—') : (item?.productNameEn || item?.productNameAr || '—') }}
-                      <span v-if="item && item.quantity > 1" class="qty-tag">×{{ item.quantity }}</span>
+                      <span v-if="item && item.quantity > 1" class="qty-tag">&times;{{ item.quantity }}</span>
                     </span>
                     <span v-if="(r.items ?? []).length > 2" class="more-badge mono">+{{ (r.items ?? []).length - 2 }} {{ t('common.more') }}</span>
                   </div>
@@ -201,7 +200,7 @@ onMounted(() => {
                       class="text-[11px] text-slate-500 font-normal"
                       :title="`${t('sales.baseCurrency')}: ${r.baseCurrency} → ${t('sales.requestedCurrency')}: ${r.requestedCurrency}`"
                     >
-                      {{ r.baseCurrency }} → {{ r.requestedCurrency }}
+                      {{ r.baseCurrency }} &rarr; {{ r.requestedCurrency }}
                     </div>
                   </div>
                 </td>
@@ -314,23 +313,24 @@ onMounted(() => {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  height: 44px;
-  padding: 0 1.25rem;
-  background: var(--wl-primary);
-  color: var(--wl-on-primary);
-  border: none;
-  border-radius: var(--wl-radius-sm);
+  padding: 0.65rem 1.15rem;
+  background: var(--brand, #0F3D56);
+  color: #ffffff;
+  border: 1px solid var(--brand, #0F3D56);
+  border-radius: var(--radius-md, 6px);
   font-size: 13.5px;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 4px 12px -2px var(--wl-primary-ring);
-  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.15s ease-out;
 }
-
 .btn-create-rfq:hover {
-  background: var(--wl-primary-hover);
+  background: var(--brand-hover, #147D92);
+  border-color: var(--brand-hover, #147D92);
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px -2px var(--wl-primary-ring);
+}
+.btn-create-rfq:active {
+  transform: scale(0.98);
 }
 
 /* Table Card */

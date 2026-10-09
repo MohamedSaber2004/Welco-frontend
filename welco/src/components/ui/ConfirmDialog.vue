@@ -55,7 +55,9 @@ const variantClass = computed(() => `confirm__icon--${opts.value?.variant ?? 'da
           <!-- header accent -->
           <div class="confirm-accent" aria-hidden="true"></div>
 
-          <button class="confirm-close" :aria-label="t('common.close')" @click="confirmService.dismiss()">✕</button>
+          <button class="confirm-close" :aria-label="t('common.close')" @click="confirmService.dismiss()">
+            <span class="material-symbols-outlined text-[18px]">close</span>
+          </button>
 
           <div class="confirm-body">
             <div class="confirm-icon-wrap" :class="variantClass" aria-hidden="true">
@@ -120,7 +122,7 @@ const variantClass = computed(() => `confirm__icon--${opts.value?.variant ?? 'da
   max-width: 460px;
   background: var(--bg-surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg, 8px);
+  border-radius: var(--radius-xl, 12px);
   box-shadow: var(--shadow-lg);
   position: relative;
   overflow: hidden;

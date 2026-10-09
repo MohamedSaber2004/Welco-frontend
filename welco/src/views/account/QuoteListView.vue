@@ -110,8 +110,7 @@ onMounted(() => {
           v-model="searchQuery"
           type="text"
           class="search-input mono"
-          :placeholder="t('common.searchPlaceholder') + ' — ' + t('sales.quoteTitle')"
-          @input="onSearch"
+          :placeholder="t('common.searchPlaceholder') + ' – ' + t('sales.quoteTitle')" @input="onSearch"
         />
         <button v-if="searchQuery" type="button" class="clear-btn" @click="searchQuery = ''; onSearch()">
           <span class="material-symbols-outlined text-[14px]">close</span>
@@ -178,7 +177,7 @@ onMounted(() => {
                 <td class="text-end">
                   <span class="row-link mono">
                     <span>{{ t('marketplace.viewDetails') }}</span>
-                    <span class="icon--directional text-[14px]">→</span>
+                    <span class="icon--directional text-[14px]">&rarr;</span>
                   </span>
                 </td>
               </tr>

@@ -49,39 +49,43 @@ function step(delta: number) {
   display: inline-flex;
   align-items: center;
   height: 38px;
-  background: var(--wl-surface);
-  border: 1.5px solid var(--wl-border);
-  border-radius: 10px;
+  background: var(--bg-surface, #ffffff);
+  border: 1px solid var(--border, #d9e2ec);
+  border-radius: var(--radius-md, 6px);
   overflow: hidden;
-  box-shadow: 0 1px 2px rgba(0, 10, 25, 0.05);
-  transition: border-color 0.18s var(--wl-ease-spring), box-shadow 0.18s var(--wl-ease-spring);
+  box-shadow: var(--shadow-xs);
+  transition: border-color var(--duration-fast, 150ms) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
 }
 
-.qty:focus-within,
-.qty:hover {
-  border-color: var(--wl-primary);
+.qty:focus-within {
+  border-color: var(--color-focus, #0ea5e9);
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.12);
+}
+
+.qty:hover:not(:focus-within) {
+  border-color: var(--border-strong, #c2c7cd);
 }
 
 .qty__btn {
   width: 36px;
   height: 100%;
   border: none;
-  background: var(--wl-surface-soft);
-  color: var(--wl-ink-strong);
+  background: var(--bg-subtle, #edf4ff);
+  color: var(--fg-heading, #102a43);
   display: grid;
   place-items: center;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all var(--duration-fast, 150ms) var(--ease-out);
   user-select: none;
 }
 
 .qty__btn:hover:not(:disabled) {
-  background: var(--wl-primary-soft);
-  color: var(--wl-primary);
+  background: var(--color-primary-light, #e3efff);
+  color: var(--color-primary, #0f3d56);
 }
 
 .qty__btn:active:not(:disabled) {
-  transform: scale(0.92);
+  transform: scale(0.95);
 }
 
 .qty__btn:disabled {

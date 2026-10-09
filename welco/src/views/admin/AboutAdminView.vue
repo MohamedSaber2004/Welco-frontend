@@ -388,8 +388,8 @@ const previewParagraphs = computed(() => {
   align-items: center;
   gap: 0.5rem;
   padding: 0.25rem 0.65rem;
-  background: var(--platform-lime, #d6f36a);
-  color: var(--primary-900, #0a2540);
+  background: var(--color-surgical-cyan, #28A7A1);
+    color: #FFFFFF;
   border-radius: 9999px;
   font-size: 11px;
   font-weight: 700;

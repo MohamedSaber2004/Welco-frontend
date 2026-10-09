@@ -114,7 +114,7 @@ const goTo = (p: number | string) => {
     <div v-if="hasInfo" class="pagination__info mono">
       <template v-if="itemRange">
         <span>{{ t('common.showing') }}</span>
-        <strong class="mono-num">{{ itemRange.start }}–{{ itemRange.end }}</strong>
+        <strong class="mono-num">{{ itemRange.start }} – {{ itemRange.end }}</strong>
         <span>{{ t('common.of') }}</span>
         <strong class="mono-num">{{ itemRange.total }}</strong>
       </template>
@@ -138,7 +138,7 @@ const goTo = (p: number | string) => {
 
       <div v-if="showPageNumbers" class="pagination__pages">
         <template v-for="(item, idx) in paginationRange" :key="idx">
-          <span v-if="item === '...'" class="page-ellipsis mono" aria-hidden="true">…</span>
+          <span v-if="item === '...'" class="page-ellipsis mono" aria-hidden="true">&hellip;</span>
           <button
             v-else
             type="button"

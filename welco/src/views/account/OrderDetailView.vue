@@ -44,7 +44,7 @@ function statusIndex(o: OrderDto): number {
       <span class="crumb-sep icon--directional">/</span>
       <router-link to="/account/orders">{{ t('commerce.ordersTitle') }}</router-link>
       <span class="crumb-sep icon--directional">/</span>
-      <span class="crumb-active">{{ order?.orderNumber ?? '…' }}</span>
+      <span class="crumb-active">{{ order?.orderNumber ?? '—' }}</span>
     </nav>
 
     <SkeletonLoader v-if="loading" type="order-detail" />
@@ -68,8 +68,8 @@ function statusIndex(o: OrderDto): number {
           <h1 class="mono order-heading">{{ order.orderNumber }}</h1>
           <p class="mono order-sub">
             <span>{{ t('commerce.placed') }}: {{ new Date(order.createdAt).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</span>
-            <span>•</span>
-            <span>{{ t('account.lotVerified') }}</span>
+            <span>&bull;</span>
+          <span>{{ t('account.lotVerified') }}</span>
           </p>
         </div>
 

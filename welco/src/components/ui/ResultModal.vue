@@ -10,9 +10,9 @@ const close = () => modalService.close()
       <div v-if="modalService.visible.value" class="modal-overlay" @click.self="close">
         <div class="modal" role="dialog" aria-modal="true">
           <div :class="['modal__icon', `modal__icon--${modalService.data.value?.type}`]">
-            <span v-if="modalService.data.value?.type === 'success'">✓</span>
-            <span v-else-if="modalService.data.value?.type === 'error'">×</span>
-            <span v-else>!</span>
+            <span v-if="modalService.data.value?.type === 'success'" class="material-symbols-outlined text-[24px]">check_circle</span>
+            <span v-else-if="modalService.data.value?.type === 'error'" class="material-symbols-outlined text-[24px]">error</span>
+            <span v-else class="material-symbols-outlined text-[24px]">info</span>
           </div>
           <p class="modal__msg">{{ modalService.data.value?.message }}</p>
           <button class="modal__close" @click="close">OK</button>
@@ -38,7 +38,7 @@ const close = () => modalService.close()
 .modal {
   background: var(--bg-surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl, 12px);
   padding: 1.75rem;
   max-width: 420px;
   width: 100%;
@@ -83,15 +83,23 @@ const close = () => modalService.close()
 }
 
 .modal__close {
-  background: var(--brand);
-  color: var(--fg-on-brand);
+  background: var(--brand, #0F3D56);
+  color: var(--fg-on-brand, #FFFFFF);
   border: none;
-  border-radius: var(--radius-sm, 4px);
-  padding: 0.62rem 1.5rem;
-  font-weight: var(--weight-medium);
+  border-radius: var(--radius-md, 6px);
+  padding: 0.65rem 1.8rem;
+  font-weight: 600;
   font-family: var(--font-body);
   cursor: pointer;
-  box-shadow: var(--shadow-brand);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.15s ease-out;
+}
+.modal__close:hover {
+  background: var(--brand-hover, #147D92);
+  transform: translateY(-1px);
+}
+.modal__close:active {
+  transform: scale(0.98);
 }
 
 .modal-enter-active,

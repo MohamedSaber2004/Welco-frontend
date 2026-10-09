@@ -41,7 +41,7 @@ describe('BaseButton', () => {
   })
 
   describe('Variants', () => {
-    const variants = ['primary', 'secondary', 'ghost', 'outline', 'danger', 'gold'] as const
+    const variants = ['primary', 'secondary', 'ghost', 'outline', 'danger', 'gold', 'success', 'link'] as const
     for (const variant of variants) {
       it(`renders ${variant} variant`, async () => {
         const btn = await mountButton({ variant })

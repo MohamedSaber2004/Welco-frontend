@@ -51,7 +51,7 @@ const pillars = computed(() => [
     icon: 'verified',
     title: t('about.qualityTitle'),
     desc: t('about.qualityDesc'),
-    badge: 'ISO 13485 · CE MDR',
+    badge: 'ISO 13485 • CE MDR',
   },
   {
     icon: 'public',

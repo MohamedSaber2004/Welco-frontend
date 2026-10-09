@@ -119,7 +119,7 @@ async function placeOrderFromQuote() {
       <span class="crumb-sep icon--directional">/</span>
       <router-link to="/account/quotes">{{ t('sales.quoteTitle') }}</router-link>
       <span class="crumb-sep icon--directional">/</span>
-      <span class="crumb-active">{{ quote?.quoteNumber ?? '…' }}</span>
+      <span class="crumb-active">{{ quote?.quoteNumber ?? '—' }}</span>
     </nav>
 
     <SkeletonLoader v-if="loading" type="order-detail" />
@@ -143,8 +143,8 @@ async function placeOrderFromQuote() {
           <h1 class="mono quote-heading">{{ quote.quoteNumber }}</h1>
           <p class="mono quote-sub">
             <span>{{ t('account.refRfq', { number: quote.rfqNumber ?? '' }) }}</span>
-            <span>•</span>
-            <span>{{ t('account.validThroughDate', { date: new Date(quote.validUntil).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') }) }}</span>
+            <span>&bull;</span>
+          <span>{{ t('account.validThroughDate', { date: new Date(quote.validUntil).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') }) }}</span>
           </p>
         </div>
 
@@ -169,8 +169,8 @@ async function placeOrderFromQuote() {
                 <h3 class="item-title">{{ localized(it.productNameEn, it.productNameAr || it.productNameEn) }}</h3>
                 <div class="item-math mono">
                   <span>{{ t('account.qtyUnits', { count: it.quantity }) }}</span>
-                  <span>•</span>
-                  <span>{{ formatPrice(it.unitPrice, locale) }} {{ quote.currency || 'USD' }} {{ t('account.perUnitShort') }}</span>
+                  <span>&bull;</span>
+                <span>{{ formatPrice(it.unitPrice, locale) }} {{ quote.currency || 'USD' }} {{ t('account.perUnitShort') }}</span>
                 </div>
               </div>
 
@@ -526,7 +526,7 @@ async function placeOrderFromQuote() {
   justify-content: center;
   gap: 0.45rem;
   height: 44px;
-  background: var(--color-success-500, #198754);
+  background: var(--color-success, #16A34A);
   color: #ffffff;
   border: none;
   border-radius: var(--radius-sm, 4px);
@@ -538,7 +538,11 @@ async function placeOrderFromQuote() {
 }
 
 .btn-approve:hover:not(:disabled) {
-  background: var(--color-success-600, #157347);
+  background: #15803D;
+  transform: translateY(-1px);
+}
+.btn-approve:active:not(:disabled) {
+  transform: scale(0.98);
 }
 
 .btn-decline {
@@ -548,7 +552,7 @@ async function placeOrderFromQuote() {
   gap: 0.45rem;
   height: 44px;
   background: var(--surface, #ffffff);
-  color: var(--fg-danger, #DC3545);
+  color: var(--color-danger, #EF4444);
   border: 1px solid var(--border-danger, #FFDAD6);
   border-radius: var(--radius-sm, 4px);
   font-size: 13px;
@@ -558,7 +562,12 @@ async function placeOrderFromQuote() {
 }
 
 .btn-decline:hover:not(:disabled) {
-  background: var(--color-danger-50, #FFF8F7);
+  background: #FEF2F2;
+  border-color: #EF4444;
+  transform: translateY(-1px);
+}
+.btn-decline:active:not(:disabled) {
+  transform: scale(0.98);
 }
 
 .approved-head {
@@ -567,7 +576,7 @@ async function placeOrderFromQuote() {
   gap: 0.45rem;
   font-size: 12px;
   font-weight: 700;
-  color: var(--fg-success, #198754);
+  color: var(--color-success, #16A34A);
   margin-bottom: 0.4rem;
 }
 
@@ -594,7 +603,7 @@ async function placeOrderFromQuote() {
   gap: 0.45rem;
   height: 44px;
   width: 100%;
-  background: var(--color-success-500, #198754);
+  background: var(--color-success, #16A34A);
   color: #ffffff;
   border: none;
   border-radius: var(--radius-sm, 4px);
@@ -607,7 +616,11 @@ async function placeOrderFromQuote() {
 }
 
 .btn-place-order:hover:not(:disabled) {
-  background: var(--color-success-600, #157347);
+  background: #15803D;
+  transform: translateY(-1px);
+}
+.btn-place-order:active:not(:disabled) {
+  transform: scale(0.98);
 }
 
 .btn-place-order:disabled {

@@ -33,6 +33,14 @@ const ytdValue = computed(() => {
 })
 
 const awaitingQuotes = computed(() => salesService.quotes.value.filter((q) => q.status === 'Sent' || q.status === 'Draft'))
+const expiringQuotes = computed(() => {
+  const now = Date.now()
+  return awaitingQuotes.value.filter((q) => {
+    if (!q.validUntil) return false
+    const diff = new Date(q.validUntil).getTime() - now
+    return diff > 0 && diff < 3 * 24 * 60 * 60 * 1000
+  })
+})
 const recentRfqs = computed(() => salesService.rfqs.value.slice(0, 4))
 const orderCurrency = computed(() => commerceService.orders.value[0]?.currencyCode || 'USD')
 const wishlistCount = computed(() => wishlistIds.value.length)
@@ -180,6 +188,22 @@ onMounted(loadDashboard)
     </div>
 
     <template v-else>
+      <!-- Expiring Quotation Action Alert -->
+      <div v-if="expiringQuotes.length && expiringQuotes[0]" class="expiring-alert-banner">
+        <div class="expiring-alert-content">
+          <span class="material-symbols-outlined text-[20px] text-amber-600">warning</span>
+          <div class="expiring-alert-text">
+            <strong class="mono">{{ expiringQuotes[0]?.quoteNumber }}</strong>
+            <span class="text-xs text-amber-900 ms-2">
+              {{ expiringQuotes[0]?.validUntil ? t('account.validUntilDate', { date: new Date(expiringQuotes[0].validUntil).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') }) : '' }}
+            </span>
+          </div>
+        </div>
+        <BaseButton size="sm" variant="outline" @click="expiringQuotes[0]?.id && router.push({ name: 'account-quote-detail', params: { id: expiringQuotes[0].id } })">
+          {{ t('marketplace.viewDetails') }}
+        </BaseButton>
+      </div>
+
       <div class="stats-grid">
         <StatCard
           :label="t('account.statOpenRfqs')"
@@ -267,7 +291,7 @@ onMounted(loadDashboard)
                 <span class="material-symbols-outlined text-[14px]">fact_check</span>
                 <span>{{ t('account.actionRequired') }}</span>
               </div>
-              <h2 class="card-title">{{ t('sales.quoteTitle') }} · {{ t('account.quotesAwaiting') }}</h2>
+              <h2 class="card-title">{{ t('sales.quoteTitle') }} &bull; {{ t('account.quotesAwaiting') }}</h2>
             </div>
           </div>
 
@@ -421,6 +445,30 @@ onMounted(loadDashboard)
 </template>
 
 <style scoped>
+.expiring-alert-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1.15rem;
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  border-inline-start: 4px solid #D97706;
+  border-radius: var(--radius-md, 6px);
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+.expiring-alert-content {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+.expiring-alert-text {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
 .org-shell {
   max-width: var(--wl-max-width);
   margin: 0 auto;

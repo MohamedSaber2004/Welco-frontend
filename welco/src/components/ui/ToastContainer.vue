@@ -23,7 +23,7 @@ const toasts = toastService.toasts
           {{ toast.action.label }}
         </button>
         <button class="toast__close" :aria-label="t('common.dismiss')" @click="toastService.dismiss(toast.id)">
-          ×
+          <span class="material-symbols-outlined text-[16px]">close</span>
         </button>
       </div>
     </TransitionGroup>
@@ -68,7 +68,7 @@ const toasts = toastService.toasts
   border-inline-start: 3px solid var(--fg-warning);
 }
 .toast--info {
-  border-inline-start: 3px solid var(--fg-info);
+  border-inline-start: 3px solid var(--color-steel-teal, #147D92);
 }
 
 .toast__msg {

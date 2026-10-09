@@ -8,6 +8,20 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Direct Clinical Precision brand tokens
+        'primary-deep': 'var(--color-primary-deep, #001D32)',
+        'primary-light': 'var(--color-primary-light, #E3EFFF)',
+        'steel-teal': 'var(--color-steel-teal, #147D92)',
+        'surgical-cyan': 'var(--color-surgical-cyan, #28A7A1)',
+        canvas: 'var(--color-canvas, #F7F9FB)',
+        'brand-ice': 'var(--color-brand-ice, #EDF4FF)',
+        heading: 'var(--color-heading, #102A43)',
+        body: 'var(--color-body, #42474D)',
+        muted: 'var(--color-muted, #7A90A8)',
+        'border-strong': 'var(--color-border-strong, #C2C7CD)',
+        focus: 'var(--color-focus, #0EA5E9)',
+        'surface-subtle': 'var(--color-surface-subtle, #F8FAFC)',
+
         // Clinical Precision brand — Deep Medical Navy & Steel Teal
         primary: 'var(--brand)',
         'primary-hover': 'var(--brand-hover)',
@@ -108,6 +122,19 @@ export default {
         full: 'var(--radius-pill)',// 9999px
       },
       spacing: {
+        'space-1': 'var(--space-1, 4px)',
+        'space-2': 'var(--space-2, 8px)',
+        'space-3': 'var(--space-3, 12px)',
+        'space-4': 'var(--space-4, 16px)',
+        'space-5': 'var(--space-5, 20px)',
+        'space-6': 'var(--space-6, 24px)',
+        'space-7': 'var(--space-7, 28px)',
+        'space-8': 'var(--space-8, 32px)',
+        'space-10': 'var(--space-10, 40px)',
+        'space-12': 'var(--space-12, 48px)',
+        'space-16': 'var(--space-16, 64px)',
+        'space-20': 'var(--space-20, 80px)',
+        'space-24': 'var(--space-24, 96px)',
         'input-sm': '36px',
         'input-md': '40px',
         'input-lg': '48px',
@@ -121,6 +148,14 @@ export default {
         mono: ['JetBrains Mono', 'SFMono-Regular', 'Consolas', 'Liberation Mono', 'Menlo', 'monospace'],
       },
       fontSize: {
+        display: 'var(--text-display, 48px)',
+        h1: 'var(--text-h1, 36px)',
+        h2: 'var(--text-h2, 30px)',
+        h3: 'var(--text-h3, 24px)',
+        h4: 'var(--text-h4, 20px)',
+        'body-lg': 'var(--text-body-lg, 18px)',
+        'body-sm': 'var(--text-body-sm, 14px)',
+        caption: 'var(--text-caption, 12px)',
         '2xs': 'var(--text-2xs)',
         xs: 'var(--text-xs)',
         sm: 'var(--text-sm)',

@@ -8,6 +8,8 @@ import { useCart } from '../../composables/useCart'
 import { useWishlist } from '../../composables/useWishlist'
 import { toastService } from '../../infrastructure/feedback/toast.service'
 import SkeletonLoader from '../../components/ui/SkeletonLoader.vue'
+import DataState from '../../components/ui/DataState.vue'
+import StatusPill from '../../components/ui/StatusPill.vue'
 import { productMediaUrl } from '../../utils/file-url'
 import BackButton from '../../components/ui/BackButton.vue'
 import AppPagination from '../../components/ui/AppPagination.vue'
@@ -168,7 +170,7 @@ const filteredSidebarCategories = computed(() => {
       <span class="active-filters-label mono">{{ t('catalog.filters') }}:</span>
       
       <button v-if="categoryId" type="button" class="filter-chip mono" @click="categoryId = null">
-        <span>{{ activeCategoryName }}</span>
+        <span>{{ activeCategoryName }} &bull; {{ totalCount }} {{ t('marketplace.products') }}</span>
         <span class="material-symbols-outlined text-[13px]">close</span>
       </button>
 
@@ -198,7 +200,7 @@ const filteredSidebarCategories = computed(() => {
       </button>
 
       <button v-if="lengthMin != null || lengthMax != null" type="button" class="filter-chip mono" @click="lengthMin = null; lengthMax = null">
-        <span>{{ lengthMin ?? 0 }} – {{ lengthMax ?? '∞' }} cm</span>
+        <span>{{ lengthMin ?? 0 }} – {{ lengthMax ?? 'max' }} cm</span>
         <span class="material-symbols-outlined text-[13px]">close</span>
       </button>
 
@@ -274,7 +276,7 @@ const filteredSidebarCategories = computed(() => {
             <span class="range-sep" aria-hidden="true">–</span>
             <input v-model.number="lengthMax" type="number" min="0" step="any" inputmode="decimal" :placeholder="t('catalog.lengthMax')" :aria-label="t('catalog.lengthMax')" class="search-input mono range-input" />
           </div>
-          <div v-if="lengthBounds && lengthBounds.min !== lengthBounds.max" class="mono" style="font-size:10px;color:var(--wl-muted);margin-top:4px">Range: {{ lengthBounds.min }}–{{ lengthBounds.max }} cm</div>
+          <div v-if="lengthBounds && lengthBounds.min !== lengthBounds.max" class="mono" style="font-size:10px;color:var(--wl-muted);margin-top:4px">Range: {{ lengthBounds.min }} – {{ lengthBounds.max }} cm</div>
         </div>
 
         <div class="filter-section">
@@ -307,19 +309,25 @@ const filteredSidebarCategories = computed(() => {
 
       <main class="catalog-results">
         <SkeletonLoader v-if="loading" type="catalog-grid" :count="6" />
-        <div v-else-if="error" style="text-align:center;padding:2rem">
-          <p style="color:var(--wl-danger)">{{ error }}</p>
-          <button class="btn btn-ghost btn-sm" type="button" style="margin-top:0.75rem" @click="load()">{{ t('common.retry') }}</button>
-        </div>
-        <div v-else-if="!products.length" style="text-align:center;padding:3rem 1rem">
-          <span class="material-symbols-outlined" style="font-size:40px;color:var(--wl-muted)">inventory_2</span>
-          <p style="margin-top:0.75rem;color:var(--wl-muted)">{{ t('marketplace.noProducts') }}</p>
-          <p style="font-size:13px;color:var(--wl-muted)">{{ t('marketplace.noProductsDesc') }}</p>
-          <button v-if="hasFilters" type="button" class="btn btn-ghost btn-sm" style="margin-top:1rem" @click="clearFilters">{{ t('marketplace.clearFilters') }}</button>
-        </div>
+        <DataState
+          v-else-if="error"
+          state="error"
+          :error-message="error"
+          :retry-text="t('common.retry')"
+          :on-retry="() => load()"
+        />
+        <DataState
+          v-else-if="!products.length"
+          state="empty"
+          icon="inventory_2"
+          :title="t('marketplace.noProducts')"
+          :description="t('marketplace.noProductsDesc')"
+          :action-text="hasFilters ? t('marketplace.clearFilters') : undefined"
+          @action="clearFilters"
+        />
         <template v-else>
           <div class="results-meta-bar mono" style="font-size:11px;color:var(--wl-muted);margin-bottom:0.5rem">
-            <span>{{ activeCategoryName }} · {{ totalCount }} {{ t('catalog.showing', { count: String(products.length), total: String(totalCount), page: String(page), totalPages: String(totalPages) } as never).split('·')[0] }}</span>
+            <span>{{ activeCategoryName }} &bull; {{ totalCount }} {{ t('marketplace.products') }}</span>
           </div>
           <div class="products-grid">
             <article v-for="(p, i) in products" :key="p.id" class="card catalog-card anim-fade-in-up"
@@ -345,14 +353,17 @@ const filteredSidebarCategories = computed(() => {
               <div class="catalog-card__body">
                 <div class="catalog-card__category mono" dir="auto">{{ localized(p.categoryNameEn || '', p.categoryNameAr || '') }}</div>
                 <h3 class="catalog-card__title" dir="auto">{{ localized(p.nameEn, p.nameAr) }}</h3>
-                <div class="catalog-card__title-alt mono" dir="auto">{{ locale === 'ar' ? p.nameEn : p.nameAr }}</div>
-                <div class="catalog-card__origin mono">{{ p.manufacturerEn || t('catalog.fallbackMfr') }} · {{ p.isActive ? t('catalog.ceMarked') : '' }}<span v-if="p.lengthCm" class="length-chip mono"><span class="length-dot" aria-hidden="true"></span>{{ p.lengthCm }} cm</span></div>
+                <div class="catalog-card__origin mono">
+                  <span class="material-symbols-outlined text-[14px] text-teal-600 align-middle">storefront</span>
+                  <span>{{ p.companyName || localized(p.supplierNameEn, p.supplierNameAr) || p.manufacturerEn || t('catalog.fallbackMfr') }}</span>
+                  <span v-if="p.lengthCm" class="length-chip mono"><span class="length-dot" aria-hidden="true"></span>{{ p.lengthCm }} cm</span>
+                </div>
                 <div class="catalog-card__foot">
                   <div class="price-col">
                     <strong class="catalog-card__price mono">{{ formatPrice(p.price, locale) }} <span class="currency-tag">{{ p.currencySymbol || p.currencyCode || p.currency || '$' }}</span></strong>
                     <span v-if="p.unit" class="unit-tag mono">/ {{ p.unit }}</span>
                   </div>
-                  <span v-if="p.rating" class="rating-tag mono">★ {{ p.rating.toFixed(1) }}</span>
+                  <span v-if="p.rating" class="rating-tag mono"><span class="material-symbols-outlined text-[13px] text-amber-500">star</span> {{ p.rating.toFixed(1) }}</span>
                 </div>
                 <div class="catalog-card__actions">
                   <button class="card-action-btn card-action-btn--view" type="button" @click.stop="router.push({ name: 'marketplace-product', params: { id: p.id } })">{{ t('marketplace.viewDetails') }}</button>
@@ -974,15 +985,15 @@ const filteredSidebarCategories = computed(() => {
 }
 
 .stock-pill--in {
-  background: var(--color-success-500, #198754);
+  background: var(--color-success, #16a34a);
 }
 
 .stock-pill--low {
-  background: var(--color-warning-500, #E67E22);
+  background: var(--color-warning, #d97706);
 }
 
 .stock-pill--out {
-  background: var(--color-danger-500, #DC3545);
+  background: var(--color-danger, #ef4444);
 }
 
 .catalog-card__body {
@@ -1132,10 +1143,16 @@ const filteredSidebarCategories = computed(() => {
 }
 
 .card-action-btn--quote {
-  background: var(--wl-primary);
-  border: 1px solid var(--wl-primary);
-  color: #ffffff !important;
-  box-shadow: var(--shadow-card);
+  background: var(--brand, #0F3D56);
+  color: #ffffff;
+  border: 1px solid var(--brand, #0F3D56);
+}
+.card-action-btn--quote:hover {
+  background: var(--brand-hover, #147D92);
+  border-color: var(--brand-hover, #147D92);
+}
+.card-action-btn:active {
+  transform: scale(0.97);
 }
 
 .card-action-btn--quote,
@@ -1295,7 +1312,135 @@ const filteredSidebarCategories = computed(() => {
     width: 100%;
   }
 }
+
+/* Modern Ultra-Clean Catalog Elevation */
+.catalog-card {
+  border: 1px solid #E2E8F0 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 4px 16px rgba(15, 61, 86, 0.04) !important;
+  background: #FFFFFF !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.catalog-card:hover:not(:disabled) {
+  border-color: #147D92 !important;
+  transform: translateY(-4px) !important;
+  box-shadow: 0 16px 36px rgba(15, 61, 86, 0.09) !important;
+}
+
+.catalog-card__media {
+  height: 200px !important;
+  background: #F8FAFC !important;
+  border-bottom: 1px solid #F1F5F9 !important;
+  border-radius: 16px 16px 0 0 !important;
+}
+
+.catalog-card__body {
+  padding: 1.15rem !important;
+}
+
+.catalog-card__category {
+  color: #147D92 !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase !important;
+  margin-bottom: 0.3rem !important;
+}
+
+.catalog-card__title {
+  color: #102A43 !important;
+  font-size: 1.02rem !important;
+  font-weight: 700 !important;
+  line-height: 1.35 !important;
+  margin-bottom: 0.25rem !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+}
+
+.catalog-card__title-alt {
+  color: #64748B !important;
+  font-size: 0.82rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.catalog-card__origin {
+  color: #64748B !important;
+  font-size: 0.78rem !important;
+  margin-bottom: 1rem !important;
+}
+
+.catalog-card__price {
+  color: #0F3D56 !important;
+  font-size: 1.25rem !important;
+  font-weight: 800 !important;
+}
+
+.catalog-card__actions {
+  display: flex !important;
+  gap: 0.5rem !important;
+  margin-top: 0.85rem !important;
+  padding-top: 0.85rem !important;
+  border-top: 1px solid #F1F5F9 !important;
+}
+
+.card-action-btn {
+  flex: 1 !important;
+  padding: 0.5rem 0.65rem !important;
+  border-radius: 10px !important;
+  font-size: 0.82rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.card-action-btn--view {
+  background: #F8FAFC !important;
+  border: 1px solid #E2E8F0 !important;
+  color: #102A43 !important;
+}
+
+.card-action-btn--view:hover:not(:disabled) {
+  background: #F1F5F9 !important;
+  border-color: #CBD5E1 !important;
+  transform: translateY(-1px) !important;
+}
+
+.card-action-btn--quote {
+  background: #0F3D56 !important;
+  border: 1px solid #0F3D56 !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 2px 8px rgba(15, 61, 86, 0.2) !important;
+}
+
+.card-action-btn--quote:hover:not(:disabled) {
+  background: #147D92 !important;
+  border-color: #147D92 !important;
+  color: #FFFFFF !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 14px rgba(20, 125, 146, 0.3) !important;
+}
+
+/* Sidebar Elevation */
+.filter-sidebar {
+  background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 4px 16px rgba(15, 61, 86, 0.04) !important;
+  padding: 1.25rem !important;
+}
+
+.filter-heading {
+  color: #102A43 !important;
+  font-size: 0.78rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+}
 </style>
+
 
 
 

@@ -329,9 +329,9 @@ const goPage = (p: number) => {
 }
 
 .filter-chip.is-active {
-  background: var(--wl-primary);
-  color: var(--wl-on-primary);
-  border-color: var(--wl-primary);
+  background: var(--color-primary-light, #edf4ff);
+  color: var(--color-primary, #0f3d56);
+  border-color: var(--color-primary, #0f3d56);
 }
 
 .crumb-bar {

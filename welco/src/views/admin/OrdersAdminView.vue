@@ -255,8 +255,7 @@ function goPage(p: number) {
             v-model="searchQuery"
             type="text"
             class="search-input mono"
-            :placeholder="t('common.searchPlaceholder') + ' — ' + t('commerce.orderNumber')"
-            @input="onSearch"
+            :placeholder="t('common.searchPlaceholder') + ' – ' + t('commerce.orderNumber')" @input="onSearch"
           />
           <button v-if="searchQuery" type="button" class="clear-btn" @click="searchQuery = ''; onSearch()">
             <span class="material-symbols-outlined text-[14px]">close</span>

@@ -116,8 +116,7 @@ onMounted(() => {
           v-model="searchQuery"
           type="text"
           class="search-input mono"
-          :placeholder="t('common.searchPlaceholder') + ' — ' + t('commerce.orderNumber')"
-          @input="onSearch"
+          :placeholder="t('common.searchPlaceholder') + ' – ' + t('commerce.orderNumber')" @input="onSearch"
         />
         <button v-if="searchQuery" type="button" class="clear-btn" @click="searchQuery = ''; onSearch()">
           <span class="material-symbols-outlined text-[14px]">close</span>
@@ -179,7 +178,7 @@ onMounted(() => {
                       class="product-name-pill"
                     >
                       {{ locale === 'ar' ? (item?.productNameAr || item?.productNameEn || '—') : (item?.productNameEn || item?.productNameAr || '—') }}
-                      <span v-if="item && item.quantity > 1" class="qty-tag">×{{ item.quantity }}</span>
+                      <span v-if="item && item.quantity > 1" class="qty-tag">&times;{{ item.quantity }}</span>
                     </span>
                     <span v-if="(o.items ?? []).length > 2" class="more-badge mono">+{{ (o.items ?? []).length - 2 }} {{ t('common.more') }}</span>
                   </div>
@@ -195,7 +194,7 @@ onMounted(() => {
                 <td class="text-end">
                   <span class="row-link mono">
                     <span>{{ t('marketplace.viewDetails') }}</span>
-                    <span class="icon--directional text-[14px]">→</span>
+                    <span class="icon--directional text-[14px]">&rarr;</span>
                   </span>
                 </td>
               </tr>

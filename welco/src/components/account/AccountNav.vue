@@ -72,19 +72,18 @@ import { t } from '../../i18n'
 }
 
 .account-nav__link.is-active {
-  color: var(--wl-ink-strong);
-  background: var(--wl-surface);
+  color: var(--color-primary, #0f3d56);
+  background: var(--color-primary-light, #e3efff);
   font-weight: 600;
-  box-shadow: 0 1px 3px rgba(0, 10, 25, 0.08), 0 1px 2px rgba(0, 10, 25, 0.04);
 }
 
 .nav-icon {
   font-size: 17px;
-  color: var(--wl-muted);
+  color: var(--fg-muted, #7a90a8);
 }
 
 .account-nav__link.is-active .nav-icon {
-  color: var(--wl-primary);
+  color: var(--color-primary, #0f3d56);
 }
 
 @media (max-width: 640px) {

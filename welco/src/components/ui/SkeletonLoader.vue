@@ -6,7 +6,7 @@ withDefaults(
     type?: 'text' | 'card' | 'circle' | 'table-row' | 'custom'
       | 'product-card' | 'catalog-grid' | 'category-grid' | 'stats-grid'
       | 'table' | 'pdp' | 'list' | 'form' | 'location-grid' | 'hero' | 'pills'
-      | 'provider-grid' | 'provider-cards' | 'store-hero' | 'store-rows'
+      | 'provider-grid' | 'provider-cards' | 'cat-provider-grid' | 'provider-mini-grid' | 'store-hero' | 'store-rows'
       | 'ticket' | 'track' | 'cert-grid'
       | 'address-grid' | 'order-detail' | 'order-confirm' | 'help-grid' | 'profile' | 'about'
     lines?: number

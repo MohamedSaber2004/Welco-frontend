@@ -212,12 +212,12 @@ const submit = async () => {
   if (!f.categoryId) { formError.value = t('admin.errCategory'); return }
   const numPrice = Number(f.price)
   if (isNaN(numPrice) || numPrice <= 0) {
-    formError.value = locale.value === 'ar' ? 'يجب أن يكون السعر رقماً أكبر من 0' : 'Price must be a number greater than 0'
+    formError.value = locale.value === 'ar' ? 'يجب أن يكون السعر رقمًا أكبر من 0' : 'Price must be a number greater than 0'
     return
   }
   const numStock = Number(f.stock)
   if (isNaN(numStock) || numStock < 0) {
-    formError.value = locale.value === 'ar' ? 'لا يمكن أن يكون المخزون سالباً' : 'Stock cannot be negative'
+    formError.value = locale.value === 'ar' ? 'لا يمكن أن يكون المخزون سالبًا' : 'Stock cannot be negative'
     return
   }
   formLoading.value = true

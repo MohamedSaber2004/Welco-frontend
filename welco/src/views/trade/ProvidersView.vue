@@ -347,7 +347,7 @@ const browseProviderProducts = (providerId: string) => {
               <!-- Suggestions -->
               <div v-if="showSuggestions && suggestionList.length" class="suggestions" role="listbox">
                 <p class="suggestions__label mono">
-                  {{ searchTerm.trim() ? t('providers.sortBy') + ' · ' + suggestionList.length : 'Recent' }}
+                  {{ searchTerm.trim() ? t('providers.sortBy') + ' • ' + suggestionList.length : 'Recent' }}
                 </p>
                 <button
                   v-for="(s, i) in suggestionList"
@@ -408,7 +408,7 @@ const browseProviderProducts = (providerId: string) => {
             <div class="meta-left">
               <span class="mono results-count" role="status" aria-live="polite">
                 {{ t('providers.providerCount', { count: totalCount }) }}
-                <span v-if="searchTerm.trim()" class="results-count__query" dir="auto">· “{{ debouncedSearchTerm || searchTerm }}”</span>
+                <span v-if="searchTerm.trim()" class="results-count__query" dir="auto">&ldquo;{{ debouncedSearchTerm || searchTerm }}&rdquo;</span>
               </span>
               <span v-if="!loading" class="mono results-shown">{{ resultMeta.shown }}/{{ resultMeta.total }}</span>
             </div>
@@ -552,9 +552,8 @@ const browseProviderProducts = (providerId: string) => {
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.1em;
-  color: var(--wl-gold);
+  color: var(--color-steel-teal, #147d92);
   text-transform: uppercase;
-  text-shadow: var(--wl-gold-text-shadow);
 }
 
 .view-header__title {
@@ -563,11 +562,7 @@ const browseProviderProducts = (providerId: string) => {
   font-weight: 800;
   letter-spacing: -0.02em;
   margin: 0;
-  background: var(--wl-gradient-gold);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  filter: var(--wl-gold-text-filter);
+  color: var(--color-heading, #102a43);
 }
 
 .view-header__subtitle {

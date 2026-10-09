@@ -97,27 +97,28 @@ withDefaults(
 }
 
 .btn--secondary {
-  background: var(--bg-surface);
-  color: var(--fg-body);
-  border-color: var(--border);
+  background: var(--color-steel-teal, #147d92);
+  color: #ffffff;
+  border-color: var(--color-steel-teal, #147d92);
   box-shadow: var(--shadow-xs);
 }
 
 .btn--secondary:hover:not(:disabled) {
-  background: var(--bg-subtle);
-  color: var(--fg-heading);
+  background: #0e5a69;
+  border-color: #0e5a69;
+  color: #ffffff;
 }
 
 .btn--outline {
   background: transparent;
-  color: var(--fg-heading);
-  border-color: var(--border);
+  color: var(--brand, #0f3d56);
+  border-color: var(--brand, #0f3d56);
 }
 
 .btn--outline:hover:not(:disabled) {
-  background: var(--brand-soft);
-  border-color: var(--brand);
-  color: var(--brand);
+  background: var(--color-brand-ice, #edf4ff);
+  border-color: var(--brand, #0f3d56);
+  color: var(--brand, #0f3d56);
 }
 
 .btn--ghost {

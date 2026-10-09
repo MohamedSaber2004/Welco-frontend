@@ -524,15 +524,27 @@ const resolvedDescription = computed(() => {
             </div>
           </div>
 
-          <!-- Regulatory & Manufacturer Subhead -->
-          <div v-if="product.manufacturerEn || product.manufacturerAr || product.companyName || product.isActive" class="pdp-subhead mono">
-            <span v-if="product.manufacturerEn || product.manufacturerAr || product.companyName">
-              {{ localized(product.manufacturerEn, product.manufacturerAr) || product.companyName }}
-            </span>
-            <template v-if="(product.manufacturerEn || product.manufacturerAr || product.companyName) && product.isActive">
-              <span class="dot-sep">·</span>
-            </template>
-            <span v-if="product.isActive" class="pdp-compliance-tag">{{ t('catalog.ceMarked') }}</span>
+          <!-- Provider / Supplier & Regulatory Bar -->
+          <div class="pdp-supplier-strip">
+            <div v-if="product.companyName || product.companyId" class="pdp-provider-chip">
+              <span class="material-symbols-outlined provider-icon" aria-hidden="true">storefront</span>
+              <span class="provider-lbl">{{ locale === 'ar' ? 'المورد:' : 'Supplier:' }}</span>
+              <router-link
+                v-if="product.companyId"
+                :to="{ name: 'provider-storefront', params: { id: product.companyId } }"
+                class="provider-name is-link"
+              >
+                {{ product.companyName }}
+              </router-link>
+              <strong v-else class="provider-name">{{ product.companyName }}</strong>
+            </div>
+
+            <div v-if="product.manufacturerEn || product.manufacturerAr" class="pdp-manufacturer-chip mono">
+              <span class="mfg-lbl">{{ locale === 'ar' ? 'المصنّع:' : 'Mfg:' }}</span>
+              <span class="mfg-val">{{ localized(product.manufacturerEn, product.manufacturerAr) }}</span>
+            </div>
+            
+            <span v-if="product.isActive" class="pdp-compliance-tag mono">{{ t('catalog.ceMarked') }}</span>
           </div>
 
           <!-- Key Technical Specs Strip -->
@@ -1351,13 +1363,63 @@ const resolvedDescription = computed(() => {
   overflow-wrap: anywhere;
 }
 
-.pdp-subhead {
+.pdp-supplier-strip {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  font-size: var(--step-0);
-  color: var(--wl-muted);
   flex-wrap: wrap;
+}
+
+.pdp-provider-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.75rem;
+  background: #F0F7FF;
+  border: 1px solid #BAE3FF;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #0F3D56;
+}
+
+.pdp-provider-chip .provider-icon {
+  font-size: 17px;
+  color: #147D92;
+}
+
+.pdp-provider-chip .provider-lbl {
+  font-size: 12px;
+  color: #627D98;
+  font-weight: 500;
+}
+
+.pdp-provider-chip .provider-name {
+  font-weight: 700;
+  color: #0F3D56;
+}
+
+.pdp-provider-chip .provider-name.is-link {
+  color: #147D92;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.pdp-provider-chip .provider-name.is-link:hover {
+  color: #0F3D56;
+}
+
+.pdp-manufacturer-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 12.5px;
+  color: var(--wl-muted);
+}
+
+.pdp-manufacturer-chip .mfg-lbl {
+  font-weight: 600;
 }
 
 .dot-sep {
@@ -1367,6 +1429,10 @@ const resolvedDescription = computed(() => {
 .pdp-compliance-tag {
   color: var(--wl-primary);
   font-weight: 700;
+  font-size: 12.5px;
+  background: rgba(20, 125, 146, 0.08);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
 }
 
 /* Quick Specs Strip */

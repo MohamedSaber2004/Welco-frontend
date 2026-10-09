@@ -6,49 +6,60 @@ const props = withDefaults(
     label: string
     value: string | number
     hint?: string
-    to?: string
-    iconOnly?: boolean
     trend?: string
-    trendUp?: boolean
+    /** Trend direction: 'positive' | 'negative' | 'neutral'. If omitted, auto-detected from `+` or `-` in `trend`. */
+    trendDirection?: 'positive' | 'negative' | 'neutral'
+    /** Visual tone tint applied to background/icon. Defaults to 'slate'. */
+    tone?: 'brand' | 'indigo' | 'emerald' | 'teal' | 'cyan' | 'amber' | 'gold' | 'orange' | 'rose' | 'slate' | 'violet' | 'obsidian'
+    /** If provided, renders as router-link. */
+    to?: string
+    /** Optional numeric series for an integrated mini area sparkline chart. Min 2 points. */
     sparkline?: number[]
-    tone?: 'teal' | 'indigo' | 'amber' | 'emerald' | 'rose' | 'obsidian' | 'slate' | 'gold'
+    /** Render as compact icon-only tile for dense summary rails (e.g. territory/zones). */
+    iconOnly?: boolean
   }>(),
   {
     hint: undefined,
-    to: undefined,
-    iconOnly: false,
     trend: undefined,
-    trendUp: undefined,
+    trendDirection: undefined,
+    tone: 'slate',
+    to: undefined,
     sparkline: undefined,
-    tone: 'indigo',
+    iconOnly: false,
   },
 )
 
 const isPositive = computed(() => {
-  if (props.trendUp !== undefined) return props.trendUp
-  if (!props.trend) return true
-  return props.trend.startsWith('+') || props.trend.includes('✓')
+  if (props.trendDirection) return props.trendDirection === 'positive'
+  return Boolean(props.trend && props.trend.trim().startsWith('+'))
 })
 
 const isNegative = computed(() => {
-  if (props.trendUp !== undefined) return !props.trendUp
-  if (!props.trend) return false
-  return props.trend.startsWith('-')
+  if (props.trendDirection) return props.trendDirection === 'negative'
+  return Boolean(props.trend && props.trend.trim().startsWith('-'))
 })
 
-// Generate SVG smooth area curve path for the sparkline
+/**
+ * Generate smooth SVG path (cubic bezier) + filled area coordinates
+ * scaled to 88x32 viewBox for high-density rendering.
+ */
 const sparkPath = computed(() => {
-  const data = props.sparkline && props.sparkline.length >= 2 ? props.sparkline : []
-  if (data.length < 2) return { line: '', area: '' }
+  if (!props.sparkline || props.sparkline.length < 2) return { line: '', area: '' }
+  const data = props.sparkline
   const width = 88
   const height = 32
-  const min = Math.min(...data)
+  const padX = 2
+  const padY = 3
+  const chartW = width - padX * 2
+  const chartH = height - padY * 2
+
   const max = Math.max(...data)
-  const range = max - min || 1
+  const min = Math.min(...data)
+  const range = max === min ? 1 : max - min
 
   const points: [number, number][] = data.map((v, i) => {
-    const x = (i / (data.length - 1)) * width
-    const y = height - 4 - ((v - min) / range) * (height - 8)
+    const x = padX + (i / (data.length - 1)) * chartW
+    const y = height - padY - ((v - min) / range) * chartH
     return [x, y]
   })
 
@@ -73,10 +84,12 @@ const sparkPath = computed(() => {
 })
 
 const strokeColor = computed(() => {
-  if (props.tone === 'emerald' || (props.trend && isPositive.value)) return 'var(--fg-success)'
-  if (props.tone === 'rose' || (props.trend && isNegative.value)) return 'var(--fg-danger)'
-  if (props.tone === 'amber') return 'var(--fg-warning)'
-  return 'var(--brand)'
+  if (props.tone === 'emerald' || (props.trend && isPositive.value)) return 'var(--color-success, #16a34a)'
+  if (props.tone === 'rose' || (props.trend && isNegative.value)) return 'var(--color-danger, #ef4444)'
+  if (props.tone === 'amber' || props.tone === 'orange' || props.tone === 'gold') return 'var(--color-warning, #d97706)'
+  if (props.tone === 'teal') return 'var(--color-steel-teal, #147d92)'
+  if (props.tone === 'cyan') return 'var(--color-surgical-cyan, #28a7a1)'
+  return 'var(--color-primary, #0f3d56)'
 })
 </script>
 
@@ -100,46 +113,46 @@ const strokeColor = computed(() => {
 
     <template v-else>
       <div class="stat-card__header">
-      <span class="stat-card__label mono">{{ label }}</span>
-      <div class="stat-card__top-right">
-        <span
-          v-if="trend"
-          class="stat-card__trend mono"
-          :class="{
-            'trend--positive': isPositive,
-            'trend--negative': isNegative,
-            'trend--neutral': !isPositive && !isNegative,
-          }"
-        >
-          <span class="trend__icon" aria-hidden="true">{{ isPositive ? '↑' : isNegative ? '↓' : '•' }}</span>
-          {{ trend }}
-        </span>
-        <div v-if="$slots.icon" class="stat-card__icon-wrap">
-          <slot name="icon" />
+        <span class="stat-card__label mono">{{ label }}</span>
+        <div class="stat-card__top-right">
+          <span
+            v-if="trend"
+            class="stat-card__trend mono"
+            :class="{
+              'trend--positive': isPositive,
+              'trend--negative': isNegative,
+              'trend--neutral': !isPositive && !isNegative,
+            }"
+          >
+            <span class="trend__icon" aria-hidden="true">{{ isPositive ? '↑' : isNegative ? '↓' : '•' }}</span>
+            {{ trend }}
+          </span>
+          <div v-if="$slots.icon" class="stat-card__icon-wrap">
+            <slot name="icon" />
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="stat-card__main">
-      <div class="stat-card__content">
-        <div class="stat-card__value mono-num">{{ value }}</div>
-        <div v-if="hint" class="stat-card__hint">{{ hint }}</div>
-      </div>
+      <div class="stat-card__main">
+        <div class="stat-card__content">
+          <div class="stat-card__value mono-num">{{ value }}</div>
+          <div v-if="hint" class="stat-card__hint">{{ hint }}</div>
+        </div>
 
-      <!-- Integrated Mini Sparkline Area Chart (only when real sparkline data provided) -->
-      <div v-if="sparkline && sparkline.length >= 2" class="stat-card__spark-box" aria-hidden="true">
-        <svg class="spark-svg" viewBox="0 0 88 32" fill="none" preserveAspectRatio="none">
-          <defs>
-            <linearGradient :id="`spark-grad-${label.replace(/[^a-zA-Z0-9]/g, '-')}`" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" :stop-color="strokeColor" stop-opacity="0.25" />
-              <stop offset="100%" :stop-color="strokeColor" stop-opacity="0.0" />
-            </linearGradient>
-          </defs>
-          <path :d="sparkPath.area" :fill="`url(#spark-grad-${label.replace(/[^a-zA-Z0-9]/g, '-')})`" />
-          <path :d="sparkPath.line" :stroke="strokeColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
+        <!-- Integrated Mini Sparkline Area Chart -->
+        <div v-if="sparkline && sparkline.length >= 2" class="stat-card__spark-box" aria-hidden="true">
+          <svg class="spark-svg" viewBox="0 0 88 32" fill="none" preserveAspectRatio="none">
+            <defs>
+              <linearGradient :id="`spark-grad-${label.replace(/[^a-zA-Z0-9]/g, '-')}`" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" :stop-color="strokeColor" stop-opacity="0.25" />
+                <stop offset="100%" :stop-color="strokeColor" stop-opacity="0.0" />
+              </linearGradient>
+            </defs>
+            <path :d="sparkPath.area" :fill="`url(#spark-grad-${label.replace(/[^a-zA-Z0-9]/g, '-')})`" />
+            <path :d="sparkPath.line" :stroke="strokeColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </div>
       </div>
-    </div>
     </template>
   </component>
 </template>
@@ -149,22 +162,34 @@ const strokeColor = computed(() => {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: var(--space-4);
-  padding: var(--space-5) var(--space-4);
-  background: var(--stat-bg, var(--bg-subtle));
-  border: 1px solid transparent;
-  border-radius: var(--radius-lg);
-  box-shadow: none;
+  gap: var(--space-4, 1rem);
+  padding: var(--space-5, 1.25rem) var(--space-4, 1rem);
+  background: var(--bg-surface, #ffffff);
+  border: 1px solid var(--border, #d9e2ec);
+  border-radius: var(--radius-lg, 8px);
+  box-shadow: var(--shadow-xs, 0 1px 2px rgba(0, 0, 0, 0.04));
   text-decoration: none;
   color: inherit;
   position: relative;
   overflow: hidden;
-  transition: border-color var(--duration-base) var(--ease-out), box-shadow var(--duration-base) var(--ease-out);
+  transition: all var(--duration-base, 200ms) var(--ease-out, ease-out);
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--stat-fg, var(--brand, #0f3d56));
+  opacity: 0.9;
 }
 
 .stat-card.is-interactive:hover {
-  border-color: var(--border-strong);
-  box-shadow: var(--shadow-md);
+  border-color: var(--brand, #0f3d56);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md, 0 4px 12px rgba(15, 61, 86, 0.08));
 }
 
 .stat-card.is-icon-only {
@@ -172,17 +197,17 @@ const strokeColor = computed(() => {
   align-items: center;
   justify-content: flex-start;
   min-height: 72px;
-  padding: var(--space-3) var(--space-4);
-  gap: var(--space-3);
+  padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
+  gap: var(--space-3, 0.75rem);
   box-shadow: var(--shadow-sm);
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
+  background: var(--bg-surface, #ffffff);
+  border: 1px solid var(--border, #d9e2ec);
 }
 
 .stat-card__compact {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-3, 0.75rem);
   width: 100%;
   min-width: 0;
 }
@@ -198,7 +223,7 @@ const strokeColor = computed(() => {
 .stat-card__compact-info .stat-card__label {
   font-size: 11px;
   font-weight: var(--weight-semibold, 600);
-  color: var(--fg-muted);
+  color: var(--fg-muted, #7a90a8);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   white-space: nowrap;
@@ -211,7 +236,7 @@ const strokeColor = computed(() => {
   font-size: 1.35rem;
   font-weight: var(--weight-bold, 700);
   line-height: 1.15;
-  color: var(--fg-heading);
+  color: var(--fg-heading, #102a43);
 }
 
 .stat-card__header {
@@ -222,9 +247,9 @@ const strokeColor = computed(() => {
 }
 
 .stat-card__label {
-  font-size: var(--text-sm);
-  font-weight: var(--weight-medium);
-  color: var(--fg-body);
+  font-size: var(--text-sm, 0.75rem);
+  font-weight: var(--weight-medium, 500);
+  color: var(--fg-body, #42474d);
 }
 
 .stat-card__top-right {
@@ -237,31 +262,31 @@ const strokeColor = computed(() => {
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  font-size: var(--text-xs);
-  font-weight: var(--weight-medium);
+  font-size: var(--text-xs, 0.6875rem);
+  font-weight: var(--weight-medium, 500);
   line-height: 1;
   padding: 0.2rem 0.48rem;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-pill, 9999px);
   font-variant-numeric: tabular-nums;
   border: 1px solid transparent;
 }
 
 .trend--positive {
-  background: var(--color-success-100);
-  color: var(--fg-success);
-  border-color: var(--color-success-100);
+  background: var(--color-success-50, #f0fdf4);
+  color: var(--fg-success, #16a34a);
+  border-color: rgba(22, 163, 74, 0.2);
 }
 
 .trend--negative {
-  background: var(--color-danger-100);
-  color: var(--fg-danger);
-  border-color: var(--color-danger-100);
+  background: var(--color-danger-50, #fef2f2);
+  color: var(--fg-danger, #ef4444);
+  border-color: rgba(239, 68, 68, 0.2);
 }
 
 .trend--neutral {
-  background: var(--bg-subtle);
-  color: var(--fg-muted);
-  border-color: var(--border);
+  background: var(--bg-subtle, #edf4ff);
+  color: var(--fg-muted, #7a90a8);
+  border-color: var(--border, #d9e2ec);
 }
 
 .trend__icon {
@@ -272,12 +297,13 @@ const strokeColor = computed(() => {
 .stat-card__icon-wrap {
   display: grid;
   place-items: center;
-  width: 34px;
-  height: 34px;
-  border-radius: var(--radius-pill);
-  background: var(--stat-fg, var(--brand));
-  color: #fff;
-  font-size: 16px;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md, 6px);
+  background: var(--stat-bg, var(--brand-soft, #e3efff));
+  color: var(--stat-fg, var(--brand, #0f3d56));
+  font-size: 18px;
+  border: 1px solid rgba(0, 0, 0, 0.04);
 }
 
 .stat-card__main {
@@ -294,17 +320,18 @@ const strokeColor = computed(() => {
 }
 
 .stat-card__value {
-  font-family: var(--font-sans);
-  font-size: var(--text-2xl);
-  font-weight: var(--weight-bold);
-  letter-spacing: var(--tracking-tight);
-  line-height: var(--leading-tight);
-  color: var(--fg-heading);
+  font-family: var(--font-display, var(--font-sans));
+  font-size: clamp(1.5rem, 2.2vw, 1.875rem);
+  font-weight: 700;
+  letter-spacing: var(--tracking-tight, -0.02em);
+  line-height: var(--leading-tight, 1.2);
+  color: var(--fg-heading, #102a43);
+  font-variant-numeric: tabular-nums;
 }
 
 .stat-card__hint {
-  font-size: var(--text-sm);
-  color: var(--fg-muted);
+  font-size: var(--text-sm, 0.75rem);
+  color: var(--fg-muted, #7a90a8);
 }
 
 .stat-card__spark-box {
@@ -326,11 +353,13 @@ const strokeColor = computed(() => {
   overflow: visible;
 }
 
-/* Tone tints — Clinical Precision stat tiles */
-.stat-card--rose { --stat-bg: var(--color-rose-100); --stat-fg: var(--color-rose-500); }
-.stat-card--orange, .stat-card--amber, .stat-card--gold { --stat-bg: var(--color-orange-100); --stat-fg: var(--color-orange-500); }
-.stat-card--emerald, .stat-card--teal { --stat-bg: var(--color-green-100); --stat-fg: var(--color-green-500); }
-.stat-card--violet { --stat-bg: var(--color-violet-100); --stat-fg: var(--color-violet-500); }
-.stat-card--indigo, .stat-card--brand { --stat-bg: var(--brand-soft); --stat-fg: var(--brand); }
-.stat-card--slate, .stat-card--obsidian { --stat-bg: var(--bg-subtle); --stat-fg: var(--fg-muted); }
+/* Tone accents */
+.stat-card--rose { --stat-bg: var(--color-danger-50, #fef2f2); --stat-fg: var(--color-danger-500, #ef4444); }
+.stat-card--orange, .stat-card--amber, .stat-card--gold { --stat-bg: var(--color-warning-50, #fffbeb); --stat-fg: var(--color-warning-500, #d97706); }
+.stat-card--emerald { --stat-bg: var(--color-success-50, #f0fdf4); --stat-fg: var(--color-success-500, #16a34a); }
+.stat-card--teal { --stat-bg: var(--color-brand-ice, #edf4ff); --stat-fg: var(--color-steel-teal, #147d92); }
+.stat-card--cyan { --stat-bg: #e6faf8; --stat-fg: var(--color-surgical-cyan, #28a7a1); }
+.stat-card--violet { --stat-bg: #edf4ff; --stat-fg: #147d92; }
+.stat-card--indigo, .stat-card--brand { --stat-bg: var(--brand-soft, #e3efff); --stat-fg: var(--brand, #0f3d56); }
+.stat-card--slate, .stat-card--obsidian { --stat-bg: var(--bg-subtle, #edf4ff); --stat-fg: var(--fg-muted, #7a90a8); }
 </style>

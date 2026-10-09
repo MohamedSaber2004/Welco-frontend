@@ -41,8 +41,7 @@ const {
 const localized = (en?: string | null, ar?: string | null) =>
   locale.value === 'ar' ? ar || en || '' : en || ar || ''
 /** Backend totals only — no client-side math. Null until quoted. */
-const fmtQuote = (v: number | null) =>
-  v == null ? '…' : v.toLocaleString(locale.value === 'ar' ? 'ar-EG' : 'en-US')
+const fmtQuote = (v: number | null) => v == null ? '—' : v.toLocaleString(locale.value === 'ar' ? 'ar-EG' : 'en-US')
 
 const submittingRfq = ref(false)
 const availableCurrencies = ref<CurrencyDto[]>([])

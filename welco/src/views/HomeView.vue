@@ -344,28 +344,79 @@ const navigateToOemFromModal = () => {
 <template>
   <div class="home">
     <header class="hero">
+      <div class="hero__glow" aria-hidden="true"></div>
       <div class="hero__inner">
         <div class="hero__copy">
-          <h1>{{ t('home.heroTitle') }} <em>{{ t('home.heroTitleAccent') }}</em></h1>
-          <p>{{ t('home.heroSubtitle') }}</p>
+          <h1 class="hero__title">
+            {{ t('home.heroTitle') }} <span class="hero__title-accent">{{ t('home.heroTitleAccent') }}</span>
+          </h1>
+          <p class="hero__subtitle">{{ t('home.heroSubtitle') }}</p>
+
           <div class="hero__search">
             <form class="hero__search-bar" @submit.prevent="goSearch">
-              <input v-model="heroSearch" :placeholder="t('marketplace.searchPlaceholder')" />
-              <button class="hero__search-btn" type="submit">{{ t('common.searchPlaceholder') }}</button>
+              <span class="material-symbols-outlined hero__search-icon" aria-hidden="true">search</span>
+              <input
+                v-model="heroSearch"
+                :placeholder="locale === 'ar' ? 'ابحث برقم SKU أو اسم الأداة أو المعيار...' : 'Search SKU, instrument name or DIN standard...'"
+                aria-label="Search surgical instruments"
+              />
+              <button
+                v-if="heroSearch"
+                type="button"
+                class="hero__search-clear"
+                @click="heroSearch = ''"
+              >
+                <span class="material-symbols-outlined text-[16px]">close</span>
+              </button>
+              <button class="hero__search-btn" type="submit">
+                <span>{{ t('common.searchPlaceholder') }}</span>
+                <span class="material-symbols-outlined hero__btn-arrow" aria-hidden="true">arrow_forward</span>
+              </button>
             </form>
+            <div class="hero__trust-strip">
+              <span class="hero__trust-badge">
+                <span class="material-symbols-outlined trust-icon">verified</span>
+                <span class="mono">ISO 13485 ✓</span>
+              </span>
+              <span class="hero__trust-sep" aria-hidden="true">&bull;</span>
+              <span class="hero__trust-badge">
+                <span class="material-symbols-outlined trust-icon">check_circle</span>
+                <span class="mono">CE Certified ✓</span>
+              </span>
+              <span class="hero__trust-sep" aria-hidden="true">&bull;</span>
+              <span class="hero__trust-badge">
+                <span class="material-symbols-outlined trust-icon">public</span>
+                <span class="mono">40+ Countries 🌍</span>
+              </span>
+            </div>
           </div>
+
           <div class="hero__ctas">
             <button class="btn btn-primary btn-lg" type="button" @click="router.push({ name: 'marketplace' })">
+              <span class="material-symbols-outlined text-[19px]">explore</span>
               <span>{{ t('nav.marketplace') }}</span>
             </button>
             <button class="btn btn-secondary btn-lg" type="button" @click="openPriceModal">
-              <span class="material-symbols-outlined text-[20px]">request_quote</span>
+              <span class="material-symbols-outlined text-[19px]">request_quote</span>
               <span>{{ t('home.requestQuote') }}</span>
             </button>
           </div>
         </div>
-        <div class="hero__logo-box">
-          <img src="/logo.jpeg" alt="Welco — Surgical Instruments" width="420" height="220" loading="eager" />
+
+        <div class="hero__logo-showcase">
+          <div class="logo-showcase__card">
+            <div class="logo-showcase__glow" aria-hidden="true"></div>
+            <div class="logo-showcase__frame">
+              <img
+                src="/logo-512.png"
+                alt="Welco Surgical Instruments"
+                class="logo-showcase__img"
+                width="280"
+                height="280"
+                loading="eager"
+              />
+            </div>
+          </div>
         </div>
       </div>
     </header>
@@ -407,15 +458,28 @@ const navigateToOemFromModal = () => {
                   fit="cover"
                   class="product-card__img"
                 />
-                <span v-if="p.isNew" class="mono product-card__badge">{{ t('home.newBadge') }}</span>
-                <span v-if="p.stock > 0" class="mono product-card__stock product-card__stock--in">{{ t('catalog.inStock') }}</span>
-                <span v-else class="mono product-card__stock product-card__stock--out">{{ t('catalog.madeToOrder') }}</span>
+                <div class="product-card__badges">
+                  <span v-if="p.isNew" class="mono product-badge product-badge--new">{{ t('home.newBadge') }}</span>
+                  <span
+                    class="mono product-stock-badge"
+                    :class="p.stock > 0 ? 'product-stock-badge--in' : 'product-stock-badge--out'"
+                  >
+                    <span class="stock-dot" :class="p.stock > 0 ? 'stock-dot--in' : 'stock-dot--out'"></span>
+                    <span>{{ p.stock > 0 ? t('catalog.inStock') : t('catalog.madeToOrder') }}</span>
+                  </span>
+                </div>
               </div>
               <div class="product-card__body">
                 <div class="mono product-card__category" dir="auto">{{ localized(p.categoryNameEn, p.categoryNameAr) }}</div>
                 <h3 class="product-card__title" dir="auto">{{ localized(p.nameEn, p.nameAr) }}</h3>
                 <div class="mono product-card__meta-alt" dir="auto">{{ locale === 'en' ? p.nameAr : p.nameEn }}</div>
-                <div class="mono product-card__meta">{{ p.companyName || p.manufacturerEn || 'Welco Surgical' }} · CE Certified</div>
+                <div class="product-card__provider">
+                  <span class="material-symbols-outlined provider-icon" aria-hidden="true">storefront</span>
+                  <span class="provider-label">{{ locale === 'ar' ? 'المورد:' : 'Supplier:' }}</span>
+                  <span class="provider-value" dir="auto">
+                    {{ p.companyName || localized(p.supplierNameEn, p.supplierNameAr) || localized(p.manufacturerEn, p.manufacturerAr) || (locale === 'ar' ? 'توريد مباشر' : 'Direct Supply') }}
+                  </span>
+                </div>
                 <div class="product-card__foot">
                   <strong class="mono-num">{{ formatPrice(p.price, locale) }} {{ p.currencySymbol || '$' }}</strong>
                   <button class="btn btn-primary btn-sm btn-quote-white" type="button" @click.stop="handleAddToQuote(p.id)">
@@ -508,13 +572,17 @@ const navigateToOemFromModal = () => {
               </button>
             </div>
             <div v-if="tileTotalPages > 1" class="provider-pager">
-              <button type="button" class="page-btn" :disabled="tileProductPage <= 1" @click="tileProductPage--">‹</button>
+              <button type="button" class="page-btn" :disabled="tileProductPage <= 1" :aria-label="t('common.prev')" @click="tileProductPage--">
+                <span class="material-symbols-outlined text-[16px] icon--directional">chevron_left</span>
+              </button>
               <span class="mono provider-pager__num">{{ tileProductPage }} / {{ tileTotalPages }}</span>
-              <button type="button" class="page-btn" :disabled="tileProductPage >= tileTotalPages" @click="tileProductPage++">›</button>
+              <button type="button" class="page-btn" :disabled="tileProductPage >= tileTotalPages" :aria-label="t('common.next')" @click="tileProductPage++">
+                <span class="material-symbols-outlined text-[16px] icon--directional">chevron_right</span>
+              </button>
             </div>
             <router-link :to="{ name: 'provider-storefront', params: { id: p.id } }" class="provider-viewall mono">
               <span>{{ t('provider.viewCatalog') }}</span>
-              <span class="icon--directional">→</span>
+              <span class="material-symbols-outlined text-[14px] icon--directional">arrow_forward</span>
             </router-link>
           </div>
         </article>
@@ -575,16 +643,14 @@ const navigateToOemFromModal = () => {
             class="page-btn"
             :disabled="catPage <= 1 || catsLoading"
             :aria-label="t('common.prev')"
-            @click="catPage--"
-          >‹</button>
+            @click="catPage--"><span class="material-symbols-outlined text-[16px] icon--directional">chevron_left</span></button>
           <span class="mono cat-pager__num">{{ catPage }} / {{ catTotalPages }}</span>
           <button
             type="button"
             class="page-btn"
             :disabled="catPage >= catTotalPages || catsLoading"
             :aria-label="t('common.next')"
-            @click="catPage++"
-          >›</button>
+            @click="catPage++"><span class="material-symbols-outlined text-[16px] icon--directional">chevron_right</span></button>
         </div>
       </div>
     </section>
@@ -639,7 +705,7 @@ const navigateToOemFromModal = () => {
 
           <div v-else class="cat-explorer__intro">
             <div>
-              <h3 class="cat-explorer__heading">{{ t('provider.providersInCategory') }}</h3>
+              <h3 class="cat-explorer__heading">{{ t('marketplace.filterBySpecialty') }}</h3>
             </div>
           </div>
           <div v-if="visibleSpecialties.length" class="cat-explorer__pills" role="tablist" :aria-label="t('marketplace.filterBySpecialty')">
@@ -1069,6 +1135,33 @@ const navigateToOemFromModal = () => {
   border-color: var(--wl-primary);
   box-shadow: var(--wl-focus-ring);
   transform: translateY(-0.5px);
+}
+
+.hero__trust-strip {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.hero__trust-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-steel-teal, #147D92);
+}
+
+.hero__trust-badge .trust-icon {
+  font-size: 15px;
+  color: var(--color-surgical-cyan, #28A7A1);
+}
+
+.hero__trust-sep {
+  color: var(--color-muted, #7A90A8);
+  font-size: 10px;
 }
 
 .search-icon {
@@ -2766,225 +2859,712 @@ const navigateToOemFromModal = () => {
 
 /* 2026 platform landing treatment */
 .home {
-  background: var(--platform-mist);
-  color: var(--platform-ink);
+  background: var(--platform-mist, #F7F9FB);
+  color: var(--platform-ink, #102A43);
 }
+
+
+/* ==========================================================================
+   Clinical Precision Modern Architecture Styles
+   ========================================================================== */
+
+/* Hero Clinical Precision Light Architecture */
 .home .hero {
-  min-height: min(700px, 76vh);
-  background: linear-gradient(118deg, #062f45 0%, #0b6370 58%, #13969a 100%) !important;
-  border: 0;
-  border-radius: 0 0 2rem 2rem;
-  color: white;
-}
-.home .hero::before {
-  background: radial-gradient(circle at 78% 24%, rgba(214, 243, 106, .26), transparent 20rem), linear-gradient(135deg, transparent 0 55%, rgba(255,255,255,.08) 55% 56%, transparent 56%);
-  opacity: 1;
-}
-.home .hero__inner { max-width: 1320px; min-height: min(700px, 76vh); grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: clamp(2rem, 5vw, 6rem); padding-block: clamp(3rem, 6vw, 6rem); }
-.home .hero__copy { position: relative; z-index: 1; }
-.home .hero h1 { max-width: 760px; margin-top: .45rem; color: #f7fffe; font-size: clamp(2.65rem, 5.8vw, 5.7rem); line-height: .98; letter-spacing: -.065em; }
-.home .hero h1 em { color: var(--platform-lime) !important; background: none; }
-.home .hero p { max-width: 620px; color: rgba(247,255,254,.78); font-size: clamp(1rem, 1.4vw, 1.2rem); line-height: 1.7; }
-.home .hero__search { max-width: 610px; }
-.home .hero__search-bar { height: 58px; padding-inline-start: 1rem; border: 1px solid rgba(255,255,255,.28); background: rgba(255,255,255,.12); box-shadow: 0 15px 35px rgba(1,27,40,.18); transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease; }
-.home .hero__search-bar input { color: #f7fffe; caret-color: var(--platform-lime); transition: color 180ms ease; }
-.home .hero__search-bar input::placeholder { color: rgba(255,255,255,.65); opacity: 1; transition: color 180ms ease, opacity 180ms ease, transform 180ms ease; }
-.home .hero__search-bar:focus-within { background: #fff; border-color: var(--platform-lime); box-shadow: 0 0 0 4px rgba(214,243,106,.22), 0 18px 40px rgba(1,27,40,.24); }
-.home .hero__search-bar input:focus,
-.home .hero__search-bar input:focus-visible { color: #071923; caret-color: var(--platform-teal); background: transparent; border-color: transparent; box-shadow: none; outline: 0; }
-.home .hero__search-bar input:focus::placeholder { color: #52656b; opacity: .72; transform: translateX(6px); animation: hero-placeholder-pulse 1.35s ease-in-out infinite alternate; }
-@keyframes hero-placeholder-pulse { from { opacity: .42; letter-spacing: 0; } to { opacity: .86; letter-spacing: .018em; } }
-.home .hero__search-btn { height: 46px; border-radius: 999px; background: var(--platform-lime); color: var(--platform-ink); }
-.home .hero__ctas .btn-primary { background: white; color: var(--platform-ink); border-color: white; border-radius: 999px; padding-inline: 1.4rem; }
-.home .hero__ctas .btn-secondary { background: transparent; color: white; border-color: rgba(255,255,255,.45); border-radius: 999px; padding-inline: 1.4rem; }
-.home .hero__logo-box { min-height: 360px; border: 1px solid rgba(255,255,255,.22); border-radius: 1.5rem; background: rgba(255,255,255,.10); box-shadow: 0 24px 70px rgba(1,27,40,.22); transform: rotate(2deg); }
-.home .hero__logo-box::before { background: var(--platform-lime); height: 4px; }
-.home .hero__logo-box img { border-radius: 1rem; mix-blend-mode: screen; opacity: .94; }
-.home .section { padding-block: clamp(4rem, 8vw, 8rem); }
-
-/* Alternating Section Background Mechanism:
-   1. Hero: Hero background (dark teal gradient)
-   2. Most Selling: Pure White (#ffffff)
-   3. Providers: Hero background (dark teal gradient)
-   4. Clinical Specialty: Pure White (#ffffff)
-   5. Certifications: Hero background (dark teal gradient)
-   6. About: Pure White (#ffffff)
-*/
-.home .section--most-selling {
-  background: #ffffff !important;
-  border-bottom: 1px solid #f1f5f9;
-}
-.home .section--most-selling .section-title {
-  color: var(--platform-ink);
-}
-.home .section--most-selling .section-desc {
-  color: var(--platform-ink-soft);
-}
-.home .section--most-selling .section__eyebrow {
-  color: var(--platform-teal) !important;
-}
-
-.home .section--providers {
-  background: linear-gradient(118deg, #062f45 0%, #0b6370 58%, #13969a 100%) !important;
-  border: 0;
-  color: white;
-}
-.home .section--providers .section-title {
-  color: #f7fffe !important;
-}
-.home .section--providers .section-desc {
-  color: rgba(247, 255, 254, 0.85) !important;
-}
-.home .section--providers .section__eyebrow {
-  color: var(--platform-lime) !important;
-}
-.home .section--providers .view-all-btn {
-  color: #f7fffe !important;
-  border-color: rgba(255, 255, 255, 0.28) !important;
-  background: rgba(255, 255, 255, 0.1) !important;
-}
-.home .section--providers .view-all-btn:hover {
-  background: rgba(255, 255, 255, 0.2) !important;
-}
-
-.home .section--certs {
-  background: linear-gradient(118deg, #062f45 0%, #0b6370 58%, #13969a 100%) !important;
-  border: 0;
-  color: white;
-}
-.home .section--certs .section-title {
-  color: #f7fffe !important;
-}
-.home .section--certs .section-desc {
-  color: rgba(247, 255, 254, 0.85) !important;
-}
-.home .section--certs .section__eyebrow {
-  color: var(--platform-lime) !important;
-}
-.home .section--certs .view-all-btn {
-  color: #f7fffe !important;
-  border-color: rgba(255, 255, 255, 0.28) !important;
-  background: rgba(255, 255, 255, 0.1) !important;
-}
-.home .section--certs .view-all-btn:hover {
-  background: rgba(255, 255, 255, 0.2) !important;
-}
-
-.home .section--about {
-  background: #ffffff !important;
-  border-top: 1px solid #f1f5f9;
-}
-.home .section-head { align-items: end; margin-bottom: 1rem; }
-.home .section__eyebrow { color: var(--platform-teal) !important; font-weight: 800; letter-spacing: .14em; }
-.home .section-title { max-width: 700px; color: var(--platform-ink); font-size: clamp(2rem, 4vw, 3.6rem); letter-spacing: -.055em; line-height: 1.04; }
-.home .section-desc { max-width: 680px; color: var(--platform-ink-soft); font-size: 1.05rem; }
-.home .provider-tile, .home .home-cert-card { border: 1px solid var(--platform-border); border-radius: 1.1rem; box-shadow: 0 8px 26px rgba(9,47,67,.06); background: #fff; }
-.home .provider-tile:hover, .home .home-cert-card:hover { border-color: rgba(11,127,134,.45); box-shadow: var(--platform-shadow); transform: translateY(-4px); }
-.home .about-grid { border-radius: 1.5rem; padding: clamp(2rem, 5vw, 5rem); background: var(--platform-aqua); }
-.home .about-content .section-title { max-width: 620px; }
-.home .about-media { border-radius: 1rem; overflow: hidden; box-shadow: var(--platform-shadow); background: white; }
-.home .about-media__img { mix-blend-mode: multiply; }
-
-.home .provider-tile__logo {
-  height: 142px;
-  min-height: 142px;
-  width: 100%;
-  min-width: 0;
-  padding: 1rem;
+  background: #FFFFFF !important;
+  border-bottom: 1px solid var(--color-border, #D9E2EC) !important;
+  position: relative;
   overflow: hidden;
+  padding-block: clamp(3.2rem, 5.5vw, 4.8rem);
+}
+
+.home .hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(900px 450px at 80% 15%, rgba(20, 125, 146, 0.05), transparent 60%),
+    radial-gradient(700px 350px at 15% 85%, rgba(15, 61, 86, 0.03), transparent 50%),
+    linear-gradient(rgba(15, 61, 86, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 61, 86, 0.02) 1px, transparent 1px);
+  background-size: auto, auto, 28px 28px, 28px 28px;
+  pointer-events: none;
+}
+
+.home .hero__glow {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 1200px;
+  height: 100%;
+  background: radial-gradient(circle at 60% 20%, rgba(40, 167, 161, 0.04), transparent 70%);
+  pointer-events: none;
+}
+
+.home .hero__inner {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 clamp(1rem, 4vw, 2.5rem);
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: clamp(2rem, 4vw, 4rem);
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+.home .hero__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  background: var(--color-brand-ice, #EDF4FF);
+  border: 1px solid #C8E0FF;
+  color: var(--color-primary, #0F3D56);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  margin-bottom: 1.25rem;
+}
+
+.home .hero__badge-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-steel-teal, #147D92);
+  box-shadow: 0 0 0 2px rgba(20, 125, 146, 0.25);
+  animation: pulse-glow 2s infinite ease-in-out;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.7; }
+}
+
+.home .hero__title {
+  color: var(--color-heading, #102A43) !important;
+  font-size: clamp(2.3rem, 4.2vw, 3.5rem) !important;
+  font-weight: 800 !important;
+  line-height: 1.12 !important;
+  letter-spacing: -0.035em !important;
+  margin-bottom: 1rem;
+}
+
+.home .hero__title-accent {
+  background: linear-gradient(135deg, #0F3D56 0%, #147D92 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: var(--color-steel-teal, #147D92);
+  display: inline-block;
+}
+
+.home .hero__subtitle {
+  max-width: 580px;
+  color: var(--color-body, #42474D) !important;
+  font-size: clamp(1rem, 1.25vw, 1.125rem) !important;
+  line-height: 1.65 !important;
+  margin-bottom: 1.75rem;
+}
+
+.home .hero__search {
+  max-width: 580px;
+  margin-bottom: 0.75rem;
+}
+
+.home .hero__search-bar {
+  display: flex;
+  align-items: center;
+  height: 52px;
+  background: #FFFFFF;
+  border: 1.5px solid var(--color-border, #D9E2EC);
+  border-radius: 12px;
+  padding: 0.35rem 0.45rem 0.35rem 1rem;
+  box-shadow: 0 4px 18px rgba(16, 42, 67, 0.06);
+  transition: all 0.2s ease;
+}
+
+.home .hero__search-bar:focus-within {
+  background: #FFFFFF;
+  border-color: var(--color-focus, #0EA5E9);
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15), 0 8px 24px rgba(16, 42, 67, 0.08);
+}
+
+.home .hero__search-icon {
+  color: var(--color-steel-teal, #147D92);
+  font-size: 22px;
+  margin-inline-end: 0.65rem;
+  flex-shrink: 0;
+}
+
+.home .hero__search-bar input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--color-heading, #102A43);
+  font-size: 0.95rem;
+  caret-color: var(--color-steel-teal, #147D92);
+  outline: none;
+}
+
+.home .hero__search-bar input::placeholder {
+  color: var(--color-muted, #7A90A8);
+}
+
+.home .hero__search-clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--color-muted, #7A90A8);
+  cursor: pointer;
+  margin-inline-end: 0.5rem;
+  transition: all 0.15s ease;
+}
+.home .hero__search-clear:hover {
+  background: #EDF4FF;
+  color: #102A43;
+}
+
+.home .hero__search-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  height: 40px;
+  padding: 0 1.25rem;
+  border-radius: 8px;
+  background: var(--color-primary, #0F3D56);
+  color: #FFFFFF;
+  font-weight: 600;
+  font-size: 0.88rem;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.home .hero__search-btn:hover {
+  background: var(--color-primary-deep, #001D32);
+  transform: translateY(-1px);
+}
+
+.home .hero__btn-arrow {
+  font-size: 17px;
+  transition: transform 0.2s ease;
+}
+
+.home .hero__search-btn:hover .hero__btn-arrow {
+  transform: translateX(3px);
+}
+[dir='rtl'] .home .hero__search-btn:hover .hero__btn-arrow {
+  transform: translateX(-3px);
+}
+
+.home .hero__ctas {
+  display: flex;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+}
+
+.home .hero__ctas .btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--color-primary, #0F3D56) !important;
+  color: #FFFFFF !important;
+  border: 1px solid var(--color-primary, #0F3D56) !important;
+  border-radius: 8px !important;
+  padding: 0.75rem 1.6rem !important;
+  font-weight: 600 !important;
+  box-shadow: 0 4px 14px rgba(15, 61, 86, 0.2) !important;
+  transition: all 0.2s ease !important;
+}
+
+.home .hero__ctas .btn-primary:hover {
+  background: var(--color-primary-deep, #001D32) !important;
+  border-color: var(--color-primary-deep, #001D32) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 20px rgba(15, 61, 86, 0.25) !important;
+}
+
+.home .hero__ctas .btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #FFFFFF !important;
+  color: var(--color-heading, #102A43) !important;
+  border: 1.5px solid var(--color-border, #D9E2EC) !important;
+  border-radius: 8px !important;
+  padding: 0.75rem 1.6rem !important;
+  font-weight: 600 !important;
+  box-shadow: 0 1px 3px rgba(16, 42, 67, 0.04) !important;
+  transition: all 0.2s ease !important;
+}
+
+.home .hero__ctas .btn-secondary:hover {
+  background: var(--color-brand-ice, #EDF4FF) !important;
+  border-color: var(--color-steel-teal, #147D92) !important;
+  color: var(--color-primary, #0F3D56) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Hero Welco Logo Showcase */
+.home .hero__logo-showcase {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(145deg, var(--platform-aqua), #f9fcfb);
+  position: relative;
+  width: 100%;
 }
-.home .provider-tile__logo :deep(.app-image-placeholder) {
-  inset: 0;
-  min-width: 0;
-  min-height: 0;
+
+.home .logo-showcase__card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 420px;
+  padding: clamp(2.5rem, 5vw, 3.5rem) 2rem;
+  background: #FFFFFF;
+  border: 1.5px solid var(--color-border, #D9E2EC);
+  border-radius: 24px;
+  box-shadow:
+    0 20px 48px rgba(15, 61, 86, 0.07),
+    0 4px 14px rgba(15, 61, 86, 0.03);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
   overflow: hidden;
 }
-.home .provider-tile__logo :deep(.placeholder-icon-badge) {
-  width: 52px;
-  height: 52px;
-  flex: 0 0 52px;
-}
-.home .provider-tile__logo :deep(.placeholder-icon) { font-size: 26px; }
-.home .provider-tile__logo :deep(.placeholder-text) { display: none; }
 
-@media (prefers-reduced-motion: reduce) {
-  .home .hero__search-bar input:focus::placeholder { animation: none; }
+.home .logo-showcase__card:hover {
+  transform: translateY(-4px);
+  border-color: #147D92;
+  box-shadow:
+    0 28px 56px rgba(15, 61, 86, 0.11),
+    0 8px 20px rgba(15, 61, 86, 0.04);
 }
 
-/* Browse by category + browse by clinical specialty: two distinct bands */
-.home .section--category,
-.home .section--clinical {
-  border-top: 1px solid #f1f5f9;
-  padding-block: clamp(3rem, 5.5vw, 4.5rem);
+.home .logo-showcase__card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #0F3D56 0%, #147D92 50%, #28A7A1 100%);
 }
-.home .section--category {
-  background: #ffffff;
-  border-bottom: 0;
+
+.home .logo-showcase__glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 280px;
+  height: 280px;
+  background: radial-gradient(circle, rgba(20, 125, 146, 0.08) 0%, rgba(40, 167, 161, 0.03) 50%, transparent 70%);
+  pointer-events: none;
+  filter: blur(20px);
 }
-.home .section--clinical {
-  background: var(--wl-surface-soft, #f8fafc);
-  border-bottom: 1px solid #f1f5f9;
+
+.home .logo-showcase__frame {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 280px;
+  padding: 1.75rem;
+  background: #FAFCFE;
+  border: 1px solid #E2E8F0;
+  border-radius: 20px;
+  box-shadow: inset 0 2px 6px rgba(16, 42, 67, 0.02);
+  transition: transform 0.3s ease, border-color 0.3s ease;
 }
-.home .section--category .section__inner,
-.home .section--clinical .section__inner {
-  max-width: 1320px;
-  margin-inline: auto;
-  padding-inline: clamp(1rem, 4vw, 2.75rem);
+
+.home .logo-showcase__card:hover .logo-showcase__frame {
+  border-color: #C8E0FF;
+  transform: scale(1.02);
 }
-.home .section--category .section-head,
-.home .section--clinical .section-head {
-  margin-bottom: clamp(1.5rem, 3.5vw, 2.25rem);
-}
-.home .section--category .section__eyebrow,
-.home .section--clinical .section__eyebrow {
-  color: var(--platform-teal) !important;
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-.home .section--category .section-title,
-.home .section--clinical .section-title {
-  color: var(--platform-ink);
-  font-size: clamp(1.85rem, 3.8vw, 2.6rem);
-  font-weight: 800;
-  letter-spacing: -0.035em;
-  line-height: 1.15;
-}
-.home .section--category .cat-grid {
-  grid-template-columns: repeat(4, 1fr);
-  margin-inline: 0;
-  gap: clamp(0.85rem, 2vw, 1.25rem);
-}
-@media (max-width: 1100px) {
-  .home .section--category .cat-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-@media (max-width: 768px) {
-  .home .section--category .cat-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.875rem;
-  }
-}
-@media (max-width: 440px) {
-  .home .section--category .cat-grid {
-    grid-template-columns: 1fr;
-  }
+
+.home .logo-showcase__img {
+  width: 100%;
+  max-width: 230px;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 6px 16px rgba(15, 61, 86, 0.06));
 }
 
 @media (max-width: 900px) {
-  .home .hero, .home .hero__inner { min-height: auto; }
-  .home .hero__inner { grid-template-columns: 1fr; gap: 2.5rem; }
-  .home .hero__logo-box { min-height: 230px; max-width: 520px; transform: rotate(0); }
-  .home .hero h1 { font-size: clamp(2.4rem, 10vw, 3.8rem); }
+  .home .logo-showcase__card {
+    max-width: 340px;
+    padding: 2rem 1.5rem;
+  }
+  .home .logo-showcase__frame {
+    max-width: 220px;
+    padding: 1.25rem;
+  }
+  .home .logo-showcase__img {
+    max-width: 180px;
+  }
+}
+
+/* Sections Global Modern Clean Styling */
+.home .section {
+  padding-block: clamp(3.5rem, 6vw, 6rem);
+}
+
+.home .section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.home .section__eyebrow {
+  color: #147D92 !important;
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  margin-bottom: 0.4rem;
+}
+
+.home .section-title {
+  color: #102A43 !important;
+  font-size: clamp(1.85rem, 3.5vw, 2.75rem) !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.04em !important;
+  line-height: 1.15 !important;
+}
+
+.home .section-desc {
+  max-width: 680px;
+  color: #42474D !important;
+  font-size: 1.05rem !important;
+  line-height: 1.6 !important;
+  margin-bottom: 2rem;
+}
+
+/* Section 1: Most Selling */
+.home .section--most-selling {
+  background: #FFFFFF !important;
+  border-bottom: 1px solid #E2E8F0 !important;
+}
+
+/* Section 2: Providers & Partners (Clean Slate Background) */
+.home .section--providers {
+  background: #F8FAFC !important;
+  border-bottom: 1px solid #E2E8F0 !important;
+  color: #102A43 !important;
+}
+
+.home .section--providers .section-title {
+  color: #102A43 !important;
+}
+
+.home .section--providers .section-desc {
+  color: #42474D !important;
+}
+
+.home .section--providers .view-all-btn {
+  color: #0F3D56 !important;
+  border-color: #D9E2EC !important;
+  background: #FFFFFF !important;
+}
+
+.home .section--providers .view-all-btn:hover {
+  background: #F1F5F9 !important;
+  border-color: #CBD5E1 !important;
+}
+
+/* Section 3: Categories */
+.home .section--category {
+  background: #FFFFFF !important;
+  border-bottom: 1px solid #E2E8F0 !important;
+}
+
+/* Section 4: Clinical Specialty */
+.home .section--clinical {
+  background: #F8FAFC !important;
+  border-bottom: 1px solid #E2E8F0 !important;
+}
+
+/* Section 5: Certifications (Clean White Showcase) */
+.home .section--certs {
+  background: #FFFFFF !important;
+  border-bottom: 1px solid #E2E8F0 !important;
+  color: #102A43 !important;
+}
+
+.home .section--certs .section-title {
+  color: #102A43 !important;
+}
+
+.home .section--certs .section-desc {
+  color: #42474D !important;
+}
+
+.home .section--certs .view-all-btn {
+  color: #0F3D56 !important;
+  border-color: #D9E2EC !important;
+  background: #FFFFFF !important;
+}
+
+.home .section--certs .view-all-btn:hover {
+  background: #F1F5F9 !important;
+  border-color: #CBD5E1 !important;
+}
+
+/* Section 6: About */
+.home .section--about {
+  background: #F8FAFC !important;
+}
+
+.home .about-grid {
+  background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  border-radius: 20px !important;
+  box-shadow: 0 8px 30px rgba(15, 61, 86, 0.05) !important;
+  padding: clamp(2rem, 5vw, 4rem) !important;
+}
+
+/* Product Cards Elevation */
+.home .product-card {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(15, 61, 86, 0.04);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+.home .product-card:hover {
+  transform: translateY(-4px);
+  border-color: #147D92;
+  box-shadow: 0 16px 36px rgba(15, 61, 86, 0.1);
+}
+
+.home .product-card__media {
+  height: 210px;
+  width: 100%;
+  position: relative;
+  background: #F8FAFC;
+  overflow: hidden;
+}
+
+.home .product-card__badges {
+  position: absolute;
+  top: 10px;
+  inset-inline-start: 10px;
+  inset-inline-end: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.home .product-badge--new {
+  background: #0F3D56;
+  color: #FFFFFF;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(15, 61, 86, 0.2);
+}
+
+.home .product-stock-badge {
+  margin-inline-start: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(16, 42, 67, 0.08);
+  white-space: nowrap;
+}
+
+.home .product-stock-badge--in {
+  background: #DCFCE7;
+  color: #166534;
+  border: 1px solid #BBF7D0;
+}
+
+.home .product-stock-badge--out {
+  background: #F1F5F9;
+  color: #475569;
+  border: 1px solid #CBD5E1;
+}
+
+.home .stock-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.home .stock-dot--in {
+  background: #16A34A;
+}
+.home .stock-dot--out {
+  background: #94A3B8;
+}
+
+.home .product-card__body {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.home .product-card__category {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #147D92;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.35rem;
+}
+
+.home .product-card__title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #102A43;
+  line-height: 1.35;
+  margin-bottom: 0.35rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.home .product-card__meta-alt {
+  font-size: 0.85rem;
+  color: #64748B;
+  margin-bottom: 0.5rem;
+}
+
+.home .product-card__provider {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  color: #102A43;
+  background: #F0F7FF;
+  border: 1px solid #C8E0FF;
+  border-radius: 6px;
+  padding: 0.25rem 0.6rem;
+  margin-bottom: 0.95rem;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.home .product-card__provider .provider-icon {
+  font-size: 15px;
+  color: #147D92;
+  flex-shrink: 0;
+}
+
+.home .product-card__provider .provider-label {
+  font-weight: 700;
+  color: #5A6A80;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+}
+
+.home .product-card__provider .provider-value {
+  font-weight: 700;
+  color: #0F3D56;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.home .product-card__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 0.85rem;
+  border-top: 1px solid #F1F5F9;
+}
+
+.home .product-card__foot strong {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0F3D56;
+}
+
+.home .btn-quote-white {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #0F3D56 !important;
+  color: #FFFFFF !important;
+  border-radius: 8px !important;
+  padding: 0.45rem 0.85rem !important;
+  font-size: 0.82rem !important;
+  font-weight: 600 !important;
+  border: none !important;
+  cursor: pointer;
+  transition: all 0.2s ease !important;
+}
+
+.home .btn-quote-white:hover {
+  background: #147D92 !important;
+  transform: translateY(-1px);
+}
+
+/* Provider & Cert Tiles Modern Styling */
+.home .provider-tile, .home .home-cert-card {
+  border: 1px solid #E2E8F0 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 4px 16px rgba(15, 61, 86, 0.04) !important;
+  background: #FFFFFF !important;
+  transition: all 0.25s ease !important;
+}
+
+.home .provider-tile:hover, .home .home-cert-card:hover {
+  border-color: #147D92 !important;
+  box-shadow: 0 16px 36px rgba(15, 61, 86, 0.09) !important;
+  transform: translateY(-4px) !important;
+}
+
+.home .provider-tile__logo {
+  height: 130px !important;
+  min-height: 130px !important;
+  background: #F8FAFC !important;
+  border-bottom: 1px solid #F1F5F9;
+}
+
+/* Cat Explorer Pills Active State */
+.pill--active {
+  background: #0F3D56 !important;
+  color: #FFFFFF !important;
+  border-color: #0F3D56 !important;
+  box-shadow: 0 4px 12px rgba(15, 61, 86, 0.25) !important;
+}
+
+@media (max-width: 900px) {
+  .home .hero__inner {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
 }
 </style>
-
-
-
-

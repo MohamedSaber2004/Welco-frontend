@@ -1,4 +1,4 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch, nextTick } from 'vue'
 import { t } from '../../i18n'
 
@@ -118,7 +118,7 @@ onUnmounted(() => {
                 <h3 class="modal-title">{{ title }}</h3>
               </slot>
               <button class="modal-close" :aria-label="t('common.close')" @click="handleClose">
-                ✕
+                <span class="material-symbols-outlined text-[18px]">close</span>
               </button>
             </div>
 
@@ -140,7 +140,7 @@ onUnmounted(() => {
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: var(--bg-overlay, rgba(15, 23, 42, 0.6));
+  background: var(--bg-overlay, rgba(16, 42, 67, 0.45));
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   display: flex;
@@ -159,71 +159,75 @@ onUnmounted(() => {
 }
 
 .modal-card {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg, 8px);
-  box-shadow: var(--shadow-lg);
+  background: var(--bg-surface, #ffffff);
+  border: 1px solid var(--border, #d9e2ec);
+  border-radius: var(--radius-xl, 12px);
+  box-shadow: var(--shadow-lg, 0 12px 32px rgba(16, 42, 67, 0.10));
   display: flex;
   flex-direction: column;
   max-height: 90vh;
   overflow: hidden;
-  z-index: var(--z-modal);
+  z-index: var(--z-modal, 1050);
 }
+
 .modal-header {
-  padding: var(--space-4) var(--space-6);
-  border-bottom: 1px solid var(--border);
+  padding: var(--space-4, 1rem) var(--space-6, 1.5rem);
+  border-bottom: 1px solid var(--border, #d9e2ec);
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  gap: var(--space-4);
+  gap: var(--space-4, 1rem);
+  background: var(--bg-surface, #ffffff);
 }
 
 .modal-title {
   font-family: var(--font-display);
-  font-size: var(--text-lg);
-  font-weight: var(--weight-semibold);
-  color: var(--fg-heading);
+  font-size: var(--text-lg, 1.125rem);
+  font-weight: var(--weight-semibold, 600);
+  color: var(--fg-heading, #102a43);
   margin: 0;
-  letter-spacing: var(--tracking-tight);
+  letter-spacing: var(--tracking-tight, -0.02em);
 }
 
 .modal-close {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   display: grid;
   place-items: center;
   background: transparent;
   border: 0;
-  border-radius: var(--radius-pill);
-  font-size: 13px;
-  color: var(--fg-muted);
+  border-radius: var(--radius-pill, 9999px);
+  color: var(--fg-muted, #7a90a8);
   cursor: pointer;
-  transition: background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+  transition: all var(--duration-fast, 150ms) var(--ease-out, ease-out);
 }
+
 .modal-close:hover {
-  color: var(--fg-heading);
-  background: var(--bg-subtle);
+  color: var(--fg-heading, #102a43);
+  background: var(--bg-subtle, #edf4ff);
 }
 
 .modal-body {
-  padding: var(--space-6);
+  padding: var(--space-6, 1.5rem);
   overflow-y: auto;
+  color: var(--fg-body, #42474d);
 }
 
 .modal-footer {
-  padding: var(--space-4) var(--space-6);
-  border-top: 1px solid var(--border);
+  padding: var(--space-4, 1rem) var(--space-6, 1.5rem);
+  border-top: 1px solid var(--border, #d9e2ec);
   display: flex;
-  gap: var(--space-3);
+  gap: var(--space-3, 0.75rem);
   justify-content: flex-end;
+  background: var(--bg-subtle, #f8fafc);
 }
 
 @media (max-width: 640px) {
   .modal-backdrop {
-    padding: var(--space-2);
+    padding: var(--space-2, 0.5rem);
   }
   .modal-card {
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-lg, 8px);
     max-height: 94vh;
   }
 }
@@ -231,7 +235,7 @@ onUnmounted(() => {
 /* Transitions */
 .modal-fade-enter-active,
 .modal-fade-leave-active {
-  transition: all var(--duration-base) var(--ease-out);
+  transition: all var(--duration-base, 180ms) var(--ease-out, ease-out);
 }
 
 .modal-fade-enter-from,
@@ -241,6 +245,6 @@ onUnmounted(() => {
 
 .modal-fade-enter-from .modal-container,
 .modal-fade-leave-to .modal-container {
-  transform: scale(0.95) translateY(8px);
+  transform: scale(0.96) translateY(6px);
 }
 </style>

@@ -8,7 +8,38 @@
 @import './design-tokens.css';
 
 :root {
+  /* ChatGPT Direct Token Aliases (Clinical Precision Spec) */
+  --color-primary: #0F3D56;
+  --color-primary-deep: #001D32;
+  --color-primary-light: #E3EFFF;
+  --color-steel-teal: #147D92;
+  --color-surgical-cyan: #28A7A1;
+  --color-canvas: #F7F9FB;
+  --color-white: #FFFFFF;
+  --color-brand-ice: #EDF4FF;
+  --color-heading: #102A43;
+  --color-body: #42474D;
+  --color-muted: #7A90A8;
+  --color-border: #D9E2EC;
+  --color-border-strong: #C2C7CD;
+  --color-focus: #0EA5E9;
+  --color-success: #16A34A;
+  --color-warning: #D97706;
+  --color-danger: #EF4444;
+  --color-surface-subtle: #F8FAFC;
+  --gradient-brand: linear-gradient(135deg, #0F3D56 0%, #147D92 100%);
   color-scheme: light;
+
+  /* ChatGPT Typography Scale */
+  --text-display: 48px;
+  --text-h1: 36px;
+  --text-h2: 30px;
+  --text-h3: 24px;
+  --text-h4: 20px;
+  --text-body-lg: 18px;
+  --text-body: 16px;
+  --text-body-sm: 14px;
+  --text-caption: 12px;
 
   /* ── Type — Plus Jakarta Sans (Display) + Inter (Body) + JetBrains Mono (Mono) ── */
   --wl-font-display: var(--font-display);
@@ -57,12 +88,12 @@
   --wl-gradient-rail: var(--bg-surface);
   --wl-gradient-card: var(--bg-surface);
   --wl-gradient-panel: var(--bg-surface);
-  --wl-gradient-primary: var(--brand-gradient);
-  --wl-gradient-gold: linear-gradient(135deg, #F59E0B 0%, #E67E22 100%);
+  --wl-gradient-primary: var(--brand-gradient, linear-gradient(135deg, #0F3D56 0%, #147D92 100%));
+  --wl-gradient-gold: var(--brand-gradient, linear-gradient(135deg, #0F3D56 0%, #147D92 100%));
   --wl-gradient-table-head: var(--bg-subtle);
   --wl-gradient-toolbar: var(--bg-surface);
   --wl-gradient-chip: var(--bg-subtle);
-  --wl-laser-sweep: linear-gradient(90deg, transparent, var(--secondary), transparent);
+  --wl-laser-sweep: linear-gradient(90deg, transparent, var(--secondary, #147D92), transparent);
 
   /* Shadows → Clinical Precision elevation */
   --shadow-card: var(--shadow-sm);
@@ -72,7 +103,7 @@
   --shadow-xl: var(--shadow-lg);
 
   /* Headings & Title effects — Clinical authority */
-  --wl-gold-text: var(--fg-warning);
+  --wl-gold-text: var(--color-steel-teal, #147D92);
   --wl-gold-text-shadow: none;
   --wl-gold-title-shadow: var(--shadow-xs);
   --wl-gold-glow-soft: none;
@@ -153,12 +184,13 @@
   --wl-danger-faint: var(--color-danger-100);
   --wl-indigo: var(--brand);
   --wl-indigo-soft: var(--brand-soft);
-  --wl-indigo-light: var(--color-brand-400);
-  --wl-primary-light: var(--color-brand-400);
-  --wl-primary-active: var(--brand-hover);
+  --wl-indigo-light: var(--color-primary-light, #E3EFFF);
+  --wl-primary-light: var(--color-steel-teal, #147D92);
+  --wl-primary-active: var(--color-steel-teal, #147D92);
+  --wl-cyan: var(--color-surgical-cyan, #28A7A1);
   --wl-sky: var(--secondary);
   --wl-sky-soft: var(--secondary-soft);
-  --wl-blue: var(--chart-1);
+  --wl-blue: var(--color-primary, #0F3D56);
   --wl-blue-soft: var(--color-brand-100);
   --wl-gold-light: var(--color-warning-500);
   --wl-admin: var(--brand);

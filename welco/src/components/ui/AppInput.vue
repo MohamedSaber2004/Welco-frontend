@@ -133,9 +133,9 @@ const sizeClass = computed(() => `field-control--${props.size}`)
   display: flex;
   align-items: center;
   width: 100%;
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm, 4px);
+  background: var(--bg-surface, #ffffff);
+  border: 1px solid var(--border, #d9e2ec);
+  border-radius: var(--radius-md, 6px);
   box-shadow: none;
   transition: border-color var(--duration-fast) var(--ease-out),
               box-shadow var(--duration-fast) var(--ease-out);
@@ -143,31 +143,31 @@ const sizeClass = computed(() => `field-control--${props.size}`)
 }
 
 .field-control:hover:not(.is-disabled) {
-  border-color: var(--border-strong);
+  border-color: var(--border-strong, #c2c7cd);
 }
 
 .field-control:focus-within {
-  border-color: var(--border-focus);
-  box-shadow: var(--ring-focus);
-  background: var(--bg-surface);
+  border-color: var(--color-focus, #0ea5e9);
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.12) !important;
+  background: var(--bg-surface, #ffffff);
 }
 
 .field-control--sm {
   min-height: 36px;
   height: 36px;
-  border-radius: var(--radius-xs, 3px);
+  border-radius: var(--radius-sm, 4px);
 }
 
 .field-control--md {
-  min-height: 40px;
-  height: 40px;
-  border-radius: var(--radius-sm, 4px);
+  min-height: 42px;
+  height: 42px;
+  border-radius: var(--radius-md, 6px);
 }
 
 .field-control--lg {
-  min-height: 44px;
-  height: 44px;
-  border-radius: var(--radius-sm, 4px);
+  min-height: 48px;
+  height: 48px;
+  border-radius: var(--radius-lg, 8px);
 }
 
 .field__input {
@@ -252,9 +252,9 @@ const sizeClass = computed(() => `field-control--${props.size}`)
 }
 
 .has-error .field-control {
-  border-color: var(--color-danger-500) !important;
-  box-shadow: 0 0 0 3px rgba(240, 67, 95, 0.25) !important;
-  background: var(--bg-surface);
+  border-color: var(--color-danger, #ef4444) !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12) !important;
+  background: var(--bg-surface, #ffffff);
 }
 
 .is-disabled {

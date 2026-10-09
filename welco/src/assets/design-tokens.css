@@ -1,18 +1,48 @@
-
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
 
 :root {
+  --color-primary: #0F3D56;
+  --color-primary-deep: #001D32;
+  --color-primary-light: #E3EFFF;
 
+  --color-steel-teal: #147D92;
+  --color-surgical-cyan: #28A7A1;
+
+  --color-canvas: #F7F9FB;
+  --color-white: #FFFFFF;
+  --color-brand-ice: #EDF4FF;
+
+  --color-heading: #102A43;
+  --color-body: #42474D;
+  --color-muted: #7A90A8;
+
+  --color-border: #D9E2EC;
+  --color-border-strong: #C2C7CD;
+
+  --color-focus: #0EA5E9;
+
+  /* Semantic */
+  --color-success: #16A34A;
+  --color-warning: #D97706;
+  --color-danger: #EF4444;
+
+  /* Optional surface */
+  --color-surface-subtle: #F8FAFC;
+
+  /* Brand gradient */
+  --gradient-brand: linear-gradient(135deg, #0F3D56 0%, #147D92 100%);
+
+  /* Base scales */
   --color-brand-50:  #EDF4FF;
   --color-brand-100: #E3EFFF;
   --color-brand-200: #C8E6FF;
   --color-brand-300: #A3CBEA;
   --color-brand-400: #80A8C5;
-  --color-brand-500: #147D92;  
-  --color-brand-600: #0F3D56;  
+  --color-brand-500: #147D92;
+  --color-brand-600: #0F3D56;
   --color-brand-700: #0C3145;
   --color-brand-800: #082434;
-  --color-brand-900: #001D32;  
+  --color-brand-900: #001D32;
 
 
   --color-neutral-0:   #FFFFFF;  /* Sterile clean white */
@@ -166,11 +196,23 @@
   /* ------------------------------------------------------------------
      4. Typography Scale & Families
      ------------------------------------------------------------------ */
-  --font-display: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-body:    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-sans:    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Plus Jakarta Sans", "Cairo", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-body:    "Inter", "Cairo", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-sans:    "Inter", "Cairo", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono:    "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
 
+  /* Centralized Typography Scale (ChatGPT Spec) */
+  --text-display: 48px;
+  --text-h1: 36px;
+  --text-h2: 30px;
+  --text-h3: 24px;
+  --text-h4: 20px;
+  --text-body-lg: 18px;
+  --text-body: 16px;
+  --text-body-sm: 14px;
+  --text-caption: 12px;
+
+  /* Component step scales */
   --text-2xs: 0.625rem;  /* 10px — technical micro tags, DIN stamps */
   --text-xs:  0.6875rem; /* 11px — lot-traceable badges, micro legends */
   --text-sm:  0.75rem;   /* 12px — high-density table cells, SKU info */
@@ -200,17 +242,19 @@
      5. Spacing — 4px baseline subdivision on 8pt architectural rhythm
      ------------------------------------------------------------------ */
   --space-0: 0;
-  --space-1: 0.25rem;  /* 4px  */
-  --space-2: 0.5rem;   /* 8px  */
-  --space-3: 0.75rem;  /* 12px */
-  --space-4: 1rem;     /* 16px */
-  --space-5: 1.25rem;  /* 20px */
-  --space-6: 1.5rem;   /* 24px */
-  --space-7: 1.75rem;  /* 28px */
-  --space-8: 2rem;     /* 32px */
-  --space-10: 2.5rem;  /* 40px */
-  --space-12: 3rem;    /* 48px */
-  --space-16: 4rem;    /* 64px */
+  --space-1: 4px;      /* 0.25rem */
+  --space-2: 8px;      /* 0.5rem */
+  --space-3: 12px;     /* 0.75rem */
+  --space-4: 16px;     /* 1rem */
+  --space-5: 20px;     /* 1.25rem */
+  --space-6: 24px;     /* 1.5rem */
+  --space-7: 28px;     /* 1.75rem */
+  --space-8: 32px;     /* 2rem */
+  --space-10: 40px;    /* 2.5rem */
+  --space-12: 48px;    /* 3rem */
+  --space-16: 64px;    /* 4rem */
+  --space-20: 80px;    /* 5rem */
+  --space-24: 96px;    /* 6rem */
 
   /* ------------------------------------------------------------------
      6. Radius — Level 1 Soft Precision (Avoid bulbous consumer radii)
@@ -227,9 +271,9 @@
      7. Elevation — Professional Shadows with Depth
      ------------------------------------------------------------------ */
   --shadow-xs: 0 1px 2px rgba(16, 42, 67, 0.04);
-  --shadow-sm: 0 1px 3px rgba(16, 42, 67, 0.05), 0 1px 2px rgba(16, 42, 67, 0.03);
-  --shadow-md: 0 4px 14px -2px rgba(16, 42, 67, 0.06), 0 2px 6px -1px rgba(16, 42, 67, 0.04);
-  --shadow-lg: 0 12px 28px -4px rgba(16, 42, 67, 0.12), 0 4px 12px -2px rgba(16, 42, 67, 0.06);
+  --shadow-sm: 0 2px 6px rgba(16, 42, 67, 0.06);
+  --shadow-md: 0 6px 18px rgba(16, 42, 67, 0.08);
+  --shadow-lg: 0 12px 32px rgba(16, 42, 67, 0.10);
   --shadow-xl: 0 20px 40px -4px rgba(16, 42, 67, 0.16), 0 8px 16px -2px rgba(16, 42, 67, 0.08);
   --shadow-2xl: 0 25px 50px -12px rgba(16, 42, 67, 0.20);
   --shadow-brand: 0 6px 18px rgba(15, 61, 86, 0.18);
@@ -549,6 +593,38 @@
     opacity: 1;
     transform: none;
   }
+}
+
+/* --------------------------------------------------------------------------
+   14. Arabic / RTL Typography & Technical Data Alignment
+   -------------------------------------------------------------------------- */
+[dir="rtl"] {
+  --font-display: "Cairo", "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  --font-body:    "Cairo", "Inter", system-ui, -apple-system, sans-serif;
+  --font-sans:    "Cairo", "Inter", system-ui, -apple-system, sans-serif;
+}
+
+[dir="rtl"] h1,
+[dir="rtl"] h2,
+[dir="rtl"] h3,
+[dir="rtl"] h4,
+[dir="rtl"] h5,
+[dir="rtl"] h6 {
+  font-family: var(--font-display);
+  letter-spacing: normal;
+}
+
+/* Medical technical identifiers must strictly remain LTR in monospace font across all languages */
+.mono,
+.mono-num,
+[class*="sku"],
+[class*="din"],
+[class*="lot"],
+[class*="rfq-num"],
+[class*="order-num"] {
+  font-family: var(--font-mono) !important;
+  direction: ltr !important;
+  unicode-bidi: isolate;
 }
 
 

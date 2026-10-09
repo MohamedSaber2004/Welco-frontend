@@ -422,11 +422,12 @@ const goToProduct = (id: string) => {
                 <div class="card-specs mono">
                   <span v-if="p.material" class="spec-tag">{{ p.material }}</span>
                   <span v-if="p.lengthCm" class="spec-tag">{{ p.lengthCm }} cm</span>
-                  <span class="spec-tag">CE Class IIa</span>
                 </div>
 
                 <div class="card-provider mono">
-                  {{ p.companyName || p.manufacturerEn || 'Welco Surgical' }}
+                  <span class="material-symbols-outlined provider-icon" aria-hidden="true">storefront</span>
+                  <span class="provider-label">{{ locale === 'ar' ? 'المورد:' : 'Supplier:' }}</span>
+                  <span class="provider-value" dir="auto">{{ p.companyName || localized(p.supplierNameEn, p.supplierNameAr) || localized(p.manufacturerEn, p.manufacturerAr) || (locale === 'ar' ? 'توريد مباشر' : 'Direct Supply') }}</span>
                 </div>
 
                 <!-- Footer with Price & White Add to Quote Button -->
@@ -961,10 +962,40 @@ const goToProduct = (id: string) => {
 }
 
 .card-provider {
-  font-size: 0.75rem;
-  color: var(--text-muted, #94a3b8);
-  margin-bottom: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  color: #102A43;
+  background: #F0F7FF;
+  border: 1px solid #C8E0FF;
+  border-radius: 6px;
+  padding: 0.25rem 0.55rem;
+  margin-bottom: 0.85rem;
   margin-top: auto;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.card-provider .provider-icon {
+  font-size: 15px;
+  color: #147D92;
+  flex-shrink: 0;
+}
+
+.card-provider .provider-label {
+  font-weight: 700;
+  color: #5A6A80;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+}
+
+.card-provider .provider-value {
+  font-weight: 700;
+  color: #0F3D56;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Card Foot */

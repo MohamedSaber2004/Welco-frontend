@@ -6,6 +6,18 @@ import { authService, services } from '../../di/container'
 const support = computed(() => services.contentService.supportContact.value)
 // Footer shows general guest links only; account links render for authed users.
 const isAuthed = computed(() => authService.isAuthenticated)
+
+const effectiveEmail = computed(() => support.value?.supportEmail || 'support@welco.health')
+const effectivePhone = computed(() => support.value?.phoneNumber || '+971 4 800 9352')
+
+const displayWorkingHours = computed(() => {
+  const raw = support.value?.workingHours
+  // If the backend has a custom string that is NOT the dummy GST/Mon-Fri seed
+  if (raw && !raw.includes('Mon - Fri') && !raw.includes('GST') && !raw.includes('الاثنين - الجمعة')) {
+    return raw
+  }
+  return t('footer.workingHours')
+})
 </script>
 
 <template>
@@ -14,19 +26,21 @@ const isAuthed = computed(() => authService.isAuthenticated)
       <div class="footer__brand">
         <div class="footer__logo">
           <img src="/logo.jpeg" alt="Welco" width="120" height="28" loading="lazy" />
-          <span class="brand-title">Welco Surgical</span>
+          <span class="brand-title">{{ t('footer.brandTitle') }}</span>
         </div>
         <p class="brand-desc">{{ t('footer.brandDesc') }}</p>
-        <div class="footer-badges mono">
-          <span class="footer-badge">ISO 13485:2016</span>
-          <span class="footer-badge">CE MDR CLASS IIa</span>
-          <span class="footer-badge">UDI LOT-TRACEABLE</span>
+        <div class="footer-badges">
+          <span class="footer-badge">{{ t('footer.badgeIso') }}</span>
+          <span class="footer-badge">{{ t('footer.badgeCe') }}</span>
+          <span class="footer-badge">{{ t('footer.badgeVerified') }}</span>
         </div>
       </div>
 
       <div class="footer__col">
         <h4>{{ t('footer.product') }}</h4>
         <router-link to="/marketplace" class="footer__link">{{ t('nav.marketplace') }}</router-link>
+        <router-link to="/catalog/most-selling" class="footer__link">{{ t('home.mostSellingTitle') }}</router-link>
+        <router-link to="/categories" class="footer__link">{{ t('marketplace.categoriesTitle') }}</router-link>
         <router-link to="/providers" class="footer__link">{{ t('nav.providers') }}</router-link>
         <router-link to="/certifications" class="footer__link">{{ t('nav.certifications') }}</router-link>
         <router-link to="/oem" class="footer__link">{{ t('nav.oem') }}</router-link>
@@ -46,23 +60,33 @@ const isAuthed = computed(() => authService.isAuthenticated)
         <router-link to="/about" class="footer__link">{{ t('nav.about') }}</router-link>
         <router-link to="/help" class="footer__link">{{ t('footer.helpCenter') }}</router-link>
         <router-link v-if="isAuthed" to="/help/my-tickets" class="footer__link">{{ t('help.myTickets') }}</router-link>
-        <a v-if="support.supportEmail" class="footer__link" :href="'mailto:' + support.supportEmail">
-          {{ support.supportEmail }}
-        </a>
-        <a v-if="support.phoneNumber" class="footer__link" :href="'tel:' + support.phoneNumber.replace(/\s+/g, '')">
-          {{ support.phoneNumber }}
-        </a>
-        <span v-if="support.workingHours" class="footer__note mono">{{ support.workingHours }}</span>
+        
+        <div class="footer__contact-items">
+          <a class="footer__contact-item" :href="'mailto:' + effectiveEmail">
+            <span class="material-symbols-outlined contact-icon" aria-hidden="true">mail</span>
+            <span>{{ effectiveEmail }}</span>
+          </a>
+          <a class="footer__contact-item" :href="'tel:' + effectivePhone.replace(/\s+/g, '')">
+            <span class="material-symbols-outlined contact-icon" aria-hidden="true">call</span>
+            <span dir="ltr">{{ effectivePhone }}</span>
+          </a>
+          <div class="footer__contact-item footer__contact-hours">
+            <span class="material-symbols-outlined contact-icon" aria-hidden="true">schedule</span>
+            <div class="hours-wrap">
+              <span class="hours-label">{{ t('footer.workingHoursLabel') }}</span>
+              <span class="hours-val">{{ displayWorkingHours }}</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Verification & Compliance Bar -->
+    <!-- Bottom Status & Copyright Bar -->
     <div class="footer__bottom">
       <div class="footer__bottom-left">
-        <span>© {{ new Date().getFullYear() }} Welco Surgical Instruments GmbH / FZ-LLC. All rights reserved.</span>
-        <span class="compliance-note">Passivated Stainless Steel DIN EN ISO 17664 · 134°C Autoclave Validated.</span>
+        <span>{{ t('footer.copyright', { year: new Date().getFullYear() }) }}</span>
       </div>
-      <div class="footer__bottom-right mono">
+      <div class="footer__bottom-right">
         <span class="telemetry-pill">
           <span class="status-dot"></span>
           <span>{{ t('footer.productionOnline') }}</span>
@@ -74,17 +98,25 @@ const isAuthed = computed(() => authService.isAuthenticated)
 
 <style scoped>
 .footer {
-  background: radial-gradient(circle at 78% 24%, rgba(214, 243, 106, .26), transparent 22rem), linear-gradient(118deg, #062f45 0%, #0b6370 58%, #13969a 100%) !important;
-  color: rgba(247, 255, 254, .85) !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.12) !important;
-  padding: clamp(3rem, 7vw, 6rem) var(--wl-gutter) 1.5rem;
+  background: #FFFFFF !important;
+  color: #243B53 !important;
+  border-top: 1px solid var(--color-border, #D9E2EC) !important;
+  box-shadow: 0 -4px 24px rgba(16, 42, 67, 0.04);
+  padding: clamp(3.2rem, 5vw, 4.8rem) var(--wl-gutter) 1.5rem;
   position: relative;
   padding-inline-start: max(var(--wl-gutter), env(safe-area-inset-left, 0px));
   padding-inline-end: max(var(--wl-gutter), env(safe-area-inset-right, 0px));
   padding-bottom: max(1.5rem, env(safe-area-inset-bottom, 0px));
 }
 .footer::before {
-  display: none;
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #0F3D56 0%, #147D92 45%, #28A7A1 100%);
+  display: block !important;
 }
 .footer__inner {
   max-width: var(--wl-max-width);
@@ -100,110 +132,181 @@ const isAuthed = computed(() => authService.isAuthenticated)
 .footer__logo {
   display: inline-flex;
   align-items: center;
-  gap: 0.65rem;
+  gap: 0.75rem;
 }
 
 .footer__logo img {
-  height: 26px;
+  height: 32px;
   width: auto;
   border-radius: 6px;
+  border: 1px solid #D9E2EC;
+  background: #FFFFFF;
 }
 
 .brand-title {
   font-family: var(--wl-font-display);
-  font-size: 1.15rem;
+  font-size: 1.25rem;
   font-weight: 800;
-  color: #ffffff;
+  color: #0F3D56;
   letter-spacing: -0.015em;
 }
 
 .brand-desc {
-  margin: 0.85rem 0 1.15rem;
-  font-size: 13px;
-  color: rgba(247, 255, 254, 0.85);
-  line-height: 1.6;
+  margin: 0.85rem 0 1.25rem;
+  font-size: 14px;
+  color: #486581;
+  line-height: 1.65;
   max-width: 320px;
 }
 
 .footer-badges {
   display: flex;
-  gap: 0.4rem;
+  gap: 0.45rem;
   flex-wrap: wrap;
 }
 
 .footer-badge {
-  font-size: var(--text-2xs);
-  font-weight: var(--weight-medium);
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  padding: 0.2rem 0.5rem;
-  border-radius: var(--radius-xs);
+  font-size: 11px;
+  font-weight: 700;
+  color: #0F3D56;
+  background: #F0F7FF;
+  border: 1px solid #BAE3FF;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  letter-spacing: 0.03em;
 }
 
 .footer__col h4,
 .footer__title {
   font-family: var(--font-display);
-  font-size: var(--text-xs);
-  letter-spacing: var(--tracking-wide);
+  font-size: 12.5px;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: var(--platform-lime, #d6f36a);
-  margin-bottom: 0.95rem;
-  font-weight: 700;
+  color: #0F3D56;
+  margin-bottom: 1.1rem;
+  font-weight: 800;
 }
 
 .footer__link {
   display: block;
-  font-size: 13.5px;
+  font-size: 14px;
+  font-weight: 500;
   padding: 0.35rem 0;
-  color: rgba(247, 255, 254, 0.82);
+  color: #243B53;
   text-decoration: none;
   transition: color 0.15s ease, transform 0.15s ease;
 }
 
 .footer__link:hover {
-  color: var(--platform-lime, #d6f36a);
+  color: #147D92;
+  transform: translateX(3px);
+  font-weight: 600;
+}
+
+.footer__contact-items {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.footer__contact-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #243B53;
+  text-decoration: none;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.footer__contact-item:hover {
+  color: #147D92;
   transform: translateX(2px);
+}
+[dir='rtl'] .footer__contact-item:hover {
+  transform: translateX(-2px);
+}
+
+.contact-icon {
+  font-size: 18px;
+  color: #147D92;
+  flex-shrink: 0;
+}
+
+.footer__contact-hours {
+  align-items: flex-start;
+  margin-top: 0.25rem;
+  padding: 0.55rem 0.75rem;
+  background: #F7FAFC;
+  border-radius: 8px;
+  border: 1px solid #E2E8F0;
+}
+
+.footer__contact-hours:hover {
+  transform: none;
+}
+
+.hours-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  line-height: 1.35;
+}
+
+.hours-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #627D98;
+}
+
+.hours-val {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #0F3D56;
 }
 
 .footer__note {
   display: block;
-  font-size: 10.5px;
-  color: rgba(247, 255, 254, 0.65);
+  font-size: 11.5px;
+  color: #627D98;
   padding: 0.35rem 0;
   line-height: 1.5;
 }
 [dir='rtl'] .footer__link:hover {
-  transform: translateX(-2px);
+  transform: translateX(-3px);
 }
 @media (hover: none) {
   .footer__link:hover { transform: none; }
-  .footer__link:active { color: var(--platform-lime, #d6f36a); }
+  .footer__link:active { color: #147D92; }
 }
 
 .footer__bottom {
   max-width: var(--wl-max-width);
-  margin: 2.5rem auto 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.14);
-  padding-top: 1.25rem;
+  margin: 2.75rem auto 0;
+  border-top: 1px solid #E2E8F0;
+  padding-top: 1.35rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
   flex-wrap: wrap;
-  font-size: 11.5px;
-  color: rgba(247, 255, 254, 0.7);
+  font-size: 12.5px;
+  color: #486581;
 }
 
 .footer__bottom-left {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.3rem;
 }
 
 .compliance-note {
-  font-size: 10.5px;
-  color: rgba(247, 255, 254, 0.6);
+  font-size: 11.5px;
+  color: #627D98;
 }
 
 .telemetry-pill {
@@ -211,22 +314,22 @@ const isAuthed = computed(() => authService.isAuthenticated)
   align-items: center;
   gap: 0.45rem;
   font-family: var(--font-mono, monospace);
-  font-size: 10px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #062f45;
-  background: var(--platform-lime, #d6f36a);
-  border: 1px solid rgba(214, 243, 106, 0.4);
-  padding: 0.2rem 0.55rem;
-  border-radius: var(--radius-xs, 3px);
+  color: #15803D;
+  background: #F0FDF4;
+  border: 1.5px solid #86EFAC;
+  padding: 0.3rem 0.65rem;
+  border-radius: 6px;
 }
 .status-dot {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
-  background: #062f45;
-  box-shadow: 0 0 0 2px rgba(6, 47, 69, 0.2);
+  background: #16A34A;
+  box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.25);
 }
 
 @media (max-width: 1024px) {

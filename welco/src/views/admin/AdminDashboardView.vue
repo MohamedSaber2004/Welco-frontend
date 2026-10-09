@@ -113,9 +113,9 @@ const totalSevenMonthOps = computed(() => {
 const territoryData = computed(() => {
   const max = Math.max(liveCounts.value.countries, liveCounts.value.cities, liveCounts.value.zones, 1)
   return [
-    { label: t('admin.countries'), value: liveCounts.value.countries, pct: Math.round((liveCounts.value.countries / max) * 100), color: 'var(--wl-primary-light)', icon: 'public', desc: t('admin.sovereignRoot') },
-    { label: t('admin.cities'), value: liveCounts.value.cities, pct: Math.round((liveCounts.value.cities / max) * 100), color: 'var(--wl-primary-active)', icon: 'location_city', desc: t('admin.regionalHubs') },
-    { label: t('admin.zones'), value: liveCounts.value.zones, pct: Math.round((liveCounts.value.zones / max) * 100), color: 'var(--wl-success)', icon: 'my_location', desc: t('admin.deliveryAnchors') },
+    { label: t('admin.countries'), value: liveCounts.value.countries, pct: Math.round((liveCounts.value.countries / max) * 100), color: 'var(--color-primary, #0F3D56)', icon: 'public', desc: t('admin.sovereignRoot') },
+    { label: t('admin.cities'), value: liveCounts.value.cities, pct: Math.round((liveCounts.value.cities / max) * 100), color: 'var(--color-steel-teal, #147D92)', icon: 'location_city', desc: t('admin.regionalHubs') },
+    { label: t('admin.zones'), value: liveCounts.value.zones, pct: Math.round((liveCounts.value.zones / max) * 100), color: 'var(--color-surgical-cyan, #28A7A1)', icon: 'my_location', desc: t('admin.deliveryAnchors') },
   ]
 })
 
@@ -133,10 +133,10 @@ const activeDonutSegment = ref<{ label: string; value: number; pct: number; colo
 
 const platformData = computed(() => {
   const items = [
-    { label: t('admin.products'), value: stats.value.products, color: 'var(--wl-primary-light)', to: '/marketplace' },
-    { label: t('admin.categoriesTitle'), value: stats.value.categories, color: 'var(--wl-primary-active)', to: '/marketplace' },
-    { label: t('admin.users'), value: stats.value.users, color: 'var(--wl-success)', to: '/admin/users' },
-    { label: t('admin.distributorApps'), value: stats.value.pendingApps, color: 'var(--wl-warning)', to: '/admin/companies' },
+    { label: t('admin.products'), value: stats.value.products, color: 'var(--color-primary, #0F3D56)', to: '/marketplace' },
+    { label: t('admin.categoriesTitle'), value: stats.value.categories, color: 'var(--color-steel-teal, #147D92)', to: '/marketplace' },
+    { label: t('admin.users'), value: stats.value.users, color: 'var(--color-surgical-cyan, #28A7A1)', to: '/admin/users' },
+    { label: t('admin.distributorApps'), value: stats.value.pendingApps, color: 'var(--color-warning, #D97706)', to: '/admin/companies' },
   ]
   const total = items.reduce((s, i) => s + i.value, 0) || 1
   let acc = 0
@@ -482,7 +482,7 @@ onUnmounted(_removeListeners)
               <span class="telemetry-sep" aria-hidden="true"></span>
               <div class="telemetry-item">
                 <span class="telemetry-label mono">{{ t('admin.kpiPeak') }}</span>
-                <strong class="telemetry-value mono">{{ peakThroughputMonth.month }} · {{ peakThroughputMonth.value }}</strong>
+                <strong class="telemetry-value mono">{{ peakThroughputMonth.month }} &bull; {{ peakThroughputMonth.value }}</strong>
               </div>
               <span class="telemetry-sep" aria-hidden="true"></span>
               <div class="telemetry-item">
@@ -495,15 +495,15 @@ onUnmounted(_removeListeners)
           <div class="curve-chart-container">
             <svg class="curve-chart-svg" viewBox="0 0 540 180" preserveAspectRatio="none">
               <defs>
-<linearGradient id="curveGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="var(--wl-primary-light)" stop-opacity="0.32" />
-                  <stop offset="60%" stop-color="var(--wl-primary-active)" stop-opacity="0.10" />
-                  <stop offset="100%" stop-color="var(--wl-primary-active)" stop-opacity="0.0" />
+                <linearGradient id="curveGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#147D92" stop-opacity="0.25" />
+                  <stop offset="60%" stop-color="#147D92" stop-opacity="0.08" />
+                  <stop offset="100%" stop-color="#0F3D56" stop-opacity="0.0" />
                 </linearGradient>
                 <linearGradient id="laserStrokeGrad" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0%" stop-color="var(--wl-primary-light)" />
-                  <stop offset="50%" stop-color="var(--wl-primary-active)" />
-                  <stop offset="100%" stop-color="var(--wl-primary-active)" />
+                  <stop offset="0%" stop-color="#0F3D56" />
+                  <stop offset="50%" stop-color="#147D92" />
+                  <stop offset="100%" stop-color="#28A7A1" />
                 </linearGradient>
               </defs>
 
@@ -515,7 +515,7 @@ onUnmounted(_removeListeners)
 
               <!-- Ambient Glow & Laser Curve -->
               <path :d="smoothChart.area" fill="url(#curveGrad)" />
-              <path :d="smoothChart.line" fill="none" stroke="rgba(105, 169, 255, 0.25)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" class="chart-glow-path" />
+              <path :d="smoothChart.line" fill="none" stroke="rgba(20, 125, 146, 0.20)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" class="chart-glow-path" />
               <path :d="smoothChart.line" fill="none" stroke="url(#laserStrokeGrad)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" />
 
               <!-- Interactive Laser Caliper Vertical Guide -->
@@ -582,7 +582,7 @@ onUnmounted(_removeListeners)
                 <span class="material-symbols-outlined header-icon">public</span>
                 {{ t('admin.territoryArchitecture') }}
               </h3>
-              <span class="mono chart-card__sub">{{ territoryRatios.citiesPerCountry }} {{ t('admin.ratioCitiesPerCountry') }} · {{ territoryRatios.zonesPerCity }} {{ t('admin.ratioZonesPerCity') }}</span>
+              <span class="mono chart-card__sub">{{ territoryRatios.citiesPerCountry }} {{ t('admin.ratioCitiesPerCountry') }} &bull; {{ territoryRatios.zonesPerCity }} {{ t('admin.ratioZonesPerCity') }}</span>
             </div>
           </div>
 
@@ -685,7 +685,7 @@ onUnmounted(_removeListeners)
             <span class="material-symbols-outlined text-[15px]">history</span>
             <span>{{ t('admin.auditTrail') }}</span>
           </div>
-          <h2 class="card-title">{{ t('admin.auditLogs') }} · {{ t('admin.liveLedger') }}</h2>
+          <h2 class="card-title">{{ t('admin.auditLogs') }} &bull; {{ t('admin.liveLedger') }}</h2>
         </div>
       </div>
 

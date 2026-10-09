@@ -327,15 +327,14 @@ const toggleLang = async () => {
 }
 
 .admin-link--active {
-  background: var(--brand) !important;
-  color: var(--fg-on-brand) !important;
-  border-color: var(--brand) !important;
-  font-weight: var(--weight-medium);
-  box-shadow: var(--shadow-brand);
+  background: var(--color-primary-light, #e3efff) !important;
+  color: var(--color-primary, #0f3d56) !important;
+  border-color: transparent !important;
+  font-weight: var(--weight-semibold, 600);
 }
 
 .admin-link--active .nav-icon {
-  color: var(--fg-on-brand);
+  color: var(--color-primary, #0f3d56);
 }
 
 .rail__foot {
@@ -498,10 +497,10 @@ const toggleLang = async () => {
     outline-offset: 2px;
   }
   .admin-mobile-pill.is-active {
-    background: var(--brand);
-    color: var(--fg-on-brand);
-    border-color: var(--brand);
-    box-shadow: var(--shadow-brand);
+    background: var(--color-primary-light, #e3efff);
+    color: var(--color-primary, #0f3d56);
+    border-color: var(--color-primary-light, #e3efff);
+    font-weight: 600;
   }
   .admin-main {
     padding: 0;

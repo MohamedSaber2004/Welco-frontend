@@ -198,7 +198,7 @@ const handleLogin = async () => {
   padding: 0 14px;
   padding-inline-start: 42px;
   background: var(--wl-surface);
-  border: 1.5px solid var(--wl-border);
+  border: 1px solid var(--border, #D9E2EC);
   border-radius: var(--radius-md);
   font-size: 14px;
   font-family: var(--wl-font-body);
@@ -245,7 +245,7 @@ const handleLogin = async () => {
   gap: 0.65rem;
   padding: 0.85rem 1.1rem;
   background: color-mix(in srgb, var(--wl-primary) 8%, var(--wl-surface));
-  border: 1.5px solid color-mix(in srgb, var(--wl-primary) 35%, var(--wl-border));
+  border: 1px solid color-mix(in srgb, var(--wl-primary) 35%, var(--wl-border));
   border-radius: var(--radius-md);
   color: var(--wl-ink-strong);
   font-size: 13px;

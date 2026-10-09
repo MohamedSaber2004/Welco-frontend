@@ -438,7 +438,7 @@ watch([() => filters.value.entity, () => filters.value.action, () => filters.val
 .table-card {
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  border-radius: 16px;
+  border-radius: var(--radius-lg, 8px);
   overflow: hidden;
   box-shadow: var(--wl-shadow-card);
 }

@@ -249,7 +249,7 @@ async function track() {
 .track-search-card {
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  border-radius: 16px;
+  border-radius: var(--radius-lg, 8px);
   padding: 1.25rem;
   box-shadow: var(--shadow-xs);
 }
@@ -283,8 +283,8 @@ async function track() {
   padding: 0 14px;
   padding-inline-start: 42px;
   background: var(--wl-surface-soft);
-  border: 1.5px solid var(--wl-border);
-  border-radius: 10px;
+  border: 1px solid var(--wl-border);
+  border-radius: var(--radius-md, 6px);
   font-size: 14px;
   color: var(--wl-ink-strong);
   outline: none;
@@ -337,7 +337,7 @@ async function track() {
 .result-not-found-card {
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  border-radius: 16px;
+  border-radius: var(--radius-lg, 8px);
   padding: 3.5rem 1.5rem;
   text-align: center;
   box-shadow: var(--shadow-xs);
@@ -377,7 +377,7 @@ async function track() {
 .result-card {
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  border-radius: 16px;
+  border-radius: var(--radius-lg, 8px);
   padding: 1.5rem;
   box-shadow: var(--shadow-xs);
   display: flex;
@@ -513,8 +513,8 @@ async function track() {
   height: 44px;
   padding: 0 1.25rem;
   background: var(--wl-surface);
-  border: 1.5px solid var(--wl-border);
-  border-radius: 10px;
+  border: 1px solid var(--wl-border);
+  border-radius: var(--radius-md, 6px);
   font-size: 13px;
   font-weight: 700;
   color: var(--wl-ink-soft);

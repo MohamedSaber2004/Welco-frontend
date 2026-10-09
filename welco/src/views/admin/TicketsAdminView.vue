@@ -365,8 +365,8 @@ function clearFilters() {
   height: 44px;
   padding: 0 14px;
   background: var(--wl-surface);
-  border: 1.5px solid var(--wl-border);
-  border-radius: 10px;
+  border: 1px solid var(--wl-border);
+  border-radius: var(--radius-md, 6px);
   font-size: 13px;
   color: var(--wl-ink-strong);
   outline: none;
@@ -386,8 +386,8 @@ function clearFilters() {
   height: 44px;
   padding: 0 1rem;
   background: var(--wl-surface);
-  border: 1.5px solid var(--wl-border);
-  border-radius: 10px;
+  border: 1px solid var(--wl-border);
+  border-radius: var(--radius-md, 6px);
   font-size: 13px;
   font-weight: 600;
   color: var(--wl-ink-soft);
@@ -404,7 +404,7 @@ function clearFilters() {
 .empty-tray-card {
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  border-radius: 16px;
+  border-radius: var(--radius-lg, 8px);
   padding: 3.5rem 1.5rem;
   text-align: center;
   box-shadow: var(--shadow-xs);
@@ -443,7 +443,7 @@ function clearFilters() {
 .ticket-card {
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  border-radius: 16px;
+  border-radius: var(--radius-lg, 8px);
   padding: 1.25rem 1.5rem;
   box-shadow: var(--shadow-xs);
   display: flex;
@@ -602,8 +602,8 @@ function clearFilters() {
   height: 44px;
   padding: 0 14px;
   background: var(--wl-surface-soft);
-  border: 1.5px solid var(--wl-border);
-  border-radius: 10px;
+  border: 1px solid var(--wl-border);
+  border-radius: var(--radius-md, 6px);
   font-size: 13px;
   color: var(--wl-ink-strong);
   outline: none;

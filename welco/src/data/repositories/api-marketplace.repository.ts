@@ -76,6 +76,28 @@ const normalizeProduct = (p: ProductDto): ProductDto => {
     p.description = p.descriptionEn || p.descriptionAr || rawDesc
   }
 
+  // Handle company & supplier names
+  if (!p.companyName) {
+    const rawComp = (raw.company ?? raw.Company) as Record<string, unknown> | undefined
+    const compName = rawComp && typeof rawComp === 'object' ? (rawComp.name ?? rawComp.Name ?? rawComp.nameEn ?? rawComp.NameEn) : undefined
+    p.companyName = (raw.companyName ?? raw.CompanyName ?? raw.providerName ?? raw.ProviderName ?? compName ?? null) as string | null
+  }
+  if (!p.companyId) {
+    const rawComp = (raw.company ?? raw.Company) as Record<string, unknown> | undefined
+    const compId = rawComp && typeof rawComp === 'object' ? (rawComp.id ?? rawComp.Id) : undefined
+    p.companyId = (raw.companyId ?? raw.CompanyId ?? raw.providerId ?? raw.ProviderId ?? compId ?? null) as string | null
+  }
+  if (!p.supplierNameEn) {
+    const rawSupp = (raw.supplier ?? raw.Supplier) as Record<string, unknown> | undefined
+    const suppName = rawSupp && typeof rawSupp === 'object' ? (rawSupp.nameEn ?? rawSupp.NameEn ?? rawSupp.name ?? rawSupp.Name) : undefined
+    p.supplierNameEn = (raw.supplierNameEn ?? raw.SupplierNameEn ?? raw.supplierName ?? raw.SupplierName ?? suppName ?? '') as string
+  }
+  if (!p.supplierNameAr) {
+    const rawSupp = (raw.supplier ?? raw.Supplier) as Record<string, unknown> | undefined
+    const suppName = rawSupp && typeof rawSupp === 'object' ? (rawSupp.nameAr ?? rawSupp.NameAr ?? rawSupp.name ?? rawSupp.Name) : undefined
+    p.supplierNameAr = (raw.supplierNameAr ?? raw.SupplierNameAr ?? raw.supplierName ?? raw.SupplierName ?? suppName ?? '') as string
+  }
+
   // Handle images: support imageName, imageUrl, image, imagePath, fileUrl, photo
   if (!p.imageName) {
     p.imageName = (raw.imageName ?? raw.ImageName ?? raw.imageUrl ?? raw.ImageUrl ?? raw.image ?? raw.Image ?? raw.fileUrl ?? raw.FileUrl ?? raw.photo ?? null) as string | null

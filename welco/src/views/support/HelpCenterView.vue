@@ -886,7 +886,7 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
   padding: 2.5rem 2rem;
   border: 1px solid var(--wl-border);
   background: var(--wl-surface);
-  border-radius: 16px;
+  border-radius: var(--radius-xl, 12px);
   box-shadow: var(--wl-shadow-card);
   position: relative;
   overflow: hidden;
@@ -1815,7 +1815,7 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
   padding: 2.75rem 2.25rem;
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  border-radius: 20px;
+  border-radius: var(--radius-xl, 12px);
   box-shadow: 0 4px 24px -6px rgba(0, 0, 0, 0.06);
   position: relative;
   overflow: hidden;
@@ -2055,7 +2055,7 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
 .escalation-form-panel {
   background: var(--wl-surface-soft);
   border: 1px solid var(--wl-border);
-  border-radius: 16px;
+  border-radius: var(--radius-lg, 8px);
   padding: 1.75rem;
   display: flex;
   flex-direction: column;

@@ -1016,7 +1016,7 @@ const setLang = async (v: AppLanguage) => {
   height: 100%;
   border-radius: var(--radius-pill);
   object-fit: cover;
-  border: 3px solid var(--wl-primary-soft);
+  border: 1px solid var(--wl-border);
   box-shadow: var(--shadow-card);
 }
 
@@ -1029,7 +1029,7 @@ const setLang = async (v: AppLanguage) => {
   border-radius: var(--radius-pill);
   background: var(--wl-primary);
   color: var(--wl-on-primary);
-  border: 2px solid var(--wl-surface);
+  border: 1px solid var(--wl-surface);
   display: grid;
   place-items: center;
   cursor: pointer;
@@ -1920,7 +1920,7 @@ const setLang = async (v: AppLanguage) => {
   gap: var(--space-5);
   padding: var(--space-6);
   background: var(--wl-surface-soft);
-  border: 1.5px dashed var(--wl-border-strong);
+  border: 1px dashed var(--wl-border-strong);
   border-radius: var(--radius-md);
   flex-wrap: wrap;
 }

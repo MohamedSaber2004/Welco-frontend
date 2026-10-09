@@ -71,7 +71,7 @@ const toggleLang = () => {
   max-width: 440px;
   background: color-mix(in srgb, var(--bg-surface) 94%, transparent);
   border: 1px solid rgba(255,255,255,.38);
-  border-radius: 1.5rem;
+  border-radius: var(--radius-xl, 12px);
   box-shadow: 0 28px 70px rgba(2, 25, 39, .24);
   backdrop-filter: blur(18px);
   position: relative;

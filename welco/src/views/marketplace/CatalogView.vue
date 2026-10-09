@@ -1315,8 +1315,8 @@ const filteredSidebarCategories = computed(() => {
 
 /* Modern Ultra-Clean Catalog Elevation */
 .catalog-card {
-  border: 1px solid #E2E8F0 !important;
-  border-radius: 16px !important;
+  border: 1px solid var(--border, #D9E2EC) !important;
+  border-radius: var(--radius-lg, 8px) !important;
   box-shadow: 0 4px 16px rgba(15, 61, 86, 0.04) !important;
   background: #FFFFFF !important;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
@@ -1332,7 +1332,7 @@ const filteredSidebarCategories = computed(() => {
   height: 200px !important;
   background: #F8FAFC !important;
   border-bottom: 1px solid #F1F5F9 !important;
-  border-radius: 16px 16px 0 0 !important;
+  border-radius: var(--radius-lg, 8px) var(--radius-lg, 8px) 0 0 !important;
 }
 
 .catalog-card__body {
@@ -1426,8 +1426,8 @@ const filteredSidebarCategories = computed(() => {
 /* Sidebar Elevation */
 .filter-sidebar {
   background: #FFFFFF !important;
-  border: 1px solid #E2E8F0 !important;
-  border-radius: 16px !important;
+  border: 1px solid var(--border, #D9E2EC) !important;
+  border-radius: var(--radius-lg, 8px) !important;
   box-shadow: 0 4px 16px rgba(15, 61, 86, 0.04) !important;
   padding: 1.25rem !important;
 }

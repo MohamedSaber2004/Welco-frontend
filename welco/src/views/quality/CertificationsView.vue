@@ -389,7 +389,7 @@ const goPage = (p: number) => {
 .cert-hero {
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  border-radius: 20px;
+  border-radius: var(--radius-xl, 12px);
   padding: 2.5rem;
   box-shadow: var(--wl-shadow-card);
 }
@@ -527,7 +527,7 @@ const goPage = (p: number) => {
 .cert-card {
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  border-radius: 16px;
+  border-radius: var(--radius-lg, 8px);
   padding: 0;
   box-shadow: var(--wl-shadow-card);
   display: flex;
@@ -687,7 +687,7 @@ const goPage = (p: number) => {
 @media (max-width: 640px) {
   .cert-hero {
     padding: 1.25rem;
-    border-radius: 16px;
+    border-radius: var(--radius-lg, 8px);
   }
   .hero-top-row {
     gap: 1.25rem;

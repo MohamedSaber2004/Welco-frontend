@@ -320,7 +320,7 @@ const displayWorkingHours = computed(() => {
   text-transform: uppercase;
   color: #15803D;
   background: #F0FDF4;
-  border: 1.5px solid #86EFAC;
+  border: 1px solid #86EFAC;
   padding: 0.3rem 0.65rem;
   border-radius: 6px;
 }

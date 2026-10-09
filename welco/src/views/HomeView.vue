@@ -477,11 +477,14 @@ const navigateToOemFromModal = () => {
                   <span class="material-symbols-outlined provider-icon" aria-hidden="true">storefront</span>
                   <span class="provider-label">{{ locale === 'ar' ? 'المورد:' : 'Supplier:' }}</span>
                   <span class="provider-value" dir="auto">
-                    {{ p.companyName || localized(p.supplierNameEn, p.supplierNameAr) || localized(p.manufacturerEn, p.manufacturerAr) || (locale === 'ar' ? 'توريد مباشر' : 'Direct Supply') }}
+                    {{ p.companyName || localized(p.supplierNameEn, p.supplierNameAr) || localized(p.manufacturerEn, p.manufacturerAr) || t('catalog.fallbackMfr') }}
                   </span>
                 </div>
                 <div class="product-card__foot">
-                  <strong class="mono-num">{{ formatPrice(p.price, locale) }} {{ p.currencySymbol || '$' }}</strong>
+                  <div class="price-wrap mono">
+                    <span class="price-amount mono-num">{{ formatPrice(p.price, locale) }}</span>
+                    <span class="price-currency">{{ p.currencySymbol || '$' }}</span>
+                  </div>
                   <button class="btn btn-primary btn-sm btn-quote-white" type="button" @click.stop="handleAddToQuote(p.id)">
                     <span class="material-symbols-outlined text-[15px]">add_shopping_cart</span>
                     <span>{{ t('marketplace.addToQuote') }}</span>
@@ -1685,8 +1688,8 @@ const navigateToOemFromModal = () => {
   display: flex;
   flex-direction: column;
   gap: clamp(1.25rem, 2.5vw, 1.75rem);
-  border: 1px solid #e2e8f0;
-  border-radius: 20px;
+  border: 1px solid var(--border, #d9e2ec);
+  border-radius: var(--radius-xl, 12px);
   background: #ffffff;
   box-shadow: 0 4px 20px -2px rgba(15, 61, 86, 0.05), 0 1px 3px rgba(0, 0, 0, 0.02);
   color: var(--platform-ink, #0f3d56);
@@ -1913,7 +1916,7 @@ const navigateToOemFromModal = () => {
 }
 
 @media (max-width: 640px) {
-  .cat-explorer { padding: 1.15rem; border-radius: 16px; }
+  .cat-explorer { padding: 1.15rem; border-radius: var(--radius-lg, 8px); }
   .cat-explorer__intro { align-items: start; flex-direction: column; }
   .cat-explorer__providers { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
   .cat-provider { min-height: 175px; padding: 0.85rem 0.65rem; }
@@ -2173,8 +2176,8 @@ const navigateToOemFromModal = () => {
 /* ── Cat card — pure white, clean borders & border-radius only ── */
 .cat-card {
   background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
+  border: 1px solid var(--border, #d9e2ec);
+  border-radius: var(--radius-lg, 8px);
   padding: 0.875rem;
   text-decoration: none;
   box-shadow: 0 1px 3px rgba(15, 61, 86, 0.04), 0 3px 8px rgba(15, 61, 86, 0.02);
@@ -2617,7 +2620,7 @@ const navigateToOemFromModal = () => {
 .modal-txt {
   width: 100%;
   background: var(--wl-surface-soft);
-  border: 1.5px solid var(--wl-border);
+  border: 1px solid var(--wl-border);
   border-radius: var(--radius-md);
   color: var(--fg-heading, #102A43);
   font-size: var(--step-0);
@@ -2979,8 +2982,8 @@ const navigateToOemFromModal = () => {
   align-items: center;
   height: 52px;
   background: #FFFFFF;
-  border: 1.5px solid var(--color-border, #D9E2EC);
-  border-radius: 12px;
+  border: 1px solid var(--color-border, #D9E2EC);
+  border-radius: 8px;
   padding: 0.35rem 0.45rem 0.35rem 1rem;
   box-shadow: 0 4px 18px rgba(16, 42, 67, 0.06);
   transition: all 0.2s ease;
@@ -3099,7 +3102,7 @@ const navigateToOemFromModal = () => {
   gap: 0.5rem;
   background: #FFFFFF !important;
   color: var(--color-heading, #102A43) !important;
-  border: 1.5px solid var(--color-border, #D9E2EC) !important;
+  border: 1px solid var(--color-border, #D9E2EC) !important;
   border-radius: 8px !important;
   padding: 0.75rem 1.6rem !important;
   font-weight: 600 !important;
@@ -3133,8 +3136,8 @@ const navigateToOemFromModal = () => {
   max-width: 420px;
   padding: clamp(2.5rem, 5vw, 3.5rem) 2rem;
   background: #FFFFFF;
-  border: 1.5px solid var(--color-border, #D9E2EC);
-  border-radius: 24px;
+  border: 1px solid var(--color-border, #D9E2EC);
+  border-radius: 12px;
   box-shadow:
     0 20px 48px rgba(15, 61, 86, 0.07),
     0 4px 14px rgba(15, 61, 86, 0.03);
@@ -3183,7 +3186,7 @@ const navigateToOemFromModal = () => {
   padding: 1.75rem;
   background: #FAFCFE;
   border: 1px solid #E2E8F0;
-  border-radius: 20px;
+  border-radius: 8px;
   box-shadow: inset 0 2px 6px rgba(16, 42, 67, 0.02);
   transition: transform 0.3s ease, border-color 0.3s ease;
 }
@@ -3334,7 +3337,7 @@ const navigateToOemFromModal = () => {
 .home .about-grid {
   background: #FFFFFF !important;
   border: 1px solid #E2E8F0 !important;
-  border-radius: 20px !important;
+  border-radius: 12px !important;
   box-shadow: 0 8px 30px rgba(15, 61, 86, 0.05) !important;
   padding: clamp(2rem, 5vw, 4rem) !important;
 }
@@ -3343,7 +3346,7 @@ const navigateToOemFromModal = () => {
 .home .product-card {
   background: #FFFFFF;
   border: 1px solid #E2E8F0;
-  border-radius: 16px;
+  border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 4px 16px rgba(15, 61, 86, 0.04);
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
@@ -3500,29 +3503,50 @@ const navigateToOemFromModal = () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 0.5rem;
   margin-top: auto;
-  padding-top: 0.85rem;
+  padding-top: 0.75rem;
   border-top: 1px solid #F1F5F9;
 }
 
-.home .product-card__foot strong {
-  font-size: 1.25rem;
-  font-weight: 800;
+.home .price-wrap {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.25rem;
+  white-space: nowrap;
+  min-width: 0;
+  flex-shrink: 0;
+}
+
+.home .price-amount {
+  font-size: 1rem;
+  font-weight: 700;
   color: #0F3D56;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.home .price-currency {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #627D98;
+  line-height: 1.2;
 }
 
 .home .btn-quote-white {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.35rem;
   background: #0F3D56 !important;
   color: #FFFFFF !important;
-  border-radius: 8px !important;
-  padding: 0.45rem 0.85rem !important;
-  font-size: 0.82rem !important;
+  border-radius: 6px !important;
+  padding: 0.4rem 0.75rem !important;
+  font-size: 0.78rem !important;
   font-weight: 600 !important;
   border: none !important;
   cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
   transition: all 0.2s ease !important;
 }
 
@@ -3533,8 +3557,8 @@ const navigateToOemFromModal = () => {
 
 /* Provider & Cert Tiles Modern Styling */
 .home .provider-tile, .home .home-cert-card {
-  border: 1px solid #E2E8F0 !important;
-  border-radius: 16px !important;
+  border: 1px solid var(--border, #D9E2EC) !important;
+  border-radius: var(--radius-lg, 8px) !important;
   box-shadow: 0 4px 16px rgba(15, 61, 86, 0.04) !important;
   background: #FFFFFF !important;
   transition: all 0.25s ease !important;

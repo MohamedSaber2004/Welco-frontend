@@ -195,6 +195,16 @@
   --wl-gold-light: var(--color-warning-500);
   --wl-admin: var(--brand);
   --wl-admin-soft: var(--brand-soft);
+  --wl-radius-xs: var(--radius-xs, 3px);
+  --wl-radius-sm: var(--radius-sm, 4px);
+  --wl-radius-md: var(--radius-md, 6px);
+  --wl-radius-lg: var(--radius-lg, 8px);
+  --wl-radius-xl: var(--radius-xl, 12px);
+  --wl-radius-2xl: var(--radius-2xl, 16px);
+  --wl-radius-card: var(--radius-lg, 8px);
+  --wl-radius-modal: var(--radius-xl, 12px);
+  --wl-radius-technical: var(--radius-sm, 4px);
+  --wl-radius-full: var(--radius-pill, 9999px);
   --wl-shadow: var(--shadow-sm);
   --wl-shadow-sm: var(--shadow-sm);
   --wl-shadow-md: var(--shadow-md);

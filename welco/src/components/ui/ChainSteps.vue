@@ -1,4 +1,4 @@
-﻿<script setup lang="ts">
+<script setup lang="ts">
 import { computed } from 'vue'
 
 const props = withDefaults(
@@ -59,7 +59,7 @@ const activeIndex = computed(() => Math.min(props.current, props.steps.length - 
   width: 20px;
   height: 20px;
   border-radius: var(--radius-pill, 9999px);
-  border: 2px solid var(--border-strong, #c2c7cd);
+  border: 1.5px solid var(--border-strong, #c2c7cd);
   background: var(--bg-surface, #ffffff);
   position: relative;
   flex-shrink: 0;

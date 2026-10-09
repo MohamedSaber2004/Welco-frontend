@@ -31,6 +31,9 @@ const handleSubmit = async () => {
   }
   if (res.ok) {
     success.value = true
+    try {
+      sessionStorage.setItem('welco-forgot-email', email.value.trim())
+    } catch {}
     toastService.success(t('auth.codeSent'))
     setTimeout(() => {
       void router.push({
@@ -220,7 +223,7 @@ const handleSubmit = async () => {
   padding: 0 14px;
   padding-inline-start: 42px;
   background: var(--wl-surface);
-  border: 1.5px solid var(--wl-border);
+  border: 1px solid var(--border, #D9E2EC);
   border-radius: var(--radius-md);
   font-size: 14px;
   font-family: var(--wl-font-body, system-ui);

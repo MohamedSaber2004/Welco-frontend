@@ -1576,8 +1576,8 @@ watch([applicationSearch, statusFilter, typeFilter], () => {
   flex-direction: column;
   justify-content: space-between;
   background: var(--wl-surface);
-  border: 1.5px solid var(--wl-border);
-  border-radius: var(--radius-lg, 10px);
+  border: 1px solid var(--wl-border);
+  border-radius: var(--radius-lg, 8px);
   padding: 0.95rem 1.15rem;
   text-align: start;
   cursor: pointer;
@@ -1753,8 +1753,8 @@ watch([applicationSearch, statusFilter, typeFilter], () => {
   padding-inline-start: 38px;
   padding-inline-end: 32px;
   background: var(--wl-surface-soft);
-  border: 1.5px solid var(--wl-border);
-  border-radius: 10px;
+  border: 1px solid var(--wl-border);
+  border-radius: var(--radius-md, 6px);
   font-size: 13px;
   color: var(--wl-ink-strong);
   outline: none;
@@ -1806,8 +1806,8 @@ watch([applicationSearch, statusFilter, typeFilter], () => {
   padding: 0 12px;
   padding-inline-start: 32px;
   background: var(--wl-surface-soft);
-  border: 1.5px solid var(--wl-border);
-  border-radius: 10px;
+  border: 1px solid var(--wl-border);
+  border-radius: var(--radius-md, 6px);
   font-size: 12px;
   font-weight: 600;
   color: var(--wl-ink-strong);

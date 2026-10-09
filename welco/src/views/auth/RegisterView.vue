@@ -591,7 +591,7 @@ const handleRegister = async () => {
   gap: 0.45rem;
   padding: 1rem;
   background: var(--wl-surface);
-  border: 1.5px solid var(--wl-border);
+  border: 1px solid var(--border, #D9E2EC);
   border-radius: var(--radius-md);
   color: var(--wl-ink-soft);
   text-align: start;
@@ -694,7 +694,7 @@ const handleRegister = async () => {
   height: 44px;
   padding: 0 14px;
   background: var(--wl-surface);
-  border: 1.5px solid var(--wl-border);
+  border: 1px solid var(--border, #D9E2EC);
   border-radius: var(--radius-md);
   font-size: 14px;
   font-family: var(--wl-font-body, system-ui);
@@ -870,7 +870,7 @@ const handleRegister = async () => {
   gap: 0.3rem;
   padding: 0.9rem 1rem;
   background: var(--wl-surface);
-  border: 1.5px solid var(--wl-border);
+  border: 1px solid var(--border, #D9E2EC);
   border-radius: var(--radius-md);
   cursor: pointer;
   text-align: start;

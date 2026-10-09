@@ -28,15 +28,27 @@ const startTimer = () => {
   }, 1000)
 }
 
-onMounted(startTimer)
+onMounted(() => {
+  if (!email.value) {
+    try {
+      const s = sessionStorage.getItem('welco-forgot-email')
+      if (s) email.value = s
+    } catch {}
+  }
+  startTimer()
+})
 onUnmounted(() => {
   if (timer) clearInterval(timer)
 })
 
 const handleVerify = async () => {
   error.value = ''
-  if (!otpCode.value.trim() || !email.value.trim()) {
+  if (!otpCode.value.trim()) {
     error.value = t('auth.errInvalidOtp')
+    return
+  }
+  if (!email.value.trim()) {
+    error.value = t('auth.errEmailRequired')
     return
   }
   loading.value = true
@@ -98,19 +110,18 @@ const handleResend = async () => {
         </div>
       </nav>
 
-      <form class="auth-form-body" @submit.prevent="handleVerify" novalidate>
-        <div class="form-group">
-          <label class="form-label mono" for="otp-email">{{ t('auth.email') }}</label>
-          <input
-            id="otp-email"
-            v-model="email"
-            type="email"
-            required
-            :placeholder="t('auth.emailPlaceholder')"
-            class="vip-input"
-          />
+      <div class="email-notice-card">
+        <span class="material-symbols-outlined notice-icon">mark_email_read</span>
+        <div>
+          <strong class="notice-title">{{ t('auth.verifyNoticeTitle') }}</strong>
+          <p class="notice-sub">
+            {{ t('auth.verifyNoticeDesc') }}
+            <span class="mono email-highlight">{{ email || t('auth.verifyFallbackEmail') }}</span>.
+          </p>
         </div>
+      </div>
 
+      <form class="auth-form-body" @submit.prevent="handleVerify" novalidate>
         <div class="form-group">
           <div class="label-row">
             <label class="form-label mono" for="otp-code">{{ t('auth.otpCode') }}</label>
@@ -120,8 +131,10 @@ const handleResend = async () => {
             id="otp-code"
             v-model="otpCode"
             type="text"
+            inputmode="numeric"
             maxlength="8"
             required
+            autofocus
             placeholder="123456"
             class="vip-input vip-otp-input mono"
             autocomplete="one-time-code"
@@ -143,13 +156,19 @@ const handleResend = async () => {
           <button
             type="button"
             class="resend-btn mono"
-            :disabled="secondsLeft > 0 || resending"
+            :disabled="secondsLeft > 0 || resending || !email.trim()"
             @click="handleResend"
           >
             <span v-if="secondsLeft > 0">{{ t('auth.resendTimer', { seconds: secondsLeft }) }}</span>
             <span v-else-if="resending">{{ t('common.loading') }}</span>
             <span v-else>{{ t('auth.resend') }}</span>
           </button>
+        </div>
+
+        <div class="auth-switch mono">
+          <router-link to="/auth/forgot-password" class="switch-link">
+            {{ t('auth.changeEmail') }}
+          </router-link>
         </div>
       </form>
     </div>
@@ -249,7 +268,7 @@ const handleResend = async () => {
   height: 44px;
   padding: 0 14px;
   background: var(--wl-surface);
-  border: 1.5px solid var(--wl-border);
+  border: 1px solid var(--border, #D9E2EC);
   border-radius: var(--radius-md);
   font-size: 14px;
   font-family: var(--wl-font-body, system-ui);
@@ -339,10 +358,68 @@ const handleResend = async () => {
   text-decoration: underline;
 }
 
+.email-notice-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  background: var(--wl-success-soft);
+  border: 1px solid var(--wl-border);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.15rem;
+}
+
+.notice-icon {
+  font-size: 24px;
+  color: var(--wl-success);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.notice-title {
+  display: block;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--wl-ink-strong);
+  margin-bottom: 0.2rem;
+}
+
+.notice-sub {
+  font-size: 12.5px;
+  color: var(--wl-ink-soft);
+  margin: 0;
+  line-height: 1.45;
+}
+
+.email-highlight {
+  font-weight: 700;
+  color: var(--wl-ink-strong);
+  background: var(--wl-surface);
+  padding: 1px 5px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--wl-border);
+}
+
 .resend-btn:disabled {
   color: var(--wl-muted);
   cursor: not-allowed;
   text-decoration: none;
+}
+
+.auth-switch {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.25rem;
+}
+
+.switch-link {
+  color: var(--wl-primary);
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 12.5px;
+}
+
+.switch-link:hover {
+  text-decoration: underline;
 }
 </style>
 

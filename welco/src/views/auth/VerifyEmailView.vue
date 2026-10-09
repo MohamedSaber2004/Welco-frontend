@@ -35,6 +35,7 @@ onMounted(() => {
     try {
       const s = sessionStorage.getItem('welco-pending-email')
       if (s) email.value = s
+      else if (authService.user.value?.email) email.value = authService.user.value.email
     } catch {}
   }
   startTimer()
@@ -141,19 +142,6 @@ const handleResend = async () => {
 
       <form class="auth-form-body" @submit.prevent="handleVerify" novalidate>
         <div class="form-group">
-          <label class="form-label mono" for="verify-email-input">{{ t('auth.email') }}</label>
-          <input
-            id="verify-email-input"
-            v-model="email"
-            type="email"
-            required
-            autocomplete="email"
-            :placeholder="t('auth.emailPlaceholder')"
-            class="vip-input"
-          />
-        </div>
-
-        <div class="form-group">
           <div class="label-row">
             <label class="form-label mono" for="verify-otp-input">{{ t('auth.otpCode') }}</label>
             <span class="mono text-xs text-muted">{{ t('auth.otpLengthHint') }}</span>
@@ -165,6 +153,7 @@ const handleResend = async () => {
             inputmode="numeric"
             maxlength="8"
             required
+            autofocus
             placeholder="123456"
             class="vip-input vip-otp-input mono"
             autocomplete="one-time-code"
@@ -284,7 +273,7 @@ const handleResend = async () => {
   height: 44px;
   padding: 0 14px;
   background: var(--wl-surface);
-  border: 1.5px solid var(--wl-border);
+  border: 1px solid var(--border, #D9E2EC);
   border-radius: var(--radius-md);
   font-size: 14px;
   font-family: var(--wl-font-body, system-ui);

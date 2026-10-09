@@ -615,8 +615,8 @@ const browseProviderProducts = (providerId: string) => {
   min-width: min(100%, 280px);
   min-height: var(--wl-control-md, 44px);
   background: var(--wl-surface-soft);
-  border: 1.5px solid var(--wl-border);
-  border-radius: var(--radius-sm, 10px);
+  border: 1px solid var(--wl-border);
+  border-radius: var(--radius-md, 6px);
   padding: 0 0.7rem 0 0.85rem;
   padding-inline: 0.85rem 0.7rem;
   transition: border-color var(--wl-transition, 0.18s cubic-bezier(0.16, 1, 0.3, 1)), box-shadow var(--wl-transition, 0.18s cubic-bezier(0.16, 1, 0.3, 1)), background var(--wl-transition, 0.18s cubic-bezier(0.16, 1, 0.3, 1));
@@ -770,8 +770,8 @@ const browseProviderProducts = (providerId: string) => {
 .toolbar__select {
   appearance: none;
   background: var(--wl-surface);
-  border: 1.5px solid var(--wl-border);
-  border-radius: var(--radius-sm, 10px);
+  border: 1px solid var(--wl-border);
+  border-radius: var(--radius-md, 6px);
   padding: 0 2rem 0 2.2rem;
   padding-inline: 2.2rem 2rem;
   min-height: var(--wl-control-md, 44px);

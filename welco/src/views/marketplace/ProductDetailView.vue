@@ -449,21 +449,11 @@ const resolvedDescription = computed(() => {
             </button>
           </div>
 
-          <!-- Image Viewport with Surgical Precision Grid & Inspection Loupe -->
+          <!-- Clean Image Viewport -->
           <div
             class="pdp-image-viewport"
-            :style="{ background: productMediaUrl(product.imageName, product.imageGradient).background }"
             @click="inspectModalOpen = true"
           >
-            <!-- Caliper Measurement Scale along left border -->
-            <div class="pdp-caliper-markings mono" aria-hidden="true">
-              <span class="caliper-tick">0</span>
-              <span class="caliper-tick">5</span>
-              <span class="caliper-tick">10</span>
-              <span class="caliper-tick">15</span>
-              <span class="caliper-tick">20cm</span>
-            </div>
-
             <!-- Real Product Image -->
             <template v-if="productImageUrl">
               <img
@@ -475,19 +465,17 @@ const resolvedDescription = computed(() => {
               />
               <button type="button" class="pdp-inspect-trigger mono" @click.stop="inspectModalOpen = true">
                 <span class="material-symbols-outlined text-[18px]">zoom_in</span>
-                <span>Inspect Instrument</span>
+                <span>{{ locale === 'ar' ? 'معاينة مكبرة' : 'Inspect Instrument' }}</span>
               </button>
             </template>
 
-            <!-- Technical Schematic Caliper Fallback -->
+            <!-- Clean Minimal Placeholder Fallback -->
             <div v-else class="pdp-schematic-fallback">
-              <span class="material-symbols-outlined pdp-schematic-icon">precision_manufacturing</span>
-              <span class="pdp-schematic-text mono">{{ product.sku }}</span>
-              <div class="pdp-schematic-caliper">
-                <span class="caliper-bar"></span>
-                <span class="mono text-[10px] px-2 text-muted uppercase tracking-wider">Calibrated Grade</span>
-                <span class="caliper-bar"></span>
+              <div class="pdp-fallback-icon-wrap">
+                <span class="material-symbols-outlined pdp-schematic-icon">medical_services</span>
               </div>
+              <span class="pdp-schematic-text mono">{{ product.sku }}</span>
+              <span class="pdp-schematic-sub">{{ locale === 'ar' ? 'مستلزم طبي معتمد' : 'Verified Medical Instrument' }}</span>
             </div>
           </div>
 
@@ -526,17 +514,19 @@ const resolvedDescription = computed(() => {
 
           <!-- Provider / Supplier & Regulatory Bar -->
           <div class="pdp-supplier-strip">
-            <div v-if="product.companyName || product.companyId" class="pdp-provider-chip">
+            <div class="pdp-provider-chip">
               <span class="material-symbols-outlined provider-icon" aria-hidden="true">storefront</span>
               <span class="provider-lbl">{{ locale === 'ar' ? 'المورد:' : 'Supplier:' }}</span>
               <router-link
-                v-if="product.companyId"
+                v-if="product.companyId && (product.companyName || product.supplierNameEn)"
                 :to="{ name: 'provider-storefront', params: { id: product.companyId } }"
                 class="provider-name is-link"
               >
-                {{ product.companyName }}
+                {{ product.companyName || localized(product.supplierNameEn, product.supplierNameAr) }}
               </router-link>
-              <strong v-else class="provider-name">{{ product.companyName }}</strong>
+              <strong v-else class="provider-name">
+                {{ product.companyName || localized(product.supplierNameEn, product.supplierNameAr) || t('catalog.fallbackMfr') }}
+              </strong>
             </div>
 
             <div v-if="product.manufacturerEn || product.manufacturerAr" class="pdp-manufacturer-chip mono">
@@ -895,10 +885,7 @@ const resolvedDescription = computed(() => {
             class="rel-card"
             @click="router.push({ name: 'marketplace-product', params: { id: p.id } })"
           >
-            <div
-              class="rel-media"
-              :style="{ background: productMediaUrl(p.imageName, p.imageGradient).background }"
-            >
+            <div class="rel-media">
               <AppImage
                 :src="p.imageName"
                 placeholder-type="product"
@@ -995,10 +982,7 @@ const resolvedDescription = computed(() => {
       @update:model-value="(val) => { inspectModalOpen = val }"
     >
       <div v-if="product" class="pdp-inspect-modal">
-        <div
-          class="inspect-viewport"
-          :style="{ background: productMediaUrl(product.imageName, product.imageGradient).background }"
-        >
+        <div class="inspect-viewport">
           <img
             v-if="productImageUrl"
             :src="productImageUrl"
@@ -1006,9 +990,11 @@ const resolvedDescription = computed(() => {
             class="inspect-image"
           />
           <div v-else class="pdp-schematic-fallback">
-            <span class="material-symbols-outlined pdp-schematic-icon text-[64px]">precision_manufacturing</span>
-            <span class="pdp-schematic-text mono text-xl">{{ product.sku }}</span>
-            <span class="text-muted text-sm mono">Surgical Grade Inspection Schematic</span>
+            <div class="pdp-fallback-icon-wrap">
+              <span class="material-symbols-outlined pdp-schematic-icon text-[36px]">medical_services</span>
+            </div>
+            <span class="pdp-schematic-text mono text-lg">{{ product.sku }}</span>
+            <span class="pdp-schematic-sub">{{ locale === 'ar' ? 'مستلزم طبي معتمد' : 'Verified Medical Instrument' }}</span>
           </div>
         </div>
         <div class="inspect-foot mono">
@@ -1185,72 +1171,53 @@ const resolvedDescription = computed(() => {
   max-height: 540px;
   display: grid;
   place-items: center;
-  padding: var(--space-10) var(--space-8);
+  padding: var(--space-8);
   position: relative;
   cursor: zoom-in;
   overflow: hidden;
-}
-
-/* Measurement scale ticks */
-.pdp-caliper-markings {
-  position: absolute;
-  top: var(--space-10);
-  inset-inline-start: var(--space-4);
-  bottom: var(--space-10);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  font-size: 9px;
-  color: rgba(255, 255, 255, 0.4);
-  pointer-events: none;
-  border-inline-start: 1px dashed rgba(255, 255, 255, 0.2);
-  padding-inline-start: 6px;
-  user-select: none;
+  background: var(--bg-surface, #ffffff);
 }
 
 .pdp-hero-image {
   width: 100%;
   max-height: 420px;
   object-fit: contain;
-  filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.2));
-  transition: transform 0.35s var(--wl-ease-spring), filter 0.35s ease;
+  transition: transform 0.3s var(--wl-ease-spring);
   user-select: none;
 }
 
 .pdp-image-viewport:hover .pdp-hero-image {
-  transform: scale(1.04);
-  filter: drop-shadow(0 20px 35px rgba(0, 0, 0, 0.28));
+  transform: scale(1.025);
 }
 
 .pdp-inspect-trigger {
   position: absolute;
-  bottom: 1.25rem;
-  inset-inline-end: var(--space-4);
+  bottom: 1rem;
+  inset-inline-end: 1rem;
   display: inline-flex;
   align-items: center;
-  gap: var(--space-1);
-  padding: var(--space-1) var(--space-2);
-  background: rgba(0, 10, 25, 0.75);
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: var(--wl-ink-strong);
+  border: 1px solid var(--border, #D9E2EC);
+  color: var(--fg-heading, #102A43);
   border-radius: var(--radius-pill);
-  font-size: var(--step--1);
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  opacity: 0.85;
+  box-shadow: var(--shadow-xs);
   transition: all 0.2s ease;
 }
 
 .pdp-image-viewport:hover .pdp-inspect-trigger {
-  opacity: 1;
-  transform: translateY(-2px);
-  background: var(--wl-primary);
-  border-color: var(--wl-primary);
+  background: var(--brand, #0F3D56);
+  color: #ffffff;
+  border-color: var(--brand, #0F3D56);
 }
 
 .pdp-inspect-trigger:focus-visible {
-  outline: 2px solid var(--wl-primary);
+  outline: 2px solid var(--brand, #0F3D56);
   outline-offset: 2px;
 }
 
@@ -1258,34 +1225,44 @@ const resolvedDescription = computed(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-4);
-  color: rgba(255, 255, 255, 0.7);
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-8) var(--space-4);
+  color: var(--fg-muted, #627D98);
   text-align: center;
+  width: 100%;
+  min-height: 340px;
+  background: var(--bg-subtle, #F8FAFC);
+  border-radius: var(--radius-md, 6px);
+  border: 1px dashed var(--border, #D9E2EC);
+}
+
+.pdp-fallback-icon-wrap {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--bg-surface, #ffffff);
+  border: 1px solid var(--border, #D9E2EC);
+  display: grid;
+  place-items: center;
+  box-shadow: var(--shadow-xs);
 }
 
 .pdp-schematic-icon {
-  font-size: 4.5rem;
-  color: var(--wl-primary);
-  opacity: 0.85;
+  font-size: 30px;
+  color: var(--secondary, #147D92);
 }
 
 .pdp-schematic-text {
-  font-size: 1.35rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  color: var(--wl-ink-strong);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--fg-heading, #102A43);
 }
 
-.pdp-schematic-caliper {
-  display: flex;
-  align-items: center;
-  width: 220px;
-}
-
-.caliper-bar {
-  flex: 1;
-  height: 1px;
-  background: rgba(255, 255, 255, 0.25);
+.pdp-schematic-sub {
+  font-size: 12px;
+  color: var(--fg-muted, #627D98);
 }
 
 .pdp-visual-foot {
@@ -1374,32 +1351,38 @@ const resolvedDescription = computed(() => {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  padding: 0.35rem 0.75rem;
-  background: #F0F7FF;
-  border: 1px solid #BAE3FF;
-  border-radius: 6px;
+  padding: 0.35rem 0.85rem;
+  background: var(--bg-surface, #ffffff);
+  border: 1px solid var(--border, #D9E2EC);
+  border-radius: var(--radius-md, 6px);
   font-size: 13px;
-  color: #0F3D56;
+  color: var(--fg-heading, #102A43);
+  box-shadow: var(--shadow-xs);
+  transition: all 0.15s ease;
+}
+
+.pdp-provider-chip:hover {
+  border-color: var(--border-strong, #C2C7CD);
 }
 
 .pdp-provider-chip .provider-icon {
   font-size: 17px;
-  color: #147D92;
+  color: var(--secondary, #147D92);
 }
 
 .pdp-provider-chip .provider-lbl {
   font-size: 12px;
-  color: #627D98;
+  color: var(--fg-muted, #627D98);
   font-weight: 500;
 }
 
 .pdp-provider-chip .provider-name {
   font-weight: 700;
-  color: #0F3D56;
+  color: var(--fg-heading, #102A43);
 }
 
 .pdp-provider-chip .provider-name.is-link {
-  color: #147D92;
+  color: var(--secondary, #147D92);
   text-decoration: underline;
   text-underline-offset: 3px;
   cursor: pointer;
@@ -1407,7 +1390,7 @@ const resolvedDescription = computed(() => {
 }
 
 .pdp-provider-chip .provider-name.is-link:hover {
-  color: #0F3D56;
+  color: var(--brand, #0F3D56);
 }
 
 .pdp-manufacturer-chip {
@@ -1605,7 +1588,7 @@ const resolvedDescription = computed(() => {
   align-items: center;
   height: 48px;
   background: var(--wl-surface);
-  border: 1.5px solid var(--wl-border);
+  border: 1px solid var(--border, #D9E2EC);
   border-radius: var(--radius-md);
   overflow: hidden;
   box-shadow: var(--shadow-card);
@@ -1726,7 +1709,7 @@ const resolvedDescription = computed(() => {
   gap: var(--space-2);
   background: transparent;
   color: var(--wl-ink-strong);
-  border: 1.5px solid var(--wl-border-strong);
+  border: 1px solid var(--border-strong, #C2C7CD);
   border-radius: var(--radius-md);
   font-weight: 700;
   font-size: var(--step-0);
@@ -1990,7 +1973,7 @@ const resolvedDescription = computed(() => {
   border-radius: var(--radius-full);
   background: rgba(255, 255, 255, 0.25);
   backdrop-filter: blur(6px);
-  border: 1.5px solid rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.7);
   color: var(--wl-ink-strong);
   display: grid;
   place-items: center;
@@ -2500,12 +2483,6 @@ const resolvedDescription = computed(() => {
   }
 }
 
-[dir='rtl'] .pdp-caliper-markings {
-  border-inline-start: none;
-  border-inline-end: 1px dashed rgba(255, 255, 255, 0.2);
-  padding-inline-start: 0;
-  padding-inline-end: 6px;
-}
 [dir='rtl'] .spec-row dd {
   text-align: start;
 }

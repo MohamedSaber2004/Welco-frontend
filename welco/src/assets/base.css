@@ -298,7 +298,7 @@ input[type="checkbox"], input[type="radio"] {
   height: 18px;
   min-height: 18px;
   border-radius: var(--radius-xs);
-  border: 1.5px solid var(--border-strong);
+  border: 1px solid var(--border-strong);
   accent-color: var(--brand);
   cursor: pointer;
   transition: border-color var(--duration-fast) ease, box-shadow var(--duration-fast) ease;

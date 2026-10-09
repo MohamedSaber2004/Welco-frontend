@@ -66,19 +66,19 @@ watch(routeLoading, async (loading) => {
   width: min(16rem, 58vw);
   aspect-ratio: 1;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(214,243,106,.16), transparent 68%);
+  background: radial-gradient(circle, rgba(40,167,161,.16), transparent 68%);
   animation: spinner-pulse 1.8s ease-in-out infinite;
 }
 .loading-spinner__ring {
   position: relative;
-  width: 58px;
-  height: 58px;
-  border: 5px solid rgba(255,255,255,.28);
+  width: 52px;
+  height: 52px;
+  border: 3px solid rgba(255,255,255,.22);
   border-top-color: #28A7A1;
   border-right-color: #147D92;
-  border-bottom-color: rgba(45,212,191,.4);
+  border-bottom-color: rgba(40,167,161,.3);
   border-radius: 50%;
-  box-shadow: 0 0 0 8px rgba(214,243,106,.1), 0 10px 28px rgba(2,25,39,.25);
+  box-shadow: 0 10px 28px rgba(2,25,39,.25);
   animation: spinner-rotate .78s linear infinite;
 }
 .loading-spinner__label {

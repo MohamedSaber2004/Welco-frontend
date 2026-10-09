@@ -563,7 +563,7 @@ const submitStatusUpdate = async () => {
   gap: var(--space-3);
   padding: var(--space-4);
   background: var(--wl-surface);
-  border: 1.5px solid var(--wl-border);
+  border: 1px solid var(--wl-border);
   border-radius: var(--radius-md);
   cursor: pointer;
   transition: all 0.18s ease;
@@ -956,7 +956,7 @@ const submitStatusUpdate = async () => {
   display: grid;
   place-items: center;
   background: var(--wl-surface);
-  border: 2px solid var(--wl-border);
+  border: 1px solid var(--wl-border);
   color: var(--wl-muted);
   transition: all 0.2s ease;
 }

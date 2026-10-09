@@ -481,8 +481,8 @@ async function closeTicket(id: string) {
   height: 48px;
   padding: 0 14px;
   background: var(--wl-surface-soft);
-  border: 1.5px solid var(--wl-border);
-  border-radius: 10px;
+  border: 1px solid var(--wl-border);
+  border-radius: var(--radius-md, 6px);
   font-size: 13.5px;
   color: var(--wl-ink-strong);
   outline: none;
@@ -493,8 +493,8 @@ async function closeTicket(id: string) {
   width: 100%;
   padding: 12px 14px;
   background: var(--wl-surface-soft);
-  border: 1.5px solid var(--wl-border);
-  border-radius: 10px;
+  border: 1px solid var(--wl-border);
+  border-radius: var(--radius-md, 6px);
   font-size: 13.5px;
   color: var(--wl-ink-strong);
   outline: none;

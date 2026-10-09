@@ -1128,7 +1128,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 .pipeline-card {
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  border-radius: 16px;
+  border-radius: var(--radius-lg, 8px);
   padding: 1.25rem 1.5rem;
   box-shadow: var(--shadow-xs);
   display: flex;
@@ -1232,7 +1232,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 .table-card {
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  border-radius: 16px;
+  border-radius: var(--radius-lg, 8px);
   overflow: hidden;
   box-shadow: var(--shadow-xs);
 }
@@ -1374,7 +1374,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
   padding: 0 8px;
   text-align: end;
   background: var(--wl-surface);
-  border: 1.5px solid var(--wl-border);
+  border: 1px solid var(--wl-border);
   border-radius: 6px;
   font-size: 13px;
   color: var(--wl-ink-strong);
@@ -1417,7 +1417,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
   height: 38px;
   padding: 0 10px;
   background: var(--wl-surface);
-  border: 1.5px solid var(--wl-border);
+  border: 1px solid var(--wl-border);
   border-radius: 8px;
   font-size: 12.5px;
   color: var(--wl-ink-strong);

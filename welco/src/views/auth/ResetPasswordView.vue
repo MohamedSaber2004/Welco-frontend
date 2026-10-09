@@ -307,7 +307,7 @@ const handleReset = async () => {
   height: 44px;
   padding: 0 14px;
   background: var(--wl-surface);
-  border: 1.5px solid var(--wl-border);
+  border: 1px solid var(--border, #D9E2EC);
   border-radius: var(--radius-md);
   font-size: 14px;
   font-family: var(--wl-font-body, system-ui);

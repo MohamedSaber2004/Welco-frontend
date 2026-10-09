@@ -1029,7 +1029,7 @@ onMounted(() => { void loadAll() })
   gap: var(--space-3);
   padding: var(--space-4);
   background: var(--wl-surface);
-  border: 1.5px solid var(--wl-border);
+  border: 1px solid var(--wl-border);
   border-radius: var(--radius-lg);
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);

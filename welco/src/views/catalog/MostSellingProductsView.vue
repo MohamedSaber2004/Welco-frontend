@@ -427,7 +427,7 @@ const goToProduct = (id: string) => {
                 <div class="card-provider mono">
                   <span class="material-symbols-outlined provider-icon" aria-hidden="true">storefront</span>
                   <span class="provider-label">{{ locale === 'ar' ? 'المورد:' : 'Supplier:' }}</span>
-                  <span class="provider-value" dir="auto">{{ p.companyName || localized(p.supplierNameEn, p.supplierNameAr) || localized(p.manufacturerEn, p.manufacturerAr) || (locale === 'ar' ? 'توريد مباشر' : 'Direct Supply') }}</span>
+                  <span class="provider-value" dir="auto">{{ p.companyName || localized(p.supplierNameEn, p.supplierNameAr) || localized(p.manufacturerEn, p.manufacturerAr) || t('catalog.fallbackMfr') }}</span>
                 </div>
 
                 <!-- Footer with Price & White Add to Quote Button -->
@@ -1009,20 +1009,24 @@ const goToProduct = (id: string) => {
 }
 
 .price-wrap {
-  display: flex;
+  display: inline-flex;
   align-items: baseline;
   gap: 0.25rem;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .price-amount {
-  font-size: 1.15rem;
-  font-weight: 800;
-  color: var(--text-primary, #0f172a);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary, #0F3D56);
+  letter-spacing: -0.01em;
 }
 
 .price-currency {
   font-size: 0.75rem;
-  color: var(--text-muted, #64748b);
+  font-weight: 600;
+  color: var(--text-muted, #627D98);
 }
 
 /* White Add to Quote Button */

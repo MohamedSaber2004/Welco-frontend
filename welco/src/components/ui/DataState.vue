@@ -889,8 +889,8 @@ const delay = (i: number) => ({ animationDelay: `${-((i % 16) * 90)}ms` })
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  border: 3px solid var(--sk-border, #E2E6EA);
-  border-top-color: var(--brand, var(--wl-primary, #2563EB));
+  border: 2px solid var(--sk-border, #E2E6EA);
+  border-top-color: var(--brand, var(--wl-primary, #0F3D56));
   animation: data-state-spin 800ms linear infinite;
   will-change: transform;
 }
@@ -1674,7 +1674,7 @@ const delay = (i: number) => ({ animationDelay: `${-((i % 16) * 90)}ms` })
 }
 
 .empty__halo-ring--1 { inset: 6px; border-color: rgba(var(--wl-primary-rgb), 0.08); }
-.empty__halo-ring--2 { inset: -6px; border-radius: 20px; border-style: dashed; border-color: var(--border-strong); opacity: 0.7; }
+.empty__halo-ring--2 { inset: -6px; border-radius: var(--radius-xl, 12px); border-style: dashed; border-color: var(--border-strong); opacity: 0.7; }
 
 .empty__title {
   font-family: var(--font-sans);

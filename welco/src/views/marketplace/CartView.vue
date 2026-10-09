@@ -879,7 +879,7 @@ const submitRfq = async () => {
 .currency-hub-card {
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  border-radius: var(--wl-radius-card, 16px);
+  border-radius: var(--radius-lg, 8px);
   padding: 1.25rem 1.5rem;
   box-shadow: var(--wl-shadow-card, 0 1px 3px rgba(0, 10, 25, 0.05));
   display: flex;
@@ -1077,7 +1077,7 @@ const submitRfq = async () => {
   height: 38px;
   padding: 0 var(--space-3);
   background: var(--wl-surface);
-  border: 1.5px solid var(--wl-border);
+  border: 1px solid var(--border, #D9E2EC);
   border-radius: var(--radius-sm);
   font-size: var(--step-0);
   font-weight: 700;
@@ -1205,7 +1205,7 @@ const submitRfq = async () => {
   padding-inline-start: 34px;
   padding-inline-end: 28px;
   background: var(--wl-surface-soft);
-  border: 1.5px solid var(--wl-border);
+  border: 1px solid var(--border, #D9E2EC);
   border-radius: var(--radius-sm);
   font-size: var(--step-0);
   color: var(--wl-ink-strong);
@@ -1788,7 +1788,7 @@ const submitRfq = async () => {
   width: 18px;
   height: 18px;
   border-radius: var(--radius-xs, 4px);
-  border: 1.5px solid var(--wl-border);
+  border: 1px solid var(--border, #D9E2EC);
   background: var(--wl-surface);
   display: grid;
   place-items: center;
@@ -1848,7 +1848,7 @@ const submitRfq = async () => {
 .price-input-wrap {
   display: flex;
   align-items: center;
-  border: 1.5px solid var(--wl-border);
+  border: 1px solid var(--border, #D9E2EC);
   border-radius: var(--radius-md);
   background: var(--wl-surface);
   overflow: hidden;

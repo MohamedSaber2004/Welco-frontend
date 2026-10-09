@@ -1045,7 +1045,7 @@ const handleDecline = async (rfq: RfqDto) => {
   gap: var(--space-3);
   padding: var(--space-4);
   background: var(--wl-surface);
-  border: 1.5px solid var(--wl-border);
+  border: 1px solid var(--wl-border);
   border-radius: var(--radius-md);
   cursor: pointer;
   position: relative;

@@ -723,7 +723,7 @@ function onZoomWheel(e: WheelEvent) {
 }
 
 .fup__drop {
-  border: 1.5px dashed var(--wl-border-strong);
+  border: 1px dashed var(--wl-border-strong);
   background: var(--wl-surface-soft);
   display: flex;
   flex-direction: column;

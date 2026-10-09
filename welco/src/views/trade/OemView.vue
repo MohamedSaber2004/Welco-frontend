@@ -360,7 +360,7 @@ async function submit() {
 .hud-card {
   background: var(--wl-surface-soft);
   border: 1px solid var(--wl-border);
-  border-radius: 16px;
+  border-radius: var(--radius-lg, 8px);
   padding: 1.5rem;
   color: var(--wl-text);
   display: flex;
@@ -481,7 +481,7 @@ async function submit() {
 .service-card {
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  border-radius: 16px;
+  border-radius: var(--radius-lg, 8px);
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
@@ -614,7 +614,7 @@ async function submit() {
 .inquiry-form-card {
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  border-radius: 20px;
+  border-radius: var(--radius-xl, 12px);
   padding: 2rem;
   box-shadow: var(--wl-shadow-card);
 }
@@ -725,7 +725,7 @@ async function submit() {
   height: 60px;
   border-radius: 50%;
   background: var(--wl-success-faint);
-  border: 2px solid var(--wl-success-border);
+  border: 1px solid var(--wl-success-border, #16a34a);
   color: var(--wl-success);
   display: grid;
   place-items: center;

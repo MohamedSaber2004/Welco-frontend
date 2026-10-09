@@ -172,7 +172,7 @@ onMounted(async () => {
 .confirm-hero-card {
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  border-radius: 20px;
+  border-radius: var(--radius-xl, 12px);
   padding: 2.5rem 1.5rem;
   text-align: center;
   box-shadow: var(--shadow-xs);
@@ -187,7 +187,7 @@ onMounted(async () => {
   height: 64px;
   border-radius: 50%;
   background: var(--wl-success-soft);
-  border: 2px solid rgba(87, 242, 135, 0.35);
+  border: 1px solid rgba(87, 242, 135, 0.35);
   color: var(--wl-success);
   display: grid;
   place-items: center;
@@ -257,7 +257,7 @@ onMounted(async () => {
 .stepper-card {
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  border-radius: 16px;
+  border-radius: var(--radius-lg, 8px);
   padding: 1.25rem 1.5rem;
   box-shadow: var(--shadow-xs);
 }
@@ -272,7 +272,7 @@ onMounted(async () => {
 .order-summary-card {
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  border-radius: 16px;
+  border-radius: var(--radius-lg, 8px);
   padding: 1.5rem;
   box-shadow: var(--shadow-xs);
   display: flex;
@@ -356,7 +356,7 @@ onMounted(async () => {
 .actions-card {
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  border-radius: 16px;
+  border-radius: var(--radius-lg, 8px);
   padding: 1.5rem;
   box-shadow: var(--shadow-xs);
   display: flex;
@@ -397,7 +397,7 @@ onMounted(async () => {
   background: var(--wl-primary);
   color: var(--wl-on-primary);
   border: none;
-  border-radius: 10px;
+  border-radius: var(--radius-md, 6px);
   font-size: 13.5px;
   font-weight: 700;
   cursor: pointer;
@@ -419,8 +419,8 @@ onMounted(async () => {
   padding: 0 1.25rem;
   background: var(--wl-surface);
   color: var(--wl-ink-strong);
-  border: 1.5px solid var(--wl-border);
-  border-radius: 10px;
+  border: 1px solid var(--wl-border);
+  border-radius: var(--radius-md, 6px);
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;

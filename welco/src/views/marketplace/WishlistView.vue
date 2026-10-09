@@ -284,9 +284,9 @@ const goDetail = (id: string) => {
   height: 44px;
   padding: 0 1rem;
   background: var(--wl-surface);
-  border: 1.5px solid rgba(237, 66, 69, 0.35);
+  border: 1px solid rgba(237, 66, 69, 0.35);
   color: var(--wl-danger);
-  border-radius: 10px;
+  border-radius: var(--radius-md, 6px);
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
@@ -306,7 +306,7 @@ const goDetail = (id: string) => {
   background: var(--wl-primary);
   color: var(--wl-on-primary);
   border: none;
-  border-radius: 10px;
+  border-radius: var(--radius-md, 6px);
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
@@ -329,7 +329,7 @@ const goDetail = (id: string) => {
 .product-card {
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  border-radius: 16px;
+  border-radius: var(--radius-lg, 8px);
   overflow: hidden;
   display: flex;
   flex-direction: column;

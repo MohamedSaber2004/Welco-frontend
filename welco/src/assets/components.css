@@ -914,7 +914,7 @@ hr {
   height: 18px;
   margin: 0;
   flex: none;
-  border: 1.5px solid var(--border-strong);
+  border: 1px solid var(--border-strong);
   border-radius: var(--radius-xs);
   background: var(--bg-surface);
   cursor: pointer;

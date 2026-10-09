@@ -902,7 +902,7 @@ const totalCompany = computed(() => company.addresses.value.length)
   height: 48px;
   padding: 0 14px;
   background: var(--wl-surface-soft);
-  border: 1.5px solid var(--wl-border);
+  border: 1px solid var(--wl-border);
   border-radius: var(--radius-md);
   font-size: var(--step-0);
   color: var(--wl-ink-strong);
@@ -988,7 +988,7 @@ const totalCompany = computed(() => company.addresses.value.length)
 .btn-modal-cancel {
   height: 48px;
   background: var(--wl-surface);
-  border: 1.5px solid var(--wl-border);
+  border: 1px solid var(--wl-border);
   color: var(--wl-ink-strong);
   border-radius: var(--radius-md);
   font-size: var(--step-0);

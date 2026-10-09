@@ -840,8 +840,8 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
   padding: 0 14px;
   padding-inline-start: 38px;
   background: var(--wl-surface);
-  border: 1.5px solid var(--wl-border);
-  border-radius: 10px;
+  border: 1px solid var(--wl-border);
+  border-radius: var(--radius-md, 6px);
   font-size: 13.5px;
   color: var(--wl-ink-strong);
   outline: none;

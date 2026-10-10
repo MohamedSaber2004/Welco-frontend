@@ -179,6 +179,18 @@ async function placeOrderFromQuote() {
               </div>
             </article>
           </div>
+
+          <!-- Provider Notes / Counter Terms if present -->
+          <div v-if="quote.note" class="quote-note-card">
+            <div class="quote-note-header">
+              <span class="material-symbols-outlined text-[20px] text-indigo-600">sticky_note_2</span>
+              <div>
+                <strong class="mono text-indigo-900">{{ t('sales.notes') }}</strong>
+                <p class="mono text-xs text-indigo-700">{{ t('account.providerResponse') }}</p>
+              </div>
+            </div>
+            <p class="quote-note-text">{{ quote.note }}</p>
+          </div>
         </main>
 
         <aside class="side-panel">
@@ -452,6 +464,29 @@ async function placeOrderFromQuote() {
   font-size: 13.5px;
   font-weight: 700;
   color: var(--fg-heading, #102A43);
+}
+
+.quote-note-card {
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-sm, 4px);
+  margin-top: 1.25rem;
+}
+
+.quote-note-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.quote-note-text {
+  font-size: 13px;
+  color: #312e81;
+  margin: 0.5rem 0 0 0;
+  padding-inline-start: 2.25rem;
+  line-height: 1.5;
+  white-space: pre-line;
 }
 
 /* Sidebar */

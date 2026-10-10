@@ -48,6 +48,8 @@ export type Messages = {
     change: string
     approvedSuccessfully: string
     savedSuccessfully: string
+    pageNotFound: string
+    pageNotFoundDesc: string
     actions: string
     whatsAppInquiry: string
     whatsAppDefaultMsg: string
@@ -1324,6 +1326,13 @@ export type Messages = {
     trendYtd: string
     actionRequired: string
     inquiryQueue: string
+    myInquiriesTitle: string
+    myInquiriesDesc: string
+    noInquiriesYet: string
+    providerResponse: string
+    awaitingProviderResponse: string
+    respondedAt: string
+    negotiationResponse: string
     createFirstRfq: string
     validUntilDate: string
     rfqRef: string
@@ -1621,6 +1630,22 @@ export type Messages = {
     generalCategory: string
     allStatuses: string
     supportResponseTitle: string
+    networkStatus: string
+    slaFast: string
+    triageCore: string
+    activeDesk: string
+    ifuNodeTitle: string
+    ifuNodeDesc: string
+    rfqNodeTitle: string
+    rfqNodeDesc: string
+    freightNodeTitle: string
+    freightNodeDesc: string
+    regulatoryNodeTitle: string
+    regulatoryNodeDesc: string
+    engineersOnline: string
+    lotTraceable: string
+    isoAudited: string
+    resolutionRate: string
   }
   landing: {
     instrumentsCount: string
@@ -1706,6 +1731,8 @@ export type Messages = {
     inquiryMsgPh: string
     sendInquiry: string
     inquiryFoot: string
+    loginRequiredForInquiry: string
+    inquiryAuthNotice: string
     relatedEyebrow: string
     waMessage: string
     addedRfq: string

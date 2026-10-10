@@ -39,7 +39,7 @@ const loadData = async () => {
   loading.value = true
   try {
     const [, cats] = await Promise.allSettled([
-      marketplaceService.loadMostSelling(48),
+      marketplaceService.loadMostSelling(100),
       marketplaceService.getCategories(),
     ])
     rawProducts.value = marketplaceService.mostSelling.value || []
@@ -164,6 +164,16 @@ const handleAddToQuote = (p: ProductDto) => {
   toastService.success(
     t('catalog.quoteSuccess', { product: localized(p.nameEn, p.nameAr) }),
   )
+}
+
+const handlePageChange = (newPage: number) => {
+  page.value = newPage
+  const resultsEl = document.querySelector('.results-header')
+  if (resultsEl) {
+    resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  } else {
+    window.scrollTo({ top: 350, behavior: 'smooth' })
+  }
 }
 
 const goToProduct = (id: string) => {
@@ -454,9 +464,11 @@ const goToProduct = (id: string) => {
           <!-- Pagination -->
           <div v-if="totalPages > 1" class="pagination-wrap">
             <AppPagination
-              :current-page="page"
+              v-model:page="page"
               :total-pages="totalPages"
-              @page-change="page = $event"
+              :total-items="totalCount"
+              :page-size="pageSize"
+              @change="handlePageChange"
             />
           </div>
         </DataState>

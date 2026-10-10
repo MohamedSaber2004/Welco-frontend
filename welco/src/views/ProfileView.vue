@@ -134,7 +134,7 @@ const userTypeInfo = computed(() => {
 })
 
 const isAdminOrSales = computed(() => authService.isAdmin.value)
-const showCompanyInfo = computed(() => !isAdminOrSales.value)
+const showCompanyInfo = computed(() => !isAdminOrSales.value && Boolean(authService.isProvider.value || authService.user.value?.companyId))
 const companyAddressesCount = computed(() => (showCompanyInfo.value ? companyService.companyAddresses.value.length : 0))
 
 const load = async () => {

@@ -263,7 +263,7 @@ const handleRegister = async () => {
             </div>
 
             <div class="form-group col-span-2">
-              <PhoneInput v-model="phoneNumber" :label="t('auth.phoneNumber')" :placeholder="t('auth.phonePlaceholder')" />
+              <PhoneInput v-model="phoneNumber" country-code="AE" :label="t('auth.phoneNumber')" :placeholder="t('auth.phonePlaceholder')" />
               <p v-if="phoneCountryLabel" class="phone-hint mono">
                 ↳ {{ t('locations.phoneCode') }} {{ phoneCountry?.phoneCode }} — {{ phoneCountryLabel }} ({{ phoneCountry?.code }})
               </p>

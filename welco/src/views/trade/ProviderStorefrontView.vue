@@ -49,6 +49,24 @@ const onSearchInput = () => {
   searchTimer = setTimeout(() => { void loadProducts() }, 400)
 }
 
+const synthesizeFromProducts = () => {
+  if (products.value.length === 0) return
+  const p0 = products.value[0]
+  const name = p0?.companyName || (locale.value === 'ar' ? p0?.supplierNameAr : p0?.supplierNameEn) || 'Medical Provider'
+  company.value = {
+    id: companyId.value,
+    name,
+    type: 2,
+    status: 2,
+    isActive: true,
+    countryNameEn: (p0 as unknown as { countryNameEn?: string })?.countryNameEn || null,
+    countryNameAr: (p0 as unknown as { countryNameAr?: string })?.countryNameAr || null,
+    createdAt: new Date().toISOString(),
+  } as CompanyDto
+  companyError.value = ''
+  companyFailed.value = false
+}
+
 const loadCompany = async () => {
   companyLoading.value = true
   companyError.value = ''
@@ -56,9 +74,13 @@ const loadCompany = async () => {
   try {
     company.value = await companyRepository.getCompanyById(companyId.value)
   } catch (e) {
-    companyError.value = e instanceof Error ? e.message : t('common.error')
-    company.value = null
-    companyFailed.value = true
+    if (products.value.length > 0) {
+      synthesizeFromProducts()
+    } else {
+      companyError.value = e instanceof Error ? e.message : t('common.error')
+      company.value = null
+      companyFailed.value = true
+    }
   } finally {
     companyLoading.value = false
   }
@@ -84,6 +106,9 @@ const loadProducts = async () => {
           nameAr: p.categoryNameAr || p.categoryId,
         } as CategoryDto)
       }
+    }
+    if (!company.value && products.value.length > 0) {
+      synthesizeFromProducts()
     }
   } catch (e) {
     fetchError.value = e instanceof Error ? e.message : t('common.error')
@@ -125,10 +150,10 @@ const memberYear = computed(() => {
     <BackButton fallback="/providers" variant="minimal" class="mb-3" />
 
     <DataState
-      :loading="companyLoading"
-      :error="companyError"
+      :loading="companyLoading && !company"
+      :error="company ? '' : companyError"
       skeleton-type="store-hero"
-      :empty="!company && !companyLoading"
+      :empty="!company && !companyLoading && !products.length"
       :empty-title="t('provider.noCompanyTitle')"
       @retry="() => { loadCompany(); loadProducts() }"
     >

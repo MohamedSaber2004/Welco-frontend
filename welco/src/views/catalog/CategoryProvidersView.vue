@@ -23,6 +23,7 @@ const categoryLoading = ref(true)
 
 const providers = ref<CompanyDto[]>([])
 const products = ref<ProductDto[]>([])
+const productsTotalCount = ref(0)
 const productsLoading = ref(true)
 const productsError = ref('')
 const totalCount = ref(0)
@@ -31,6 +32,12 @@ const fetchError = ref('')
 const page = ref(1)
 const pageSize = 9
 const totalPages = computed(() => Math.max(1, Math.ceil(totalCount.value / pageSize)))
+
+const displayProductCount = computed(() => {
+  if (productsTotalCount.value > 0) return productsTotalCount.value
+  if (products.value.length > 0) return products.value.length
+  return category.value?.productCount ?? 0
+})
 
 const loadCategory = async () => {
   categoryLoading.value = true
@@ -49,9 +56,11 @@ const loadProducts = async () => {
   try {
     const res = await services.marketplaceRepository.getProducts({ categoryId: categoryId.value, page: 1, pageSize: 6 })
     products.value = Array.isArray(res?.data) ? res.data : []
+    productsTotalCount.value = res?.totalCount ?? products.value.length
   } catch (e) {
     productsError.value = e instanceof Error ? e.message : t('common.error')
     products.value = []
+    productsTotalCount.value = 0
   } finally {
     productsLoading.value = false
   }
@@ -129,9 +138,9 @@ const openStorefront = (id: string) => {
               <span class="material-symbols-outlined text-[15px]">apartment</span>
               <span>{{ totalCount }} · {{ t('provider.providersInCategory') }}</span>
             </span>
-            <span v-if="category.productCount != null" class="count-chip mono">
+            <span v-if="displayProductCount > 0" class="count-chip mono">
               <span class="material-symbols-outlined text-[15px]">inventory_2</span>
-              <span>{{ category.productCount }} · {{ t('provider.providerProducts') }}</span>
+              <span>{{ displayProductCount }} · {{ t('provider.providerProducts') }}</span>
             </span>
           </div>
         </div>

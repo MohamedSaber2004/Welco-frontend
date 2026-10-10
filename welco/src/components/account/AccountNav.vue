@@ -21,6 +21,10 @@ import { t } from '../../i18n'
         <span class="material-symbols-outlined nav-icon">local_shipping</span>
         <span>{{ t('commerce.ordersTitle') }}</span>
       </router-link>
+      <router-link to="/account/inquiries" class="account-nav__link" active-class="is-active">
+        <span class="material-symbols-outlined nav-icon">chat_bubble_outline</span>
+        <span>{{ t('account.myInquiriesTitle') }}</span>
+      </router-link>
     </div>
   </nav>
 </template>

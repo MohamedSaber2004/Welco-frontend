@@ -173,4 +173,25 @@ export class SalesService {
       return { ok: false, error: err instanceof Error ? err.message : t('common.error') }
     }
   }
+
+  async respondProductInquiry(id: string, response: string): Promise<SalesResult & { inquiry?: import('../domain/ports/sales-repository').ProductInquiryDto }> {
+    try {
+      const updated = await this.repo.respondProductInquiry(id, response)
+      toastService.success(t('common.savedSuccessfully'))
+      return { ok: true, inquiry: updated }
+    } catch (err) {
+      return { ok: false, error: err instanceof Error ? err.message : t('common.error') }
+    }
+  }
+
+  async respondRfq(id: string, payload: { responseNote: string; proposedAmount?: number; validityDays?: number }): Promise<SalesResult & { rfq?: RfqDto }> {
+    try {
+      const updated = await this.repo.respondRfq(id, payload)
+      await this.loadAll()
+      toastService.success(t('common.savedSuccessfully'))
+      return { ok: true, rfq: updated }
+    } catch (err) {
+      return { ok: false, error: err instanceof Error ? err.message : t('common.error') }
+    }
+  }
 }

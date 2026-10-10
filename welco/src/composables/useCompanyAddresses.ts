@@ -67,6 +67,7 @@ export function useCompanyAddresses() {
   const load = async () => {
     error.value = ''
     if (!authService.isAuthenticated) return
+    if (!authService.isProvider.value && !authService.user.value?.companyId) return
     await companyService.loadMyCompany().catch(() => {})
     const cid = companyService.myCompany.value?.id
     if (!cid) {

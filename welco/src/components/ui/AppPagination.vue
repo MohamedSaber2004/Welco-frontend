@@ -4,9 +4,11 @@ import { t } from '../../i18n'
 
 interface Props {
   page?: number
+  currentPage?: number
   modelValue?: number
   totalPages: number
   totalItems?: number
+  totalCount?: number
   pageSize?: number
   siblingCount?: number
   showInfo?: boolean
@@ -16,10 +18,12 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  page: 1,
+  page: undefined,
+  currentPage: undefined,
   modelValue: undefined,
   totalPages: 1,
   totalItems: undefined,
+  totalCount: undefined,
   pageSize: 10,
   siblingCount: 1,
   showInfo: undefined,
@@ -30,30 +34,40 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   (e: 'update:page', value: number): void
+  (e: 'update:currentPage', value: number): void
   (e: 'update:modelValue', value: number): void
   (e: 'change', value: number): void
+  (e: 'pageChange', value: number): void
 }>()
 
-const currentPage = computed(() => {
+const activePage = computed(() => {
   if (typeof props.modelValue === 'number') return props.modelValue
-  return props.page || 1
+  if (typeof props.page === 'number') return props.page
+  if (typeof props.currentPage === 'number') return props.currentPage
+  return 1
+})
+
+const resolvedTotalItems = computed(() => {
+  if (typeof props.totalItems === 'number') return props.totalItems
+  if (typeof props.totalCount === 'number') return props.totalCount
+  return undefined
 })
 
 const hasInfo = computed(() => {
   if (typeof props.showInfo === 'boolean') return props.showInfo
-  return typeof props.totalItems === 'number' || props.variant === 'table'
+  return typeof resolvedTotalItems.value === 'number' || props.variant === 'table'
 })
 
 const itemRange = computed(() => {
-  if (typeof props.totalItems !== 'number') return null
-  const start = (currentPage.value - 1) * props.pageSize + 1
-  const end = Math.min(currentPage.value * props.pageSize, props.totalItems)
-  return { start: Math.max(1, start), end, total: props.totalItems }
+  if (typeof resolvedTotalItems.value !== 'number') return null
+  const start = (activePage.value - 1) * props.pageSize + 1
+  const end = Math.min(activePage.value * props.pageSize, resolvedTotalItems.value)
+  return { start: Math.max(1, start), end, total: resolvedTotalItems.value }
 })
 
 const paginationRange = computed(() => {
   const total = Math.max(1, props.totalPages)
-  const current = Math.min(Math.max(1, currentPage.value), total)
+  const current = Math.min(Math.max(1, activePage.value), total)
   const siblings = props.siblingCount
 
   const totalNumbers = siblings * 2 + 5
@@ -93,10 +107,12 @@ const paginationRange = computed(() => {
 
 const goTo = (p: number | string) => {
   if (typeof p !== 'number') return
-  if (p < 1 || p > props.totalPages || p === currentPage.value || props.disabled) return
+  if (p < 1 || p > props.totalPages || p === activePage.value || props.disabled) return
   emit('update:page', p)
+  emit('update:currentPage', p)
   emit('update:modelValue', p)
   emit('change', p)
+  emit('pageChange', p)
 }
 </script>
 
@@ -119,7 +135,7 @@ const goTo = (p: number | string) => {
         <strong class="mono-num">{{ itemRange.total }}</strong>
       </template>
       <template v-else>
-        <span>{{ t('common.page', { current: currentPage, total: totalPages }) }}</span>
+        <span>{{ t('common.page', { current: activePage, total: totalPages }) }}</span>
       </template>
     </div>
 
@@ -127,10 +143,10 @@ const goTo = (p: number | string) => {
       <button
         type="button"
         class="page-nav-btn page-nav-btn--prev"
-        :disabled="currentPage <= 1 || disabled"
-        :aria-disabled="currentPage <= 1 || disabled"
+        :disabled="activePage <= 1 || disabled"
+        :aria-disabled="activePage <= 1 || disabled"
         :aria-label="t('common.prev')"
-        @click="goTo(currentPage - 1)"
+        @click="goTo(activePage - 1)"
       >
         <span class="material-symbols-outlined icon--directional nav-icon" aria-hidden="true">chevron_left</span>
         <span class="nav-text">{{ t('common.prev') }}</span>
@@ -143,8 +159,8 @@ const goTo = (p: number | string) => {
             v-else
             type="button"
             class="page-num-btn mono-num"
-            :class="{ 'is-active': item === currentPage }"
-            :aria-current="item === currentPage ? 'page' : undefined"
+            :class="{ 'is-active': item === activePage }"
+            :aria-current="item === activePage ? 'page' : undefined"
             :aria-label="t('common.pageNumber', { number: item })"
             :disabled="disabled"
             @click="goTo(item)"
@@ -155,7 +171,7 @@ const goTo = (p: number | string) => {
       </div>
 
       <div v-else class="page-indicator mono">
-        <strong class="mono-num">{{ currentPage }}</strong>
+        <strong class="mono-num">{{ activePage }}</strong>
         <span class="page-indicator__sep">/</span>
         <span class="mono-num">{{ totalPages }}</span>
       </div>
@@ -163,10 +179,10 @@ const goTo = (p: number | string) => {
       <button
         type="button"
         class="page-nav-btn page-nav-btn--next"
-        :disabled="currentPage >= totalPages || disabled"
-        :aria-disabled="currentPage >= totalPages || disabled"
+        :disabled="activePage >= totalPages || disabled"
+        :aria-disabled="activePage >= totalPages || disabled"
         :aria-label="t('common.next')"
-        @click="goTo(currentPage + 1)"
+        @click="goTo(activePage + 1)"
       >
         <span class="nav-text">{{ t('common.next') }}</span>
         <span class="material-symbols-outlined icon--directional nav-icon" aria-hidden="true">chevron_right</span>

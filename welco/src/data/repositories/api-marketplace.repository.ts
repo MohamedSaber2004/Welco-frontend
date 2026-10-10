@@ -98,9 +98,56 @@ const normalizeProduct = (p: ProductDto): ProductDto => {
     p.supplierNameAr = (raw.supplierNameAr ?? raw.SupplierNameAr ?? raw.supplierName ?? raw.SupplierName ?? suppName ?? '') as string
   }
 
-  // Handle images: support imageName, imageUrl, image, imagePath, fileUrl, photo
+  // Handle images: support imageName, imageUrl, image, imagePath, fileUrl, photo, attachments, media
   if (!p.imageName) {
-    p.imageName = (raw.imageName ?? raw.ImageName ?? raw.imageUrl ?? raw.ImageUrl ?? raw.image ?? raw.Image ?? raw.fileUrl ?? raw.FileUrl ?? raw.photo ?? null) as string | null
+    let candidate = (raw.imageName ?? raw.ImageName ?? raw.imageUrl ?? raw.ImageUrl ?? raw.image ?? raw.Image ?? raw.fileUrl ?? raw.FileUrl ?? raw.photo ?? raw.Photo ?? raw.filePath ?? raw.FilePath ?? null) as unknown
+    if (!candidate) {
+      const arr = (raw.attachments ?? raw.Attachments ?? raw.media ?? raw.Media ?? raw.images ?? raw.Images ?? raw.productImages ?? raw.ProductImages) as unknown
+      if (Array.isArray(arr) && arr.length > 0) {
+        const first = arr[0]
+        if (typeof first === 'string') {
+          candidate = first
+        } else if (first && typeof first === 'object') {
+          const item = first as Record<string, unknown>
+          candidate = item.fileName ?? item.FileName ?? item.name ?? item.Name ?? item.url ?? item.Url ?? item.fileUrl ?? item.FileUrl ?? item.filePath ?? item.FilePath ?? item.imageName ?? item.ImageName
+        }
+      }
+    }
+    if (typeof candidate === 'string') {
+      let cleaned = candidate.trim()
+      if ((cleaned.startsWith('{') && cleaned.endsWith('}')) || (cleaned.startsWith('"') && cleaned.endsWith('"'))) {
+        try {
+          const parsed = JSON.parse(cleaned)
+          if (typeof parsed === 'string') cleaned = parsed
+          else if (parsed && typeof parsed === 'object') {
+            const o = parsed as Record<string, unknown>
+            cleaned = String(o.fileName ?? o.FileName ?? o.name ?? o.Name ?? o.url ?? o.Url ?? '')
+          }
+        } catch {
+          // keep cleaned as is
+        }
+      }
+      p.imageName = cleaned || null
+    }
+  }
+
+  const lowerName = (p.nameEn || '').toLowerCase()
+
+  // Remove bogus sofa photo for Weitlaner Retractor so clean medical placeholder is used
+  if (lowerName.includes('weitlaner')) {
+    p.imageName = null
+  }
+
+  // Fix miscategorized products
+  if (lowerName.includes('metzenbaum')) {
+    p.categoryNameEn = 'Surgical Scissors'
+    p.categoryNameAr = 'مقصات جراحية'
+  } else if (lowerName.includes('hegar') || lowerName.includes('needle holder')) {
+    p.categoryNameEn = 'Needle Holders'
+    p.categoryNameAr = 'حوامل الإبر الجراحية'
+  } else if (lowerName.includes('molt') || lowerName.includes('elevator')) {
+    p.categoryNameEn = 'Elevators & Periosteals'
+    p.categoryNameAr = 'روافع جراحية'
   }
 
   // Gradient seeds
@@ -118,6 +165,17 @@ const normalizeProduct = (p: ProductDto): ProductDto => {
     p.imageGradient = 'linear-gradient(160deg,#122C3E,#0B1D2A)'
   }
   return p
+}
+
+export const isTestProduct = (p: ProductDto | null | undefined): boolean => {
+  if (!p) return true
+  // Filter based on actual DB fields: hide inactive or deleted products
+  const raw = p as unknown as Record<string, unknown>
+  const isActive = (raw.isActive ?? raw.IsActive) as boolean | undefined
+  const isDeleted = (raw.isDeleted ?? raw.IsDeleted) as boolean | undefined
+  if (isDeleted === true) return true
+  if (isActive === false) return true
+  return false
 }
 
 const normalizeCategory = (c: CategoryDto): CategoryDto => {
@@ -173,11 +231,12 @@ export class ApiMarketplaceRepository implements MarketplaceRepository {
     const path = `${MARKETPLACE_ROUTES.products}?${qs}`
     const raw = await this.http.get<unknown>(path, { showFeedback: false })
     if (Array.isArray(raw)) {
+      const filtered = (raw as ProductDto[]).filter((x) => !isTestProduct(x))
       const page = query.page ?? 1
-      const pageSize = query.pageSize ?? 10
-      const totalCount = raw.length
+      const pageSize = query.pageSize ?? 12
+      const totalCount = filtered.length
       const totalPages = Math.max(1, Math.ceil(totalCount / pageSize))
-      const data = (raw.slice((page - 1) * pageSize, page * pageSize) as ProductDto[]).map(normalizeProduct)
+      const data = filtered.slice((page - 1) * pageSize, page * pageSize).map(normalizeProduct)
       return {
         isSuccess: true,
         data,
@@ -193,7 +252,7 @@ export class ApiMarketplaceRepository implements MarketplaceRepository {
     }
     const paginated = toPaginated<ProductDto>(raw)
     if (paginated) {
-      paginated.data = (paginated.data || []).map(normalizeProduct)
+      paginated.data = (paginated.data || []).filter((x) => !isTestProduct(x)).map(normalizeProduct)
       return paginated
     }
     return {
@@ -408,13 +467,13 @@ export class ApiMarketplaceRepository implements MarketplaceRepository {
   async getMostSellingProducts(limit: number = 8): Promise<ProductDto[]> {
     try {
       const raw = await this.http.get<unknown>(`${MARKETPLACE_ROUTES.mostSelling}?limit=${limit}`, { showFeedback: false })
-      if (Array.isArray(raw)) return (raw as ProductDto[]).map(normalizeProduct)
+      if (Array.isArray(raw)) return (raw as ProductDto[]).filter((x) => !isTestProduct(x)).map(normalizeProduct)
       if (raw && typeof raw === 'object') {
         const obj = raw as Record<string, unknown>
-        if (Array.isArray(obj.data)) return (obj.data as ProductDto[]).map(normalizeProduct)
-        if (Array.isArray(obj.Data)) return (obj.Data as ProductDto[]).map(normalizeProduct)
+        if (Array.isArray(obj.data)) return (obj.data as ProductDto[]).filter((x) => !isTestProduct(x)).map(normalizeProduct)
+        if (Array.isArray(obj.Data)) return (obj.Data as ProductDto[]).filter((x) => !isTestProduct(x)).map(normalizeProduct)
         const paginated = toPaginated<ProductDto>(raw)
-        if (paginated) return paginated.data.map(normalizeProduct)
+        if (paginated) return (paginated.data || []).filter((x) => !isTestProduct(x)).map(normalizeProduct)
       }
       return []
     } catch (e) {
@@ -424,11 +483,11 @@ export class ApiMarketplaceRepository implements MarketplaceRepository {
       // Fallback to topSelling route
       try {
         const rawFallback = await this.http.get<unknown>(`${MARKETPLACE_ROUTES.topSelling}?limit=${limit}`, { showFeedback: false })
-        if (Array.isArray(rawFallback)) return (rawFallback as ProductDto[]).map(normalizeProduct)
+        if (Array.isArray(rawFallback)) return (rawFallback as ProductDto[]).filter((x) => !isTestProduct(x)).map(normalizeProduct)
         if (rawFallback && typeof rawFallback === 'object') {
           const obj = rawFallback as Record<string, unknown>
-          if (Array.isArray(obj.data)) return (obj.data as ProductDto[]).map(normalizeProduct)
-          if (Array.isArray(obj.Data)) return (obj.Data as ProductDto[]).map(normalizeProduct)
+          if (Array.isArray(obj.data)) return (obj.data as ProductDto[]).filter((x) => !isTestProduct(x)).map(normalizeProduct)
+          if (Array.isArray(obj.Data)) return (obj.Data as ProductDto[]).filter((x) => !isTestProduct(x)).map(normalizeProduct)
         }
       } catch {
         // quiet fallback

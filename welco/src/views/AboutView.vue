@@ -104,7 +104,7 @@ const pillars = computed(() => [
               </div>
               <div class="hero-badge">
                 <span class="material-symbols-outlined text-[16px] text-[var(--wl-primary)]">history_edu</span>
-                <span>{{ t('about.statYears') }}</span>
+                <span>{{ yearsOfExperience }} {{ t('about.statYears') }}</span>
               </div>
               <div class="hero-badge">
                 <span class="material-symbols-outlined text-[16px] text-[var(--wl-primary)]">public</span>

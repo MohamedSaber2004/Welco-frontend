@@ -20,6 +20,11 @@ useAnimation()
 
 const route = useRoute()
 const router = useRouter()
+const initialPage = computed(() => {
+  const p = route.query.page ? parseInt(String(route.query.page), 10) : 1
+  return Number.isFinite(p) && p > 0 ? p : 1
+})
+
 const {
   products,
   categories,
@@ -47,6 +52,7 @@ const {
   search: route.query.search ? String(route.query.search) : undefined,
   categoryId: route.query.categoryId ? String(route.query.categoryId) : undefined,
   sortBy: route.query.sortBy ? (String(route.query.sortBy) as 'price-asc' | 'price-desc' | 'newest') : undefined,
+  page: initialPage.value,
 })
 const { add } = useCart()
 const { isSaved, toggleSave, canEditWishlist } = useWishlist()
@@ -56,6 +62,34 @@ const handleWishlist = async (id: string) => {
 }
 
 const showMobileFilters = ref(false)
+
+const handlePageChange = (p: number) => {
+  goPage(p)
+  void router.push({
+    query: {
+      ...route.query,
+      page: p > 1 ? String(p) : undefined,
+    },
+  })
+}
+
+watch(
+  () => route.query.page,
+  (newPage) => {
+    const p = newPage ? parseInt(String(newPage), 10) : 1
+    const valid = Number.isFinite(p) && p > 0 ? p : 1
+    if (page.value !== valid) {
+      goPage(valid)
+    }
+  },
+)
+
+const showingRange = computed(() => {
+  if (!totalCount.value) return '0'
+  const start = (page.value - 1) * 12 + 1
+  const end = Math.min(page.value * 12, totalCount.value)
+  return `${start}–${end}`
+})
 
 watch(
   () => route.query.search,
@@ -126,7 +160,7 @@ const filteredSidebarCategories = computed(() => {
         <h1>{{ t('marketplace.title') }}</h1>
         <p class="catalog-head__desc">{{ t('marketplace.subtitle') }}</p>
       </div>
-      <div v-if="totalCount" class="mono" style="font-size:11px;color:var(--wl-muted)">{{ t('catalog.showing', { count: String(products.length), total: String(totalCount), page: String(page), totalPages: String(totalPages) } as never) }}</div>
+      <div v-if="totalCount" class="mono" style="font-size:11px;color:var(--wl-muted)">{{ t('catalog.showing', { count: showingRange, total: String(totalCount), page: String(page), totalPages: String(totalPages) } as never) }}</div>
     </div>
 
     <div v-if="categories.length" class="category-pills-bar">
@@ -372,7 +406,7 @@ const filteredSidebarCategories = computed(() => {
               </div>
             </article>
           </div>
-          <AppPagination v-if="totalPages > 1" :page="page" :total-pages="totalPages" :total-items="totalCount" :page-size="12" class="catalog-pagination" @change="goPage" />
+          <AppPagination v-if="totalPages > 1" :page="page" :total-pages="totalPages" :total-items="totalCount" :page-size="12" class="catalog-pagination" @change="handlePageChange" />
         </template>
       </main>
     </div>

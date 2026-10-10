@@ -134,6 +134,7 @@ function normalizeRfq(raw: unknown): RfqDto {
     requestedCurrency,
     baseCurrency,
     note: rawNote,
+    responseNote: pickStr(o, 'responseNote', 'ResponseNote') || undefined,
     createdAt: pickStr(o, 'createdAt', 'CreatedAt'),
   }
 }
@@ -165,6 +166,7 @@ function normalizeQuote(raw: unknown): QuoteDto {
     currency: pickStr(o, 'currency', 'Currency') || undefined,
     validUntil: pickStr(o, 'validUntil', 'ValidUntil'),
     status: normalizeQuoteStatus(o.status ?? o.Status),
+    note: pickStr(o, 'note', 'Note') || undefined,
     items: items.map((it) => normalizeQuoteItem(it, id)),
     createdAt: pickStr(o, 'createdAt', 'CreatedAt'),
   }
@@ -286,13 +288,30 @@ export class ApiSalesRepository implements SalesRepository {
     if (query.searchTerm) params.set('searchTerm', query.searchTerm)
     if (query.productId) params.set('productId', query.productId)
     const qs = params.toString()
-    const raw = await this.http.get<unknown>(qs ? `${SALES_ROUTES.productInquiries}?${qs}` : SALES_ROUTES.productInquiries, { showFeedback: false })
-    if (Array.isArray(raw)) return { isSuccess: true, data: raw as ProductInquiryDto[], totalCount: raw.length, pageNumber: query.pageNumber ?? 1, pageSize: query.pageSize ?? 10, totalPages: 1, hasPreviousPage: false, hasNextPage: false, message: 'OK', statusCode: 200 }
-    return raw as PaginatedResult<ProductInquiryDto>
+    try {
+      const raw = await this.http.get<unknown>(qs ? `${SALES_ROUTES.productInquiries}?${qs}` : SALES_ROUTES.productInquiries, { showFeedback: false })
+      if (Array.isArray(raw)) return { isSuccess: true, data: raw as ProductInquiryDto[], totalCount: raw.length, pageNumber: query.pageNumber ?? 1, pageSize: query.pageSize ?? 10, totalPages: 1, hasPreviousPage: false, hasNextPage: false, message: 'OK', statusCode: 200 }
+      return raw as PaginatedResult<ProductInquiryDto>
+    } catch {
+      return { isSuccess: false, data: [], totalCount: 0, pageNumber: query.pageNumber ?? 1, pageSize: query.pageSize ?? 10, totalPages: 1, hasPreviousPage: false, hasNextPage: false, message: 'OK', statusCode: 200 }
+    }
   }
 
   async getProductInquiryById(id: string): Promise<ProductInquiryDto> {
     return await this.http.get<ProductInquiryDto>(SALES_ROUTES.productInquiryById(id), { showFeedback: false })
+  }
+
+  async respondRfq(id: string, payload: { responseNote: string; proposedAmount?: number; validityDays?: number }): Promise<RfqDto> {
+    const raw = await this.http.post<unknown>(SALES_ROUTES.rfqRespond(id), payload, { showFeedback: false })
+    const o = asObj(raw)
+    const data = o.data && typeof o.data === 'object' ? o.data : raw
+    return normalizeRfq(data)
+  }
+
+  async respondProductInquiry(id: string, response: string): Promise<ProductInquiryDto> {
+    const raw = await this.http.post<unknown>(SALES_ROUTES.productInquiryRespond(id), { response }, { showFeedback: false })
+    const o = asObj(raw)
+    return (o.data && typeof o.data === 'object' ? o.data : raw) as ProductInquiryDto
   }
 
   async deleteProductInquiry(id: string): Promise<void> {

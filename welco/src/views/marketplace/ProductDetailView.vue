@@ -2,7 +2,7 @@
 import { ref, onMounted, computed, watch, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { t, locale } from '../../i18n'
-import { services } from '../../di/container'
+import { services, authService } from '../../di/container'
 import type { ProductDto } from '../../domain/models/marketplace'
 import { useCart } from '../../composables/useCart'
 import { useWishlist } from '../../composables/useWishlist'
@@ -60,6 +60,21 @@ const inquiryOrg = ref('')
 const inquiryEmail = ref('')
 const inquiryMsg = ref('')
 const inquirySending = ref(false)
+
+function initInquiryUser() {
+  if (authService.isAuthenticated && authService.user.value) {
+    const u = authService.user.value
+    if (!inquiryName.value) {
+      inquiryName.value = u.fullName || ''
+    }
+    if (!inquiryEmail.value && u.email) {
+      inquiryEmail.value = u.email
+    }
+    if (!inquiryOrg.value && u.company) {
+      inquiryOrg.value = u.company.name || ''
+    }
+  }
+}
 
 const { isSaved, toggleSave, canEditWishlist } = useWishlist()
 const rfqListIds = ref<string[]>(
@@ -132,7 +147,16 @@ const loadProductData = async (id: string) => {
 onMounted(() => {
   void loadProductData(String(route.params.id))
   void services.contentService.loadSupportContact()
+  initInquiryUser()
 })
+
+watch(
+  () => authService.user.value,
+  () => {
+    initInquiryUser()
+  },
+  { immediate: true },
+)
 
 watch(
   () => route.params.id,
@@ -228,6 +252,11 @@ function toggleRfqList() {
 }
 
 async function sendInquiry() {
+  if (!authService.isAuthenticated) {
+    toastService.info(t('pdp.loginRequiredForInquiry'))
+    void router.push({ name: 'login', query: { redirect: route.fullPath } })
+    return
+  }
   if (!inquiryName.value.trim() || !inquiryMsg.value.trim()) {
     toastService.error(t('common.error'))
     return
@@ -247,6 +276,7 @@ async function sendInquiry() {
       inquiryOrg.value = ''
       inquiryEmail.value = ''
       inquiryMsg.value = ''
+      initInquiryUser()
       toastService.success(t('common.operationDone'))
     } else {
       toastService.error(res.error || t('common.error'))
@@ -803,6 +833,13 @@ const resolvedDescription = computed(() => {
           <span class="inquiry-eyebrow mono">{{ t('pdp.inquiryEyebrow') }}</span>
           <h2 class="inquiry-title">{{ t('pdp.inquiryTitle') }}</h2>
           <p class="inquiry-hint">{{ t('pdp.inquiryHint') }}</p>
+          <div v-if="!authService.isAuthenticated" class="inquiry-auth-notice">
+            <span class="material-symbols-outlined text-[18px]">lock</span>
+            <span>{{ t('pdp.inquiryAuthNotice') }}</span>
+            <router-link :to="{ name: 'login', query: { redirect: route.fullPath } }" class="inquiry-login-link mono">
+              {{ t('nav.login') }} →
+            </router-link>
+          </div>
         </div>
 
         <form class="inquiry-form" @submit.prevent="sendInquiry">
@@ -855,8 +892,8 @@ const resolvedDescription = computed(() => {
               :disabled="inquirySending"
             >
               <span v-if="inquirySending" class="material-symbols-outlined animate-spin text-[18px]">progress_activity</span>
-              <span v-else class="material-symbols-outlined text-[18px]">send</span>
-              <span>{{ inquirySending ? 'Sending...' : t('pdp.sendInquiry') }}</span>
+              <span v-else class="material-symbols-outlined text-[18px]">{{ authService.isAuthenticated ? 'send' : 'lock' }}</span>
+              <span>{{ inquirySending ? 'Sending...' : (authService.isAuthenticated ? t('pdp.sendInquiry') : t('pdp.sendInquiry')) }}</span>
             </button>
             <p class="inquiry-foot mono">{{ t('pdp.inquiryFoot') }}</p>
           </div>
@@ -2041,6 +2078,26 @@ const resolvedDescription = computed(() => {
   color: var(--wl-ink-soft);
   line-height: 1.6;
   margin: 0;
+}
+
+.inquiry-auth-notice {
+  margin-top: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-surface-elevated, #fffbeb);
+  border: 1px solid var(--border-warning, #fde68a);
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--step--1);
+  color: var(--fg-warning, #92400e);
+}
+
+.inquiry-login-link {
+  font-weight: 700;
+  color: var(--wl-primary);
+  text-decoration: underline;
+  margin-inline-start: var(--space-2);
 }
 
 .inquiry-form {

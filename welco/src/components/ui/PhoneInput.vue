@@ -123,9 +123,9 @@ watch(
           return
         }
       }
-      // Fallback to first API dial
-      const first = mergedDials.value[0]
-      if (first) selectedDial.value = first.dial
+      // Fallback: prefer AE (UAE) or EG (Egypt) or SA (Saudi) before alphabetical first dial (+1 Canada)
+      const defaultPref = findByCode('AE') || findByCode('EG') || findByCode('SA') || mergedDials.value[0]
+      if (defaultPref) selectedDial.value = defaultPref.dial
     }
     if (props.modelValue) parseModelValue(props.modelValue)
     if (props.countryId) {

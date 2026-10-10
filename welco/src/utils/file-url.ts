@@ -1,7 +1,56 @@
-import { API_BASE_URL } from '../config/api.config'
+import { API_BASE_URL, BACKEND_BASE_URL } from '../config/api.config'
 
 export const PLACEHOLDER = '/images/placeholder.svg'
 export const PLACEHOLDER_PNG = '/images/placeholder.png'
+
+const KNOWN_PROVIDER_LOGOS = new Set([
+  'apex-surgical.svg',
+  'carepoint.svg',
+  'citycare.svg',
+  'delta-surgical.svg',
+  'gulf-medical.svg',
+  'lifeline.svg',
+  'medcore.svg',
+  'meridian.svg',
+  'nova-health.svg',
+  'orthoplus.svg',
+  'primecare.svg',
+  'sahara-med.svg',
+])
+
+/**
+ * Known seed mock filenames from database records that do not exist
+ * on the physical storage of the backend. They must never trigger HTTP calls.
+ */
+const KNOWN_MISSING_SEED_FILES = new Set([
+  'needle-holder-premium-89.jpg',
+  'adson-forceps-straight-87.jpg',
+  'mdsap-2024.jpg',
+  'sfda-2025.jpg',
+  'fda-510k-2023.jpg',
+  'iso-9001-2024.jpg',
+  'iso-13485-2024.jpg',
+  'ce-mark-2024.jpg',
+  'ce-2024.jpg',
+])
+
+export function isKnownMissingSeedFile(fileName: string | null | undefined): boolean {
+  if (!fileName || typeof fileName !== 'string') return false
+  const clean = fileName.trim().replace(/^\/+/, '').replace(/^files\/+/, '').toLowerCase()
+  if (!clean) return false
+
+  // 1. Any file inside demo/ or mock/ folders from database migrations
+  if (clean.startsWith('demo/') || clean.startsWith('mock/') || clean.includes('/demo/')) {
+    return true
+  }
+
+  // 2. Base name check against known seed files
+  const baseName = clean.split('/').pop() || clean
+  if (KNOWN_MISSING_SEED_FILES.has(baseName)) return true
+  if (/^(sfda|fda|iso|mdsap|ce)[-_0-9a-z]*[-_]\d{4}\.(jpg|jpeg|png|webp|svg)$/i.test(baseName)) return true
+  if (/^[a-z0-9-]+-\d{2}\.(jpg|jpeg|png|webp)$/i.test(baseName)) return true
+  return false
+}
 
 /**
  * Memory cache of backend file URLs that already failed (404/401/…).
@@ -28,7 +77,10 @@ export function isKnownBrokenUrl(url: string | null | undefined): boolean {
 export function isStoredFileName(value: string | null | undefined): boolean {
   if (typeof value !== 'string') return false
   const trimmed = value.trim().replace(/^\/+/, '')
+  if (!trimmed || trimmed.includes(' ')) return false
+  if (isKnownMissingSeedFile(trimmed)) return false
   return (
+    /\.(png|jpe?g|svg|webp|gif|pdf|docx?|xlsx?)$/i.test(trimmed) ||
     /^\d+_[0-9a-fA-F-]{8,}\..+$/i.test(trimmed) ||
     /^\d+_\d+\..+$/i.test(trimmed) ||
     /^\d+_[a-zA-Z0-9_-]+\.[a-zA-Z0-9]+$/i.test(trimmed)
@@ -38,7 +90,24 @@ export function isStoredFileName(value: string | null | undefined): boolean {
 export function resolveFileUrl(storedName: string | null | undefined, fallback = PLACEHOLDER): string {
   if (!storedName || typeof storedName !== 'string' || !storedName.trim()) return fallback
   const trimmed = storedName.trim()
+  if (trimmed === 'null' || trimmed === 'undefined') return fallback
   if (trimmed === PLACEHOLDER || trimmed === PLACEHOLDER_PNG) return trimmed
+
+  // Unpack JSON string if passed (e.g. '{"fileName":"foo.png"}')
+  if ((trimmed.startsWith('{') && trimmed.endsWith('}')) || (trimmed.startsWith('"') && trimmed.endsWith('"'))) {
+    try {
+      const parsed = JSON.parse(trimmed)
+      if (typeof parsed === 'string') return resolveFileUrl(parsed, fallback)
+      if (parsed && typeof parsed === 'object') {
+        const o = parsed as Record<string, unknown>
+        const val = (o.fileName ?? o.FileName ?? o.name ?? o.Name ?? o.url ?? o.Url ?? o.fileUrl ?? o.FileUrl ?? o.filePath ?? o.FilePath) as string | undefined
+        if (val) return resolveFileUrl(val, fallback)
+      }
+    } catch {
+      // not valid JSON, proceed
+    }
+  }
+
   if (trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('data:') || trimmed.startsWith('blob:')) {
     return trimmed
   }
@@ -52,21 +121,29 @@ export function resolveFileUrl(storedName: string | null | undefined, fallback =
   ) {
     return trimmed
   }
+
+  const cleanName = trimmed.replace(/^\/+/, '')
+  if (KNOWN_PROVIDER_LOGOS.has(cleanName.toLowerCase())) {
+    return `/images/providers/${cleanName}`
+  }
+
+  // Prevent browser 404 network calls for dummy seed files from database
+  if (isKnownMissingSeedFile(cleanName)) {
+    return fallback
+  }
+
+  const backendBase = (BACKEND_BASE_URL || API_BASE_URL || 'https://welco-gateway.runasp.net').replace(/\/+$/, '')
+
   if (trimmed.startsWith('/files/')) {
-    return `${API_BASE_URL}${trimmed}`
+    const fileOnly = trimmed.replace(/^\/+files\/+/, '')
+    return `${backendBase}/files/${fileOnly}`
   }
   if (trimmed.startsWith('files/')) {
-    return `${API_BASE_URL}/${trimmed}`
+    const fileOnly = trimmed.replace(/^files\/+/, '')
+    return `${backendBase}/files/${fileOnly}`
   }
-  const cleanName = trimmed.replace(/^\/+/, '')
-  // Only true backend-stored names (timestamped `123_...ext`) hit /files/.
-  // Bare seed names like `gulf-medical.svg` have no backend file — return
-  // fallback immediately instead of 404-spamming the console on every mount.
-  if (isStoredFileName(cleanName)) {
-    return `${API_BASE_URL}/files/${cleanName}`
-  }
-  if (trimmed.startsWith('/')) return trimmed
-  return fallback
+
+  return `${backendBase}/files/${cleanName}`
 }
 
 export function withImageFallback(img: HTMLImageElement): void {

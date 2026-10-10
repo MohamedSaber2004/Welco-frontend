@@ -11,6 +11,7 @@ import { toastService } from '../../infrastructure/feedback/toast.service'
 import { confirmService } from '../../infrastructure/feedback/confirm.service'
 import { t, locale } from '../../i18n'
 import type { RfqDto, QuoteDto, RfqItemDto } from '../../domain/models/sales'
+import type { ProductInquiryDto } from '../../domain/ports/sales-repository'
 import { parseNegotiationNote } from '../../utils/negotiation'
 import { formatPrice } from '../../utils/format'
 
@@ -67,11 +68,12 @@ const selectedRfqBaseTotal = computed(() => {
 
 const rfqs = salesService.rfqs
 const quotes = salesService.quotes
+const inquiries = ref<ProductInquiryDto[]>([])
 const loading = ref(true)
 const fetchError = ref('')
 const search = ref('')
 const statusFilter = ref('all')
-const tab = ref<'all' | 'negotiations' | 'quotes'>('all')
+const tab = ref<'all' | 'negotiations' | 'quotes' | 'inquiries'>('all')
 const page = ref(1)
 const pageSize = 10
 
@@ -97,15 +99,52 @@ const counterNote = ref('')
 const counterValidityDays = ref(14)
 const submittingCounter = ref(false)
 
+// Inquiry Response modal
+const selectedInquiry = ref<ProductInquiryDto | null>(null)
+const showInquiryModal = ref(false)
+const inquiryResponseText = ref('')
+const submittingInquiryResponse = ref(false)
+
+const openInquiryResponse = (inq: ProductInquiryDto) => {
+  selectedInquiry.value = inq
+  inquiryResponseText.value = inq.response || ''
+  showInquiryModal.value = true
+}
+
+const submitInquiryResponse = async () => {
+  if (!selectedInquiry.value || !inquiryResponseText.value.trim()) {
+    toastService.error(t('common.error'))
+    return
+  }
+  submittingInquiryResponse.value = true
+  try {
+    const res = await salesService.respondProductInquiry(selectedInquiry.value.id, inquiryResponseText.value.trim())
+    if (res.ok) {
+      if (res.inquiry) {
+        const idx = inquiries.value.findIndex((x) => x.id === selectedInquiry.value?.id)
+        if (idx !== -1) inquiries.value[idx] = res.inquiry
+      }
+      showInquiryModal.value = false
+      await loadData()
+    } else {
+      toastService.error(res.error || t('common.error'))
+    }
+  } finally {
+    submittingInquiryResponse.value = false
+  }
+}
+
 const loadData = async () => {
   loading.value = true
   fetchError.value = ''
   try {
-    await Promise.all([
+    const [_, __, ___, inqPage] = await Promise.all([
       companyService.loadMyCompany().catch(() => null),
       salesService.loadRfqs({ pageSize: 50 }),
       salesService.loadQuotes({ pageSize: 50 }),
+      salesService.loadProductInquiries({ pageSize: 50 }).catch(() => null),
     ])
+    inquiries.value = inqPage?.data || []
   } catch (e) {
     fetchError.value = e instanceof Error ? e.message : t('common.error')
   } finally {
@@ -326,8 +365,17 @@ const submitCounterOffer = async () => {
       rfqId: rfq.id,
       amount: counterAmount.value,
       validUntil: validUntil || '',
+      note: counterNote.value.trim() || undefined,
       items: lines,
     })
+
+    if (counterNote.value.trim()) {
+      await salesService.respondRfq(rfq.id, {
+        responseNote: counterNote.value.trim(),
+        proposedAmount: counterAmount.value ?? undefined,
+        validityDays: counterValidityDays.value,
+      }).catch(() => null)
+    }
 
     if (res.ok) {
       toastService.success(t('provider.counterSuccess'))
@@ -436,6 +484,26 @@ const handleDecline = async (rfq: RfqDto) => {
             <strong class="kpi-value mono">{{ quotesCount }}</strong>
           </div>
         </button>
+
+        <button
+          type="button"
+          class="kpi-card"
+          role="radio"
+          :aria-checked="tab === 'inquiries'"
+          :class="{ 'is-active': tab === 'inquiries' }"
+          @click="tab = 'inquiries'"
+        >
+          <div class="kpi-icon-box bg-purple-soft">
+            <span class="material-symbols-outlined text-purple-600" aria-hidden="true">question_answer</span>
+          </div>
+          <div class="kpi-info">
+            <span class="kpi-label mono">{{ locale === 'ar' ? 'استفسارات المنتجات' : 'Product Inquiries' }}</span>
+            <strong class="kpi-value mono">{{ inquiries.length }}</strong>
+          </div>
+          <span v-if="inquiries.filter((i) => !i.response).length > 0" class="negotiation-ping-badge mono">
+            {{ inquiries.filter((i) => !i.response).length }}
+          </span>
+        </button>
       </div>
 
       <!-- Quotes List Tab vs RFQ List Tab -->
@@ -483,6 +551,83 @@ const handleDecline = async (rfq: RfqDto) => {
                         @click="openQuoteDetails(q)"
                       >
                         <span class="material-symbols-outlined text-[16px]">visibility</span>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </DataState>
+        </div>
+      </template>
+
+      <!-- Product Inquiries Tab -->
+      <template v-else-if="tab === 'inquiries'">
+        <div class="table-card">
+          <div class="table-card-head">
+            <h2 class="section-title">{{ locale === 'ar' ? 'استفسارات المنتجات' : 'Product Inquiries' }} ({{ inquiries.length }})</h2>
+          </div>
+
+          <DataState :loading="loading" :error="fetchError" :empty="!inquiries.length" :empty-title="locale === 'ar' ? 'لا توجد استفسارات حالياً' : 'No Product Inquiries Yet'" @retry="loadData">
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr class="mono">
+                    <th>{{ locale === 'ar' ? 'العميل' : 'Client' }}</th>
+                    <th>{{ t('marketplace.products') }}</th>
+                    <th>{{ t('pdp.inquiryMsg') }}</th>
+                    <th>{{ t('commerce.status') }}</th>
+                    <th class="text-end">{{ t('common.actions') }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="inq in inquiries"
+                    :key="inq.id"
+                    class="table-row-clickable"
+                    @click="openInquiryResponse(inq)"
+                  >
+                    <td>
+                      <div class="rfq-id-cell">
+                        <strong class="mono rfq-num">{{ inq.name }}</strong>
+                        <span v-if="inq.organization" class="text-xs text-muted block">{{ inq.organization }}</span>
+                        <span v-if="inq.email" class="text-xs text-muted font-mono block">{{ inq.email }}</span>
+                        <span class="text-xs text-muted font-mono block">{{ inq.createdAt ? new Date(inq.createdAt).toLocaleDateString() : '' }}</span>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="flex flex-col gap-1">
+                        <strong class="text-sm font-semibold">{{ localized(inq.productNameEn, inq.productNameAr) || inq.productId }}</strong>
+                        <span v-if="inq.productSku" class="mono text-xs text-muted">SKU: {{ inq.productSku }}</span>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="inquiry-msg-box">
+                        <p class="text-sm italic">"{{ inq.message }}"</p>
+                        <div v-if="inq.response" class="inquiry-response-preview mono">
+                          <span class="material-symbols-outlined text-[14px] text-emerald-600">reply</span>
+                          <span><strong>{{ locale === 'ar' ? 'ردك:' : 'Response:' }}</strong> {{ inq.response }}</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <span
+                        class="status-pill mono"
+                        :class="inq.response || inq.status === 'Responded' ? 'status--quoted' : 'status--pending'"
+                      >
+                        {{ inq.response || inq.status === 'Responded' ? (locale === 'ar' ? 'تم الرد' : 'Responded') : (locale === 'ar' ? 'قيد الانتظار' : 'Pending') }}
+                      </span>
+                    </td>
+                    <td class="text-end" @click.stop>
+                      <button
+                        type="button"
+                        class="action-btn"
+                        :class="inq.response ? 'btn-view' : 'btn-accept'"
+                        :title="inq.response ? (locale === 'ar' ? 'عرض الرد' : 'View') : (locale === 'ar' ? 'رد' : 'Respond')"
+                        @click="openInquiryResponse(inq)"
+                      >
+                        <span class="material-symbols-outlined text-[16px]">reply</span>
+                        <span>{{ inq.response ? (locale === 'ar' ? 'عرض' : 'View') : (locale === 'ar' ? 'رد' : 'Respond') }}</span>
                       </button>
                     </td>
                   </tr>
@@ -990,6 +1135,59 @@ const handleDecline = async (rfq: RfqDto) => {
           </div>
         </template>
       </BaseModal>
+
+      <!-- Product Inquiry Response Modal -->
+      <BaseModal
+        v-model="showInquiryModal"
+        :title="`${locale === 'ar' ? 'الرد على استفسار المنتج' : 'Respond to Product Inquiry'} · ${selectedInquiry?.name || ''}`"
+        size="md"
+      >
+        <div v-if="selectedInquiry" class="detail-modal-body">
+          <div class="inquiry-modal-meta mono">
+            <div class="detail-item">
+              <span class="lbl">{{ t('pdp.inquiryName') }}</span>
+              <strong class="val">{{ selectedInquiry.name }}</strong>
+            </div>
+            <div class="detail-item" v-if="selectedInquiry.organization">
+              <span class="lbl">{{ t('pdp.inquiryOrg') }}</span>
+              <strong class="val">{{ selectedInquiry.organization }}</strong>
+            </div>
+            <div class="detail-item" v-if="selectedInquiry.email">
+              <span class="lbl">Email</span>
+              <strong class="val">{{ selectedInquiry.email }}</strong>
+            </div>
+            <div class="detail-item">
+              <span class="lbl">{{ t('marketplace.products') }}</span>
+              <strong class="val">{{ localized(selectedInquiry.productNameEn, selectedInquiry.productNameAr) || selectedInquiry.productId }}</strong>
+            </div>
+          </div>
+
+          <div class="inquiry-quote-bubble">
+            <span class="material-symbols-outlined text-[18px] text-muted">format_quote</span>
+            <p class="text-sm">"{{ selectedInquiry.message }}"</p>
+          </div>
+
+          <div class="form-group mt-3">
+            <label class="form-lbl mono">{{ locale === 'ar' ? 'رد المزوّد للعميل' : 'Provider Response to Customer' }} *</label>
+            <textarea
+              v-model="inquiryResponseText"
+              rows="4"
+              class="form-textarea"
+              :placeholder="locale === 'ar' ? 'اكتب ردك المفصل مع شروط الأسعار والتوريد هنا...' : 'Type your detailed response regarding pricing, MOQ, or specifications...'"
+            ></textarea>
+          </div>
+        </div>
+
+        <template #footer>
+          <div class="modal-footer-actions">
+            <BaseButton variant="ghost" @click="showInquiryModal = false">{{ t('common.cancel') }}</BaseButton>
+            <BaseButton variant="primary" :loading="submittingInquiryResponse" @click="submitInquiryResponse">
+              <span class="material-symbols-outlined text-[16px]">send</span>
+              <span>{{ locale === 'ar' ? 'إرسال الرد' : 'Send Response' }}</span>
+            </BaseButton>
+          </div>
+        </template>
+      </BaseModal>
     </div>
   </ProviderLayout>
 </template>
@@ -1087,7 +1285,48 @@ const handleDecline = async (rfq: RfqDto) => {
 .bg-primary-soft { background: var(--wl-primary-soft); }
 .bg-emerald-soft { background: #ecfdf5; }
 .bg-gold-soft { background: #fefce8; }
+.bg-purple-soft { background: #f5f3ff; }
 .text-gold { color: #ca8a04; }
+
+.inquiry-msg-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 480px;
+}
+
+.inquiry-response-preview {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 6px 10px;
+  background: var(--wl-surface-soft, #f8fafc);
+  border: 1px solid var(--wl-border, #e2e8f0);
+  border-radius: var(--radius-sm, 6px);
+  font-size: 12px;
+  color: var(--wl-ink-soft, #334155);
+}
+
+.inquiry-quote-bubble {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px 14px;
+  background: var(--wl-surface-soft, #f1f5f9);
+  border-radius: var(--radius-sm, 6px);
+  margin-top: 12px;
+  border-inline-start: 3px solid var(--wl-primary);
+}
+
+.inquiry-modal-meta {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  padding: 12px;
+  background: var(--wl-surface-soft, #f8fafc);
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid var(--wl-border, #e2e8f0);
+}
 
 .kpi-info {
   display: flex;

@@ -12,10 +12,13 @@ import ErrorState from '../../components/ui/ErrorState.vue'
 import BaseButton from '../../components/ui/BaseButton.vue'
 import { useWishlist } from '../../composables/useWishlist'
 import { formatPrice } from '../../utils/format'
+import type { ProductInquiryDto } from '../../domain/ports/sales-repository'
 
 const { wishlistIds } = useWishlist()
 const router = useRouter()
 const loadError = ref<string | null>(null)
+const userInquiries = ref<ProductInquiryDto[]>([])
+const loadingInquiries = ref(false)
 
 const loading = computed(() => salesService.loading.value || commerceService.loading.value || companyService.loading.value)
 
@@ -93,14 +96,29 @@ const procurementPipeline = computed(() => {
 
 async function loadDashboard(): Promise<void> {
   loadError.value = null
+  loadingInquiries.value = true
   try {
-    await Promise.allSettled([
+    const tasks: Promise<unknown>[] = [
       salesService.loadAll(),
       commerceService.loadOrders(),
-      companyService.loadMyCompany(),
-    ])
+    ]
+    const hasCompany = Boolean(authService.isProvider.value || authService.user.value?.companyId)
+    if (hasCompany) {
+      tasks.push(companyService.loadMyCompany().catch(() => null))
+    }
+    if (authService.isAuthenticated) {
+      tasks.push(salesService.loadProductInquiries({ pageSize: 6 }).catch(() => null))
+    }
+    const results = await Promise.allSettled(tasks)
+    const inqTask = authService.isAuthenticated ? results[results.length - 1] : undefined
+    if (inqTask && inqTask.status === 'fulfilled' && inqTask.value) {
+      const val = inqTask.value as { data?: ProductInquiryDto[] }
+      userInquiries.value = Array.isArray(val?.data) ? val.data : []
+    }
   } catch (e) {
     loadError.value = e instanceof Error ? e.message : String(e)
+  } finally {
+    loadingInquiries.value = false
   }
 }
 
@@ -380,6 +398,86 @@ onMounted(loadDashboard)
           </div>
         </section>
       </div>
+
+      <!-- Product Inquiries & Provider Responses Section -->
+      <section class="card inquiries-section">
+        <div class="card-head">
+          <div>
+            <div class="card-eyebrow mono">
+              <span class="material-symbols-outlined text-[14px]">contact_support</span>
+              <span>{{ t('account.inquiryQueue') }}</span>
+            </div>
+            <h2 class="card-title">{{ t('account.myInquiriesTitle') }}</h2>
+            <p class="section-desc mono">{{ t('account.myInquiriesDesc') }}</p>
+          </div>
+          <div class="head-side-actions">
+            <span v-if="userInquiries.length" class="inquiries-counter mono">
+              {{ userInquiries.length }}
+            </span>
+            <router-link to="/account/inquiries" class="view-all-link mono">
+              <span>{{ locale === 'ar' ? 'عرض الكل' : 'View All' }}</span>
+              <span class="icon--directional text-[14px]">→</span>
+            </router-link>
+          </div>
+        </div>
+
+        <div v-if="!userInquiries.length" class="empty-tray">
+          <div class="empty-icon-box">
+            <span class="material-symbols-outlined text-[24px]">chat_bubble_outline</span>
+          </div>
+          <p class="empty-text mono">{{ t('account.noInquiriesYet') }}</p>
+          <span class="empty-hint">{{ t('pdp.inquiryHint') }}</span>
+        </div>
+
+        <div v-else class="inquiries-grid">
+          <div v-for="inq in userInquiries" :key="inq.id" class="inquiry-card">
+            <div class="inquiry-header">
+              <div class="inquiry-product-info">
+                <router-link
+                  v-if="inq.productId"
+                  :to="`/marketplace/product/${inq.productId}`"
+                  class="inquiry-product-name mono"
+                >
+                  <span class="material-symbols-outlined text-[16px]">inventory_2</span>
+                  <span>{{ (locale === 'ar' ? (inq.productNameAr || inq.productNameEn) : (inq.productNameEn || inq.productNameAr)) || (inq.productSku ? `SKU: ${inq.productSku}` : (locale === 'ar' ? 'تفاصيل المنتج' : 'Product Details')) }}</span>
+                </router-link>
+                <span class="inquiry-date mono">{{ inq.createdAt ? new Date(inq.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') : '' }}</span>
+              </div>
+              <span
+                class="inquiry-status-pill mono"
+                :class="inq.response ? 'status-responded' : 'status-pending'"
+              >
+                {{ inq.response ? (locale === 'ar' ? 'تم الرد' : 'Responded') : (locale === 'ar' ? 'قيد الانتظار' : 'Pending') }}
+              </span>
+            </div>
+
+            <div class="inquiry-bubble-user">
+              <div class="bubble-meta mono">
+                <span class="material-symbols-outlined text-[14px]">person</span>
+                <span>{{ inq.name }} <template v-if="inq.organization">({{ inq.organization }})</template></span>
+              </div>
+              <p class="bubble-text">{{ inq.message }}</p>
+            </div>
+
+            <!-- Provider Reply Box -->
+            <div v-if="inq.response" class="inquiry-bubble-provider">
+              <div class="provider-meta mono">
+                <span class="material-symbols-outlined text-[16px] text-emerald-600">verified_user</span>
+                <strong>{{ t('account.providerResponse') }}</strong>
+                <span v-if="inq.respondedAt" class="response-time">
+                  &bull; {{ t('account.respondedAt') }} {{ new Date(inq.respondedAt).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') }}
+                </span>
+              </div>
+              <p class="provider-response-body">{{ inq.response }}</p>
+            </div>
+
+            <div v-else class="inquiry-waiting-banner mono">
+              <span class="material-symbols-outlined text-[15px]">hourglass_empty</span>
+              <span>{{ t('account.awaitingProviderResponse') }}</span>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <section class="bento-section">
         <div class="bento-head">
@@ -1279,6 +1377,200 @@ onMounted(loadDashboard)
         flex-direction: column;
         align-items: flex-start;
         gap: var(--space-1);
+      }
+    }
+
+    .inquiries-section {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-6);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: var(--space-6);
+    }
+
+    .section-desc {
+      font-size: var(--step--1);
+      color: var(--wl-muted);
+      margin-top: 0.25rem;
+    }
+
+    .head-side-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .view-all-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--wl-primary);
+      text-decoration: none;
+      transition: color 0.15s ease;
+    }
+
+    .view-all-link:hover {
+      text-decoration: underline;
+    }
+
+    .inquiries-counter {
+      font-size: var(--step--1);
+      font-weight: 700;
+      color: var(--wl-primary);
+      background: var(--wl-primary-soft);
+      padding: 0.25rem 0.65rem;
+      border-radius: 9999px;
+      border: 1px solid rgba(var(--wl-primary-rgb), 0.2);
+    }
+
+    .inquiries-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .inquiry-card {
+      background: var(--wl-surface-soft, rgba(248, 250, 252, 0.8));
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.15rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .inquiry-card:hover {
+      border-color: rgba(var(--wl-primary-rgb), 0.4);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .inquiry-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+
+    .inquiry-product-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .inquiry-product-name {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--wl-primary);
+      text-decoration: none;
+      line-height: 1.3;
+    }
+
+    .inquiry-product-name:hover {
+      text-decoration: underline;
+    }
+
+    .inquiry-date {
+      font-size: 0.75rem;
+      color: var(--wl-muted);
+    }
+
+    .inquiry-status-pill {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.2rem 0.55rem;
+      border-radius: 9999px;
+      white-space: nowrap;
+    }
+
+    .status-responded {
+      background: rgba(16, 185, 129, 0.12);
+      color: #059669;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .status-pending {
+      background: rgba(245, 158, 11, 0.12);
+      color: #d97706;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .inquiry-bubble-user {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 0.9rem;
+    }
+
+    .bubble-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--wl-muted);
+      margin-bottom: 0.35rem;
+    }
+
+    .bubble-text {
+      font-size: 0.88rem;
+      color: var(--wl-ink-strong, #1e293b);
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    .inquiry-bubble-provider {
+      background: rgba(238, 242, 255, 0.7);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      border-radius: 8px;
+      padding: 0.75rem 0.9rem;
+    }
+
+    .provider-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.75rem;
+      color: #4338ca;
+      margin-bottom: 0.35rem;
+    }
+
+    .response-time {
+      font-size: 0.72rem;
+      color: var(--wl-muted);
+      font-weight: normal;
+    }
+
+    .provider-response-body {
+      font-size: 0.88rem;
+      color: #1e1b4b;
+      margin: 0;
+      line-height: 1.5;
+      font-weight: 500;
+    }
+
+    .inquiry-waiting-banner {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.78rem;
+      color: #b45309;
+      background: rgba(245, 158, 11, 0.08);
+      border: 1px dashed rgba(245, 158, 11, 0.3);
+      padding: 0.55rem 0.75rem;
+      border-radius: 6px;
+    }
+
+    @media (max-width: 640px) {
+      .inquiries-grid {
+        grid-template-columns: 1fr;
       }
     }
 </style>

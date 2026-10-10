@@ -85,8 +85,19 @@ export class ApiCommerceRepository implements CommerceRepository {
     return await this.http.post<CartDto>(COMMERCE_ROUTES.cartItems(cartId), body, { showFeedback: false })
   }
 
-  async getBySession(sessionId: string): Promise<CartDto> {
-    return await this.http.get<CartDto>(COMMERCE_ROUTES.cartBySession(sessionId), { showFeedback: false })
+  async getBySession(sessionId: string): Promise<CartDto | null> {
+    try {
+      const raw = await this.http.get<unknown>(COMMERCE_ROUTES.cartBySession(sessionId), { showFeedback: false })
+      if (!raw || typeof raw !== 'object') return null
+      const obj = raw as Record<string, unknown>
+      // Backend wraps result: { isSuccess, data: CartDto }
+      if ('data' in obj && obj.data && typeof obj.data === 'object') return obj.data as CartDto
+      if ('id' in obj) return raw as CartDto
+      return null
+    } catch {
+      // 404 = no cart yet for this session — caller will create one
+      return null
+    }
   }
 
   async clearCart(cartId: string): Promise<void> {

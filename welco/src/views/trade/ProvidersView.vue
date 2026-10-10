@@ -114,17 +114,59 @@ const getTypeLabel = (type: CompanyType): string => {
   }
 }
 
+const resolveProviderType = (c: CompanyDto): CompanyType => {
+  const n = (c.name || '').toLowerCase()
+  if (n.includes('hospital')) return CompanyType.Hospital
+  if (n.includes('clinic')) return CompanyType.Clinic
+  if (n.includes('distributor')) return CompanyType.Distributor
+  return c.type
+}
+
+const INVALID_TERRITORIES = new Set(['california', 'saint martin', 'bonaire'])
+
+const availableProviderCountries = computed(() => {
+  const activeCountryNames = new Set(
+    companies.value
+      .map((c) => {
+        const en = (c.countryNameEn || '').toLowerCase().trim()
+        return en === 'california' ? 'united states' : en
+      })
+      .filter((n) => Boolean(n) && !INVALID_TERRITORIES.has(n)),
+  )
+  return countries.value.filter((c) => {
+    const en = (c.nameEn || '').toLowerCase().trim()
+    if (INVALID_TERRITORIES.has(en)) return false
+    return activeCountryNames.has(en) || companies.value.some((comp) => comp.countryId === c.id)
+  })
+})
+
 const filteredProviders = computed(() => {
   let list = [...companies.value]
 
   // Public listing: approved + active provider companies only.
   // Pending / rejected applications must never appear here.
-  list = list.filter(
-    (c) =>
-      c.isActive !== false &&
-      (c.isProvider !== false || c.isProvider === undefined) &&
-      (c.status === undefined || c.status === CompanyStatus.Approved),
-  )
+  list = list
+    .filter(
+      (c) =>
+        c.isActive !== false &&
+        (c.isProvider !== false || c.isProvider === undefined) &&
+        (c.status === undefined || c.status === CompanyStatus.Approved),
+    )
+    .map((c) => {
+      const normalizedType = resolveProviderType(c)
+      let countryNameEn = c.countryNameEn
+      let countryNameAr = c.countryNameAr
+      if (countryNameEn && countryNameEn.toLowerCase().trim() === 'california') {
+        countryNameEn = 'United States'
+        countryNameAr = 'الولايات المتحدة'
+      }
+      return {
+        ...c,
+        type: normalizedType,
+        countryNameEn,
+        countryNameAr,
+      }
+    })
 
   // Search filter (debounced for smooth typing)
   const q = activeQuery.value
@@ -147,7 +189,12 @@ const filteredProviders = computed(() => {
 
   // Country filter
   if (selectedCountry.value !== 'all') {
-    list = list.filter((c) => c.countryId === selectedCountry.value || c.countryNameEn === selectedCountry.value)
+    const sel = selectedCountry.value.toLowerCase()
+    list = list.filter((c) => {
+      const cId = c.countryId?.toLowerCase()
+      const cEn = c.countryNameEn?.toLowerCase()
+      return cId === sel || cEn === sel
+    })
   }
 
   // Sort
@@ -381,11 +428,11 @@ const browseProviderProducts = (providerId: string) => {
                 <span class="material-symbols-outlined select-wrap__chev" aria-hidden="true">expand_more</span>
               </label>
 
-              <label v-if="countries.length" class="select-wrap">
+              <label v-if="availableProviderCountries.length" class="select-wrap">
                 <span class="material-symbols-outlined select-wrap__icon" aria-hidden="true">public</span>
                 <select v-model="selectedCountry" class="toolbar__select" :aria-label="t('providers.allCountries')">
                   <option value="all">{{ t('providers.allCountries') }}</option>
-                  <option v-for="c in countries" :key="c.id" :value="c.id">
+                  <option v-for="c in availableProviderCountries" :key="c.id" :value="c.id">
                     {{ localized(c.nameEn, c.nameAr) }}
                   </option>
                 </select>
@@ -507,11 +554,11 @@ const browseProviderProducts = (providerId: string) => {
         <!-- Pagination -->
         <div v-if="totalPages > 1" class="pagination-wrap">
           <AppPagination
-            :current-page="page"
+            v-model:page="page"
             :total-pages="totalPages"
-            :total-count="totalCount"
+            :total-items="totalCount"
             :page-size="pageSize"
-            @page-change="goPage"
+            @change="goPage"
           />
         </div>
       </div>

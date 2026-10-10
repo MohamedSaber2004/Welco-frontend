@@ -26,12 +26,12 @@ const goSearch = () => {
 
 const cats = ref<CategoryDto[]>([])
 const certifications = ref<CertificationDto[]>([])
-const landingPages = ref<LandingPageDto[]>([])
 const aboutPage = ref<LandingPageDto | null>(null)
 const providers = ref<CompanyDto[]>([])
+const providersLoading = ref(true)
+const certificationsLoading = ref(true)
 const mostSellingProducts = ref<ProductDto[]>([])
 const mostSellingLoading = ref(true)
-const loading = ref(true)
 
 const imageViewer = ref({
   isOpen: false,
@@ -232,50 +232,63 @@ const openProviderStorefront = (id: string) => {
 }
 watch(explorerProviderPage, () => { void fetchExplorerProviders() })
 
-onMounted(async () => {
-  loading.value = true
-  try {
-    await Promise.allSettled([
-      loadCats(1),
-      loadAllCats(),
-      services.certificationService.load(),
-      services.contentService.loadSupport(),
-      contentRepository.getLandingPages({ pageNumber: 1, pageSize: 20 }).then((p) => (landingPages.value = p.data)).catch(() => []),
-      contentRepository
-        .getLandingPageBySlug('about-us')
-        .then((p) => {
-          aboutPage.value = p && p.isActive !== false ? p : null
-        })
-        .catch(() => null),
-      companyRepository
-        .getProvidersDirectory({ pageNumber: 1, pageSize: 50 })
-        .then((p) => {
-          // Directory endpoint now filters active+approved+isProvider on server side
-          if (p?.statusCode === 401 || !p?.data?.length) {
-            providers.value = []
-          } else {
-            providers.value = p.data.slice(0, 8)
-          }
-        })
-        .catch(() => {
-          providers.value = []
-        }),
-      services.marketplaceRepository
-        .getMostSellingProducts(8)
-        .then((items) => {
-          mostSellingProducts.value = items || []
-        })
-        .catch(() => {
-          mostSellingProducts.value = []
-        })
-        .finally(() => {
-          mostSellingLoading.value = false
-        }),
-    ])
-    certifications.value = services.certificationService.certifications.value
-  } finally {
-    loading.value = false
-  }
+onMounted(() => {
+  // Fire calls independently in parallel so the Hero displays immediately and sections populate smoothly
+  services.marketplaceRepository
+    .getMostSellingProducts(8)
+    .then((items) => {
+      // Filter out test / dummy products (e.g. sku-9876)
+      mostSellingProducts.value = (items || []).filter(
+        (p) => p && p.sku !== 'sku-9876' && !p.nameEn?.toLowerCase().includes('test') && !p.nameAr?.includes('اختبار'),
+      )
+    })
+    .catch(() => {
+      mostSellingProducts.value = []
+    })
+    .finally(() => {
+      mostSellingLoading.value = false
+    })
+
+  loadAllCats().then(() => {
+    cats.value = allCats.value.slice(0, CAT_PAGE_SIZE)
+    catsTotal.value = allCats.value.length
+    catsLoading.value = false
+  })
+
+  companyRepository
+    .getProvidersDirectory({ pageNumber: 1, pageSize: 8 })
+    .then((p) => {
+      if (p?.statusCode === 401 || !p?.data?.length) {
+        providers.value = []
+      } else {
+        providers.value = p.data.slice(0, 8)
+      }
+    })
+    .catch(() => {
+      providers.value = []
+    })
+    .finally(() => {
+      providersLoading.value = false
+    })
+
+  services.certificationService
+    .load()
+    .then(() => {
+      certifications.value = services.certificationService.certifications.value
+    })
+    .catch(() => {
+      certifications.value = []
+    })
+    .finally(() => {
+      certificationsLoading.value = false
+    })
+
+  contentRepository
+    .getLandingPageBySlug('about-us')
+    .then((p) => {
+      aboutPage.value = p && p.isActive !== false ? p : null
+    })
+    .catch(() => null)
 })
 
 const localized = (en?: string | null, ar?: string | null) => locale.value === 'ar' ? (ar || en || '') : (en || ar || '')
@@ -381,7 +394,7 @@ const navigateToOemFromModal = () => {
               <span class="hero__trust-sep" aria-hidden="true">&bull;</span>
               <span class="hero__trust-badge">
                 <span class="material-symbols-outlined trust-icon">check_circle</span>
-                <span class="mono">CE Certified ✓</span>
+                <span class="mono">{{ t('catalog.ceCertified') }} ✓</span>
               </span>
               <span class="hero__trust-sep" aria-hidden="true">&bull;</span>
               <span class="hero__trust-badge">
@@ -512,7 +525,7 @@ const navigateToOemFromModal = () => {
     </div>
     <p class="section-desc">{{ t('home.ourProvidersSubtitle') }}</p>
 
-    <DataState :loading="loading && !providers.length" :empty="!providers.length && !loading" skeleton-type="provider-grid" :skeleton-count="4" min-height="250px">
+    <DataState :loading="providersLoading && !providers.length" :empty="!providers.length && !providersLoading" skeleton-type="provider-grid" :skeleton-count="4" min-height="250px">
       <div class="providers-strip-grid">
         <article
           v-for="p in providers"
@@ -817,7 +830,7 @@ const navigateToOemFromModal = () => {
             <span class="icon--directional">→</span>
           </router-link>
         </div>
-        <DataState :loading="loading && !certifications.length" :empty="!certifications.length && !loading" skeleton-type="cert-grid" :skeleton-count="4" min-height="300px">
+        <DataState :loading="certificationsLoading && !certifications.length" :empty="!certifications.length && !certificationsLoading" skeleton-type="cert-grid" :skeleton-count="4" min-height="300px">
           <div class="home-certs-grid">
             <article
               v-for="c in certifications.filter(c => c.isActive).slice(0, 4)"

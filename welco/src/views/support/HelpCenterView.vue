@@ -69,8 +69,25 @@ const ICONS: Record<string, string> = {
   shield: 'verified_user',
 }
 
+const isTestSupportItem = (...parts: Array<unknown>): boolean => {
+  for (const p of parts) {
+    if (!p || typeof p !== 'string') continue
+    const s = p.toLowerCase().trim()
+    if (s === 'test' || s === 'اختبار' || s.includes('mohamed saber')) return true
+  }
+  return false
+}
+
+const visibleCategories = computed(() => {
+  const rawList = Array.isArray(categories.value) ? categories.value : []
+  return rawList.filter((c) => {
+    if (!c || c.isActive === false) return false
+    return !isTestSupportItem(c.name)
+  })
+})
+
 const quickTags = computed(() => {
-  const allCats = Array.isArray(categories.value) ? categories.value : []
+  const allCats = visibleCategories.value
   return allCats.map((c) => c?.name).filter((n): n is string => Boolean(n)).slice(0, 6)
 })
 
@@ -91,6 +108,7 @@ const filteredArticles = computed(() => {
   const q = search.value.trim().toLowerCase()
   return rawList.filter((a) => {
     if (!a || a.isActive === false) return false
+    if (isTestSupportItem(a.title, a.body, a.slug)) return false
     if (activeCategory.value !== 'all' && a.categoryId !== activeCategory.value) return false
     if (q) {
       const matchTitle = a.title ? String(a.title).toLowerCase().includes(q) : false
@@ -118,8 +136,8 @@ const visibleFaqs = computed(() => {
 })
 
 const guideCards = computed(() => {
-  const allCats = Array.isArray(categories.value) ? categories.value.filter((c) => c && c.isActive !== false) : []
-  const allArts = Array.isArray(articles.value) ? articles.value.filter((a) => a && a.isActive !== false) : []
+  const allCats = visibleCategories.value
+  const allArts = Array.isArray(articles.value) ? articles.value.filter((a) => a && a.isActive !== false && !isTestSupportItem(a.title, a.body, a.slug)) : []
 
   return allCats.map((cat, idx) => {
     const arts = allArts.filter((a) => a && a.categoryId === cat.id)
@@ -299,75 +317,149 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
           </div>
         </div>
 
-        <div class="help-hero__graphic" aria-hidden="true">
-          <div class="telemetry-card">
-            <div class="telemetry-head">
-              <div class="telemetry-badge mono">
-                <span class="pulse-ring"></span>
-                <span>SUPPORT NETWORK STATUS</span>
+        <div class="help-hero__graphic">
+          <div class="support-matrix-card">
+            <!-- Header bar with live status -->
+            <div class="support-matrix-header">
+              <div class="matrix-status-chip">
+                <span class="live-radar-ping">
+                  <span class="radar-core"></span>
+                  <span class="radar-wave"></span>
+                </span>
+                <span class="matrix-status-text mono">{{ t('help.networkStatus') }}</span>
               </div>
-              <span class="telemetry-sla mono">&lt; 2h SLA</span>
+              <div class="matrix-sla-badge mono">
+                <span class="material-symbols-outlined sla-icon" aria-hidden="true">bolt</span>
+                <span>{{ t('help.slaFast') }}</span>
+              </div>
             </div>
 
-            <div class="schematic-container">
-              <svg class="schematic-svg" viewBox="0 0 320 190" fill="none">
+            <!-- Central Holographic Core & Satellite Capability Grid -->
+            <div class="matrix-interactive-hub">
+              <!-- Animated SVG Laser Grid in Background -->
+              <svg class="matrix-backplane-svg" viewBox="0 0 380 200" preserveAspectRatio="none" aria-hidden="true">
                 <defs>
-                  <linearGradient id="laserGrad" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stop-color="#0F3D56" />
-                    <stop offset="100%" stop-color="#147D92" />
+                  <linearGradient id="streamGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#0284c7" stop-opacity="0.8" />
+                    <stop offset="50%" stop-color="#14b8a6" stop-opacity="0.4" />
+                    <stop offset="100%" stop-color="#0ea5e9" stop-opacity="0.1" />
                   </linearGradient>
                 </defs>
-
-                <line x1="160" y1="95" x2="60" y2="45" class="laser-line" />
-                <line x1="160" y1="95" x2="260" y2="45" class="laser-line" />
-                <line x1="160" y1="95" x2="60" y2="150" class="laser-line" />
-                <line x1="160" y1="95" x2="260" y2="150" class="laser-line" />
-
-                <circle cx="160" cy="95" r="28" class="node-center-outer" />
-                <circle cx="160" cy="95" r="20" class="node-center-inner" />
-                <text x="160" y="93" text-anchor="middle" class="node-center-text mono">WELCO</text>
-                <text x="160" y="103" text-anchor="middle" class="node-center-sub mono">SUPPORT</text>
-
-                <g class="sat-node sat-node--teal">
-                  <circle cx="60" cy="45" r="18" class="sat-circle" />
-                  <text x="60" y="43" text-anchor="middle" class="sat-title mono">IFU 134°C</text>
-                  <text x="60" y="52" text-anchor="middle" class="sat-desc mono">STERILE</text>
-                </g>
-
-                <g class="sat-node sat-node--indigo">
-                  <circle cx="260" cy="45" r="18" class="sat-circle" />
-                  <text x="260" y="43" text-anchor="middle" class="sat-title mono">B2B RFQ</text>
-                  <text x="260" y="52" text-anchor="middle" class="sat-desc mono">CONTRACTS</text>
-                </g>
-
-                <g class="sat-node sat-node--amber">
-                  <circle cx="60" cy="150" r="18" class="sat-circle" />
-                  <text x="60" y="148" text-anchor="middle" class="sat-title mono">FREIGHT</text>
-                  <text x="60" y="157" text-anchor="middle" class="sat-desc mono">INCOTERMS</text>
-                </g>
-
-                <g class="sat-node sat-node--emerald">
-                  <circle cx="260" cy="150" r="18" class="sat-circle" />
-                  <text x="260" y="148" text-anchor="middle" class="sat-title mono">CE · MDR</text>
-                  <text x="260" y="157" text-anchor="middle" class="sat-desc mono">DOSSIERS</text>
-                </g>
+                <path d="M 90 45 Q 190 70 190 100" class="stream-line stream-line--active" />
+                <path d="M 290 45 Q 190 70 190 100" class="stream-line stream-line--active" />
+                <path d="M 90 155 Q 190 130 190 100" class="stream-line stream-line--active" />
+                <path d="M 290 155 Q 190 130 190 100" class="stream-line stream-line--active" />
               </svg>
+
+              <!-- Central Pulse Hub -->
+              <div class="hub-center-core">
+                <div class="hub-emblem">
+                  <span class="material-symbols-outlined hub-icon" aria-hidden="true">health_and_safety</span>
+                </div>
+                <div class="hub-caption">
+                  <span class="hub-title mono">{{ t('help.triageCore') }}</span>
+                  <span class="hub-sub mono">{{ t('help.activeDesk') }}</span>
+                </div>
+              </div>
+
+              <!-- 4 Interactive Capability Nodes -->
+              <div class="hub-nodes-grid">
+                <!-- Node 1: Sterilization & IFU -->
+                <div class="hub-node hub-node--teal">
+                  <div class="hub-node__icon-wrap">
+                    <span class="material-symbols-outlined" aria-hidden="true">sanitizer</span>
+                  </div>
+                  <div class="hub-node__content">
+                    <div class="hub-node__header">
+                      <strong class="hub-node__title">{{ t('help.ifuNodeTitle') }}</strong>
+                      <span class="hub-node__badge mono">134°C DIN</span>
+                    </div>
+                    <p class="hub-node__desc">{{ t('help.ifuNodeDesc') }}</p>
+                  </div>
+                </div>
+
+                <!-- Node 2: RFQ & Quotes -->
+                <div class="hub-node hub-node--indigo">
+                  <div class="hub-node__icon-wrap">
+                    <span class="material-symbols-outlined" aria-hidden="true">request_quote</span>
+                  </div>
+                  <div class="hub-node__content">
+                    <div class="hub-node__header">
+                      <strong class="hub-node__title">{{ t('help.rfqNodeTitle') }}</strong>
+                      <span class="hub-node__badge mono">SLA &lt;2h</span>
+                    </div>
+                    <p class="hub-node__desc">{{ t('help.rfqNodeDesc') }}</p>
+                  </div>
+                </div>
+
+                <!-- Node 3: Logistics & Freight -->
+                <div class="hub-node hub-node--emerald">
+                  <div class="hub-node__icon-wrap">
+                    <span class="material-symbols-outlined" aria-hidden="true">local_shipping</span>
+                  </div>
+                  <div class="hub-node__content">
+                    <div class="hub-node__header">
+                      <strong class="hub-node__title">{{ t('help.freightNodeTitle') }}</strong>
+                      <span class="hub-node__badge mono">DAP · DDP</span>
+                    </div>
+                    <p class="hub-node__desc">{{ t('help.freightNodeDesc') }}</p>
+                  </div>
+                </div>
+
+                <!-- Node 4: Regulatory MDR/CE -->
+                <div class="hub-node hub-node--amber">
+                  <div class="hub-node__icon-wrap">
+                    <span class="material-symbols-outlined" aria-hidden="true">verified_user</span>
+                  </div>
+                  <div class="hub-node__content">
+                    <div class="hub-node__header">
+                      <strong class="hub-node__title">{{ t('help.regulatoryNodeTitle') }}</strong>
+                      <span class="hub-node__badge mono">CE · SFDA</span>
+                    </div>
+                    <p class="hub-node__desc">{{ t('help.regulatoryNodeDesc') }}</p>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div class="telemetry-metrics">
-              <div class="telemetry-metric">
-                <strong class="metric-val mono">100%</strong>
-                <span class="metric-lbl mono">LOT TRACEABLE</span>
+            <!-- Specialist On-Duty Live Dispatch strip -->
+            <div class="hub-specialists-strip">
+              <div class="specialists-avatars">
+                <span class="avatar-pill av-1">Dr</span>
+                <span class="avatar-pill av-2">Eng</span>
+                <span class="avatar-pill av-3">QA</span>
+                <span class="avatar-pill av-more">+14</span>
               </div>
-              <div class="telemetry-metric-sep"></div>
-              <div class="telemetry-metric">
-                <strong class="metric-val mono">ISO 13485</strong>
-                <span class="metric-lbl mono">AUDITED PROTOCOL</span>
+              <span class="specialists-label mono">
+                <span class="live-dot-mini"></span>
+                14 {{ t('help.engineersOnline') }}
+              </span>
+            </div>
+
+            <!-- Bottom Telemetry & SLA Bar -->
+            <div class="support-matrix-metrics">
+              <div class="matrix-metric-item">
+                <div class="matrix-metric-top">
+                  <span class="material-symbols-outlined metric-icon text-teal" aria-hidden="true">check_circle</span>
+                  <strong class="matrix-metric-val mono">100%</strong>
+                </div>
+                <span class="matrix-metric-lbl mono">{{ t('help.lotTraceable') }}</span>
               </div>
-              <div class="telemetry-metric-sep"></div>
-              <div class="telemetry-metric">
-                <strong class="metric-val mono">99.4%</strong>
-                <span class="metric-lbl mono">RESOLUTION RATE</span>
+              <div class="matrix-metric-divider"></div>
+              <div class="matrix-metric-item">
+                <div class="matrix-metric-top">
+                  <span class="material-symbols-outlined metric-icon text-indigo" aria-hidden="true">verified</span>
+                  <strong class="matrix-metric-val mono">ISO 13485</strong>
+                </div>
+                <span class="matrix-metric-lbl mono">{{ t('help.isoAudited') }}</span>
+              </div>
+              <div class="matrix-metric-divider"></div>
+              <div class="matrix-metric-item">
+                <div class="matrix-metric-top">
+                  <span class="material-symbols-outlined metric-icon text-amber" aria-hidden="true">stars</span>
+                  <strong class="matrix-metric-val mono">99.4%</strong>
+                </div>
+                <span class="matrix-metric-lbl mono">{{ t('help.resolutionRate') }}</span>
               </div>
             </div>
           </div>
@@ -439,7 +531,7 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
             <span>{{ t('common.all') }}</span>
           </button>
           <button
-            v-for="c in categories"
+            v-for="c in visibleCategories"
             :key="c.id"
             class="pill"
             :class="{ 'pill--active': activeCategory === c.id }"
@@ -1051,120 +1143,369 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
   transform: translateY(-0.5px);
 }
 
-/* Right Side: Surgical Telemetry & Graphic */
-.telemetry-card {
-  background: var(--wl-surface-soft);
+/* Right Side: Creative High-Tech Support Matrix */
+.support-matrix-card {
+  position: relative;
+  background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  border-radius: 14px;
+  border-radius: 18px;
   padding: 1.35rem 1.4rem;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--wl-shadow-card), 0 10px 28px -8px rgba(15, 61, 86, 0.08);
   display: flex;
   flex-direction: column;
-  gap: 1.1rem;
+  gap: 1.15rem;
+  overflow: hidden;
+  backdrop-filter: blur(12px);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-.telemetry-head {
+.support-matrix-card::before {
+  content: '';
+  position: absolute;
+  top: -50px;
+  inset-inline-end: -50px;
+  width: 160px;
+  height: 160px;
+  background: radial-gradient(circle, rgba(20, 125, 146, 0.16) 0%, transparent 70%);
+  pointer-events: none;
+  border-radius: 50%;
+  filter: blur(20px);
+}
+
+.support-matrix-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 0.75rem;
 }
 
-.telemetry-badge {
+.matrix-status-chip {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  color: var(--wl-ink-strong);
+  gap: 0.55rem;
 }
 
-.pulse-ring {
+.live-radar-ping {
+  position: relative;
+  width: 10px;
+  height: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.radar-core {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: var(--wl-primary);
-  box-shadow: 0 0 0 3px var(--wl-primary-soft);
+  background: var(--wl-primary, #0284c7);
+  box-shadow: 0 0 8px var(--wl-primary, #0284c7);
 }
 
-.telemetry-sla {
-  font-size: 11px;
+.radar-wave {
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 1.5px solid var(--wl-primary, #0284c7);
+  animation: radar-ping-anim 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes radar-ping-anim {
+  0% {
+    transform: scale(0.8);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+.matrix-status-text {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  color: var(--wl-ink-strong);
+}
+
+.matrix-sla-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 10.5px;
   font-weight: 700;
-  color: var(--wl-success);
-  background: rgba(16, 185, 129, 0.1);
-  padding: 0.18rem 0.55rem;
+  color: #059669;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 0.2rem 0.55rem;
   border-radius: 9999px;
-  border: 1px solid rgba(16, 185, 129, 0.25);
-}
-
-.schematic-container {
-  width: 100%;
-  height: 155px;
-}
-
-.schematic-svg {
-  width: 100%;
-  height: 100%;
-}
-
-.laser-line {
-  stroke: var(--wl-border);
-  stroke-width: 1.5;
-  stroke-dasharray: 3 3;
-}
-
-.node-center-outer {
-  fill: var(--wl-surface);
-  stroke: var(--wl-primary);
-  stroke-width: 2;
-  box-shadow: 0 0 10px rgba(105, 169, 255, 0.4);
-}
-
-.node-center-inner {
-  fill: var(--wl-primary-soft);
-}
-
-.node-center-text {
-  font-size: 8px;
-  font-weight: 800;
-  fill: var(--wl-primary);
-  letter-spacing: 0.05em;
-}
-
-.node-center-sub {
-  font-size: 6.5px;
-  font-weight: 700;
-  fill: var(--wl-muted);
-  letter-spacing: 0.06em;
-}
-
-.sat-circle {
-  fill: var(--wl-surface);
-  stroke: var(--wl-border);
-  stroke-width: 1.5;
-  transition: all 0.2s ease;
-}
-
-.sat-title {
-  font-size: 6.5px;
-  font-weight: 800;
-  fill: var(--wl-ink-strong);
   letter-spacing: 0.03em;
 }
 
-.sat-desc {
-  font-size: 5.5px;
-  font-weight: 600;
-  fill: var(--wl-muted);
+.sla-icon {
+  font-size: 13px;
+}
+
+/* Interactive Matrix Hub & Backplane */
+.matrix-interactive-hub {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.25rem 0;
+}
+
+.matrix-backplane-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.4;
+}
+
+.stream-line {
+  stroke: var(--wl-border);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 4;
+}
+
+.stream-line--active {
+  stroke: url(#streamGrad1);
+  animation: dashflow 18s linear infinite;
+}
+
+@keyframes dashflow {
+  to {
+    stroke-dashoffset: -100;
+  }
+}
+
+/* Central Hub Capsule */
+.hub-center-core {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.08) 0%, rgba(20, 184, 166, 0.06) 100%);
+  border: 1px solid rgba(2, 132, 199, 0.25);
+  border-radius: 12px;
+  padding: 0.6rem 0.9rem;
+}
+
+.hub-emblem {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: var(--wl-primary);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
+  flex-shrink: 0;
+}
+
+.hub-icon {
+  font-size: 19px;
+}
+
+.hub-caption {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.hub-title {
+  font-size: 10.5px;
+  font-weight: 800;
+  color: var(--wl-ink-strong);
   letter-spacing: 0.05em;
 }
 
-.sat-node--teal .sat-circle { stroke: var(--chart-1); }
-.sat-node--indigo .sat-circle { stroke: var(--brand); }
-.sat-node--amber .sat-circle { stroke: var(--chart-5); }
-.sat-node--emerald .sat-circle { stroke: var(--chart-2); }
+.hub-sub {
+  font-size: 9px;
+  font-weight: 600;
+  color: #059669;
+  letter-spacing: 0.03em;
+}
 
-.telemetry-metrics {
+/* Capability Cards Grid (2x2) */
+.hub-nodes-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.6rem;
+}
+
+.hub-node {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  background: var(--wl-surface-soft);
+  border: 1px solid var(--wl-border);
+  border-radius: 11px;
+  padding: 0.65rem 0.75rem;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, box-shadow 0.2s ease;
+  cursor: default;
+}
+
+.hub-node:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px -4px rgba(15, 61, 86, 0.12);
+}
+
+.hub-node__icon-wrap {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  font-size: 16px;
+}
+
+.hub-node--teal .hub-node__icon-wrap {
+  background: rgba(20, 184, 166, 0.14);
+  color: #0d9488;
+}
+.hub-node--teal:hover {
+  border-color: rgba(20, 184, 166, 0.45);
+}
+
+.hub-node--indigo .hub-node__icon-wrap {
+  background: rgba(99, 102, 241, 0.14);
+  color: #4f46e5;
+}
+.hub-node--indigo:hover {
+  border-color: rgba(99, 102, 241, 0.45);
+}
+
+.hub-node--emerald .hub-node__icon-wrap {
+  background: rgba(16, 185, 129, 0.14);
+  color: #059669;
+}
+.hub-node--emerald:hover {
+  border-color: rgba(16, 185, 129, 0.45);
+}
+
+.hub-node--amber .hub-node__icon-wrap {
+  background: rgba(245, 158, 11, 0.14);
+  color: #d97706;
+}
+.hub-node--amber:hover {
+  border-color: rgba(245, 158, 11, 0.45);
+}
+
+.hub-node__content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.hub-node__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.35rem;
+}
+
+.hub-node__title {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--wl-ink-strong);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hub-node__badge {
+  font-size: 8px;
+  font-weight: 700;
+  color: var(--wl-muted);
+  background: var(--wl-surface);
+  border: 1px solid var(--wl-border);
+  padding: 0.08rem 0.3rem;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.hub-node__desc {
+  font-size: 9px;
+  color: var(--wl-ink-soft);
+  line-height: 1.35;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Specialists Row */
+.hub-specialists-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  background: linear-gradient(90deg, var(--wl-surface-soft) 0%, transparent 100%);
+  border: 1px solid var(--wl-border);
+  border-radius: 9999px;
+  padding: 0.3rem 0.75rem;
+}
+
+.specialists-avatars {
+  display: flex;
+  align-items: center;
+}
+
+.avatar-pill {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--wl-surface);
+  margin-inline-start: -6px;
+  display: grid;
+  place-items: center;
+  font-size: 8px;
+  font-weight: 800;
+  color: #fff;
+}
+.avatar-pill:first-child {
+  margin-inline-start: 0;
+}
+
+.av-1 { background: #0284c7; }
+.av-2 { background: #4f46e5; }
+.av-3 { background: #0d9488; }
+.av-more {
+  background: var(--wl-ink-soft);
+  font-size: 7.5px;
+}
+
+.specialists-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--wl-ink-strong);
+}
+
+.live-dot-mini {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 6px #10b981;
+}
+
+/* Bottom Telemetry Metrics */
+.support-matrix-metrics {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -1172,7 +1513,7 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
   padding-top: 0.75rem;
 }
 
-.telemetry-metric {
+.matrix-metric-item {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1180,22 +1521,36 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
   flex: 1;
 }
 
-.metric-val {
-  font-size: 12.5px;
+.matrix-metric-top {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.metric-icon {
+  font-size: 14px;
+}
+.text-teal { color: #0d9488; }
+.text-indigo { color: #4f46e5; }
+.text-amber { color: #d97706; }
+
+.matrix-metric-val {
+  font-size: 12px;
   font-weight: 800;
   color: var(--wl-ink-strong);
 }
 
-.metric-lbl {
-  font-size: 8.5px;
+.matrix-metric-lbl {
+  font-size: 8px;
   color: var(--wl-muted);
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.04em;
+  text-align: center;
 }
 
-.telemetry-metric-sep {
+.matrix-metric-divider {
   width: 1px;
-  height: 20px;
+  height: 22px;
   background: var(--wl-border);
 }
 

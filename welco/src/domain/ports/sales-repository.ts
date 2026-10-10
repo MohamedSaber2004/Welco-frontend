@@ -18,6 +18,11 @@ export interface ProductInquiryDto {
   organization: string
   message: string
   email?: string | null
+  status?: string
+  userId?: string | null
+  response?: string | null
+  respondedAt?: string | null
+  respondedById?: string | null
   createdAt: string
 }
 
@@ -31,6 +36,7 @@ export interface SalesRepository {
   getRfqById(id: string): Promise<RfqDto>
   createRfq(payload: CreateRfqPayload): Promise<RfqDto>
   updateRfqStatus(id: string, status: string): Promise<string>
+  respondRfq(id: string, payload: { responseNote: string; proposedAmount?: number; validityDays?: number }): Promise<RfqDto>
   getQuotes(query?: SalesQuery): Promise<PaginatedResult<QuoteDto>>
   getQuoteById(id: string): Promise<QuoteDto>
   createQuote(payload: CreateQuotePayload): Promise<string>
@@ -39,5 +45,6 @@ export interface SalesRepository {
   createProductInquiry(payload: { productId: string; name: string; organization: string; message: string; email?: string }): Promise<unknown>
   getProductInquiries(query?: ProductInquiryQuery): Promise<PaginatedResult<ProductInquiryDto>>
   getProductInquiryById(id: string): Promise<ProductInquiryDto>
+  respondProductInquiry(id: string, response: string): Promise<ProductInquiryDto>
   deleteProductInquiry(id: string): Promise<void>
 }

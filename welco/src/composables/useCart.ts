@@ -76,19 +76,21 @@ async function syncToServer(): Promise<void> {
   try {
     const sid = getSessionId()
     if (!items.value.length) {
+      const storedId = serverCartId.value || (() => { try { return localStorage.getItem('welco-cart-id') } catch { return null } })()
+      if (!storedId) return
       try {
         const existing = await services.commerceRepository.getBySession(sid)
         const id = (existing as unknown as { id?: string } | null)?.id
         if (id) {
           serverCartId.value = id
           try { localStorage.setItem('welco-cart-id', id) } catch { /* offline fallback */ }
-        }
-      } catch (err: unknown) {
-        const status = (err as { status?: number; statusCode?: number })?.status ?? (err as { statusCode?: number })?.statusCode
-        if (status === 404 || String((err as Error)?.message).includes('404')) {
+        } else {
           serverCartId.value = null
           try { localStorage.removeItem('welco-cart-id') } catch {}
         }
+      } catch (err: unknown) {
+        serverCartId.value = null
+        try { localStorage.removeItem('welco-cart-id') } catch {}
       }
       return
     }

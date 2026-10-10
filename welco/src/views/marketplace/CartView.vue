@@ -41,7 +41,13 @@ const {
 const localized = (en?: string | null, ar?: string | null) =>
   locale.value === 'ar' ? ar || en || '' : en || ar || ''
 /** Backend totals only — no client-side math. Null until quoted. */
-const fmtQuote = (v: number | null) => v == null ? '—' : v.toLocaleString(locale.value === 'ar' ? 'ar-EG' : 'en-US')
+const fmtQuote = (v: number | null) =>
+  v == null
+    ? '—'
+    : v.toLocaleString(locale.value === 'ar' ? 'ar-EG' : 'en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })
 
 const submittingRfq = ref(false)
 const availableCurrencies = ref<CurrencyDto[]>([])
@@ -82,7 +88,7 @@ onMounted(async () => {
   try {
     await services.locationService.loadCountries().catch(() => {})
     // /companies/my requires auth — skip for guests to avoid a 401.
-    if (authService.isAuthenticated) {
+    if (authService.isProvider.value || authService.user.value?.companyId) {
       await companyService.loadMyCompany().catch(() => {})
       const cid = companyService.myCompany.value?.id
       if (cid) {
@@ -601,7 +607,7 @@ const submitRfq = async () => {
                   <strong class="total-fig">
                     <span class="total-sym">{{ activeCurrencyMeta.symbol }}</span>
                     <span>{{ fmtQuote(getServerLine(it.product.id)?.lineTotal ?? null) }}</span>
-                    <span class="total-code">{{ targetCurrency }}</span>
+                    <span v-if="activeCurrencyMeta.symbol !== targetCurrency" class="total-code">{{ targetCurrency }}</span>
                   </strong>
                 </div>
 
@@ -630,8 +636,8 @@ const submitRfq = async () => {
 
           <div class="summary-rows">
             <div class="summary-row">
-              <span class="mono">{{ count }} {{ t('marketplace.products') }}</span>
-              <strong class="mono">{{ activeCurrencyMeta.symbol }} {{ fmtQuote(displayTotal) }} {{ targetCurrency }}</strong>
+              <span class="mono">{{ items.length }} {{ t('marketplace.products') }}</span>
+              <strong class="mono">{{ activeCurrencyMeta.symbol }} {{ fmtQuote(displayTotal) }}<template v-if="activeCurrencyMeta.symbol !== targetCurrency"> {{ targetCurrency }}</template></strong>
             </div>
 
             <div class="summary-divider"></div>
@@ -641,7 +647,7 @@ const submitRfq = async () => {
               <strong class="total-val mono">
                 <span class="total-sym">{{ activeCurrencyMeta.symbol }}</span>
                 <span>{{ fmtQuote(displayTotal) }}</span>
-                <span class="total-curr">{{ targetCurrency }}</span>
+                <span v-if="activeCurrencyMeta.symbol !== targetCurrency" class="total-curr">{{ targetCurrency }}</span>
                 <span v-if="serverTotalLoading" class="mono" aria-hidden="true">…</span>
               </strong>
             </div>
@@ -732,7 +738,7 @@ const submitRfq = async () => {
           <div class="summary-actions">
             <button class="btn btn-primary btn-block btn-lg" type="button" @click="goCheckout">
               <span class="material-symbols-outlined text-[18px]">shopping_cart_checkout</span>
-              <span>{{ t('commerce.placeOrder') }} · {{ activeCurrencyMeta.symbol }} {{ fmtQuote(displayTotal) }} {{ targetCurrency }}</span>
+              <span>{{ t('commerce.placeOrder') }} · {{ activeCurrencyMeta.symbol }} {{ fmtQuote(displayTotal) }}<template v-if="activeCurrencyMeta.symbol !== targetCurrency"> {{ targetCurrency }}</template></span>
             </button>
 
             <!-- RFQ Requested Currency Notice -->

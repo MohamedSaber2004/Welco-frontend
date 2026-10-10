@@ -218,6 +218,10 @@ watch(isAuthed, (v) => {
                   <span class="material-symbols-outlined text-[18px]">local_shipping</span>
                   <span>{{ t('account.myOrders') }}</span>
                 </router-link>
+                <router-link v-if="isBuyer" to="/account/inquiries" class="header__dropdown-item" role="menuitem" @click="userMenuOpen=false">
+                  <span class="material-symbols-outlined text-[18px]">chat_bubble_outline</span>
+                  <span>{{ t('account.myInquiriesTitle') }}</span>
+                </router-link>
                 <router-link v-if="isBuyer" to="/help/my-tickets" class="header__dropdown-item" role="menuitem" @click="userMenuOpen=false">
                   <span class="material-symbols-outlined text-[18px]">confirmation_number</span>
                   <span>{{ t('help.myTickets') }}</span>
@@ -280,6 +284,7 @@ watch(isAuthed, (v) => {
           <router-link to="/about" class="header__drawer-link" @click="closeMobile">{{ t('nav.about') }}</router-link>
           <router-link to="/account" class="header__drawer-link" @click="closeMobile">{{ t('nav.account') }}</router-link>
           <router-link to="/account/orders" class="header__drawer-link" @click="closeMobile">{{ t('account.myOrders') }}</router-link>
+          <router-link to="/account/inquiries" class="header__drawer-link" @click="closeMobile">{{ t('account.myInquiriesTitle') }}</router-link>
           <router-link to="/wishlist" class="header__drawer-link" @click="closeMobile">{{ t('nav.wishlist') }}</router-link>
           <router-link to="/cart" class="header__drawer-link" @click="closeMobile">{{ t('nav.cart') }}</router-link>
           <router-link to="/help/my-tickets" class="header__drawer-link" @click="closeMobile">{{ t('help.myTickets') }}</router-link>

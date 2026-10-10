@@ -4,6 +4,13 @@ const RAW_API_BASE = ((import.meta.env.VITE_API_BASE_URL as string | undefined) 
 export const API_BASE_URL = RAW_API_BASE ? RAW_API_BASE.replace(/\/+$/, '') : ''
 
 const WELCO_GW = 'https://welco-gateway.runasp.net'
+
+export const BACKEND_BASE_URL =
+  RAW_API_BASE
+    ? RAW_API_BASE.replace(/\/+$/, '')
+    : ((import.meta.env.VITE_PROXY_TARGET as string | undefined) ?? '').trim().replace(/\/+$/, '') ||
+      WELCO_GW
+
 export function resolveGateway(target: string | undefined): string {
   if (target === '') return WELCO_GW
   if (target === 'welco') return WELCO_GW
@@ -115,6 +122,8 @@ export const SALES_ROUTES = {
   quoteDecline: (id: string) => `/api/v1/quotes/${id}/decline`,
   productInquiries: '/api/v1/product-inquiries',
   productInquiryById: (id: string) => `/api/v1/product-inquiries/${id}`,
+  productInquiryRespond: (id: string) => `/api/v1/product-inquiries/${id}/respond`,
+  rfqRespond: (id: string) => `/api/v1/rfqs/${id}/respond`,
 } as const
 
 export const CERTIFICATION_ROUTES = {

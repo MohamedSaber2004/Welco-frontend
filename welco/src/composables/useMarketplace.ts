@@ -29,8 +29,12 @@ export function useMarketplace(init?: {
   search?: string
   categoryId?: string | null
   sortBy?: MarketplaceQuery['sortBy']
+  page?: number
 }) {
   const svc = services.marketplaceService
+  if (init?.page && init.page > 0) {
+    svc.page.value = init.page
+  }
   const search = ref(init?.search ?? '')
   const sku = ref('')
   const categoryId = ref<string | null>(init?.categoryId ?? null)

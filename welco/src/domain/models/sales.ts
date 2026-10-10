@@ -37,6 +37,7 @@ export interface RfqDto {
   requestedCurrency?: string
   baseCurrency?: string
   note?: string
+  responseNote?: string
   createdAt: string
 }
 
@@ -72,6 +73,7 @@ export interface QuoteDto {
   currency?: string
   validUntil: string
   status: QuoteStatus
+  note?: string
   items: QuoteItemDto[]
   createdAt: string
 }
@@ -86,5 +88,6 @@ export interface CreateQuotePayload {
   rfqId: string
   amount: number
   validUntil: string
+  note?: string
   items: CreateQuoteItemPayload[]
 }

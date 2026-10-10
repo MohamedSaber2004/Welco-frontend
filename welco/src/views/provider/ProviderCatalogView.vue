@@ -32,7 +32,6 @@ const fetchError = ref('')
 const search = ref('')
 const categoryFilter = ref('all')
 const stockFilter = ref<'all' | 'inStock' | 'outOfStock'>('all')
-const viewMode = ref<'table' | 'grid'>('table')
 const page = ref(1)
 const pageSize = 10
 
@@ -120,7 +119,6 @@ const emptyForm = () => ({
   description: '',
   price: '' as unknown as number,
   stock: 0,
-  specifications: '',
   imageName: '',
   videos: [] as { id?: string; url: string; title?: string; sortOrder: number }[],
   material: '',
@@ -186,7 +184,6 @@ const openEdit = (p: ProductDto) => {
     description: p.descriptionEn || p.description || '',
     price: p.price ?? 0,
     stock: p.stock ?? 0,
-    specifications: p.specifications ?? '',
     imageName: p.imageName ?? '',
     videos: p.videos ? [...p.videos] : [],
     material: p.material ?? '',
@@ -233,7 +230,6 @@ const submit = async () => {
         description: f.description.trim() || undefined,
         price: numPrice,
         stock: numStock,
-        specifications: f.specifications.trim() || undefined,
         imageName: f.imageName.trim() || null,
         material: f.material.trim() || undefined,
         currencyId: f.currencyId || null,
@@ -251,7 +247,6 @@ const submit = async () => {
         description: f.description.trim() || undefined,
         price: numPrice,
         stock: numStock,
-        specifications: f.specifications.trim() || undefined,
         imageName: f.imageName.trim() || null,
         material: f.material.trim() || undefined,
         currencyId: f.currencyId || null,
@@ -435,253 +430,107 @@ onMounted(() => { void loadAll() })
           <option value="outOfStock">{{ t('admin.outOfStock') }}</option>
         </select>
 
-        <div class="view-toggle-group" role="radiogroup" :aria-label="locale === 'ar' ? 'طريقة العرض' : 'View Mode'">
-          <button
-            type="button"
-            class="view-toggle-btn"
-            :class="{ 'is-active': viewMode === 'grid' }"
-            :aria-pressed="viewMode === 'grid'"
-            :title="locale === 'ar' ? 'عرض شبكي' : 'Grid View'"
-            @click="viewMode = 'grid'"
-          >
-            <span class="material-symbols-outlined">grid_view</span>
-          </button>
-          <button
-            type="button"
-            class="view-toggle-btn"
-            :class="{ 'is-active': viewMode === 'table' }"
-            :aria-pressed="viewMode === 'table'"
-            :title="locale === 'ar' ? 'عرض جدول' : 'Table View'"
-            @click="viewMode = 'table'"
-          >
-            <span class="material-symbols-outlined">view_list</span>
-          </button>
-        </div>
-
         <span class="mono items-count-badge">
           {{ filtered.length }} {{ t('admin.productsTitle') || 'Products' }}
         </span>
       </div>
     </div>
 
-    <!-- Products Data View -->
-    <div v-if="viewMode === 'grid'">
-      <!-- GRID VIEW -->
-      <DataState
-        :loading="loading"
-        :error="fetchError"
-        skeleton-type="catalog-grid"
-        :skeleton-count="4"
-        use-spinner
-        :spinner-label="t('common.loading')"
-        :empty="!filtered.length && !loading"
-        :empty-title="t('provider.noProducts')"
-        :empty-description="t('provider.noProductsDesc')"
-        @retry="loadAll"
-      >
-        <div class="products-grid-container">
-          <div class="products-card-grid">
-            <article
-              v-for="(p, i) in paginated"
-              :key="p.id"
-              class="catalog-product-card anim-fade-in-up"
-              :style="{ animationDelay: `${(i % pageSize) * 50}ms` }"
-              @click="openDetails(p)"
-            >
-              <div class="card-media-box">
-                <AppImage
-                  :src="p.imageName"
-                  placeholder-type="product"
-                  :alt="p.nameEn"
-                  class="card-thumb-img"
-                />
-                <div class="card-badge-top">
-                  <span
-                    class="stock-badge"
-                    :class="(p.stock ?? 0) > 0 ? 'stock-badge--positive' : 'stock-badge--zero'"
-                  >
-                    {{ (p.stock ?? 0) > 0 ? `${p.stock} ${t('admin.inStock')}` : t('admin.outOfStock') }}
-                  </span>
-                  <span v-if="p.sku" class="card-sku-chip mono">
-                    {{ p.sku }}
-                  </span>
-                </div>
+    <!-- Products Data View (Cards Grid) -->
+    <DataState
+      :loading="loading"
+      :error="fetchError"
+      skeleton-type="catalog-grid"
+      :skeleton-count="4"
+      use-spinner
+      :spinner-label="t('common.loading')"
+      :empty="!filtered.length && !loading"
+      :empty-title="t('provider.noProducts')"
+      :empty-description="t('provider.noProductsDesc')"
+      @retry="loadAll"
+    >
+      <div class="products-grid-container">
+        <div class="products-card-grid">
+          <article
+            v-for="(p, i) in paginated"
+            :key="p.id"
+            class="catalog-product-card anim-fade-in-up"
+            :style="{ animationDelay: `${(i % pageSize) * 50}ms` }"
+            @click="openDetails(p)"
+          >
+            <div class="card-media-box">
+              <AppImage
+                :src="p.imageName"
+                placeholder-type="product"
+                :alt="p.nameEn"
+                class="card-thumb-img"
+              />
+              <div class="card-badge-top">
+                <span
+                  class="stock-badge"
+                  :class="(p.stock ?? 0) > 0 ? 'stock-badge--positive' : 'stock-badge--zero'"
+                >
+                  {{ (p.stock ?? 0) > 0 ? `${p.stock} ${t('admin.inStock')}` : t('admin.outOfStock') }}
+                </span>
+                <span v-if="p.sku" class="card-sku-chip mono">
+                  {{ p.sku }}
+                </span>
+              </div>
+            </div>
+
+            <div class="card-body-box">
+              <span class="card-category-lbl mono">{{ getCategoryName(p.categoryId) }}</span>
+              <h3 class="card-product-title">{{ localized(p.nameEn, p.nameAr) }}</h3>
+              <span v-if="p.material" class="card-material-lbl mono">{{ p.material }}</span>
+
+              <div class="card-price-row">
+                <strong class="card-price-val mono">{{ p.price }}</strong>
+                <span class="card-currency-val mono text-xs">{{ getCurrencyCode(p.currencyId) || 'USD' }}</span>
               </div>
 
-              <div class="card-body-box">
-                <span class="card-category-lbl mono">{{ getCategoryName(p.categoryId) }}</span>
-                <h3 class="card-product-title">{{ localized(p.nameEn, p.nameAr) }}</h3>
-                <span v-if="p.material" class="card-material-lbl mono">{{ p.material }}</span>
-
-                <div class="card-price-row">
-                  <strong class="card-price-val mono">{{ p.price }}</strong>
-                  <span class="card-currency-val mono text-xs">{{ getCurrencyCode(p.currencyId) }}</span>
-                </div>
-
-                <div class="card-footer-actions" @click.stop>
+              <div class="card-footer-actions" @click.stop>
+                <button
+                  type="button"
+                  class="card-btn-details"
+                  :title="t('common.details')"
+                  @click="openDetails(p)"
+                >
+                  <span class="material-symbols-outlined text-[16px]">visibility</span>
+                  <span>{{ t('common.details') }}</span>
+                </button>
+                <div class="card-btn-subgroup">
                   <button
                     type="button"
-                    class="card-btn-details"
-                    :title="t('common.details')"
-                    @click="openDetails(p)"
+                    class="tbl-btn"
+                    :title="t('common.edit')"
+                    @click="openEdit(p)"
                   >
-                    <span class="material-symbols-outlined text-[16px]">visibility</span>
-                    <span>{{ t('common.details') }}</span>
+                    <span class="material-symbols-outlined text-[16px]">edit</span>
                   </button>
-                  <div class="card-btn-subgroup">
-                    <button
-                      type="button"
-                      class="tbl-btn"
-                      :title="t('common.edit')"
-                      @click="openEdit(p)"
-                    >
-                      <span class="material-symbols-outlined text-[16px]">edit</span>
-                    </button>
-                    <button
-                      type="button"
-                      class="tbl-btn tbl-btn--danger"
-                      :title="t('common.delete')"
-                      :disabled="actionPendingId === p.id"
-                      @click="confirmDelete(p)"
-                    >
-                      <span class="material-symbols-outlined text-[16px]">delete</span>
-                    </button>
-                  </div>
+                  <button
+                    type="button"
+                    class="tbl-btn tbl-btn--danger"
+                    :title="t('common.delete')"
+                    :disabled="actionPendingId === p.id"
+                    @click="confirmDelete(p)"
+                  >
+                    <span class="material-symbols-outlined text-[16px]">delete</span>
+                  </button>
                 </div>
               </div>
-            </article>
-          </div>
-          <AppPagination
-            v-model:page="page"
-            :total-pages="totalPages"
-            :total-items="filtered.length"
-            :page-size="pageSize"
-            variant="table"
-          />
+            </div>
+          </article>
         </div>
-      </DataState>
-    </div>
-    <div v-else>
-      <!-- TABLE VIEW -->
-      <DataState
-        :loading="loading"
-        :error="fetchError"
-        skeleton-type="table"
-        :skeleton-count="5"
-        use-spinner
-        :spinner-label="t('common.loading')"
-        :empty="!filtered.length && !loading"
-        :empty-title="t('provider.noProducts')"
-        :empty-description="t('provider.noProductsDesc')"
-        @retry="loadAll"
-      >
-        <div class="table-card">
-          <div class="table-wrap" tabindex="0" role="region" :aria-label="t('admin.productsTitle')">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th class="col-product">{{ t('admin.productsTitle') }}</th>
-                  <th class="col-sku">{{ t('admin.sku') }}</th>
-                  <th class="col-category">{{ t('admin.category') }}</th>
-                  <th class="col-price num">{{ t('admin.price') }}</th>
-                  <th class="col-stock num">{{ t('admin.stock') }}</th>
-                  <th class="col-status">{{ t('admin.status') }}</th>
-                  <th class="col-actions text-end">{{ t('common.actions') }}</th>
-                </tr>
-              </thead>
-              <tbody>
-            <tr
-              v-for="(p, i) in paginated"
-              :key="p.id"
-              class="catalog-row table-row-clickable anim-fade-in-up"
-              :style="{ animationDelay: `${(i % pageSize) * 50}ms` }"
-              @click="openDetails(p)"
-            >
-                  <td class="col-product">
-                    <div class="cell-media">
-                      <AppImage :src="p.imageName" placeholder-type="product" :alt="p.nameEn" width="44" height="44" class="row-thumb" />
-                      <div class="cell-titles">
-                        <strong class="table__name" :title="localized(p.nameEn, p.nameAr)">{{ localized(p.nameEn, p.nameAr) }}</strong>
-                        <span v-if="p.material" class="table__sub mono" :title="p.material">{{ p.material }}</span>
-                        <span
-                          v-else-if="locale === 'ar' ? p.nameEn : p.nameAr"
-                          class="table__sub mono"
-                          :dir="locale === 'ar' ? 'ltr' : 'rtl'"
-                          :title="locale === 'ar' ? p.nameEn : p.nameAr"
-                        >
-                          {{ locale === 'ar' ? p.nameEn : p.nameAr }}
-                        </span>
-                      </div>
-                    </div>
-                  </td>
-                  <td class="col-sku">
-                    <span class="mono sku-tag" :title="p.sku">{{ p.sku }}</span>
-                  </td>
-                  <td class="col-category">
-                    <span class="cat-pill mono">{{ getCategoryName(p.categoryId) }}</span>
-                  </td>
-                  <td class="col-price num mono-num">
-                    <span class="price-val">{{ p.price }}</span>
-                    <span class="currency-label mono text-xs">{{ getCurrencyCode(p.currencyId) }}</span>
-                  </td>
-                  <td class="col-stock num mono-num">
-                    <span class="stock-badge" :class="p.stock > 0 ? 'stock-badge--positive' : 'stock-badge--zero'">
-                      <span class="status-dot"></span>
-                      <span>{{ p.stock > 0 ? `${p.stock} ${t('admin.inStock')}` : t('admin.outOfStock') }}</span>
-                    </span>
-                  </td>
-                  <td class="col-status">
-                    <span class="status-dot-badge" :class="(p.isActive ?? true) ? 'status-dot-badge--active' : 'status-dot-badge--inactive'">
-                      <span class="dot"></span>
-                      <span>{{ (p.isActive ?? true) ? t('admin.active') : t('admin.inactive') }}</span>
-                    </span>
-                  </td>
-                  <td class="col-actions text-end" @click.stop>
-                    <div class="row-actions">
-                      <button
-                        type="button"
-                        class="row-action-btn"
-                        :title="t('admin.viewDetails') || 'View Details'"
-                        :aria-label="t('admin.viewDetails') || 'View Details'"
-                        @click="openDetails(p)"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">visibility</span>
-                      </button>
-                      <button
-                        type="button"
-                        class="row-action-btn"
-                        :title="t('common.edit')"
-                        :aria-label="t('common.edit')"
-                        @click="openEdit(p)"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">edit</span>
-                      </button>
-                      <button
-                        type="button"
-                        class="row-action-btn row-action-btn--danger"
-                        :title="t('common.delete')"
-                        :aria-label="t('common.delete')"
-                        :disabled="actionPendingId === p.id"
-                        @click="confirmDelete(p)"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">delete</span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <AppPagination
-            v-model:page="page"
-            :total-pages="totalPages"
-            :total-items="filtered.length"
-            :page-size="pageSize"
-            variant="table"
-          />
-        </div>
-      </DataState>
-    </div>
+        <AppPagination
+          v-if="filtered.length > pageSize"
+          v-model:page="page"
+          :total-pages="totalPages"
+          :total-items="filtered.length"
+          :page-size="pageSize"
+          variant="table"
+        />
+      </div>
+    </DataState>
 
     <!-- Product Details Modal -->
     <BaseModal
@@ -908,11 +757,6 @@ onMounted(() => { void loadAll() })
         <div class="form-field">
           <label class="field-label" for="pp-desc">{{ t('admin.description') }}</label>
           <textarea id="pp-desc" v-model="form.description" class="field-textarea" rows="3" placeholder="Provide product overview, intended use, etc."></textarea>
-        </div>
-
-        <div class="form-field">
-          <label class="field-label" for="pp-specs">{{ t('admin.specifications') || 'Technical Specifications' }}</label>
-          <textarea id="pp-specs" v-model="form.specifications" class="field-textarea mono text-xs" rows="3" placeholder="Dimensions, sterilization tolerance, weight, certifications, etc."></textarea>
         </div>
 
         <!-- Videos Upload Section -->
@@ -1164,14 +1008,19 @@ onMounted(() => { void loadAll() })
 .card-media-box {
   position: relative;
   aspect-ratio: 4 / 3;
-  background: var(--wl-surface-soft);
+  max-height: 220px;
+  background: var(--wl-surface-soft, #f8fafc);
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .card-thumb-img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  padding: var(--space-3, 0.75rem);
   transition: transform 0.4s ease;
 }
 

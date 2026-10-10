@@ -61,7 +61,26 @@ export class ApiCompanyRepository implements CompanyRepository {
   }
 
   async getCompanyById(id: string): Promise<CompanyDto> {
-    return await this.http.get<CompanyDto>(COMPANY_ROUTES.companyById(id), { showFeedback: false })
+    try {
+      return await this.http.get<CompanyDto>(COMPANY_ROUTES.companyById(id), { showFeedback: false })
+    } catch (err) {
+      // Fallback for public / unauthenticated visitors:
+      // Try resolving the company from the public directory endpoint
+      try {
+        const dir = await this.getProvidersDirectory({ pageSize: 50 })
+        const found = dir.data?.find((c) => c.id === id)
+        if (found) return found
+        const total = dir.totalPages || 1
+        for (let p = 2; p <= Math.min(total, 5); p++) {
+          const nextPage = await this.getProvidersDirectory({ pageNumber: p, pageSize: 50 })
+          const item = nextPage.data?.find((c) => c.id === id)
+          if (item) return item
+        }
+      } catch {
+        // Directory fallback failed
+      }
+      throw err
+    }
   }
 
   async getCompanyProducts(companyId: string, query: CompanyProductsQuery = {}): Promise<PaginatedResult<ProductDto>> {
@@ -135,22 +154,26 @@ export class ApiCompanyRepository implements CompanyRepository {
   }
 
   async getMyCompany(): Promise<CompanyDto | null> {
-    const raw = await this.http.get<Record<string, unknown> | null>(`${COMPANY_ROUTES.base}/companies/my`, { showFeedback: false })
-    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null
-    const pick = (...keys: string[]): unknown => {
-      for (const k of keys) if (k in raw && raw[k] !== undefined && raw[k] !== null && raw[k] !== '') return raw[k]
-      return undefined
+    try {
+      const raw = await this.http.get<Record<string, unknown> | null>(`${COMPANY_ROUTES.base}/companies/my`, { showFeedback: false })
+      if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null
+      const pick = (...keys: string[]): unknown => {
+        for (const k of keys) if (k in raw && raw[k] !== undefined && raw[k] !== null && raw[k] !== '') return raw[k]
+        return undefined
+      }
+      const id = pick('id', 'Id', 'companyId', 'CompanyId') as string | undefined
+      // On a 401 the HTTP client hands back a list-shaped empty envelope
+      // (`data: []`) instead of throwing. Blindly casting that produced a
+      // non-null "company" with no id and no status, which the profile rendered
+      // as a blank organization card labelled "pending". Require a real record.
+      if (!id) return null
+      return {
+        ...raw,
+        id,
+      } as unknown as CompanyDto
+    } catch {
+      return null
     }
-    const id = pick('id', 'Id', 'companyId', 'CompanyId') as string | undefined
-    // On a 401 the HTTP client hands back a list-shaped empty envelope
-    // (`data: []`) instead of throwing. Blindly casting that produced a
-    // non-null "company" with no id and no status, which the profile rendered
-    // as a blank organization card labelled "pending". Require a real record.
-    if (!id) return null
-    return {
-      ...raw,
-      id,
-    } as unknown as CompanyDto
   }
 
   async submitDistributorApplication(payload: DistributorApplicationPayload): Promise<DistributorApplicationDto> {
@@ -212,9 +235,13 @@ export class ApiCompanyRepository implements CompanyRepository {
     if (query.pageSize) params.set('pageSize', String(Math.min(50, Math.max(1, query.pageSize))))
     if (query.searchTerm) params.set('searchTerm', query.searchTerm)
     const qs = params.toString()
-    const raw = await this.http.get<unknown>(qs ? `${COMPANY_ROUTES.oemInquiries}?${qs}` : COMPANY_ROUTES.oemInquiries, { showFeedback: false })
-    if (Array.isArray(raw)) return { isSuccess: true, data: raw as OemInquiryDto[], totalCount: raw.length, pageNumber: query.pageNumber ?? 1, pageSize: query.pageSize ?? 10, totalPages: 1, hasPreviousPage: false, hasNextPage: false, message: 'OK', statusCode: 200 }
-    return raw as PaginatedResult<OemInquiryDto>
+    try {
+      const raw = await this.http.get<unknown>(qs ? `${COMPANY_ROUTES.oemInquiries}?${qs}` : COMPANY_ROUTES.oemInquiries, { showFeedback: false })
+      if (Array.isArray(raw)) return { isSuccess: true, data: raw as OemInquiryDto[], totalCount: raw.length, pageNumber: query.pageNumber ?? 1, pageSize: query.pageSize ?? 10, totalPages: 1, hasPreviousPage: false, hasNextPage: false, message: 'OK', statusCode: 200 }
+      return raw as PaginatedResult<OemInquiryDto>
+    } catch {
+      return { isSuccess: false, data: [], totalCount: 0, pageNumber: query.pageNumber ?? 1, pageSize: query.pageSize ?? 10, totalPages: 1, hasPreviousPage: false, hasNextPage: false, message: 'OK', statusCode: 200 }
+    }
   }
 
   async getOemInquiryById(id: string): Promise<OemInquiryDto> {

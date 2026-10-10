@@ -15,7 +15,12 @@ const router = useRouter()
 const { items, displayTotal, targetCurrency, count, toDisplayCurrency, quoteNote, clear, getServerLine, setTargetCurrency, unconvertedIds, refreshServerTotal, toRfqItems } = useCart()
 /** Backend totals only — no client-side math. Null until quoted. */
 const fmtQuote = (v: number | null) =>
-  v == null ? '…' : v.toLocaleString(locale.value === 'ar' ? 'ar-EG' : 'en-US')
+  v == null
+    ? '…'
+    : v.toLocaleString(locale.value === 'ar' ? 'ar-EG' : 'en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })
 
 const localized = (en: string, ar: string) => (locale.value === 'ar' ? ar : en)
 
@@ -36,8 +41,9 @@ onMounted(async () => {
   try { await refreshServerTotal() } catch { }
   // Derive address-based currency options
   try {
-    await services.locationService.loadCountries().catch(() => {})
-    await companyService.loadMyCompany().catch(() => {})
+    if (authService.isProvider.value || authService.user.value?.companyId) {
+      await companyService.loadMyCompany().catch(() => {})
+    }
     const cid = companyService.myCompany.value?.id
     if (cid) {
       await companyService.loadCompanyAddresses(cid).catch(() => {})

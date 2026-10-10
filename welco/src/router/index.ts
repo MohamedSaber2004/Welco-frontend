@@ -188,6 +188,12 @@ const router = createRouter({
       meta: { titleKey: 'commerce.orderDetailTitle', requiresAuth: true },
     },
     {
+      path: '/account/inquiries',
+      name: 'account-inquiries',
+      component: () => import('../views/account/InquiryListView.vue'),
+      meta: { titleKey: 'account.myInquiriesTitle', requiresAuth: true },
+    },
+    {
       path: '/oem',
       name: 'oem',
       component: () => import('../views/trade/OemView.vue'),
@@ -375,7 +381,9 @@ const router = createRouter({
     },
     {
       path: '/:pathMatch(.*)*',
-      redirect: '/',
+      name: 'not-found',
+      component: () => import('../views/NotFoundView.vue'),
+      meta: { titleKey: 'common.pageNotFound' },
     },
   ],
 })

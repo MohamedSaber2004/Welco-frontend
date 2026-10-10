@@ -178,6 +178,20 @@ onMounted(async () => {
             </p>
           </div>
 
+          <!-- Provider Negotiation Response Note if present -->
+          <div v-if="rfq.responseNote" class="provider-response-card">
+            <div class="provider-response-header">
+              <span class="material-symbols-outlined text-indigo-600">reply</span>
+              <div>
+                <strong class="mono text-indigo-900">{{ t('account.negotiationResponse') }}</strong>
+                <p class="mono text-xs text-indigo-700">
+                  {{ t('account.providerResponse') }}
+                </p>
+              </div>
+            </div>
+            <p class="provider-response-text">{{ rfq.responseNote }}</p>
+          </div>
+
           <!-- Notes Callout Banner if present -->
           <div v-if="parseNegotiationNote(rfq.note).cleanNote" class="notes-banner mono">
             <span class="material-symbols-outlined text-[16px] text-indigo-600">sticky_note_2</span>
@@ -495,6 +509,29 @@ onMounted(async () => {
   color: #065f46;
   margin: 0;
   padding-inline-start: 2rem;
+}
+
+.provider-response-card {
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-sm, 4px);
+  margin-top: 1rem;
+}
+
+.provider-response-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.provider-response-text {
+  font-size: 13px;
+  color: #312e81;
+  margin: 0.5rem 0 0 0;
+  padding-inline-start: 2.25rem;
+  line-height: 1.5;
+  white-space: pre-line;
 }
 
 /* Sidebar */

@@ -70,6 +70,7 @@ const defaultIcon = computed(() => {
     case 'document':
       return 'description'
     case 'product':
+      return 'medical_services'
     case 'general':
     default:
       return 'image_not_supported'

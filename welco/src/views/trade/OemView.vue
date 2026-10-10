@@ -1,9 +1,13 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { t, locale } from '../../i18n'
-import { companyService } from '../../di/container'
+import { companyService, authService } from '../../di/container'
 import type { OemService } from '../../domain/models/company'
 import BackButton from '../../components/ui/BackButton.vue'
+
+const route = useRoute()
+const router = useRouter()
 
 const services = ref<OemService[]>([])
 const form = ref({ fullName: '', email: '', companyName: '', serviceType: '', message: '' })
@@ -19,14 +23,34 @@ const ICONS: Record<string, string> = {
   flag: 'policy',
 }
 
+function initUser() {
+  if (authService.isAuthenticated && authService.user.value) {
+    const u = authService.user.value
+    if (!form.value.fullName) {
+      form.value.fullName = u.fullName || ''
+    }
+    if (!form.value.email && u.email) form.value.email = u.email
+    if (!form.value.companyName && u.company) {
+      form.value.companyName = u.company.name || ''
+    }
+  }
+}
+
 onMounted(async () => {
+  initUser()
   try {
     await companyService.loadOemServices()
   } catch {}
   services.value = companyService.oemServices.value
 })
 
+watch(() => authService.user.value, () => initUser(), { immediate: true })
+
 async function submit() {
+  if (!authService.isAuthenticated) {
+    void router.push({ name: 'login', query: { redirect: route.fullPath } })
+    return
+  }
   if (
     !form.value.fullName ||
     !form.value.email ||
@@ -194,6 +218,14 @@ async function submit() {
           </div>
 
           <form v-else class="form-stack" @submit.prevent="submit">
+            <div v-if="!authService.isAuthenticated" class="inquiry-auth-notice mb-3">
+              <span class="material-symbols-outlined text-[18px]">lock</span>
+              <span>{{ t('pdp.inquiryAuthNotice') }}</span>
+              <router-link :to="{ name: 'login', query: { redirect: route.fullPath } }" class="inquiry-login-link mono">
+                {{ t('nav.login') }} →
+              </router-link>
+            </div>
+
             <div class="fields-2col">
               <div class="field-item">
                 <label for="oem-fullname" class="vip-field-label mono">{{ t('oem.fullName') }} *</label>
@@ -237,8 +269,8 @@ async function submit() {
             <p v-if="error" class="modal-error-banner">{{ error }}</p>
 
             <button type="submit" :disabled="submitting" class="btn-submit-inquiry mono">
-              <span class="material-symbols-outlined text-[18px]">send</span>
-              <span>{{ submitting ? t('common.loading') : t('oem.submit') }}</span>
+              <span class="material-symbols-outlined text-[18px]">{{ authService.isAuthenticated ? 'send' : 'lock' }}</span>
+              <span>{{ submitting ? t('common.loading') : (authService.isAuthenticated ? t('oem.submit') : t('pdp.sendInquiry')) }}</span>
             </button>
           </form>
         </div>
@@ -755,5 +787,24 @@ async function submit() {
   .fields-2col {
     grid-template-columns: 1fr;
   }
+}
+
+.inquiry-auth-notice {
+  padding: 0.65rem 0.85rem;
+  background: var(--bg-surface-elevated, #fffbeb);
+  border: 1px solid var(--border-warning, #fde68a);
+  border-radius: var(--radius-sm, 6px);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--fg-warning, #92400e);
+}
+
+.inquiry-login-link {
+  font-weight: 700;
+  color: var(--wl-primary, #b45309);
+  text-decoration: underline;
+  margin-inline-start: 0.35rem;
 }
 </style>

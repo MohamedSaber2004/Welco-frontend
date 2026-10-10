@@ -441,6 +441,16 @@ const isPathActive = (path: string, exact = false) => {
                 </span>
               </button>
 
+              <button type="button" class="sheet-item" @click="navigateTo('/account/inquiries')">
+                <span class="sheet-icon-box sheet-icon--primary">
+                  <span class="material-symbols-outlined">chat_bubble_outline</span>
+                </span>
+                <span class="sheet-item__text">
+                  <strong>{{ t('account.myInquiriesTitle') }}</strong>
+                  <small>{{ locale === 'ar' ? 'استفساراتك وردود الموردين' : 'Inquiries & provider replies' }}</small>
+                </span>
+              </button>
+
               <button type="button" class="sheet-item" @click="navigateTo('/addresses')">
                 <span class="sheet-icon-box sheet-icon--emerald">
                   <span class="material-symbols-outlined">location_on</span>

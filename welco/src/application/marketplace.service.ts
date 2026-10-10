@@ -25,7 +25,7 @@ export class MarketplaceService {
   error = ref<string | null>(null)
   totalCount = ref(0)
   page = ref(1)
-  pageSize = ref(10)
+  pageSize = ref(12)
   totalPages = ref(1)
 
   constructor(repo: MarketplaceRepository) {

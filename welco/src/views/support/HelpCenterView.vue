@@ -120,7 +120,7 @@ const filteredArticles = computed(() => {
   })
 })
 
-const COLOR_PALETTE = ['#0F3D56', '#147D92', '#28A7A1', '#E67E22', '#198754', '#627D98', '#147D92', '#0F3D56']
+const COLOR_PALETTE = ['#071520', '#00A389', '#0EA5E9', '#D97706', '#059669', '#5A7184', '#008872', '#0D2235']
 
 const visibleFaqs = computed(() => {
   const list = Array.isArray(faqs.value) ? faqs.value : []
@@ -1869,13 +1869,13 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
 }
 
 .article-card--interactive:hover {
-  border-color: var(--wl-primary, #0f3d56);
-  box-shadow: 0 8px 24px rgba(15, 61, 86, 0.08);
+  border-color: rgba(0, 163, 137, 0.4);
+  box-shadow: 0 8px 24px rgba(0, 163, 137, 0.12);
   transform: translateY(-2px);
 }
 
 .article-card--interactive:hover .article-read-cta {
-  color: var(--wl-primary, #0f3d56);
+  color: var(--secondary, #00A389);
 }
 
 .article-card__footer {
@@ -1935,14 +1935,14 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
 }
 
 .quick-subject-btn:hover {
-  border-color: var(--wl-primary, #0f3d56);
+  border-color: var(--secondary, #00A389);
   background: #ffffff;
-  color: var(--wl-primary, #0f3d56);
+  color: var(--secondary, #00A389);
 }
 
 .quick-subject-btn.is-selected {
-  border-color: var(--wl-primary, #0f3d56);
-  background: var(--wl-primary, #0f3d56);
+  border-color: var(--secondary, #00A389);
+  background: var(--secondary, #00A389);
   color: #ffffff;
   font-weight: 700;
 }
@@ -1964,7 +1964,7 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
 }
 
 .article-modal__cat {
-  color: var(--wl-primary, #0f3d56);
+  color: var(--secondary, #00A389);
   font-weight: 700;
 }
 
@@ -2012,7 +2012,7 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: var(--wl-primary, #0f3d56);
+  color: var(--secondary, #00A389);
   font-size: 0.85rem;
   font-weight: 700;
 }

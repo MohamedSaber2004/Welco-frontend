@@ -1,4 +1,4 @@
-﻿<script setup lang="ts">
+<script setup lang="ts">
 import { computed } from 'vue'
 import { t } from '../../i18n'
 
@@ -153,9 +153,9 @@ const sizeClass = computed(() => `field-control--${props.size}`)
 }
 
 .field-control:focus-within {
-  border-color: var(--color-focus, #0ea5e9);
+  border-color: var(--secondary, #00A389);
   outline: none;
-  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.12) !important;
+  box-shadow: 0 0 0 3px rgba(0, 163, 137, 0.18) !important;
   background: var(--bg-surface, #ffffff);
 }
 
@@ -227,7 +227,7 @@ const sizeClass = computed(() => `field-control--${props.size}`)
 }
 
 .field-control:focus-within .field-icon {
-  color: var(--brand, #0f3d56);
+  color: var(--secondary, #00A389);
 }
 
 .field-icon--prefix {
@@ -281,7 +281,7 @@ const sizeClass = computed(() => `field-control--${props.size}`)
   width: 16px;
   height: 16px;
   border: 2px solid var(--border, #d9e2ec);
-  border-top-color: var(--brand, #0f3d56);
+  border-top-color: var(--secondary, #00A389);
   border-radius: var(--radius-pill, 9999px);
   animation: spin 0.7s linear infinite;
   pointer-events: none;

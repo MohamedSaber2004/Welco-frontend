@@ -89,15 +89,15 @@ const isPulsing = computed(() => ['Pending', 'Draft', 'Partial', 'In Progress'].
 }
 
 .status-pill--teal {
-  color: var(--color-steel-teal, #147d92);
-  background: var(--color-brand-ice, #edf4ff);
-  border-color: rgba(20, 125, 146, 0.25);
+  color: #007D69;
+  background: var(--brand-soft, #E8F8F5);
+  border-color: rgba(0, 163, 137, 0.28);
 }
 
 .status-pill--indigo {
-  color: var(--brand, #0f3d56);
-  background: var(--brand-soft, #e3efff);
-  border-color: rgba(15, 61, 86, 0.2);
+  color: var(--brand, #071520);
+  background: #EBF1F6;
+  border-color: rgba(7, 21, 32, 0.2);
 }
 
 .status-pill--amber {
@@ -107,14 +107,14 @@ const isPulsing = computed(() => ['Pending', 'Draft', 'Partial', 'In Progress'].
 }
 
 .status-pill--rose {
-  color: var(--color-danger-600, #dc2626);
+  color: var(--color-danger, #E11D48);
   background: var(--color-danger-50, #fef2f2);
-  border-color: rgba(239, 68, 68, 0.25);
+  border-color: rgba(225, 29, 72, 0.25);
 }
 
 .status-pill--slate {
-  color: var(--fg-muted, #627d98);
-  background: var(--bg-subtle, #edf4ff);
-  border-color: var(--border, #d9e2ec);
+  color: var(--fg-muted, #5A7184);
+  background: var(--bg-subtle, #EBF1F6);
+  border-color: var(--border, #D8E2EC);
 }
 </style>

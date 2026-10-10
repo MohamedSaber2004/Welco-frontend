@@ -98,10 +98,10 @@ export const usePageTransition = (name = 'page') => {
 }
 
 export const animationStyles = {
-  getCardHover: (lift = -2) => ({
+  getCardHover: (_lift = -2) => ({
     transition: `transform var(--duration-fast, 160ms) var(--ease-out), box-shadow var(--duration-fast, 160ms) var(--ease-out), border-color var(--duration-fast, 160ms) var(--ease-out)`,
   } as Record<string, string>),
-  getInteractiveLift: (lift = -1) => ({
+  getInteractiveLift: (_lift = -1) => ({
     transition: `transform var(--duration-fast, 120ms) var(--ease-out), box-shadow var(--duration-fast, 120ms) var(--ease-out)`,
   } as Record<string, string>),
   getStaggerDelay: (index: number, base = 40, max = 16) => ({

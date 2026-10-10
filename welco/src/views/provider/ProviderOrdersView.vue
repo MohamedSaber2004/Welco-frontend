@@ -290,7 +290,7 @@ const submitStatusUpdate = async () => {
                   </td>
 
                   <td class="mono text-muted text-sm">
-                    {{ order.createdAt ? new Date(order.createdAt).toLocaleDateString() : '—' }}
+                    {{ order.createdAt ? new Date(order.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') : '—' }}
                   </td>
 
                   <td>
@@ -375,7 +375,7 @@ const submitStatusUpdate = async () => {
                 <div class="step-dot">
                   <span class="material-symbols-outlined text-[14px]">local_shipping</span>
                 </div>
-                <span class="step-label mono">{{ locale === 'ar' ? 'تم الشحن' : 'Shipped' }}</span>
+                <span class="step-label mono">{{ t('account.stepShipped') }}</span>
               </div>
               <div class="step-line" :class="{ 'is-active': getTimelineStepIndex(selectedOrder.status) >= 3 }"></div>
               <div class="timeline-step" :class="{ 'is-complete': getTimelineStepIndex(selectedOrder.status) >= 3, 'is-current': getTimelineStepIndex(selectedOrder.status) === 3 }">
@@ -388,16 +388,16 @@ const submitStatusUpdate = async () => {
           </div>
 
           <!-- Tracking Number Banner if present -->
-          <div v-if="(selectedOrder as any).trackingNumber" class="tracking-banner">
+          <div v-if="(selectedOrder as unknown as { trackingNumber?: string }).trackingNumber" class="tracking-banner">
             <span class="material-symbols-outlined text-primary text-[22px]">local_shipping</span>
             <div class="tracking-text">
               <span class="tracking-label mono text-xs text-muted">{{ t('commerce.trackingTitle') }}</span>
-              <strong class="tracking-val mono">{{ (selectedOrder as any).trackingNumber }}</strong>
+              <strong class="tracking-val mono">{{ (selectedOrder as unknown as { trackingNumber?: string }).trackingNumber }}</strong>
             </div>
             <button
               type="button"
               class="copy-tracking-btn mono"
-              @click="copyTracking((selectedOrder as any).trackingNumber)"
+              @click="copyTracking((selectedOrder as unknown as { trackingNumber?: string }).trackingNumber || '')"
             >
               <span class="material-symbols-outlined text-[15px]">content_copy</span>
               <span>{{ locale === 'ar' ? 'نسخ' : 'Copy' }}</span>
@@ -411,7 +411,7 @@ const submitStatusUpdate = async () => {
             </div>
             <div class="detail-item">
               <span class="lbl">{{ t('commerce.placed') }}</span>
-              <strong class="val">{{ selectedOrder.createdAt ? new Date(selectedOrder.createdAt).toLocaleString() : '—' }}</strong>
+              <strong class="val">{{ selectedOrder.createdAt ? new Date(selectedOrder.createdAt).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') : '—' }}</strong>
             </div>
             <div class="detail-item">
               <span class="lbl">{{ t('commerce.status') }}</span>
@@ -584,8 +584,9 @@ const submitStatusUpdate = async () => {
 }
 
 .kpi-card.is-active {
-  border-color: var(--wl-primary);
-  box-shadow: 0 4px 12px rgba(179, 139, 45, 0.1);
+  border-color: var(--secondary, #00A389);
+  box-shadow: 0 4px 14px rgba(0, 163, 137, 0.18);
+  background: var(--brand-soft, #E8F8F5);
 }
 
 .kpi-icon-box {
@@ -908,8 +909,8 @@ const submitStatusUpdate = async () => {
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-3);
-  background: #fffbeb;
-  border: 1px solid #fef3c7;
+  background: var(--brand-soft, #E8F8F5);
+  border: 1px solid rgba(0, 163, 137, 0.25);
   border-radius: var(--radius-md);
   font-size: var(--step--1);
 }
@@ -922,16 +923,17 @@ const submitStatusUpdate = async () => {
 }
 
 .callout-link {
-  color: var(--wl-primary);
+  color: var(--secondary, #00A389);
   font-weight: 700;
   text-decoration: none;
 }
 /* Order Fulfillment Timeline */
 .order-timeline-card {
-  background: var(--wl-surface-soft);
-  border: 1px solid var(--wl-border);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: var(--space-4);
+  box-shadow: var(--shadow-tray);
 }
 
 .order-timeline-steps {
@@ -955,47 +957,47 @@ const submitStatusUpdate = async () => {
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: var(--wl-surface);
-  border: 1px solid var(--wl-border);
-  color: var(--wl-muted);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  color: var(--fg-muted);
   transition: all 0.2s ease;
 }
 
 .timeline-step.is-complete .step-dot {
   background: #ecfdf5;
-  border-color: #10b981;
+  border-color: #059669;
   color: #059669;
 }
 
 .timeline-step.is-current .step-dot {
-  background: var(--wl-primary-soft);
-  border-color: var(--wl-primary);
-  color: var(--wl-primary);
-  box-shadow: 0 0 0 3px rgba(179, 139, 45, 0.18);
+  background: var(--brand-soft, #E8F8F5);
+  border-color: var(--secondary, #00A389);
+  color: var(--secondary, #00A389);
+  box-shadow: 0 0 0 3px rgba(0, 163, 137, 0.22);
 }
 
 .step-label {
   font-size: 11px;
   font-weight: 700;
-  color: var(--wl-muted);
+  color: var(--fg-muted);
 }
 
 .timeline-step.is-complete .step-label,
 .timeline-step.is-current .step-label {
-  color: var(--wl-ink-strong);
+  color: var(--fg-heading);
 }
 
 .step-line {
   flex: 1;
   height: 2px;
-  background: var(--wl-border);
+  background: var(--border);
   margin: 0 var(--space-2);
   margin-bottom: 20px;
   transition: background 0.2s ease;
 }
 
 .step-line.is-active {
-  background: #10b981;
+  background: var(--secondary, #00A389);
 }
 
 /* Tracking Banner */
@@ -1005,8 +1007,8 @@ const submitStatusUpdate = async () => {
   justify-content: space-between;
   gap: var(--space-3);
   padding: var(--space-3) var(--space-4);
-  background: var(--wl-primary-soft, #eef2ff);
-  border: 1px solid var(--wl-primary-border, #c7d2fe);
+  background: var(--brand-soft, #E8F8F5);
+  border: 1px solid rgba(0, 163, 137, 0.28);
   border-radius: var(--radius-md);
 }
 

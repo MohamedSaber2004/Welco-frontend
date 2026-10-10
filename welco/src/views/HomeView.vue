@@ -2969,17 +2969,17 @@ const navigateToOemFromModal = () => {
 }
 
 .home .hero__title-accent {
-  background: linear-gradient(135deg, #0F3D56 0%, #147D92 100%);
+  background: linear-gradient(135deg, #071520 0%, #00A389 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  color: var(--color-steel-teal, #147D92);
+  color: var(--secondary, #00A389);
   display: inline-block;
 }
 
 .home .hero__subtitle {
   max-width: 580px;
-  color: var(--color-body, #42474D) !important;
+  color: var(--color-body, #334E68) !important;
   font-size: clamp(1rem, 1.25vw, 1.125rem) !important;
   line-height: 1.65 !important;
   margin-bottom: 1.75rem;
@@ -3055,7 +3055,7 @@ const navigateToOemFromModal = () => {
   height: 40px;
   padding: 0 1.25rem;
   border-radius: 8px;
-  background: var(--color-primary, #0F3D56);
+  background: var(--secondary, #00A389);
   color: #FFFFFF;
   font-weight: 600;
   font-size: 0.88rem;
@@ -3065,7 +3065,7 @@ const navigateToOemFromModal = () => {
 }
 
 .home .hero__search-btn:hover {
-  background: var(--color-primary-deep, #001D32);
+  background: var(--secondary-hover, #008872);
   transform: translateY(-1px);
 }
 
@@ -3092,21 +3092,21 @@ const navigateToOemFromModal = () => {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: var(--color-primary, #0F3D56) !important;
+  background: #071520 !important;
   color: #FFFFFF !important;
-  border: 1px solid var(--color-primary, #0F3D56) !important;
+  border: 1px solid rgba(0, 163, 137, 0.35) !important;
   border-radius: 8px !important;
   padding: 0.75rem 1.6rem !important;
   font-weight: 600 !important;
-  box-shadow: 0 4px 14px rgba(15, 61, 86, 0.2) !important;
+  box-shadow: 0 4px 14px rgba(7, 21, 32, 0.2) !important;
   transition: all 0.2s ease !important;
 }
 
 .home .hero__ctas .btn-primary:hover {
-  background: var(--color-primary-deep, #001D32) !important;
-  border-color: var(--color-primary-deep, #001D32) !important;
+  background: #0D2235 !important;
+  border-color: #00A389 !important;
   transform: translateY(-2px) !important;
-  box-shadow: 0 8px 20px rgba(15, 61, 86, 0.25) !important;
+  box-shadow: 0 8px 20px rgba(0, 163, 137, 0.25) !important;
 }
 
 .home .hero__ctas .btn-secondary {
@@ -3114,19 +3114,19 @@ const navigateToOemFromModal = () => {
   align-items: center;
   gap: 0.5rem;
   background: #FFFFFF !important;
-  color: var(--color-heading, #102A43) !important;
-  border: 1px solid var(--color-border, #D9E2EC) !important;
+  color: var(--color-heading, #071520) !important;
+  border: 1px solid var(--color-border, #D8E2EC) !important;
   border-radius: 8px !important;
   padding: 0.75rem 1.6rem !important;
   font-weight: 600 !important;
-  box-shadow: 0 1px 3px rgba(16, 42, 67, 0.04) !important;
+  box-shadow: 0 1px 3px rgba(7, 21, 32, 0.04) !important;
   transition: all 0.2s ease !important;
 }
 
 .home .hero__ctas .btn-secondary:hover {
-  background: var(--color-brand-ice, #EDF4FF) !important;
-  border-color: var(--color-steel-teal, #147D92) !important;
-  color: var(--color-primary, #0F3D56) !important;
+  background: var(--brand-soft, #E8F8F5) !important;
+  border-color: var(--secondary, #00A389) !important;
+  color: var(--secondary, #00A389) !important;
   transform: translateY(-2px) !important;
 }
 
@@ -3160,10 +3160,10 @@ const navigateToOemFromModal = () => {
 
 .home .logo-showcase__card:hover {
   transform: translateY(-4px);
-  border-color: #147D92;
+  border-color: #00A389;
   box-shadow:
-    0 28px 56px rgba(15, 61, 86, 0.11),
-    0 8px 20px rgba(15, 61, 86, 0.04);
+    0 28px 56px rgba(0, 163, 137, 0.14),
+    0 8px 20px rgba(7, 21, 32, 0.04);
 }
 
 .home .logo-showcase__card::before {
@@ -3173,7 +3173,7 @@ const navigateToOemFromModal = () => {
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, #0F3D56 0%, #147D92 50%, #28A7A1 100%);
+  background: linear-gradient(90deg, #071520 0%, #00A389 50%, #0EA5E9 100%);
 }
 
 .home .logo-showcase__glow {
@@ -3369,8 +3369,8 @@ const navigateToOemFromModal = () => {
 
 .home .product-card:hover {
   transform: translateY(-4px);
-  border-color: #147D92;
-  box-shadow: 0 16px 36px rgba(15, 61, 86, 0.1);
+  border-color: rgba(0, 163, 137, 0.4);
+  box-shadow: 0 16px 36px rgba(0, 163, 137, 0.12);
 }
 
 .home .product-card__media {
@@ -3395,13 +3395,13 @@ const navigateToOemFromModal = () => {
 }
 
 .home .product-badge--new {
-  background: #0F3D56;
+  background: #071520;
   color: #FFFFFF;
   font-size: 0.72rem;
   font-weight: 700;
   padding: 0.2rem 0.55rem;
   border-radius: 6px;
-  box-shadow: 0 2px 6px rgba(15, 61, 86, 0.2);
+  box-shadow: 0 2px 6px rgba(7, 21, 32, 0.2);
 }
 
 .home .product-stock-badge {
@@ -3413,13 +3413,13 @@ const navigateToOemFromModal = () => {
   font-weight: 700;
   padding: 0.25rem 0.6rem;
   border-radius: 6px;
-  box-shadow: 0 2px 6px rgba(16, 42, 67, 0.08);
+  box-shadow: 0 2px 6px rgba(7, 21, 32, 0.08);
   white-space: nowrap;
 }
 
 .home .product-stock-badge--in {
   background: #DCFCE7;
-  color: #166534;
+  color: #059669;
   border: 1px solid #BBF7D0;
 }
 
@@ -3436,7 +3436,7 @@ const navigateToOemFromModal = () => {
   flex-shrink: 0;
 }
 .home .stock-dot--in {
-  background: #16A34A;
+  background: #059669;
 }
 .home .stock-dot--out {
   background: #94A3B8;
@@ -3452,7 +3452,7 @@ const navigateToOemFromModal = () => {
 .home .product-card__category {
   font-size: 0.75rem;
   font-weight: 700;
-  color: #147D92;
+  color: #00A389;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 0.35rem;
@@ -3461,7 +3461,7 @@ const navigateToOemFromModal = () => {
 .home .product-card__title {
   font-size: 1.05rem;
   font-weight: 700;
-  color: #102A43;
+  color: #071520;
   line-height: 1.35;
   margin-bottom: 0.35rem;
   display: -webkit-box;
@@ -3472,7 +3472,7 @@ const navigateToOemFromModal = () => {
 
 .home .product-card__meta-alt {
   font-size: 0.85rem;
-  color: #64748B;
+  color: #5A7184;
   margin-bottom: 0.5rem;
 }
 
@@ -3481,9 +3481,9 @@ const navigateToOemFromModal = () => {
   align-items: center;
   gap: 0.35rem;
   font-size: 0.8rem;
-  color: #102A43;
-  background: #F0F7FF;
-  border: 1px solid #C8E0FF;
+  color: #071520;
+  background: #E8F8F5;
+  border: 1px solid rgba(0, 163, 137, 0.3);
   border-radius: 6px;
   padding: 0.25rem 0.6rem;
   margin-bottom: 0.95rem;
@@ -3493,20 +3493,20 @@ const navigateToOemFromModal = () => {
 
 .home .product-card__provider .provider-icon {
   font-size: 15px;
-  color: #147D92;
+  color: #00A389;
   flex-shrink: 0;
 }
 
 .home .product-card__provider .provider-label {
   font-weight: 700;
-  color: #5A6A80;
+  color: #5A7184;
   font-size: 0.72rem;
   text-transform: uppercase;
 }
 
 .home .product-card__provider .provider-value {
   font-weight: 700;
-  color: #0F3D56;
+  color: #071520;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -3534,7 +3534,7 @@ const navigateToOemFromModal = () => {
 .home .price-amount {
   font-size: 1rem;
   font-weight: 700;
-  color: #0F3D56;
+  color: #071520;
   letter-spacing: -0.01em;
   line-height: 1.2;
 }
@@ -3542,7 +3542,7 @@ const navigateToOemFromModal = () => {
 .home .price-currency {
   font-size: 0.75rem;
   font-weight: 600;
-  color: #627D98;
+  color: #5A7184;
   line-height: 1.2;
 }
 
@@ -3550,7 +3550,7 @@ const navigateToOemFromModal = () => {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  background: #0F3D56 !important;
+  background: #00A389 !important;
   color: #FFFFFF !important;
   border-radius: 6px !important;
   padding: 0.4rem 0.75rem !important;
@@ -3564,22 +3564,22 @@ const navigateToOemFromModal = () => {
 }
 
 .home .btn-quote-white:hover {
-  background: #147D92 !important;
+  background: #008872 !important;
   transform: translateY(-1px);
 }
 
 /* Provider & Cert Tiles Modern Styling */
 .home .provider-tile, .home .home-cert-card {
-  border: 1px solid var(--border, #D9E2EC) !important;
+  border: 1px solid var(--border, #D8E2EC) !important;
   border-radius: var(--radius-lg, 8px) !important;
-  box-shadow: 0 4px 16px rgba(15, 61, 86, 0.04) !important;
+  box-shadow: 0 4px 16px rgba(7, 21, 32, 0.04) !important;
   background: #FFFFFF !important;
   transition: all 0.25s ease !important;
 }
 
 .home .provider-tile:hover, .home .home-cert-card:hover {
-  border-color: #147D92 !important;
-  box-shadow: 0 16px 36px rgba(15, 61, 86, 0.09) !important;
+  border-color: rgba(0, 163, 137, 0.4) !important;
+  box-shadow: 0 16px 36px rgba(0, 163, 137, 0.1) !important;
   transform: translateY(-4px) !important;
 }
 
@@ -3592,10 +3592,10 @@ const navigateToOemFromModal = () => {
 
 /* Cat Explorer Pills Active State */
 .pill--active {
-  background: #0F3D56 !important;
+  background: #071520 !important;
   color: #FFFFFF !important;
-  border-color: #0F3D56 !important;
-  box-shadow: 0 4px 12px rgba(15, 61, 86, 0.25) !important;
+  border-color: #00A389 !important;
+  box-shadow: 0 4px 14px rgba(0, 163, 137, 0.25) !important;
 }
 
 @media (max-width: 900px) {

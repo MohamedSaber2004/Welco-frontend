@@ -81,6 +81,12 @@ html.theme-transition, html.theme-transition *, html.theme-transition *::before,
   width: 100%;
   box-sizing: border-box;
 }
+
+@media (max-width: 768px) {
+  .page-shell {
+    padding-bottom: calc(var(--space-8, 2rem) + 4.25rem + env(safe-area-inset-bottom, 0px)) !important;
+  }
+}
 .page-hero { padding: var(--space-5) 0 var(--space-3); }
 
 .card {
@@ -92,15 +98,63 @@ html.theme-transition, html.theme-transition *, html.theme-transition *::before,
   transition: border-color var(--duration-base) var(--ease-out), box-shadow var(--duration-base) var(--ease-out), transform var(--duration-fast) ease;
   overflow: hidden;
 }
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9), transparent);
+  pointer-events: none;
+}
 .card--pad, .card-body { padding: var(--space-6); }
 .card--pad-sm { padding: var(--space-4); }
 .card--pad-lg { padding: var(--space-8); }
 .card:hover {
-  border-color: var(--border-strong);
-  box-shadow: var(--shadow-md);
+  border-color: rgba(0, 163, 137, 0.3);
+  box-shadow: var(--shadow-tray-hover);
 }
 .card:focus-within { border-color: var(--border-focus); box-shadow: var(--ring-focus); }
 .card--muted { background: var(--bg-subtle); }
+
+/* Surgical Precision Tray & Cassette */
+.surgical-tray,
+.tray-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-tray);
+  position: relative;
+  transition: all var(--duration-base) var(--ease-out);
+  overflow: hidden;
+}
+.surgical-tray:hover,
+.tray-card:hover {
+  border-color: rgba(0, 163, 137, 0.35);
+  box-shadow: var(--shadow-tray-hover);
+  transform: translateY(-2px);
+}
+.laser-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--radius-xs);
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: var(--brand-soft);
+  color: var(--secondary);
+  border: 1px solid rgba(0, 163, 137, 0.2);
+}
+.laser-badge--dark {
+  background: var(--color-primary);
+  color: #FFFFFF;
+  border-color: rgba(0, 163, 137, 0.4);
+}
 
 /* ── Brand helpers ── */
 .wl-gradient-text {
@@ -480,9 +534,9 @@ input[type="checkbox"]:focus-visible, input[type="radio"]:focus-visible { box-sh
 }
 .mono-num, .product-card__sku, .sku-code, .phone-number-input { direction: ltr; unicode-bidi: isolate; }
 .icon--directional { display: inline-block; transition: transform var(--duration-fast) ease; line-height: 1; transform-origin: center; }
-html[dir='rtl'] .icon--directional, html[dir='rtl'] [data-flip], html[dir='rtl'] .link-arrow { transform: scaleX(calc(-1 * 1)); }
+html[dir='rtl'] .icon--directional, [dir='rtl'] .icon--directional, html[dir='rtl'] [data-flip], [dir='rtl'] [data-flip], html[dir='rtl'] .link-arrow, [dir='rtl'] .link-arrow { transform: scaleX(-1); }
 .link-arrow--back { display: inline-block; transform: scaleX(-1); transition: transform var(--duration-fast) ease; }
-html[dir='rtl'] .link-arrow--back { transform: scaleX(1) !important; }
+html[dir='rtl'] .link-arrow--back, [dir='rtl'] .link-arrow--back { transform: scaleX(1) !important; }
 .btn:hover .icon--directional,
 .trade-link:hover .icon--directional,
 .cross-link:hover .icon--directional,

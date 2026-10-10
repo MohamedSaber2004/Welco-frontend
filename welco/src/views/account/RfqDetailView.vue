@@ -87,8 +87,10 @@ onMounted(async () => {
           <h1 class="mono rfq-heading">{{ rfq.rfqNumber }}</h1>
           <p class="mono rfq-sub">
             <span>{{ t('sales.submittedAt') }} {{ new Date(rfq.createdAt).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</span>
-            <span v-if="rfq.companyName">&bull;</span>
-            <span v-if="rfq.companyName">&bull;</span>
+            <template v-if="rfq.companyName">
+              <span>&bull;</span>
+              <span>{{ rfq.companyName }}</span>
+            </template>
           </p>
         </div>
 
@@ -135,7 +137,7 @@ onMounted(async () => {
                 <img
                   v-if="it.imageName"
                   :src="resolveFileUrl(it.imageName)"
-                  :alt="localized(it.productNameEn, it.productNameEn)"
+                  :alt="localized(it.productNameEn, it.productNameAr || it.productNameEn)"
                   class="thumb-img"
                   loading="lazy"
                 />
@@ -609,19 +611,19 @@ onMounted(async () => {
   gap: 0.45rem;
   height: 44px;
   width: 100%;
-  background: var(--primary, #0F3D56);
+  background: var(--secondary, #00A389);
   color: #ffffff;
   border: none;
   border-radius: var(--radius-sm, 4px);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 2px 8px -1px rgba(15, 61, 86, 0.25);
+  box-shadow: 0 2px 8px -1px rgba(0, 163, 137, 0.25);
   transition: all 0.18s ease;
 }
 
 .btn-view-quote:hover {
-  background: var(--color-brand-800, #0B2B3D);
+  background: var(--secondary-hover, #008872);
 }
 
 .side-actions-stack {
@@ -637,8 +639,8 @@ onMounted(async () => {
   gap: 0.45rem;
   height: 44px;
   background: var(--surface, #ffffff);
-  color: var(--fg-muted, #627D98);
-  border: 1px solid var(--border, #D9E2EC);
+  color: var(--fg-muted, #5A7184);
+  border: 1px solid var(--border, #D8E2EC);
   border-radius: var(--radius-sm, 4px);
   font-size: 13px;
   font-weight: 600;
@@ -647,9 +649,9 @@ onMounted(async () => {
 }
 
 .btn-back-rfqs:hover {
-  border-color: var(--primary, #0F3D56);
-  color: var(--primary, #0F3D56);
-  background: var(--brand-soft, #EDF4FF);
+  border-color: var(--secondary, #00A389);
+  color: var(--secondary, #00A389);
+  background: var(--brand-soft, #E8F8F5);
 }
 
 .btn-create-rfq {
@@ -658,9 +660,9 @@ onMounted(async () => {
   justify-content: center;
   gap: 0.45rem;
   height: 44px;
-  background: var(--brand-soft, #EDF4FF);
-  color: var(--primary, #0F3D56);
-  border: 1px solid var(--border, #D9E2EC);
+  background: var(--brand-soft, #E8F8F5);
+  color: var(--secondary, #00A389);
+  border: 1px solid var(--border, #D8E2EC);
   border-radius: var(--radius-sm, 4px);
   font-size: 13px;
   font-weight: 600;
@@ -669,7 +671,7 @@ onMounted(async () => {
 }
 
 .btn-create-rfq:hover {
-  background: var(--primary, #0F3D56);
+  background: var(--secondary, #00A389);
   color: #ffffff;
 }
 

@@ -84,12 +84,12 @@ const sparkPath = computed(() => {
 })
 
 const strokeColor = computed(() => {
-  if (props.tone === 'emerald' || (props.trend && isPositive.value)) return 'var(--color-success, #16a34a)'
-  if (props.tone === 'rose' || (props.trend && isNegative.value)) return 'var(--color-danger, #ef4444)'
+  if (props.tone === 'emerald' || (props.trend && isPositive.value)) return 'var(--color-success, #059669)'
+  if (props.tone === 'rose' || (props.trend && isNegative.value)) return 'var(--color-danger, #e11d48)'
   if (props.tone === 'amber' || props.tone === 'orange' || props.tone === 'gold') return 'var(--color-warning, #d97706)'
-  if (props.tone === 'teal') return 'var(--color-steel-teal, #147d92)'
-  if (props.tone === 'cyan') return 'var(--color-surgical-cyan, #28a7a1)'
-  return 'var(--color-primary, #0f3d56)'
+  if (props.tone === 'teal') return 'var(--color-steel-teal, #00a389)'
+  if (props.tone === 'cyan') return 'var(--color-surgical-cyan, #0ea5e9)'
+  return 'var(--color-primary, #071520)'
 })
 </script>
 
@@ -187,9 +187,9 @@ const strokeColor = computed(() => {
 }
 
 .stat-card.is-interactive:hover {
-  border-color: var(--brand, #0f3d56);
+  border-color: rgba(0, 163, 137, 0.4);
   transform: translateY(-2px);
-  box-shadow: var(--shadow-md, 0 4px 12px rgba(15, 61, 86, 0.08));
+  box-shadow: var(--shadow-tray-hover, 0 10px 24px -4px rgba(7, 21, 32, 0.08));
 }
 
 .stat-card.is-icon-only {

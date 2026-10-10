@@ -997,6 +997,24 @@ onMounted(() => { void loadAll() })
   flex-direction: column;
   cursor: pointer;
   transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.catalog-product-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  inset-inline: 0;
+  height: 2px;
+  background: var(--wl-laser-sweep);
+  opacity: 0;
+  transition: opacity 0.22s var(--wl-ease-spring);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.catalog-product-card:hover::before {
+  opacity: 1;
 }
 
 .catalog-product-card:hover {

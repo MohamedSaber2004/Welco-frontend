@@ -132,6 +132,30 @@ const toErrorMessage = (err: unknown, fallbackKey: MessageKey): string => {
       }
     }
 
+    const isSamePasswordError = (msg: string | null | undefined): boolean => {
+      if (!msg) return false
+      const lower = msg.toLowerCase()
+      return (
+        lower.includes('same password') ||
+        lower.includes('previous password') ||
+        lower.includes('current password') ||
+        lower.includes('cannot reuse') ||
+        lower.includes('password history') ||
+        lower.includes('cannot be the same') ||
+        lower.includes('نفس كلمة المرور') ||
+        lower.includes('كلمة المرور السابقة') ||
+        lower.includes('كلمة المرور الحالية')
+      )
+    }
+    if (isSamePasswordError(err.message)) return t('auth.errPasswordSameAsCurrent')
+    if (err.errors) {
+      for (const vals of Object.values(err.errors)) {
+        for (const m of vals as string[]) {
+          if (isSamePasswordError(m)) return t('auth.errPasswordSameAsCurrent')
+        }
+      }
+    }
+
     if (err.status === 404) {
       // Prefer server-provided message/errors for genuine 404s
       if (err.errors && Object.keys(err.errors).length > 0) {

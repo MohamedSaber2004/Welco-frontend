@@ -934,14 +934,14 @@ const setLang = async (v: AppLanguage) => {
 }
 
 .head-chip--gold {
-  color: var(--wl-gold);
-  background: var(--wl-gold-soft);
-  border-color: rgba(255, 209, 102, 0.35);
+  color: var(--accent, #0EA5E9);
+  background: rgba(14, 165, 233, 0.12);
+  border-color: rgba(14, 165, 233, 0.35);
 }
 
 .head-chip--gold .pulse-dot {
-  background: var(--wl-gold);
-  box-shadow: 0 0 0 3px rgba(255, 209, 102, 0.22);
+  background: var(--accent, #0EA5E9);
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.22);
 }
 
 .head-title {
@@ -1068,16 +1068,16 @@ const setLang = async (v: AppLanguage) => {
 }
 
 .id-card--admin {
-  border-color: rgba(255, 209, 102, 0.4) !important;
+  border-color: rgba(14, 165, 233, 0.4) !important;
   background:
-    linear-gradient(180deg, rgba(255, 209, 102, 0.08) 0%, transparent 32%),
+    linear-gradient(180deg, rgba(14, 165, 233, 0.08) 0%, transparent 32%),
     var(--wl-surface) !important;
-  box-shadow: var(--wl-gold-ring), var(--wl-shadow-card) !important;
+  box-shadow: 0 0 0 1px rgba(14, 165, 233, 0.25), var(--wl-shadow-card) !important;
 }
 
 .id-card--admin .avatar-img {
-  border-color: rgba(255, 209, 102, 0.55) !important;
-  box-shadow: 0 0 0 3px rgba(255, 209, 102, 0.18), var(--shadow-sm) !important;
+  border-color: rgba(14, 165, 233, 0.55) !important;
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.18), var(--shadow-sm) !important;
 }
 
 .id-card--staff {
@@ -1116,11 +1116,10 @@ const setLang = async (v: AppLanguage) => {
 }
 
 .user-role-pill--admin {
-  background: var(--wl-gold-soft);
-  color: var(--wl-gold);
-  border: 1px solid rgba(255, 209, 102, 0.4);
-  box-shadow: 0 0 0 3px rgba(255, 209, 102, 0.12), var(--shadow-card);
-  text-shadow: 0 1px 8px rgba(233, 168, 37, 0.25);
+  background: rgba(14, 165, 233, 0.12);
+  color: var(--accent, #0EA5E9);
+  border: 1px solid rgba(14, 165, 233, 0.35);
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.12), var(--shadow-card);
 }
 
 .user-role-pill--sales {

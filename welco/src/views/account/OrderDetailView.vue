@@ -102,7 +102,7 @@ function statusIndex(o: OrderDto): number {
           <div class="items-stack">
             <article v-for="it in order.items" :key="it.id" class="line-item-row">
               <div class="item-primary">
-                <h3 class="item-title">{{ localized(it.productNameEn, it.productNameEn) }}</h3>
+                <h3 class="item-title" dir="auto">{{ localized(it.productNameEn, it.productNameAr || it.productNameEn) }}</h3>
                 <div class="item-math mono">
                   <span>{{ t('account.qtyUnits', { count: it.quantity }) }}</span>
                   <span>•</span>

@@ -622,7 +622,7 @@ async function placeOrderFromQuote() {
   gap: 0.45rem;
   height: 44px;
   width: 100%;
-  background: var(--primary, #0F3D56);
+  background: var(--brand, #071520);
   color: #ffffff;
   border: none;
   border-radius: var(--radius-sm, 4px);
@@ -638,20 +638,20 @@ async function placeOrderFromQuote() {
   gap: 0.45rem;
   height: 44px;
   width: 100%;
-  background: var(--color-success, #16A34A);
+  background: var(--color-success, #059669);
   color: #ffffff;
   border: none;
   border-radius: var(--radius-sm, 4px);
   font-size: 13.5px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 2px 8px -1px rgba(25, 135, 84, 0.25);
+  box-shadow: 0 2px 8px -1px rgba(5, 150, 105, 0.25);
   transition: all 0.18s ease;
   margin-bottom: 0.65rem;
 }
 
 .btn-place-order:hover:not(:disabled) {
-  background: #15803D;
+  background: #047857;
   transform: translateY(-1px);
 }
 .btn-place-order:active:not(:disabled) {
@@ -666,8 +666,8 @@ async function placeOrderFromQuote() {
 
 .btn-view-order--secondary {
   background: var(--surface, #ffffff);
-  color: var(--primary, #0F3D56);
-  border: 1px solid var(--border, #D9E2EC);
+  color: var(--secondary, #00A389);
+  border: 1px solid var(--border, #D8E2EC);
 }
 
 .side-actions-stack {
@@ -683,8 +683,8 @@ async function placeOrderFromQuote() {
   gap: 0.45rem;
   height: 44px;
   background: var(--surface, #ffffff);
-  color: var(--fg-muted, #627D98);
-  border: 1px solid var(--border, #D9E2EC);
+  color: var(--fg-muted, #5A7184);
+  border: 1px solid var(--border, #D8E2EC);
   border-radius: var(--radius-sm, 4px);
   font-size: 13px;
   font-weight: 600;
@@ -693,9 +693,9 @@ async function placeOrderFromQuote() {
 }
 
 .btn-back-quotes:hover {
-  border-color: var(--primary, #0F3D56);
-  color: var(--primary, #0F3D56);
-  background: var(--brand-soft, #EDF4FF);
+  border-color: var(--secondary, #00A389);
+  color: var(--secondary, #00A389);
+  background: var(--brand-soft, #E8F8F5);
 }
 
 @media (max-width: 900px) {

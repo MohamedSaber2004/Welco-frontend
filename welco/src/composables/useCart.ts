@@ -88,7 +88,7 @@ async function syncToServer(): Promise<void> {
           serverCartId.value = null
           try { localStorage.removeItem('welco-cart-id') } catch {}
         }
-      } catch (err: unknown) {
+      } catch {
         serverCartId.value = null
         try { localStorage.removeItem('welco-cart-id') } catch {}
       }

@@ -39,7 +39,7 @@ const displayWorkingHours = computed(() => {
       <div class="footer__col">
         <h4>{{ t('footer.product') }}</h4>
         <router-link to="/marketplace" class="footer__link">{{ t('nav.marketplace') }}</router-link>
-        <router-link to="/catalog/most-selling" class="footer__link">{{ t('home.mostSellingTitle') }}</router-link>
+        <router-link to="/most-selling" class="footer__link">{{ t('home.mostSellingTitle') }}</router-link>
         <router-link to="/categories" class="footer__link">{{ t('marketplace.categoriesTitle') }}</router-link>
         <router-link to="/providers" class="footer__link">{{ t('nav.providers') }}</router-link>
         <router-link to="/certifications" class="footer__link">{{ t('nav.certifications') }}</router-link>
@@ -115,7 +115,7 @@ const displayWorkingHours = computed(() => {
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, #0F3D56 0%, #147D92 45%, #28A7A1 100%);
+  background: linear-gradient(90deg, #071520 0%, #00A389 50%, #0EA5E9 100%);
   display: block !important;
 }
 .footer__inner {
@@ -139,7 +139,7 @@ const displayWorkingHours = computed(() => {
   height: 32px;
   width: auto;
   border-radius: 6px;
-  border: 1px solid #D9E2EC;
+  border: 1px solid #D8E2EC;
   background: #FFFFFF;
 }
 
@@ -147,7 +147,7 @@ const displayWorkingHours = computed(() => {
   font-family: var(--wl-font-display);
   font-size: 1.25rem;
   font-weight: 800;
-  color: #0F3D56;
+  color: #071520;
   letter-spacing: -0.015em;
 }
 
@@ -168,9 +168,9 @@ const displayWorkingHours = computed(() => {
 .footer-badge {
   font-size: 11px;
   font-weight: 700;
-  color: #0F3D56;
-  background: #F0F7FF;
-  border: 1px solid #BAE3FF;
+  color: #00A389;
+  background: #E8F8F5;
+  border: 1px solid rgba(0, 163, 137, 0.3);
   padding: 0.25rem 0.6rem;
   border-radius: 6px;
   letter-spacing: 0.03em;
@@ -182,7 +182,7 @@ const displayWorkingHours = computed(() => {
   font-size: 12.5px;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: #0F3D56;
+  color: #071520;
   margin-bottom: 1.1rem;
   font-weight: 800;
 }
@@ -198,7 +198,7 @@ const displayWorkingHours = computed(() => {
 }
 
 .footer__link:hover {
-  color: #147D92;
+  color: #00A389;
   transform: translateX(3px);
   font-weight: 600;
 }

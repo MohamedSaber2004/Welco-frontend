@@ -78,7 +78,7 @@ onMounted(async () => {
 
           <div class="items-list">
             <div v-for="it in order.items" :key="it.id" class="item-row">
-              <div class="item-name">{{ it.productNameEn }}</div>
+              <div class="item-name" dir="auto">{{ locale === 'ar' ? (it.productNameAr || it.productNameEn) : (it.productNameEn || it.productNameAr) }}</div>
               <div class="item-calc mono">
                 <span class="item-qty">{{ it.quantity }} × {{ formatPrice(it.unitPrice, locale) }}</span>
                 <strong class="item-subtotal">
@@ -99,7 +99,7 @@ onMounted(async () => {
         <section class="actions-card">
           <h3 class="actions-title mono">{{ t('commerce.nextSteps') }}</h3>
           <p class="actions-desc">
-            Your clinical purchase order is queued for QA verification and export clearance. Trace the shipment in real time.
+            {{ t('commerce.nextStepsDesc') }}
           </p>
 
           <div class="action-buttons-stack">
@@ -180,18 +180,30 @@ onMounted(async () => {
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.confirm-hero-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  inset-inline: 0;
+  height: 2.5px;
+  background: linear-gradient(90deg, var(--secondary, #00A389), var(--accent, #0EA5E9));
 }
 
 .check-halo {
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: var(--wl-success-soft);
-  border: 1px solid rgba(87, 242, 135, 0.35);
-  color: var(--wl-success);
+  background: rgba(0, 163, 137, 0.12);
+  border: 1px solid rgba(0, 163, 137, 0.35);
+  color: var(--secondary, #00A389);
   display: grid;
   place-items: center;
   margin-bottom: 0.5rem;
+  box-shadow: 0 0 20px -4px rgba(0, 163, 137, 0.25);
 }
 
 .head-chip {
@@ -200,9 +212,9 @@ onMounted(async () => {
   gap: 0.45rem;
   font-size: 10px;
   font-weight: 700;
-  color: var(--wl-primary);
+  color: var(--secondary, #00A389);
   background: var(--wl-primary-soft);
-  border: 1px solid rgba(var(--wl-primary-rgb), 0.3);
+  border: 1px solid var(--border-subtle, rgba(0, 163, 137, 0.3));
   padding: 0.2rem 0.6rem;
   border-radius: 9999px;
   letter-spacing: 0.06em;
@@ -212,7 +224,7 @@ onMounted(async () => {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--wl-primary);
+  background: var(--secondary, #00A389);
 }
 
 .confirm-title {
@@ -394,20 +406,22 @@ onMounted(async () => {
   gap: 0.45rem;
   height: 48px;
   padding: 0 1.25rem;
-  background: var(--wl-primary);
-  color: var(--wl-on-primary);
-  border: none;
+  background: var(--secondary, #00A389);
+  color: #ffffff;
+  border: 1px solid var(--secondary, #00A389);
   border-radius: var(--radius-md, 6px);
   font-size: 13.5px;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 4px 12px -2px rgba(105, 169, 255, 0.35);
+  box-shadow: 0 4px 14px -2px rgba(0, 163, 137, 0.35);
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .btn-primary-action:hover {
-  background: var(--wl-primary-hover);
+  background: var(--secondary-hover, #008872);
+  border-color: var(--secondary-hover, #008872);
   transform: translateY(-1px);
+  box-shadow: 0 6px 18px -2px rgba(0, 163, 137, 0.45);
 }
 
 .btn-secondary-action {

@@ -8,26 +8,26 @@
 @import './design-tokens.css';
 
 :root {
-  /* ChatGPT Direct Token Aliases (Clinical Precision Spec) */
-  --color-primary: #0F3D56;
-  --color-primary-deep: #001D32;
-  --color-primary-light: #E3EFFF;
-  --color-steel-teal: #147D92;
-  --color-surgical-cyan: #28A7A1;
-  --color-canvas: #F7F9FB;
+  /* ChatGPT Direct Token Aliases (Surgical Obsidian & Laser Teal Spec) */
+  --color-primary: #071520;
+  --color-primary-deep: #030B12;
+  --color-primary-light: #E8F8F5;
+  --color-steel-teal: #00A389;
+  --color-surgical-cyan: #0EA5E9;
+  --color-canvas: #F4F7FA;
   --color-white: #FFFFFF;
-  --color-brand-ice: #EDF4FF;
-  --color-heading: #102A43;
-  --color-body: #42474D;
-  --color-muted: #7A90A8;
-  --color-border: #D9E2EC;
-  --color-border-strong: #C2C7CD;
-  --color-focus: #0EA5E9;
-  --color-success: #16A34A;
+  --color-brand-ice: #E8F8F5;
+  --color-heading: #071520;
+  --color-body: #334E68;
+  --color-muted: #5A7184;
+  --color-border: #D8E2EC;
+  --color-border-strong: #BAC7D5;
+  --color-focus: #00A389;
+  --color-success: #059669;
   --color-warning: #D97706;
-  --color-danger: #EF4444;
+  --color-danger: #E11D48;
   --color-surface-subtle: #F8FAFC;
-  --gradient-brand: linear-gradient(135deg, #0F3D56 0%, #147D92 100%);
+  --gradient-brand: linear-gradient(135deg, #071520 0%, #00A389 100%);
   color-scheme: light;
 
   /* ChatGPT Typography Scale */
@@ -70,8 +70,8 @@
   --primary: var(--brand);
   --primary-hover: var(--brand-hover);
   --primary-soft: var(--brand-soft);
-  --gold: var(--fg-warning);
-  --gold-soft: var(--color-warning-100);
+  --gold: var(--secondary);
+  --gold-soft: var(--secondary-soft);
   --success: var(--fg-success);
   --success-soft: var(--color-success-100);
   --danger: var(--fg-danger);
@@ -88,12 +88,12 @@
   --wl-gradient-rail: var(--bg-surface);
   --wl-gradient-card: var(--bg-surface);
   --wl-gradient-panel: var(--bg-surface);
-  --wl-gradient-primary: var(--brand-gradient, linear-gradient(135deg, #0F3D56 0%, #147D92 100%));
-  --wl-gradient-gold: var(--brand-gradient, linear-gradient(135deg, #0F3D56 0%, #147D92 100%));
+  --wl-gradient-primary: var(--brand-gradient, linear-gradient(135deg, #071520 0%, #00A389 100%));
+  --wl-gradient-gold: linear-gradient(135deg, #00A389 0%, #0EA5E9 100%);
   --wl-gradient-table-head: var(--bg-subtle);
   --wl-gradient-toolbar: var(--bg-surface);
   --wl-gradient-chip: var(--bg-subtle);
-  --wl-laser-sweep: linear-gradient(90deg, transparent, var(--secondary, #147D92), transparent);
+  --wl-laser-sweep: linear-gradient(90deg, transparent, var(--secondary, #00A389), transparent);
 
   /* Shadows → Clinical Precision elevation */
   --shadow-card: var(--shadow-sm);
@@ -103,7 +103,7 @@
   --shadow-xl: var(--shadow-lg);
 
   /* Headings & Title effects — Clinical authority */
-  --wl-gold-text: var(--color-steel-teal, #147D92);
+  --wl-gold-text: var(--color-steel-teal, #00A389);
   --wl-gold-text-shadow: none;
   --wl-gold-title-shadow: var(--shadow-xs);
   --wl-gold-glow-soft: none;
@@ -117,30 +117,30 @@
   --wl-primary-glow: var(--ring-focus);
   --wl-focus-ring: var(--ring-focus);
   --wl-focus-ring-danger: 0 0 0 2px #FFFFFF, 0 0 0 4px var(--fg-danger);
-  --wl-gold-ring: 0 0 0 2px #FFFFFF, 0 0 0 4px var(--fg-warning);
+  --wl-gold-ring: 0 0 0 2px #FFFFFF, 0 0 0 4px var(--secondary);
   --wl-gold-glow-soft: var(--shadow-xs);
 
   /* ── Backward-compatible aliases ── */
   --wl-primary: var(--brand);
   --wl-primary-hover: var(--brand-hover);
   --wl-primary-soft: var(--brand-soft);
-  --wl-primary-rgb: 15, 61, 86;
+  --wl-primary-rgb: 7, 21, 32;
   --wl-accent: var(--secondary);
   --wl-accent-hover: var(--secondary-hover);
   --wl-accent-soft: var(--secondary-soft);
-  --wl-accent-rgb: 20, 125, 146;
+  --wl-accent-rgb: 0, 163, 137;
   --wl-success: var(--fg-success);
   --wl-success-soft: var(--color-success-100);
-  --wl-success-rgb: 25, 135, 84;
+  --wl-success-rgb: 5, 150, 105;
   --wl-danger: var(--fg-danger);
   --wl-danger-soft: var(--color-danger-100);
-  --wl-danger-rgb: 220, 53, 69;
+  --wl-danger-rgb: 225, 29, 72;
   --wl-warning: var(--fg-warning);
   --wl-warning-soft: var(--color-warning-100);
-  --wl-warning-rgb: 230, 126, 34;
+  --wl-warning-rgb: 217, 119, 6;
   --wl-info: var(--fg-info);
   --wl-info-soft: var(--color-info-100);
-  --wl-info-rgb: 20, 125, 146;
+  --wl-info-rgb: 14, 165, 233;
   --wl-muted: var(--fg-subtle);
   --wl-muted-soft: var(--fg-placeholder);
   --wl-ink: var(--fg-body);
@@ -165,18 +165,18 @@
   --wl-on-primary: var(--fg-on-brand);
   --wl-on-accent: var(--fg-on-brand);
   --wl-on-gold: var(--fg-on-brand);
-  --wl-gold: var(--fg-warning);
-  --wl-gold-hover: var(--color-warning-500);
-  --wl-gold-soft: var(--color-warning-100);
-  --wl-gold-rgb: 230, 126, 34;
+  --wl-gold: var(--secondary);
+  --wl-gold-hover: var(--secondary-hover);
+  --wl-gold-soft: var(--secondary-soft);
+  --wl-gold-rgb: 0, 163, 137;
   --wl-emerald: var(--fg-success);
   --wl-emerald-soft: var(--color-success-100);
-  --wl-emerald-rgb: 25, 135, 84;
+  --wl-emerald-rgb: 5, 150, 105;
   --wl-emerald-faint: var(--color-success-100);
   --wl-teal: var(--secondary);
   --wl-teal-soft: var(--secondary-soft);
   --wl-teal-dark: var(--secondary-hover);
-  --wl-teal-faint: var(--color-teal-100);
+  --wl-teal-faint: var(--color-brand-100);
   --wl-rose: var(--fg-danger);
   --wl-rose-soft: var(--color-danger-100);
   --wl-rose-faint: var(--color-danger-100);
@@ -184,15 +184,15 @@
   --wl-danger-faint: var(--color-danger-100);
   --wl-indigo: var(--brand);
   --wl-indigo-soft: var(--brand-soft);
-  --wl-indigo-light: var(--color-primary-light, #E3EFFF);
-  --wl-primary-light: var(--color-steel-teal, #147D92);
-  --wl-primary-active: var(--color-steel-teal, #147D92);
-  --wl-cyan: var(--color-surgical-cyan, #28A7A1);
-  --wl-sky: var(--secondary);
-  --wl-sky-soft: var(--secondary-soft);
-  --wl-blue: var(--color-primary, #0F3D56);
+  --wl-indigo-light: var(--color-primary-light, #E8F8F5);
+  --wl-primary-light: var(--color-steel-teal, #00A389);
+  --wl-primary-active: var(--color-steel-teal, #00A389);
+  --wl-cyan: var(--color-surgical-cyan, #0EA5E9);
+  --wl-sky: var(--tertiary);
+  --wl-sky-soft: var(--tertiary-soft);
+  --wl-blue: var(--color-primary, #071520);
   --wl-blue-soft: var(--color-brand-100);
-  --wl-gold-light: var(--color-warning-500);
+  --wl-gold-light: var(--secondary);
   --wl-admin: var(--brand);
   --wl-admin-soft: var(--brand-soft);
   --wl-radius-xs: var(--radius-xs, 3px);

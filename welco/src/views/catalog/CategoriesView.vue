@@ -157,11 +157,11 @@ const navigateToCategory = (catId: string) => {
 
         <div class="sort-wrapper">
           <span class="material-symbols-outlined sort-icon">sort</span>
-          <select v-model="sortBy" class="sort-select mono">
-            <option value="countDesc">Highest Count</option>
-            <option value="countAsc">Lowest Count</option>
-            <option value="nameAsc">Name (A-Z)</option>
-            <option value="nameDesc">Name (Z-A)</option>
+          <select v-model="sortBy" class="sort-select mono" :aria-label="t('marketplace.sortNewest')">
+            <option value="countDesc">{{ locale === 'ar' ? 'الأعلى عدداً' : 'Highest Count' }}</option>
+            <option value="countAsc">{{ locale === 'ar' ? 'الأقل عدداً' : 'Lowest Count' }}</option>
+            <option value="nameAsc">{{ locale === 'ar' ? 'الاسم (أ - ي)' : 'Name (A-Z)' }}</option>
+            <option value="nameDesc">{{ locale === 'ar' ? 'الاسم (ي - أ)' : 'Name (Z-A)' }}</option>
           </select>
         </div>
       </div>

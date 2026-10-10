@@ -9,7 +9,6 @@ import { useWishlist } from '../../composables/useWishlist'
 import { toastService } from '../../infrastructure/feedback/toast.service'
 import SkeletonLoader from '../../components/ui/SkeletonLoader.vue'
 import DataState from '../../components/ui/DataState.vue'
-import StatusPill from '../../components/ui/StatusPill.vue'
 import { productMediaUrl } from '../../utils/file-url'
 import BackButton from '../../components/ui/BackButton.vue'
 import AppPagination from '../../components/ui/AppPagination.vue'
@@ -461,12 +460,9 @@ const filteredSidebarCategories = computed(() => {
   font-family: var(--wl-font-display);
   font-size: clamp(1.9rem, 3.5vw, 2.6rem);
   font-weight: 800;
-  background: var(--wl-gradient-gold);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--wl-ink-strong);
   margin: var(--space-2) 0 var(--space-1);
-  line-height: 0.98;
+  line-height: 1.05;
   letter-spacing: -0.032em;
 }
 .catalog-head { position: relative; }
@@ -517,6 +513,7 @@ const filteredSidebarCategories = computed(() => {
 .cat-pill:hover:not(:disabled) {
   border-color: var(--wl-primary);
   color: var(--wl-primary);
+  background: var(--wl-surface-soft);
 }
 
 .cat-pill:focus-visible {
@@ -526,9 +523,9 @@ const filteredSidebarCategories = computed(() => {
 
 .cat-pill.is-active {
   background: var(--wl-primary);
-  color: var(--wl-on-primary);
+  color: #ffffff;
   border-color: var(--wl-primary);
-  box-shadow: var(--shadow-card);
+  box-shadow: 0 2px 8px -2px rgba(0, 163, 137, 0.4);
 }
 
 .pill-badge {
@@ -704,7 +701,7 @@ const filteredSidebarCategories = computed(() => {
   font-weight: 600;
   color: var(--wl-primary);
   background: var(--wl-primary-soft);
-  border: 1px solid rgba(var(--wl-primary-rgb, 105, 169, 255), 0.25);
+  border: 1px solid var(--border-subtle, rgba(0, 163, 137, 0.25));
   padding: var(--space-1) var(--space-2);
   border-radius: var(--radius-sm);
   cursor: pointer;
@@ -1177,13 +1174,13 @@ const filteredSidebarCategories = computed(() => {
 }
 
 .card-action-btn--quote {
-  background: var(--brand, #0F3D56);
+  background: var(--secondary, #00A389);
   color: #ffffff;
-  border: 1px solid var(--brand, #0F3D56);
+  border: 1px solid var(--secondary, #00A389);
 }
 .card-action-btn--quote:hover {
-  background: var(--brand-hover, #147D92);
-  border-color: var(--brand-hover, #147D92);
+  background: var(--secondary-hover, #008872);
+  border-color: var(--secondary-hover, #008872);
 }
 .card-action-btn:active {
   transform: scale(0.97);
@@ -1407,9 +1404,11 @@ const filteredSidebarCategories = computed(() => {
 }
 
 .catalog-card__price {
-  color: #0F3D56 !important;
+  color: #071520 !important;
+  font-family: var(--font-mono) !important;
   font-size: 1.25rem !important;
   font-weight: 800 !important;
+  font-variant-numeric: tabular-nums !important;
 }
 
 .catalog-card__actions {
@@ -1433,7 +1432,7 @@ const filteredSidebarCategories = computed(() => {
 .card-action-btn--view {
   background: #F8FAFC !important;
   border: 1px solid #E2E8F0 !important;
-  color: #102A43 !important;
+  color: #071520 !important;
 }
 
 .card-action-btn--view:hover:not(:disabled) {
@@ -1443,18 +1442,18 @@ const filteredSidebarCategories = computed(() => {
 }
 
 .card-action-btn--quote {
-  background: #0F3D56 !important;
-  border: 1px solid #0F3D56 !important;
+  background: #00A389 !important;
+  border: 1px solid #00A389 !important;
   color: #FFFFFF !important;
-  box-shadow: 0 2px 8px rgba(15, 61, 86, 0.2) !important;
+  box-shadow: 0 2px 8px rgba(0, 163, 137, 0.25) !important;
 }
 
 .card-action-btn--quote:hover:not(:disabled) {
-  background: #147D92 !important;
-  border-color: #147D92 !important;
+  background: #008872 !important;
+  border-color: #008872 !important;
   color: #FFFFFF !important;
   transform: translateY(-1px) !important;
-  box-shadow: 0 4px 14px rgba(20, 125, 146, 0.3) !important;
+  box-shadow: 0 4px 14px rgba(0, 163, 137, 0.35) !important;
 }
 
 /* Sidebar Elevation */

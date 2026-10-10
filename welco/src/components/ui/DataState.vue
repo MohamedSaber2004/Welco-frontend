@@ -72,9 +72,9 @@ const props = withDefaults(
     emptyStatus: undefined,
     fill: false,
     compact: false,
-    errorTitle: 'Something went wrong',
-    errorMessage: 'Unable to load data. Please check your connection and try again.',
-    retryText: 'Retry',
+    errorTitle: undefined,
+    errorMessage: undefined,
+    retryText: undefined,
     errorCode: undefined,
     useSpinner: false,
     spinnerLabel: '',
@@ -168,12 +168,12 @@ const emptyCopy = computed(() => {
   if (props.title) return { title: props.title, description: props.description }
   switch (resolvedEmptyVariant.value) {
     case 'no-results':
-      return { title: 'No results', description: 'No items match your search.' }
+      return { title: t('common.noData'), description: t('marketplace.noProductsDesc') }
     case 'cleared':
-      return { title: 'All caught up', description: undefined }
+      return { title: t('common.operationDone'), description: undefined }
     case 'first-use':
     default:
-      return { title: 'No items yet', description: 'Add your first to start tracking.' }
+      return { title: t('common.noData'), description: undefined }
   }
 })
 
@@ -181,8 +181,9 @@ const resolvedEmptyTitle = computed(() => emptyCopy.value.title)
 const resolvedEmptyDescription = computed(() => emptyCopy.value.description)
 
 /* ── Error-state copy helpers ─────────────────────────── */
-const errorTitle = computed(() => props.errorTitle || 'Something went wrong')
-const errorMessage = computed(() => props.errorMessage || 'Unable to load data. Please check your connection and try again.')
+const errorTitle = computed(() => props.errorTitle || t('common.loadFailed'))
+const errorMessage = computed(() => props.errorMessage || t('common.error'))
+const retryText = computed(() => props.retryText || t('common.retry'))
 
 /* ── Skeleton helpers ─────────────────────────────────── */
 const gridCount = computed(() => {

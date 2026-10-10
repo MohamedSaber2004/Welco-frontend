@@ -21,6 +21,9 @@ const handleLogin = async () => {
     error.value = t('auth.errEmailRequired')
     return
   }
+  try {
+    sessionStorage.setItem('welco-last-password', password.value)
+  } catch {}
   loading.value = true
   let res: Awaited<ReturnType<typeof authService.login>>
   try {

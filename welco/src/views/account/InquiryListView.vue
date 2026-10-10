@@ -173,7 +173,7 @@ onMounted(() => {
           :class="{ 'is-active': statusFilter === 'all' }"
           @click="setFilter('all')"
         >
-          <span>{{ locale === 'ar' ? 'الكل' : 'All' }}</span>
+          <span>{{ t('common.all') }}</span>
           <span class="tab-count">{{ totalCount }}</span>
         </button>
 
@@ -193,7 +193,7 @@ onMounted(() => {
           :class="{ 'is-active': statusFilter === 'pending' }"
           @click="setFilter('pending')"
         >
-          <span>{{ locale === 'ar' ? 'قيد الانتظار' : 'Pending' }}</span>
+          <span>{{ t('common.pending') }}</span>
           <span class="tab-count tab-count--warning">{{ pendingCount }}</span>
         </button>
       </div>
@@ -211,7 +211,7 @@ onMounted(() => {
           v-if="searchQuery"
           type="button"
           class="clear-btn"
-          :title="locale === 'ar' ? 'مسح البحث' : 'Clear search'"
+          :title="t('common.clearFilters')"
           @click="clearFilters"
         >
           <span class="material-symbols-outlined text-[16px]">close</span>
@@ -236,7 +236,7 @@ onMounted(() => {
         <p>{{ error }}</p>
       </div>
       <BaseButton size="sm" variant="outline" @click="loadData">
-        {{ locale === 'ar' ? 'إعادة المحاولة' : 'Retry' }}
+        {{ t('common.retry') }}
       </BaseButton>
     </div>
 
@@ -246,15 +246,15 @@ onMounted(() => {
         <span class="material-symbols-outlined text-[36px]">chat_bubble_outline</span>
       </div>
       <h3 class="empty-title">
-        {{ searchQuery || statusFilter !== 'all' ? (locale === 'ar' ? 'لا توجد نتائج مطابقة' : 'No matching inquiries') : t('account.noInquiriesYet') }}
+        {{ searchQuery || statusFilter !== 'all' ? t('common.noResults') : t('account.noInquiriesYet') }}
       </h3>
       <p class="empty-desc">
-        {{ searchQuery || statusFilter !== 'all' ? (locale === 'ar' ? 'جرب تغيير معايير البحث أو تصفية الحالة.' : 'Try adjusting your search query or status filter.') : t('pdp.inquiryHint') }}
+        {{ searchQuery || statusFilter !== 'all' ? t('common.searchResults') : t('pdp.inquiryHint') }}
       </p>
       <div class="empty-actions">
         <BaseButton v-if="searchQuery || statusFilter !== 'all'" variant="outline" size="sm" @click="clearFilters">
           <span class="material-symbols-outlined text-[16px]">restart_alt</span>
-          <span>{{ locale === 'ar' ? 'إعادة ضبط الفلتر' : 'Reset filters' }}</span>
+          <span>{{ t('common.clearFilters') }}</span>
         </BaseButton>
         <BaseButton v-else variant="primary" size="sm" @click="router.push({ name: 'marketplace' })">
           <span class="material-symbols-outlined text-[16px]">search</span>

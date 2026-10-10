@@ -1,62 +1,67 @@
 @import url("https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
 
 :root {
-  --color-primary: #0F3D56;
-  --color-primary-deep: #001D32;
-  --color-primary-light: #E3EFFF;
+  /* --------------------------------------------------------------------------
+     Welco — Surgical Obsidian & Electropolished Titanium Design System
+     Art Directed for Tier-1 Surgical & Hospital Procurement Platforms
+     -------------------------------------------------------------------------- */
+  --color-primary: #071520;       /* Surgical Obsidian Navy — Executive ink & deep authority */
+  --color-primary-deep: #030B12;  /* Pure Obsidian Pitch */
+  --color-primary-light: #E6F4F2; /* Laser Teal Ice container */
 
-  --color-steel-teal: #147D92;
-  --color-surgical-cyan: #28A7A1;
+  --color-steel-teal: #00A389;    /* Electropolished Laser Teal — Core Surgical Brand Accent */
+  --color-surgical-cyan: #0EA5E9; /* Cyan Telemetry Light — Focus halos & secondary telemetry */
 
-  --color-canvas: #F7F9FB;
-  --color-white: #FFFFFF;
-  --color-brand-ice: #EDF4FF;
+  --color-canvas: #F4F7FA;        /* Specular Sterile Canvas */
+  --color-white: #FFFFFF;         /* Specular Sterile White */
+  --color-brand-ice: #E8F8F5;     /* Pure Laser Ice tint */
 
-  --color-heading: #102A43;
-  --color-body: #42474D;
-  --color-muted: #7A90A8;
+  --color-heading: #071520;       /* High-contrast Obsidian Headings */
+  --color-body: #334E68;          /* High-legibility Clinical Slate Body */
+  --color-muted: #5A7184;         /* Suture Steel Grey / Technical DIN / SKU Metadata */
 
-  --color-border: #D9E2EC;
-  --color-border-strong: #C2C7CD;
+  --color-border: #D8E2EC;        /* Clinical Precision Hairline */
+  --color-border-strong: #BAC7D5; /* Specimen Tray Divide */
 
-  --color-focus: #0EA5E9;
+  --color-focus: #00A389;         /* Laser Teal Focus Halo */
 
   /* Semantic */
-  --color-success: #16A34A;
-  --color-warning: #D97706;
-  --color-danger: #EF4444;
+  --color-success: #059669;       /* ISO 13485 Verified Green */
+  --color-warning: #D97706;       /* Lot Tracing / Caution Amber */
+  --color-danger: #E11D48;        /* Critical Deviation / Out-of-Spec Rose */
 
   /* Optional surface */
   --color-surface-subtle: #F8FAFC;
 
   /* Brand gradient */
-  --gradient-brand: linear-gradient(135deg, #0F3D56 0%, #147D92 100%);
+  --gradient-brand: linear-gradient(135deg, #071520 0%, #00A389 100%);
+  --gradient-laser: linear-gradient(135deg, #00A389 0%, #0EA5E9 100%);
+  --gradient-obsidian: linear-gradient(180deg, #0D2235 0%, #071520 100%);
 
   /* Base scales */
-  --color-brand-50:  #EDF4FF;
-  --color-brand-100: #E3EFFF;
-  --color-brand-200: #C8E6FF;
-  --color-brand-300: #A3CBEA;
-  --color-brand-400: #80A8C5;
-  --color-brand-500: #147D92;
-  --color-brand-600: #0F3D56;
-  --color-brand-700: #0C3145;
-  --color-brand-800: #082434;
-  --color-brand-900: #001D32;
-
+  --color-brand-50:  #E8F8F5;
+  --color-brand-100: #D0F2EB;
+  --color-brand-200: #A2E5D8;
+  --color-brand-300: #67D2C1;
+  --color-brand-400: #2CBBA7;
+  --color-brand-500: #00A389;    /* Laser Teal Primary Accent */
+  --color-brand-600: #008872;
+  --color-brand-700: #006D5C;
+  --color-brand-800: #0A3D36;
+  --color-brand-900: #071520;    /* Obsidian */
 
   --color-neutral-0:   #FFFFFF;  /* Sterile clean white */
   --color-neutral-25:  #FCFDFE;
-  --color-neutral-50:  #F7F9FB;  /* Clinical canvas base */
-  --color-neutral-100: #EDF4FF;  /* Surface container low / subtle fill */
-  --color-neutral-200: #D9E2EC;  /* Border clinical hairline */
-  --color-neutral-300: #C2C7CD;  /* Outline variant / strong divide */
-  --color-neutral-400: #80A8C5;  /* Placeholder / subdued */
-  --color-neutral-500: #72787D;  /* Structural outline */
-  --color-neutral-600: #7a90a8;  /* Muted steel grey / metadata — lighter for ≥4.5:1 contrast */
-  --color-neutral-700: #42474D;  /* Body typography / on-surface-variant */
-  --color-neutral-800: #16334A;  /* Inverse surface */
-  --color-neutral-900: #102A43;  /* High-legibility ink primary / headings */
+  --color-neutral-50:  #F4F7FA;  /* Clinical canvas base */
+  --color-neutral-100: #EBF1F6;  /* Surface container low / subtle fill */
+  --color-neutral-200: #D8E2EC;  /* Border clinical hairline */
+  --color-neutral-300: #BAC7D5;  /* Outline variant / strong divide */
+  --color-neutral-400: #8295A8;  /* Placeholder / subdued */
+  --color-neutral-500: #5A7184;  /* Structural outline */
+  --color-neutral-600: #486581;  /* Muted steel grey / metadata (≥4.5:1 contrast) */
+  --color-neutral-700: #334E68;  /* Body typography / on-surface-variant */
+  --color-neutral-800: #102A43;  /* Elevated Obsidian surface */
+  --color-neutral-900: #071520;  /* High-legibility ink primary / headings */
 
   /* Surgical & Specialty Accents */
   --color-teal-500:   #147D92;
@@ -149,28 +154,31 @@
   --fg-subtle:     var(--color-neutral-500);  /* #72787D Structural outline text */
   --fg-placeholder:var(--color-neutral-400);  /* #80A8C5 Placeholder */
   --fg-on-brand:   var(--color-neutral-0);    /* #FFFFFF Contrast text on navy/teal */
-  --fg-link:       #147D92;                   /* Steel Teal interactive links */
+  --fg-link:       #00A389;                   /* Laser Teal precision interactive links */
 
-  /* Brand Hierarchy */
-  --brand:         #0F3D56;  /* Deep Medical Navy */
-  --brand-hover:   #147D92;  /* Steel Teal on hover */
-  --brand-soft:    #E3EFFF;  /* Container tint */
-  --brand-gradient: linear-gradient(135deg, #0F3D56 0%, #147D92 100%);
+  /* Brand Hierarchy — Surgical Obsidian & Electropolished Laser Teal */
+  --brand:         #071520;  /* Surgical Obsidian Navy */
+  --brand-hover:   #00A389;  /* Laser Teal on hover */
+  --brand-soft:    #E8F8F5;  /* Laser Teal Ice container tint */
+  --brand-accent:  #00A389;  /* Direct Laser Teal Accent */
+  --brand-accent-hover: #008872;
+  --brand-gradient: linear-gradient(135deg, #071520 0%, #00A389 100%);
+  --brand-surface: #0D2235;  /* Deep elevated tray */
 
   /* Secondary & Tertiary */
-  --secondary:       #147D92;  /* Steel Teal */
-  --secondary-hover: #00687A;
-  --secondary-soft:  #EDF4FF;
-  --tertiary:        #28A7A1;  /* Precision Surgical Cyan */
-  --tertiary-hover:  #00413E;
-  --tertiary-soft:   #D8EAFF;
+  --secondary:       #00A389;  /* Electropolished Laser Teal */
+  --secondary-hover: #008872;
+  --secondary-soft:  #E8F8F5;
+  --tertiary:        #0EA5E9;  /* Cyan Telemetry Light */
+  --tertiary-hover:  #0284C7;
+  --tertiary-soft:   #E0F2FE;
 
-  /* Borders — Hierarchy */
-  --border:        #D9E2EC;  /* Border clinical hairline 1px */
-  --border-strong: #C2C7CD;  /* Outline variant / structural divide */
-  --border-focus:  #0EA5E9;  /* Precision Teal focus boundary */
-  --border-error:  #EF4444;  /* Error state border */
-  --border-success: #16A34A; /* Success state border */
+  /* Borders — Hairline Precision */
+  --border:        #D8E2EC;  /* Border clinical hairline 1px */
+  --border-strong: #BAC7D5;  /* Outline variant / structural divide */
+  --border-focus:  #00A389;  /* Laser Teal focus boundary */
+  --border-error:  #E11D48;  /* Error state border */
+  --border-success: #059669; /* Success state border */
   --border-warning: #D97706; /* Warning state border */
 
   /* Feedback — Interactive States */
@@ -268,19 +276,21 @@
   --radius-pill: 9999px; /* Round avatar & icon button only */
 
   /* ------------------------------------------------------------------
-     7. Elevation — Professional Shadows with Depth
+     7. Elevation — Surgical Specular Inset & Laser Ambient Depths
      ------------------------------------------------------------------ */
-  --shadow-xs: 0 1px 2px rgba(16, 42, 67, 0.04);
-  --shadow-sm: 0 2px 6px rgba(16, 42, 67, 0.06);
-  --shadow-md: 0 6px 18px rgba(16, 42, 67, 0.08);
-  --shadow-lg: 0 12px 32px rgba(16, 42, 67, 0.10);
-  --shadow-xl: 0 20px 40px -4px rgba(16, 42, 67, 0.16), 0 8px 16px -2px rgba(16, 42, 67, 0.08);
-  --shadow-2xl: 0 25px 50px -12px rgba(16, 42, 67, 0.20);
-  --shadow-brand: 0 6px 18px rgba(15, 61, 86, 0.18);
-  --shadow-inner: inset 0 2px 4px rgba(16, 42, 67, 0.05);
-  --ring-focus: 0 0 0 3px rgba(15, 61, 86, 0.1), 0 0 0 4px #147D92;
-  --ring-focus-error: 0 0 0 3px rgba(239, 68, 68, 0.1), 0 0 0 4px #EF4444;
-  --ring-focus-success: 0 0 0 3px rgba(22, 163, 74, 0.1), 0 0 0 4px #16A34A;
+  --shadow-xs: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 1px 2px rgba(7, 21, 32, 0.04);
+  --shadow-sm: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 2px 6px rgba(7, 21, 32, 0.05), 0 1px 2px rgba(7, 21, 32, 0.03);
+  --shadow-md: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 6px 16px -2px rgba(7, 21, 32, 0.07), 0 2px 6px rgba(7, 21, 32, 0.04);
+  --shadow-lg: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 14px 30px -4px rgba(7, 21, 32, 0.10), 0 4px 10px rgba(7, 21, 32, 0.05);
+  --shadow-xl: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 24px 48px -8px rgba(7, 21, 32, 0.16), 0 8px 16px rgba(7, 21, 32, 0.06);
+  --shadow-2xl: 0 32px 64px -12px rgba(7, 21, 32, 0.22);
+  --shadow-brand: 0 6px 20px -2px rgba(0, 163, 137, 0.28), 0 2px 6px rgba(7, 21, 32, 0.12);
+  --shadow-tray: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 2px 8px -2px rgba(7, 21, 32, 0.06);
+  --shadow-tray-hover: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 12px 28px -4px rgba(7, 21, 32, 0.09), 0 2px 6px rgba(0, 163, 137, 0.14);
+  --shadow-inner: inset 0 2px 4px rgba(7, 21, 32, 0.06);
+  --ring-focus: 0 0 0 3px rgba(0, 163, 137, 0.18), 0 0 0 4px #00A389;
+  --ring-focus-error: 0 0 0 3px rgba(225, 29, 72, 0.18), 0 0 0 4px #E11D48;
+  --ring-focus-success: 0 0 0 3px rgba(5, 150, 105, 0.18), 0 0 0 4px #059669;
 
   /* ------------------------------------------------------------------
      8. Layout

@@ -14,7 +14,7 @@ import BackButton from '../../components/ui/BackButton.vue'
 import BaseModal from '../../components/ui/BaseModal.vue'
 import EmptyState from '../../components/ui/EmptyState.vue'
 import AppImage from '../../components/ui/AppImage.vue'
-import { productMediaUrl, resolveFileUrl, PLACEHOLDER, PLACEHOLDER_PNG, parseVideoSource } from '../../utils/file-url'
+import { resolveFileUrl, PLACEHOLDER, PLACEHOLDER_PNG, parseVideoSource } from '../../utils/file-url'
 import { formatPrice } from '../../utils/format'
 
 const route = useRoute()
@@ -820,8 +820,8 @@ const resolvedDescription = computed(() => {
             </div>
             <EmptyState
               v-else
-              title="No demonstration videos"
-              description="Clinical handling and demonstration videos for this instrument are being uploaded by our surgical education team."
+              :title="t('pdp.videoDemo')"
+              :description="t('pdp.videoComingSoon')"
             />
           </div>
         </div>
@@ -865,7 +865,7 @@ const resolvedDescription = computed(() => {
           </div>
 
           <div class="field field--full">
-            <label class="mono">Email Address</label>
+            <label class="mono">{{ t('auth.email') }}</label>
             <input
               v-model="inquiryEmail"
               type="email"
@@ -1248,13 +1248,13 @@ const resolvedDescription = computed(() => {
 }
 
 .pdp-image-viewport:hover .pdp-inspect-trigger {
-  background: var(--brand, #0F3D56);
+  background: var(--brand, #071520);
   color: #ffffff;
-  border-color: var(--brand, #0F3D56);
+  border-color: var(--secondary, #00A389);
 }
 
 .pdp-inspect-trigger:focus-visible {
-  outline: 2px solid var(--brand, #0F3D56);
+  outline: 2px solid var(--secondary, #00A389);
   outline-offset: 2px;
 }
 
@@ -1419,7 +1419,7 @@ const resolvedDescription = computed(() => {
 }
 
 .pdp-provider-chip .provider-name.is-link {
-  color: var(--secondary, #147D92);
+  color: var(--secondary, #00A389);
   text-decoration: underline;
   text-underline-offset: 3px;
   cursor: pointer;
@@ -1427,7 +1427,7 @@ const resolvedDescription = computed(() => {
 }
 
 .pdp-provider-chip .provider-name.is-link:hover {
-  color: var(--brand, #0F3D56);
+  color: var(--secondary-hover, #008872);
 }
 
 .pdp-manufacturer-chip {
@@ -1508,7 +1508,7 @@ const resolvedDescription = computed(() => {
   top: 0;
   inset-inline: 0;
   height: 2.5px;
-  background: var(--wl-gradient-gold);
+  background: linear-gradient(90deg, var(--secondary, #00A389), var(--accent, #0EA5E9));
   opacity: 0.95;
 }
 
@@ -2055,8 +2055,8 @@ const resolvedDescription = computed(() => {
   top: 0;
   inset-inline: 0;
   height: 2.5px;
-  background: var(--wl-gradient-gold);
-  opacity: 0.85;
+  background: linear-gradient(90deg, var(--secondary, #00A389), var(--accent, #0EA5E9));
+  opacity: 0.95;
 }
 
 .inquiry-eyebrow {

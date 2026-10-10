@@ -86,6 +86,10 @@ const router = createRouter({
       redirect: '/marketplace',
     },
     {
+      path: '/catalog/most-selling',
+      redirect: '/most-selling',
+    },
+    {
       path: '/categories',
       name: 'categories',
       component: () => import('../views/catalog/CategoriesView.vue'),
@@ -234,6 +238,10 @@ const router = createRouter({
       name: 'help-my-tickets',
       component: () => import('../views/support/MyTicketsView.vue'),
       meta: { titleKey: 'nav.help', requiresAuth: true, hideFooter: true },
+    },
+    {
+      path: '/support',
+      redirect: '/help',
     },
     {
       path: '/catalog/:slug',

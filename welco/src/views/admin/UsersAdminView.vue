@@ -213,12 +213,12 @@ const submitPassword = async () => {
 }
 
 const getAvatarColor = (name?: string): string => {
-  // Clinical Precision series: deep medical navy, steel teal, precision cyan, amber, green, muted slate
-  const colors = ['#0F3D56', '#147D92', '#28A7A1', '#E67E22', '#198754', '#627D98']
-  if (!name) return '#0F3D56'
+  // Surgical Obsidian & Laser Teal series
+  const colors = ['#071520', '#00A389', '#0EA5E9', '#D97706', '#059669', '#5A7184']
+  if (!name) return '#071520'
   let hash = 0
   for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash)
-  return colors[Math.abs(hash) % colors.length] ?? '#0F3D56'
+  return colors[Math.abs(hash) % colors.length] ?? '#071520'
 }
 
 const getAvatarTextColor = (bg: string): string => {
@@ -988,10 +988,10 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
 }
 
 .role-pill--admin {
-  background: var(--wl-gold-soft);
-  color: var(--wl-gold);
-  border: 1px solid rgba(255, 209, 102, 0.4);
-  box-shadow: 0 0 0 3px rgba(255, 209, 102, 0.1);
+  background: rgba(14, 165, 233, 0.12);
+  color: var(--accent, #0EA5E9);
+  border: 1px solid rgba(14, 165, 233, 0.35);
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.08);
 }
 
 .role-pill--sales {

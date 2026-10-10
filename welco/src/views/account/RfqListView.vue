@@ -314,19 +314,19 @@ onMounted(() => {
   align-items: center;
   gap: 0.45rem;
   padding: 0.65rem 1.15rem;
-  background: var(--brand, #0F3D56);
+  background: var(--secondary, #00A389);
   color: #ffffff;
-  border: 1px solid var(--brand, #0F3D56);
+  border: 1px solid var(--secondary, #00A389);
   border-radius: var(--radius-md, 6px);
   font-size: 13.5px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 2px 8px rgba(0, 163, 137, 0.25);
   transition: all 0.15s ease-out;
 }
 .btn-create-rfq:hover {
-  background: var(--brand-hover, #147D92);
-  border-color: var(--brand-hover, #147D92);
+  background: var(--secondary-hover, #008872);
+  border-color: var(--secondary-hover, #008872);
   transform: translateY(-1px);
 }
 .btn-create-rfq:active {

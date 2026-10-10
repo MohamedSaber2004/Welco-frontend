@@ -217,8 +217,8 @@ const toggleLang = async () => {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--wl-primary);
-  box-shadow: 0 0 0 3px rgba(var(--wl-primary-rgb), 0.16);
+  background: var(--secondary, #00A389);
+  box-shadow: 0 0 0 3px rgba(0, 163, 137, 0.22);
 }
 
 .rail__brand-text {
@@ -327,14 +327,14 @@ const toggleLang = async () => {
 }
 
 .admin-link--active {
-  background: var(--color-primary-light, #e3efff) !important;
-  color: var(--color-primary, #0f3d56) !important;
-  border-color: transparent !important;
+  background: var(--brand-soft, #E8F8F5) !important;
+  color: var(--secondary, #00A389) !important;
+  border-inline-start: 3px solid var(--secondary, #00A389) !important;
   font-weight: var(--weight-semibold, 600);
 }
 
 .admin-link--active .nav-icon {
-  color: var(--color-primary, #0f3d56);
+  color: var(--secondary, #00A389);
 }
 
 .rail__foot {

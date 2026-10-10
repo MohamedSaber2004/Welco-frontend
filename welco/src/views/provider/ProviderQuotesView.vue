@@ -138,7 +138,7 @@ const loadData = async () => {
   loading.value = true
   fetchError.value = ''
   try {
-    const [_, __, ___, inqPage] = await Promise.all([
+    const [, , , inqPage] = await Promise.all([
       companyService.loadMyCompany().catch(() => null),
       salesService.loadRfqs({ pageSize: 50 }),
       salesService.loadQuotes({ pageSize: 50 }),
@@ -476,8 +476,8 @@ const handleDecline = async (rfq: RfqDto) => {
           :class="{ 'is-active': tab === 'quotes' }"
           @click="tab = 'quotes'"
         >
-          <div class="kpi-icon-box bg-gold-soft">
-            <span class="material-symbols-outlined text-gold" aria-hidden="true">verified</span>
+          <div class="kpi-icon-box bg-teal-soft">
+            <span class="material-symbols-outlined text-teal" aria-hidden="true">verified</span>
           </div>
           <div class="kpi-info">
             <span class="kpi-label mono">{{ t('sales.quoteTitle') }}</span>
@@ -1265,8 +1265,9 @@ const handleDecline = async (rfq: RfqDto) => {
 }
 
 .kpi-card.is-active {
-  border-color: var(--wl-primary);
-  box-shadow: 0 4px 12px rgba(179, 139, 45, 0.1);
+  border-color: var(--secondary, #00A389);
+  box-shadow: 0 4px 14px rgba(0, 163, 137, 0.18);
+  background: var(--brand-soft, #E8F8F5);
 }
 
 .kpi-card--highlight.is-active {
@@ -1284,9 +1285,9 @@ const handleDecline = async (rfq: RfqDto) => {
 
 .bg-primary-soft { background: var(--wl-primary-soft); }
 .bg-emerald-soft { background: #ecfdf5; }
-.bg-gold-soft { background: #fefce8; }
+.bg-teal-soft { background: rgba(0, 163, 137, 0.12); }
 .bg-purple-soft { background: #f5f3ff; }
-.text-gold { color: #ca8a04; }
+.text-teal { color: var(--secondary, #00A389); }
 
 .inquiry-msg-box {
   display: flex;

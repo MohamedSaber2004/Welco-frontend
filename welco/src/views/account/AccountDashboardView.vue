@@ -390,7 +390,7 @@ onMounted(loadDashboard)
 
               <div class="quote-right">
                 <span class="quote-amount mono-num">
-                  ${{ formatPrice(r.total ?? 0, locale) }}
+                  {{ formatPrice(r.total ?? 0, locale) }} {{ r.requestedCurrency || r.currency || 'USD' }}
                 </span>
                 <StatusPill :status="r.status" />
               </div>
@@ -415,7 +415,7 @@ onMounted(loadDashboard)
               {{ userInquiries.length }}
             </span>
             <router-link to="/account/inquiries" class="view-all-link mono">
-              <span>{{ locale === 'ar' ? 'عرض الكل' : 'View All' }}</span>
+              <span>{{ t('common.viewAll') }}</span>
               <span class="icon--directional text-[14px]">→</span>
             </router-link>
           </div>
@@ -447,7 +447,7 @@ onMounted(loadDashboard)
                 class="inquiry-status-pill mono"
                 :class="inq.response ? 'status-responded' : 'status-pending'"
               >
-                {{ inq.response ? (locale === 'ar' ? 'تم الرد' : 'Responded') : (locale === 'ar' ? 'قيد الانتظار' : 'Pending') }}
+                {{ inq.response ? (locale === 'ar' ? 'تم الرد' : 'Responded') : t('common.pending') }}
               </span>
             </div>
 
@@ -630,11 +630,10 @@ onMounted(loadDashboard)
   align-items: center;
   gap: var(--space-2);
   font-size: var(--step--1);
-  color: var(--wl-gold);
+  color: var(--secondary, #00A389);
   font-weight: 700;
   letter-spacing: 0.08em;
   margin-bottom: var(--space-2);
-  text-shadow: var(--wl-gold-text-shadow);
 }
 
 .live-dot {
@@ -799,11 +798,10 @@ onMounted(loadDashboard)
       align-items: center;
       gap: var(--space-1);
       font-size: var(--step--1);
-      color: var(--wl-gold);
+      color: var(--secondary, #00A389);
       font-weight: 700;
       letter-spacing: 0.08em;
       margin-bottom: var(--space-1);
-      text-shadow: var(--wl-gold-text-shadow);
     }
 
     .pipeline-title {
@@ -811,8 +809,7 @@ onMounted(loadDashboard)
       font-size: 1.15rem;
       font-weight: 700;
       letter-spacing: -0.015em;
-      color: var(--wl-gold-text);
-      text-shadow: var(--wl-gold-text-shadow);
+      color: var(--wl-ink-strong);
       margin: 0;
     }
 
@@ -953,16 +950,14 @@ onMounted(loadDashboard)
       font-size: var(--step--1);
       font-weight: 700;
       letter-spacing: 0.08em;
-      color: var(--wl-gold);
+      color: var(--secondary, #00A389);
       margin-bottom: var(--space-1);
-      text-shadow: var(--wl-gold-text-shadow);
     }
 
     .card-title {
       font-size: var(--step-0);
       font-weight: 700;
-      color: var(--wl-gold-text);
-      text-shadow: var(--wl-gold-text-shadow);
+      color: var(--wl-ink-strong);
       margin: 0;
     }
 

@@ -1122,6 +1122,23 @@ const goToProduct = (id: string) => {
   }
   .sort-select-wrap {
     margin-left: 0;
+    margin-right: 0;
+    width: 100%;
+  }
+  [dir="rtl"] .sort-select-wrap {
+    margin-right: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .product-grid {
+    grid-template-columns: 1fr;
+  }
+  .product-card__foot {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .btn-quote-white {
     width: 100%;
   }
 }

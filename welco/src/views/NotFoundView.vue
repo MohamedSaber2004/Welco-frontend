@@ -43,7 +43,7 @@ const router = useRouter()
         <button
           type="button"
           class="btn btn-ghost btn-lg"
-          @click="router.push('/support')"
+          @click="router.push('/help')"
         >
           <span class="material-symbols-outlined">support_agent</span>
           <span>{{ t('nav.help') }}</span>

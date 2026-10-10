@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { authService } from '../../di/container'
 import { toastService } from '../../infrastructure/feedback/toast.service'
@@ -15,6 +15,25 @@ const confirmNewPassword = ref('')
 const showPassword = ref(false)
 const loading = ref(false)
 const error = ref('')
+
+onMounted(() => {
+  if (!email.value) {
+    try {
+      const s = sessionStorage.getItem('welco-forgot-email')
+      if (s) email.value = s
+    } catch {}
+  }
+  if (!token.value) {
+    try {
+      const s = sessionStorage.getItem('welco-forgot-token')
+      if (s) token.value = s
+    } catch {}
+  }
+  if (!email.value || !token.value) {
+    toastService.info(t('auth.errInvalidOtp'))
+    void router.replace({ name: 'forgot-password' })
+  }
+})
 
 const strength = computed(() => {
   if (!newPassword.value) return 0
@@ -40,6 +59,16 @@ const handleReset = async () => {
     error.value = t('auth.errPasswordMin')
     return
   }
+
+  // Prevent reusing the current/last password
+  const lastPassword = typeof window !== 'undefined'
+    ? (sessionStorage.getItem('welco-last-password') || localStorage.getItem('welco-last-password'))
+    : null
+  if (lastPassword && newPassword.value === lastPassword) {
+    error.value = t('auth.errPasswordSameAsCurrent')
+    return
+  }
+
   loading.value = true
   let res: Awaited<ReturnType<typeof authService.resetPassword>>
   try {
@@ -53,10 +82,27 @@ const handleReset = async () => {
     loading.value = false
   }
   if (res.ok) {
+    try {
+      sessionStorage.setItem('welco-last-password', newPassword.value)
+    } catch {}
     toastService.success(t('auth.passwordChanged'))
     await router.push({ name: 'login' })
   } else {
-    error.value = res.error
+    const errLow = (res.error || '').toLowerCase()
+    if (
+      errLow.includes('same') ||
+      errLow.includes('previous') ||
+      errLow.includes('current') ||
+      errLow.includes('reuse') ||
+      errLow.includes('history') ||
+      errLow.includes('نفس') ||
+      errLow.includes('السابقة') ||
+      errLow.includes('الحالية')
+    ) {
+      error.value = t('auth.errPasswordSameAsCurrent')
+    } else {
+      error.value = res.error
+    }
   }
 }
 </script>
@@ -82,32 +128,13 @@ const handleReset = async () => {
         </div>
       </nav>
 
+      <!-- Verified Email Target Chip (Readonly reference) -->
+      <div v-if="email" class="verified-account-badge mono">
+        <span class="material-symbols-outlined text-[15px]">verified_user</span>
+        <span class="verified-account-text">{{ email }}</span>
+      </div>
+
       <form class="auth-form-body" @submit.prevent="handleReset" novalidate>
-        <div class="form-group">
-          <label class="form-label mono" for="reset-email">{{ t('auth.email') }}</label>
-          <input
-            id="reset-email"
-            v-model="email"
-            type="email"
-            required
-            autocomplete="email"
-            :placeholder="t('auth.emailPlaceholder')"
-            class="vip-input"
-          />
-        </div>
-
-        <div class="form-group">
-          <label class="form-label mono" for="reset-token">{{ t('auth.otpCode') }}</label>
-          <input
-            id="reset-token"
-            v-model="token"
-            type="text"
-            required
-            placeholder="123456"
-            class="vip-input mono"
-          />
-        </div>
-
         <div class="form-group">
           <label class="form-label mono" for="reset-new-password">
             {{ t('auth.newPassword') }} <span class="req">*</span>
@@ -207,6 +234,29 @@ const handleReset = async () => {
   border-radius: 12px;
   padding: 0.6rem 0.85rem;
   font-size: 11px;
+}
+
+.verified-account-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--wl-surface-soft);
+  border: 1px solid var(--wl-border);
+  border-radius: var(--radius-md, 8px);
+  padding: 0.55rem 0.85rem;
+  font-size: 12px;
+  color: var(--wl-ink-strong);
+  word-break: break-all;
+}
+
+.verified-account-badge .material-symbols-outlined {
+  color: var(--secondary, #00A389);
+  flex-shrink: 0;
+}
+
+.verified-account-text {
+  font-weight: 600;
+  color: var(--wl-ink-strong);
 }
 
 .step-pill {

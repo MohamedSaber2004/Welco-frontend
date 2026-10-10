@@ -113,9 +113,9 @@ const totalSevenMonthOps = computed(() => {
 const territoryData = computed(() => {
   const max = Math.max(liveCounts.value.countries, liveCounts.value.cities, liveCounts.value.zones, 1)
   return [
-    { label: t('admin.countries'), value: liveCounts.value.countries, pct: Math.round((liveCounts.value.countries / max) * 100), color: 'var(--color-primary, #0F3D56)', icon: 'public', desc: t('admin.sovereignRoot') },
-    { label: t('admin.cities'), value: liveCounts.value.cities, pct: Math.round((liveCounts.value.cities / max) * 100), color: 'var(--color-steel-teal, #147D92)', icon: 'location_city', desc: t('admin.regionalHubs') },
-    { label: t('admin.zones'), value: liveCounts.value.zones, pct: Math.round((liveCounts.value.zones / max) * 100), color: 'var(--color-surgical-cyan, #28A7A1)', icon: 'my_location', desc: t('admin.deliveryAnchors') },
+    { label: t('admin.countries'), value: liveCounts.value.countries, pct: Math.round((liveCounts.value.countries / max) * 100), color: 'var(--color-primary, #071520)', icon: 'public', desc: t('admin.sovereignRoot') },
+    { label: t('admin.cities'), value: liveCounts.value.cities, pct: Math.round((liveCounts.value.cities / max) * 100), color: 'var(--secondary, #00A389)', icon: 'location_city', desc: t('admin.regionalHubs') },
+    { label: t('admin.zones'), value: liveCounts.value.zones, pct: Math.round((liveCounts.value.zones / max) * 100), color: 'var(--tertiary, #0EA5E9)', icon: 'my_location', desc: t('admin.deliveryAnchors') },
   ]
 })
 
@@ -133,9 +133,9 @@ const activeDonutSegment = ref<{ label: string; value: number; pct: number; colo
 
 const platformData = computed(() => {
   const items = [
-    { label: t('admin.products'), value: stats.value.products, color: 'var(--color-primary, #0F3D56)', to: '/marketplace' },
-    { label: t('admin.categoriesTitle'), value: stats.value.categories, color: 'var(--color-steel-teal, #147D92)', to: '/marketplace' },
-    { label: t('admin.users'), value: stats.value.users, color: 'var(--color-surgical-cyan, #28A7A1)', to: '/admin/users' },
+    { label: t('admin.products'), value: stats.value.products, color: 'var(--color-primary, #071520)', to: '/marketplace' },
+    { label: t('admin.categoriesTitle'), value: stats.value.categories, color: 'var(--secondary, #00A389)', to: '/marketplace' },
+    { label: t('admin.users'), value: stats.value.users, color: 'var(--tertiary, #0EA5E9)', to: '/admin/users' },
     { label: t('admin.distributorApps'), value: stats.value.pendingApps, color: 'var(--color-warning, #D97706)', to: '/admin/companies' },
   ]
   const total = items.reduce((s, i) => s + i.value, 0) || 1
@@ -496,14 +496,14 @@ onUnmounted(_removeListeners)
             <svg class="curve-chart-svg" viewBox="0 0 540 180" preserveAspectRatio="none">
               <defs>
                 <linearGradient id="curveGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#147D92" stop-opacity="0.25" />
-                  <stop offset="60%" stop-color="#147D92" stop-opacity="0.08" />
-                  <stop offset="100%" stop-color="#0F3D56" stop-opacity="0.0" />
+                  <stop offset="0%" stop-color="#00A389" stop-opacity="0.25" />
+                  <stop offset="60%" stop-color="#00A389" stop-opacity="0.08" />
+                  <stop offset="100%" stop-color="#071520" stop-opacity="0.0" />
                 </linearGradient>
                 <linearGradient id="laserStrokeGrad" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0%" stop-color="#0F3D56" />
-                  <stop offset="50%" stop-color="#147D92" />
-                  <stop offset="100%" stop-color="#28A7A1" />
+                  <stop offset="0%" stop-color="#071520" />
+                  <stop offset="50%" stop-color="#00A389" />
+                  <stop offset="100%" stop-color="#0EA5E9" />
                 </linearGradient>
               </defs>
 
@@ -1035,13 +1035,12 @@ onUnmounted(_removeListeners)
   font-size: 10.5px;
   font-weight: 700;
   letter-spacing: 0.08em;
-  color: var(--wl-gold);
+  color: var(--secondary, #00A389);
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
   margin-bottom: 0.35rem;
   text-transform: uppercase;
-  text-shadow: var(--wl-gold-text-shadow);
 }
 
 .chart-title {
@@ -1049,8 +1048,7 @@ onUnmounted(_removeListeners)
   font-size: 1.05rem;
   font-weight: 700;
   letter-spacing: -0.015em;
-  color: var(--wl-gold-text);
-  text-shadow: var(--wl-gold-text-shadow);
+  color: var(--wl-ink-strong);
   display: flex;
   align-items: center;
   gap: 0.5rem;

@@ -311,6 +311,7 @@ export type Messages = {
     errPasswordRequired: string
     errPasswordMin: string
     errPasswordMismatch: string
+    errPasswordSameAsCurrent: string
     errFullNameRequired: string
     errInvalidOtp: string
     errTooManyAttempts: string
@@ -1153,6 +1154,7 @@ export type Messages = {
     outOfStock: string
     relatedProducts: string
     wishlistTitle: string
+    wishlistSubtitle: string
     wishlistEmpty: string
     wishlistEmptyDesc: string
     wishlistCount: string
@@ -1247,6 +1249,7 @@ export type Messages = {
     orderPlaced: string
     orderConfirmationTitle: string
     orderConfirmationSubtitle: string
+    nextStepsDesc: string
     orderNumber: string
     trackingTitle: string
     trackingSubtitle: string

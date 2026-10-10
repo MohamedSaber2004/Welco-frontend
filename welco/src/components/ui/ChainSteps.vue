@@ -82,8 +82,8 @@ const activeIndex = computed(() => Math.min(props.current, props.steps.length - 
 }
 
 .chain-steps__node.is-active .chain-steps__ring {
-  border-color: var(--brand, #0f3d56);
-  box-shadow: 0 0 0 3px rgba(15, 61, 86, 0.12);
+  border-color: var(--secondary, #00A389);
+  box-shadow: 0 0 0 3px rgba(0, 163, 137, 0.2);
 }
 
 .chain-steps__node.is-active .chain-steps__ring::after {
@@ -92,7 +92,7 @@ const activeIndex = computed(() => Math.min(props.current, props.steps.length - 
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--brand, #0f3d56);
+  background: var(--secondary, #00A389);
 }
 
 /* Completed Step */
@@ -126,5 +126,29 @@ const activeIndex = computed(() => Math.min(props.current, props.steps.length - 
 
 .chain-steps--compact .chain-steps__node {
   gap: 0.35rem;
+}
+
+@media (max-width: 640px) {
+  .chain-steps {
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 0.25rem;
+  }
+  .chain-steps::-webkit-scrollbar {
+    display: none;
+  }
+  .chain-steps__node {
+    font-size: 0.72rem;
+    gap: 0.35rem;
+  }
+  .chain-steps__ring {
+    width: 18px;
+    height: 18px;
+  }
+  .chain-steps__link {
+    margin: 0 0.4rem;
+    min-width: 10px;
+  }
 }
 </style>

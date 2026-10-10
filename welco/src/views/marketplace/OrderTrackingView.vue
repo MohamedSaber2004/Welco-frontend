@@ -16,7 +16,8 @@ const order = ref<OrderDto | null>(null)
 const tracking = ref(false)
 const notFound = ref(false)
 
-const localized = (en: string, ar: string) => (locale.value === 'ar' ? ar : en)
+const localized = (en?: string | null, ar?: string | null) =>
+  locale.value === 'ar' ? ar || en || '' : en || ar || ''
 
 async function track() {
   if (!query.value.trim()) return
@@ -108,7 +109,7 @@ async function track() {
 
         <div class="stepper-zone">
           <ChainSteps
-            :steps="['Pending', 'Confirmed', 'Shipped', 'Delivered']"
+            :steps="[t('account.stepPending'), t('account.stepConfirmed'), t('account.stepShipped'), t('account.stepDelivered')]"
             :current="Math.max(0, ['Pending', 'Confirmed', 'Shipped', 'Delivered'].indexOf(order.status))"
           />
         </div>
@@ -126,12 +127,12 @@ async function track() {
         <div class="items-head">
           <span class="material-symbols-outlined text-[18px] text-indigo-600">inventory</span>
           <h3 class="items-title">{{ t('commerce.orderSummary') }}</h3>
-          <span class="mono items-count">({{ order.items.length }} items)</span>
+          <span class="mono items-count">({{ t('cart.itemsCount', { count: order.items.length }) }})</span>
         </div>
 
         <div class="line-items-stack">
           <div v-for="it in order.items" :key="it.id" class="line-item-row">
-            <div class="line-item-name">{{ localized(it.productNameEn, it.productNameEn) }}</div>
+            <div class="line-item-name" dir="auto">{{ localized(it.productNameEn, it.productNameAr) }}</div>
             <div class="line-item-meta mono">
               <span>{{ it.quantity }} × {{ formatPrice(it.unitPrice, locale) }} {{ order.currencyCode }}</span>
               <button

@@ -367,23 +367,22 @@ const goPage = (p: number) => {
   gap: 0.45rem;
   font-size: 10px;
   font-weight: 700;
-  color: var(--wl-gold);
-  background: var(--wl-gold-soft);
-  border: 1px solid rgba(255, 209, 102, 0.35);
+  color: var(--secondary, #00A389);
+  background: var(--wl-primary-soft);
+  border: 1px solid var(--border-subtle, rgba(0, 163, 137, 0.3));
   padding: 0.2rem 0.6rem;
   border-radius: 9999px;
   letter-spacing: 0.06em;
   width: fit-content;
   margin-bottom: 0.5rem;
-  text-shadow: var(--wl-gold-text-shadow);
 }
 
 .pulse-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--wl-gold);
-  box-shadow: var(--wl-gold-glow-soft);
+  background: var(--secondary, #00A389);
+  box-shadow: 0 0 8px rgba(0, 163, 137, 0.4);
 }
 
 .cert-hero {
@@ -415,11 +414,7 @@ const goPage = (p: number) => {
   font-weight: 800;
   letter-spacing: -0.03em;
   margin: 0;
-  background: var(--wl-gradient-gold);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  filter: var(--wl-gold-text-filter);
+  color: var(--wl-ink-strong);
   line-height: 1.1;
 }
 
@@ -502,8 +497,7 @@ const goPage = (p: number) => {
   font-weight: 800;
   letter-spacing: -0.025em;
   margin: 0.2rem 0 0;
-  color: var(--wl-gold-text);
-  text-shadow: var(--wl-gold-text-shadow);
+  color: var(--wl-ink-strong);
 }
 
 .count-badge {

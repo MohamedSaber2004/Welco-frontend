@@ -1727,19 +1727,19 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
 
 .quote-workflow-alert.is-awaiting {
   background: var(--wl-warning-soft);
-  border-color: rgba(254, 231, 92, 0.35);
+  border-color: rgba(217, 119, 6, 0.3);
   color: var(--wl-warning);
 }
 
 .quote-workflow-alert.is-approved {
   background: var(--wl-success-soft);
-  border-color: rgba(62, 215, 180, 0.4);
+  border-color: rgba(5, 150, 105, 0.3);
   color: var(--wl-success);
 }
 
 .quote-workflow-alert.is-declined {
   background: var(--wl-danger-soft);
-  border-color: rgba(237, 66, 69, 0.35);
+  border-color: rgba(225, 29, 72, 0.3);
   color: var(--wl-danger);
 }
 

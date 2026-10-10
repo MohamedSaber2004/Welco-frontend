@@ -173,7 +173,7 @@ async function convertToQuote() {
           <div class="checkout-card__head">
             <h2 id="items-heading" class="card-heading">
               <span>{{ t('commerce.orderSummary') }}</span>
-              <span class="item-count-chip mono">{{ count }} items</span>
+              <span class="item-count-chip mono">{{ t('cart.itemsCount', { count }) }}</span>
             </h2>
           </div>
 
@@ -609,8 +609,9 @@ async function convertToQuote() {
   position: absolute;
   top: 0;
   inset-inline: 0;
-  height: 2px;
-  background: var(--wl-gradient-gold);
+  height: 2.5px;
+  background: linear-gradient(90deg, var(--secondary, #00A389), var(--accent, #0EA5E9));
+  opacity: 0.95;
 }
 
 .summary-head {

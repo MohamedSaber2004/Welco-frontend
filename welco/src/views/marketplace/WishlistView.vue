@@ -80,7 +80,7 @@ const goDetail = (id: string) => {
           <span>{{ t('marketplace.wishlistCount', { count: count }) }}</span>
         </div>
         <h1 class="head-title">{{ t('marketplace.wishlistTitle') }}</h1>
-        <p v-if="items.length" class="head-subtitle">{{ t('marketplace.wishlistEmptyDesc') }}</p>
+        <p v-if="items.length" class="head-subtitle">{{ t('marketplace.wishlistSubtitle') }}</p>
       </div>
 
       <div v-if="items.length" class="head-actions">

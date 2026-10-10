@@ -62,6 +62,10 @@ const handleVerify = async () => {
     loading.value = false
   }
   if (res.ok) {
+    try {
+      sessionStorage.setItem('welco-forgot-email', email.value.trim())
+      sessionStorage.setItem('welco-forgot-token', otpCode.value.trim())
+    } catch {}
     toastService.success(t('auth.codeSent'))
     await router.push({
       name: 'reset-password',

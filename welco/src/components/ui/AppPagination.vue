@@ -60,6 +60,7 @@ const hasInfo = computed(() => {
 
 const itemRange = computed(() => {
   if (typeof resolvedTotalItems.value !== 'number') return null
+  if (resolvedTotalItems.value === 0) return { start: 0, end: 0, total: 0 }
   const start = (activePage.value - 1) * props.pageSize + 1
   const end = Math.min(activePage.value * props.pageSize, resolvedTotalItems.value)
   return { start: Math.max(1, start), end, total: resolvedTotalItems.value }
@@ -129,10 +130,15 @@ const goTo = (p: number | string) => {
   >
     <div v-if="hasInfo" class="pagination__info mono">
       <template v-if="itemRange">
-        <span>{{ t('common.showing') }}</span>
-        <strong class="mono-num">{{ itemRange.start }} – {{ itemRange.end }}</strong>
-        <span>{{ t('common.of') }}</span>
-        <strong class="mono-num">{{ itemRange.total }}</strong>
+        <template v-if="itemRange.total === 0">
+          <span>{{ t('common.noResults') }}</span>
+        </template>
+        <template v-else>
+          <span>{{ t('common.showing') }}</span>
+          <strong class="mono-num">{{ itemRange.start }} – {{ itemRange.end }}</strong>
+          <span>{{ t('common.of') }}</span>
+          <strong class="mono-num">{{ itemRange.total }}</strong>
+        </template>
       </template>
       <template v-else>
         <span>{{ t('common.page', { current: activePage, total: totalPages }) }}</span>

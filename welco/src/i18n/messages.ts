@@ -632,14 +632,27 @@ export type Messages = {
     partnerDossier: string
     accountVerification: string
     catalogSection: string
+    catalogManagement: string
+    productsDesc: string
     productsTitle: string
     categoriesTitle: string
     newProduct: string
-    newCategory: string
-    editProduct: string
+    providers: string
+    providerName: string
+    multipleProviders: string
+    noProvidersAssigned: string
+    searchProductsPlaceholder: string
+    selectProvider: string
+    assignedProvider: string
+    deleteProductTitle: string
+    noProducts: string
+    errPricePositive: string
+    errStockPositive: string
     deleteProviderCascadeTitle: string
     deleteProviderCascadeConfirm: string
     deleteWithCascade: string
+    newCategory: string
+    editProduct: string
     editImage: string
     editCategory: string
     productNameEn: string

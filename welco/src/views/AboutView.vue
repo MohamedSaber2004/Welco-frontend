@@ -38,7 +38,7 @@ const storyParagraphs = computed(() => {
   return null
 })
 
-const yearsOfExperience = computed(() => `${new Date().getFullYear() - FOUNDING_YEAR}+`)
+const yearsOfExperience = computed(() => '30+')
 
 const pillars = computed(() => [
   {

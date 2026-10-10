@@ -93,7 +93,7 @@ function clearFilters() {
         <div class="head-actions">
           <button type="button" class="btn-refresh" @click="refresh">
             <span class="material-symbols-outlined text-[18px]">refresh</span>
-            <span>{{ t('common.retry') }}</span>
+            <span>{{ t('common.refresh') }}</span>
           </button>
         </div>
       </header>

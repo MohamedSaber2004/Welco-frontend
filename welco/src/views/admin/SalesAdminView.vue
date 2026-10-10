@@ -53,10 +53,10 @@ const quoteActionLoading = ref(false)
 const pipelineStages = computed(() => {
   const all = rfqs.value
   const pending = all.filter((r) => r.status === 'Pending').length
-  const quoted = all.filter((r) => r.status === 'Quoted').length
+  const quoted = quotes.value.length
   const ordered = all.filter((r) => r.status === 'Ordered').length
   const cancelled = all.filter((r) => r.status === 'Cancelled').length
-  const total = all.length || 1
+  const total = (pending + quoted + ordered + cancelled) || all.length || 1
 
   return [
     { label: t('account.pipeStatusPending'), count: pending, pct: Math.round((pending / total) * 100), color: 'var(--wl-warning)', icon: 'hourglass_top' },
@@ -65,6 +65,45 @@ const pipelineStages = computed(() => {
     { label: `${t('admin.pipeArchived')} / ${t('admin.pipeOther')}`, count: cancelled, pct: Math.round((cancelled / total) * 100), color: 'var(--wl-muted)', icon: 'inventory' },
   ]
 })
+
+function deduplicatedItems(items: Array<{ id?: string; productId?: string; productNameEn?: string; productNameAr?: string | null; quantity?: number; unitPrice?: number }> | undefined) {
+  if (!items || !items.length) return []
+  const map = new Map<string, { id?: string; productId: string; productNameEn: string; productNameAr?: string | null; quantity: number; unitPrice: number }>()
+  for (const it of items) {
+    const key = it.productId || it.productNameEn || JSON.stringify(it)
+    const existing = map.get(key)
+    if (existing) {
+      existing.quantity += (it.quantity ?? 1)
+    } else {
+      map.set(key, {
+        id: it.id,
+        productId: it.productId || '',
+        productNameEn: it.productNameEn || '',
+        productNameAr: it.productNameAr,
+        quantity: it.quantity ?? 1,
+        unitPrice: it.unitPrice ?? 0,
+      })
+    }
+  }
+  return Array.from(map.values())
+}
+
+function getRfqOrganization(r: RfqDto | null | undefined): string {
+  if (!r) return '—'
+  if (r.companyName && r.companyName !== '—') return r.companyName
+  const anyR = r as unknown as Record<string, unknown>
+  return (anyR.organization as string) || (anyR.clientName as string) || (anyR.customerName as string) || 'Institutional Client'
+}
+
+function getQuoteCustomer(q: QuoteDto): string {
+  const rfq = getRfqForQuote(q)
+  if (rfq) {
+    const org = getRfqOrganization(rfq)
+    if (org && org !== '—') return org
+  }
+  const anyQ = q as unknown as Record<string, unknown>
+  return (anyQ.customerName as string) || (anyQ.clientName as string) || (anyQ.companyName as string) || 'Institutional Client'
+}
 
 // RFQ Filters & Search (Local)
 const rfqSearch = ref('')
@@ -496,20 +535,20 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
                     </div>
                   </td>
                   <td>
-                    <strong class="company-name">{{ r.companyName || '—' }}</strong>
+                    <strong class="company-name">{{ getRfqOrganization(r) }}</strong>
                   </td>
                   <td class="mono text-xs text-slate-500">{{ new Date(r.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</td>
                   <td>
                     <div class="product-names-cell">
                       <span
-                        v-for="(item, idx) in (r.items ?? []).slice(0, 2)"
-                        :key="item?.id || idx"
+                        v-for="(item, idx) in deduplicatedItems(r.items).slice(0, 2)"
+                        :key="item?.id || item?.productId || idx"
                         class="product-name-pill"
                       >
                         {{ locale === 'ar' ? (item?.productNameAr || item?.productNameEn || '—') : (item?.productNameEn || item?.productNameAr || '—') }}
                         <span v-if="item && item.quantity > 1" class="qty-tag">×{{ item.quantity }}</span>
                       </span>
-                      <span v-if="(r.items ?? []).length > 2" class="more-badge mono">+{{ (r.items ?? []).length - 2 }} {{ t('common.more') }}</span>
+                      <span v-if="deduplicatedItems(r.items).length > 2" class="more-badge mono">+{{ deduplicatedItems(r.items).length - 2 }} {{ t('common.more') }}</span>
                     </div>
                   </td>
                   <td>
@@ -767,11 +806,11 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
           <div class="quote-summary-grid">
             <div class="summary-tile">
               <span class="summary-label mono">{{ t('admin.quoteCustomer') }}</span>
-              <strong class="summary-value">{{ getRfqForQuote(selectedQuote)?.companyName || t('admin.institutionalClientFallback') }}</strong>
+              <strong class="summary-value">{{ getQuoteCustomer(selectedQuote) }}</strong>
             </div>
             <div class="summary-tile">
               <span class="summary-label mono">{{ t('sales.rfqTitle') }}</span>
-              <strong class="summary-value mono">{{ selectedQuote.rfqNumber || '—' }}</strong>
+              <strong class="summary-value mono">{{ selectedQuote.rfqNumber || getRfqForQuote(selectedQuote)?.rfqNumber || '—' }}</strong>
             </div>
             <div class="summary-tile">
               <span class="summary-label mono">{{ t('sales.requestDate') }}</span>
@@ -803,8 +842,8 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
                 <tr v-for="it in selectedQuote.items" :key="it.id">
                   <td class="product-title-cell">{{ locale === 'ar' ? (it.productNameAr || it.productNameEn) : it.productNameEn }}</td>
                   <td class="text-end mono">{{ it.quantity }}</td>
-                  <td class="text-end mono">${{ formatPrice(it.unitPrice, locale) }}</td>
-                  <td class="text-end mono subtotal-num">${{ formatPrice(it.quantity * it.unitPrice, locale) }}</td>
+                  <td class="text-end mono">{{ formatPrice(it.unitPrice, locale) }} {{ selectedQuote.currency || 'USD' }}</td>
+                  <td class="text-end mono subtotal-num">{{ formatPrice(it.quantity * it.unitPrice, locale) }} {{ selectedQuote.currency || 'USD' }}</td>
                 </tr>
               </tbody>
             </table>
@@ -817,7 +856,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
             </div>
             <div class="total-quote-box">
               <span class="total-label mono">{{ t('commerce.total') }}</span>
-              <strong class="total-value mono">${{ formatPrice(selectedQuote.amount, locale) }} {{ selectedQuote.currency || 'USD' }}</strong>
+              <strong class="total-value mono">{{ formatPrice(selectedQuote.amount, locale) }} {{ selectedQuote.currency || 'USD' }}</strong>
             </div>
           </div>
 

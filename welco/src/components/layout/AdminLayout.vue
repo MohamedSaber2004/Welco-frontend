@@ -44,6 +44,7 @@ const sections = computed<DashboardNavSection[]>(() => [
     label: t('admin.catalog'),
     collapsible: true,
     links: [
+      { to: '/admin/products', icon: 'inventory_2', label: t('admin.productsTitle'), visible: isAdmin.value },
       { to: '/admin/categories', icon: 'category', label: t('admin.categoriesTitle'), visible: isAdmin.value },
       { to: '/admin/certifications', icon: 'verified', label: t('certifications.title'), visible: canManageCertifications.value },
       { to: '/admin/about', icon: 'info', label: t('nav.about') },
@@ -65,6 +66,7 @@ const sections = computed<DashboardNavSection[]>(() => [
 const mobileLinks = computed<DashboardNavLink[]>(() => [
   { to: '/admin', label: t('admin.dashboard'), icon: 'dashboard', exact: true },
   { to: '/admin/orders', label: t('admin.orders'), icon: 'local_shipping' },
+  { to: '/admin/products', label: t('admin.productsTitle'), icon: 'inventory_2', visible: isAdmin.value },
   { to: '/admin/categories', label: t('admin.categoriesTitle'), icon: 'category', visible: isAdmin.value },
   { to: '/admin/about', label: t('nav.about'), icon: 'info' },
   { to: '/admin/companies', label: t('admin.companies'), icon: 'apartment', visible: canManageCompanies.value },

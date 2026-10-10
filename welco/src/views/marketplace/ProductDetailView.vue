@@ -461,9 +461,9 @@ const resolvedDescription = computed(() => {
           <div class="pdp-badges-top">
             <span class="pdp-sku-pill mono">{{ product.sku }}</span>
             <div class="pdp-status-pills">
-              <span v-if="product.isNew" class="pdp-new-pill mono">NEW</span>
-              <span v-else-if="product.isFeatured" class="pdp-featured-pill mono">FEATURED</span>
-              <span v-if="product.isActive" class="pdp-ce-pill mono">CE MARKED</span>
+              <span v-if="product.isNew" class="pdp-new-pill mono">{{ locale === 'ar' ? 'جديد' : 'NEW' }}</span>
+              <span v-else-if="product.isFeatured" class="pdp-featured-pill mono">{{ locale === 'ar' ? 'مميز' : 'FEATURED' }}</span>
+              <span v-if="product.isActive" class="pdp-ce-pill mono">{{ t('catalog.ceMarked') }}</span>
             </div>
             <button
               type="button"

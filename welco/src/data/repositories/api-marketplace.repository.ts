@@ -169,12 +169,9 @@ const normalizeProduct = (p: ProductDto): ProductDto => {
 
 export const isTestProduct = (p: ProductDto | null | undefined): boolean => {
   if (!p) return true
-  // Filter based on actual DB fields: hide inactive or deleted products
   const raw = p as unknown as Record<string, unknown>
-  const isActive = (raw.isActive ?? raw.IsActive) as boolean | undefined
   const isDeleted = (raw.isDeleted ?? raw.IsDeleted) as boolean | undefined
   if (isDeleted === true) return true
-  if (isActive === false) return true
   return false
 }
 
@@ -212,8 +209,15 @@ export class ApiMarketplaceRepository implements MarketplaceRepository {
 
   async getProducts(query: MarketplaceQuery = {}): Promise<PaginatedResult<ProductDto>> {
     const params = new URLSearchParams()
-    if (query.search) params.set('SearchTerm', query.search)
-    if (query.sku) params.set('Sku', query.sku)
+    if (query.search) {
+      params.set('SearchTerm', query.search)
+      params.set('searchTerm', query.search)
+      params.set('search', query.search)
+    }
+    if (query.sku) {
+      params.set('Sku', query.sku)
+      params.set('sku', query.sku)
+    }
     if (query.categoryId) params.set('categoryId', query.categoryId)
     if (query.sortBy === 'price-asc') params.set('sortBy', 'price-asc')
     if (query.sortBy === 'price-desc') params.set('sortBy', 'price-desc')
@@ -225,8 +229,14 @@ export class ApiMarketplaceRepository implements MarketplaceRepository {
     if (query.priceMin != null) params.set('priceMin', String(query.priceMin))
     if (query.priceMax != null) params.set('priceMax', String(query.priceMax))
     if (query.currencyId) params.set('currencyId', query.currencyId)
-    params.set('pageNumber', String(query.page ?? 1))
-    params.set('pageSize', String(Math.min(50, Math.max(1, query.pageSize ?? 12))))
+    const pageNum = String(query.page ?? 1)
+    params.set('pageNumber', pageNum)
+    params.set('PageNumber', pageNum)
+    params.set('page', pageNum)
+    params.set('Page', pageNum)
+    const pageSz = String(Math.min(100, Math.max(1, query.pageSize ?? 12)))
+    params.set('pageSize', pageSz)
+    params.set('PageSize', pageSz)
     const qs = params.toString()
     const path = `${MARKETPLACE_ROUTES.products}?${qs}`
     const raw = await this.http.get<unknown>(path, { showFeedback: false })
@@ -367,42 +377,69 @@ export class ApiMarketplaceRepository implements MarketplaceRepository {
   }
 
   async getCategories(): Promise<CategoryDto[]> {
-    // NOTE: there is no /catalog/* endpoint on the backend — /categories is
-    // the only source. Do not add a fallback loop here (it only doubles 404s).
-    // Try to get all categories without pagination first
+    const fetchAllPages = async (firstPageData: CategoryDto[], totalPages: number, urlBase: string): Promise<CategoryDto[]> => {
+      const all = [...firstPageData]
+      if (totalPages > 1) {
+        const promises: Promise<unknown>[] = []
+        for (let p = 2; p <= totalPages; p++) {
+          promises.push(
+            this.http
+              .get<unknown>(`${urlBase}${urlBase.includes('?') ? '&' : '?'}pageNumber=${p}&pageSize=50`, {
+                showFeedback: false,
+              })
+              .catch(() => null),
+          )
+        }
+        const results = await Promise.all(promises)
+        for (const r of results) {
+          if (!r) continue
+          if (Array.isArray(r)) {
+            all.push(...(r as CategoryDto[]))
+          } else if (r && typeof r === 'object') {
+            const obj = r as Record<string, unknown>
+            const d = (Array.isArray(obj.data) ? obj.data : Array.isArray(obj.Data) ? obj.Data : []) as CategoryDto[]
+            all.push(...d)
+          }
+        }
+      }
+      return all
+    }
+
+    // Try unpaginated /all route first
     try {
       const raw = await this.http.get<unknown>(`${MARKETPLACE_ROUTES.categories}/all`, { showFeedback: false })
-      let list: CategoryDto[]
-      if (Array.isArray(raw)) {
-        list = raw as CategoryDto[]
-      } else if (raw && typeof raw === 'object') {
+      if (Array.isArray(raw) && raw.length > 0) return raw.map(normalizeCategory)
+      if (raw && typeof raw === 'object') {
         const obj = raw as Record<string, unknown>
-        if (Array.isArray(obj.data)) list = obj.data as CategoryDto[]
-        else if (Array.isArray(obj.Data)) list = obj.Data as CategoryDto[]
-        else list = raw as CategoryDto[]
-      } else {
-        list = raw as CategoryDto[]
+        const d = (Array.isArray(obj.data) ? obj.data : Array.isArray(obj.Data) ? obj.Data : []) as CategoryDto[]
+        if (d.length > 0) return d.map(normalizeCategory)
       }
-      return list.map(normalizeCategory)
     } catch {
-      // Fallback: try with large page size
-      const raw = await this.http.get<unknown>(`${MARKETPLACE_ROUTES.categories}?pageSize=500&pageNumber=1`, { showFeedback: false })
-      let list: CategoryDto[]
-      if (Array.isArray(raw)) {
-        list = raw as CategoryDto[]
-      } else if (raw && typeof raw === 'object') {
-        const obj = raw as Record<string, unknown>
-        if (Array.isArray(obj.data)) list = obj.data as CategoryDto[]
-        else if (Array.isArray(obj.Data)) list = obj.Data as CategoryDto[]
-        else {
-          const paginated = toPaginated<CategoryDto>(raw)
-          list = paginated ? paginated.data : (raw as CategoryDto[])
-        }
-      } else {
-        list = raw as CategoryDto[]
-      }
-      return list.map(normalizeCategory)
+      // Fall through to paginated fetch
     }
+
+    // Fallback: fetch with pagination loop to gather all pages (e.g. 28 categories across pages)
+    try {
+      const raw = await this.http.get<unknown>(`${MARKETPLACE_ROUTES.categories}?pageSize=50&pageNumber=1`, {
+        showFeedback: false,
+      })
+      if (Array.isArray(raw)) return raw.map(normalizeCategory)
+      const paginated = toPaginated<CategoryDto>(raw)
+      if (paginated) {
+        const fullList = await fetchAllPages(paginated.data, paginated.totalPages, MARKETPLACE_ROUTES.categories)
+        return fullList.map(normalizeCategory)
+      }
+      if (raw && typeof raw === 'object') {
+        const obj = raw as Record<string, unknown>
+        const d = (Array.isArray(obj.data) ? obj.data : Array.isArray(obj.Data) ? obj.Data : []) as CategoryDto[]
+        const totalPages = typeof obj.totalPages === 'number' ? obj.totalPages : typeof obj.TotalPages === 'number' ? obj.TotalPages : 1
+        const fullList = await fetchAllPages(d, totalPages, MARKETPLACE_ROUTES.categories)
+        return fullList.map(normalizeCategory)
+      }
+    } catch {
+      // Return empty list
+    }
+    return []
   }
 
   async getCategoriesPaginated(query: CategoryQuery = {}): Promise<PaginatedResult<CategoryDto>> {

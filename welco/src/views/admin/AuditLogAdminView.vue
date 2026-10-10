@@ -9,12 +9,18 @@ import { auditLogService } from '../../di/container'
 import { useUserLookup } from '../../composables/useUserLookup'
 import { t, locale } from '../../i18n'
 import type { AuditLogDto, AuditAction } from '../../domain/models/audit-log'
+import { formatDateTime } from '../../utils/format'
 
 useAnimation()
 
 const { getUserInfo, resolveLogsUsers, getRoleBadgeClass } = useUserLookup()
 
-const filters = ref<{ entity: string; action: string; search: string }>({ entity: '', action: '', search: '' })
+const filters = ref<{ entity: string; action: string; search: string; hideTokenNoise: boolean }>({
+  entity: '',
+  action: '',
+  search: '',
+  hideTokenNoise: true,
+})
 const selectedLog = ref<AuditLogDto | null>(null)
 
 const ACTIONS: { value: AuditAction; labelKey: string }[] = [
@@ -34,11 +40,39 @@ const ACTIONS: { value: AuditAction; labelKey: string }[] = [
 const ENTITY_TYPES = ['Product', 'Category', 'Order', 'RFQ', 'Quote', 'User', 'Company', 'Certification', 'Document', 'Ticket', 'Cart', 'Address', 'DistributorApplication']
 
 const localPage = ref(1)
-const localPageSize = 15
+const localPageSize = 20
+
+function deduplicateLogs(list: AuditLogDto[]): AuditLogDto[] {
+  const result: AuditLogDto[] = []
+  for (let i = 0; i < list.length; i++) {
+    const curr = list[i]!
+    const prev = result[result.length - 1]
+    if (prev) {
+      const sameAction = prev.action === curr.action
+      const sameEntity = prev.entityName === curr.entityName && prev.entityId === curr.entityId
+      const sameUser = (prev.performedById || prev.performedBy) === (curr.performedById || curr.performedBy)
+      const timeDiff = Math.abs(new Date(curr.createdAt).getTime() - new Date(prev.createdAt).getTime())
+      if (sameAction && sameEntity && sameUser && timeDiff < 3000) {
+        continue
+      }
+    }
+    result.push(curr)
+  }
+  return result
+}
 
 const filteredLogs = computed(() => {
   const rawList = Array.isArray(auditLogService.logs.value) ? auditLogService.logs.value : []
-  let list = rawList
+  let list = deduplicateLogs(rawList)
+  if (filters.value.hideTokenNoise) {
+    list = list.filter((l) => {
+      if (!l) return false
+      const ent = String(l.entityName || '').toLowerCase()
+      const act = String(l.action || '').toLowerCase()
+      const det = String(l.details || '').toLowerCase()
+      return ent !== 'token' && !act.includes('refresh') && !det.includes('token-refresh')
+    })
+  }
   if (filters.value.entity) {
     list = list.filter((l) => l && l.entityName === filters.value.entity)
   }
@@ -67,28 +101,37 @@ const filteredLogs = computed(() => {
   return list
 })
 
-const totalPages = computed(() => Math.max(1, Math.ceil(filteredLogs.value.length / localPageSize)))
+const totalLogsCount = computed(() => auditLogService.totalCount.value || filteredLogs.value.length)
+const totalPages = computed(() => Math.max(1, Math.ceil(totalLogsCount.value / localPageSize)))
+
 const paginatedLogs = computed(() => {
+  if (auditLogService.totalCount.value > auditLogService.logs.value.length) {
+    return filteredLogs.value
+  }
   const start = (localPage.value - 1) * localPageSize
   return filteredLogs.value.slice(start, start + localPageSize)
 })
+
 const isEmpty = computed(() => !auditLogService.loading.value && filteredLogs.value.length === 0 && !auditLogService.error.value)
 const isLoading = computed(() => auditLogService.loading.value)
 const isError = computed(() => auditLogService.error.value ?? undefined)
 
-async function loadLogs() {
-  await auditLogService.loadLogs({ pageNumber: 1, pageSize: 50 } as never)
+async function loadLogs(p = 1) {
+  localPage.value = p
+  await auditLogService.loadLogs({
+    pageNumber: p,
+    pageSize: localPageSize,
+    entityName: filters.value.entity || undefined,
+    action: filters.value.action || undefined,
+    searchTerm: filters.value.search.trim() || undefined,
+  } as never)
   if (auditLogService.logs.value.length > 0) {
     void resolveLogsUsers(auditLogService.logs.value)
   }
 }
 
 function formatTime(iso: string): string {
-  try {
-    return new Date(iso).toLocaleString(locale.value === 'ar' ? 'ar-EG' : 'en-US', { year: 'numeric', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' })
-  } catch {
-    return iso
-  }
+  return formatDateTime(iso, locale.value)
 }
 
 function openDetails(log: AuditLogDto) {
@@ -123,11 +166,9 @@ function actionBadgeClass(action: string): string {
 
 function goPage(p: number) {
   if (p < 1 || p > totalPages.value) return
-  localPage.value = p
+  void loadLogs(p)
 }
 
-// Payload snapshots may embed raw database identifiers — mask any
-// GUID-shaped value so no internal IDs are shown to viewers.
 const maskedDetails = computed(() => {
   const details = selectedLog.value?.details
   if (!details) return ''
@@ -137,7 +178,7 @@ const maskedDetails = computed(() => {
   )
 })
 
-onMounted(() => void loadLogs())
+onMounted(() => void loadLogs(1))
 watch([() => filters.value.entity, () => filters.value.action, () => filters.value.search], () => {
   localPage.value = 1
 })
@@ -262,7 +303,7 @@ watch([() => filters.value.entity, () => filters.value.action, () => filters.val
           <AppPagination
             :page="localPage"
             :total-pages="totalPages"
-            :total-items="filteredLogs.length"
+            :total-items="totalLogsCount"
             :page-size="localPageSize"
             variant="table"
             @change="goPage"

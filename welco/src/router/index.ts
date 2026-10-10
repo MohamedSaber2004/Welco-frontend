@@ -299,7 +299,9 @@ const router = createRouter({
     },
     {
       path: '/admin/products',
-      redirect: '/admin',
+      name: 'admin-products',
+      component: () => import('../views/admin/ProductsAdminView.vue'),
+      meta: { titleKey: 'admin.productsTitle', requiresAuth: true, requiresAdmin: true },
     },
     {
       path: '/admin/categories',

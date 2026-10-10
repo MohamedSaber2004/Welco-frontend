@@ -52,16 +52,24 @@ const onSearchInput = () => {
 const synthesizeFromProducts = () => {
   if (products.value.length === 0) return
   const p0 = products.value[0]
-  const name = p0?.companyName || (locale.value === 'ar' ? p0?.supplierNameAr : p0?.supplierNameEn) || 'Medical Provider'
+  const name =
+    p0?.companyName ||
+    (locale.value === 'ar' ? (p0?.supplierNameAr || p0?.supplierNameEn) : (p0?.supplierNameEn || p0?.supplierNameAr)) ||
+    p0?.manufacturerEn ||
+    p0?.manufacturerAr ||
+    'Medical Provider'
+  const cEn = (p0 as unknown as { countryNameEn?: string })?.countryNameEn || (p0 as unknown as { originCountryEn?: string })?.originCountryEn || 'Egypt'
+  const cAr = (p0 as unknown as { countryNameAr?: string })?.countryNameAr || (p0 as unknown as { originCountryAr?: string })?.originCountryAr || 'مصر'
+
   company.value = {
     id: companyId.value,
     name,
-    type: 2,
+    type: (p0 as unknown as { companyType?: number })?.companyType ?? 2,
     status: 2,
     isActive: true,
-    countryNameEn: (p0 as unknown as { countryNameEn?: string })?.countryNameEn || null,
-    countryNameAr: (p0 as unknown as { countryNameAr?: string })?.countryNameAr || null,
-    createdAt: new Date().toISOString(),
+    countryNameEn: cEn,
+    countryNameAr: cAr,
+    createdAt: (p0 as unknown as { createdAt?: string })?.createdAt || new Date().toISOString(),
   } as CompanyDto
   companyError.value = ''
   companyFailed.value = false
@@ -77,9 +85,22 @@ const loadCompany = async () => {
     if (products.value.length > 0) {
       synthesizeFromProducts()
     } else {
-      companyError.value = e instanceof Error ? e.message : t('common.error')
-      company.value = null
-      companyFailed.value = true
+      try {
+        const dir = await companyRepository.getProvidersDirectory({ pageSize: 50 })
+        const found = dir.data?.find((c) => c.id === companyId.value)
+        if (found) {
+          company.value = found
+          return
+        }
+      } catch {
+        /* directory fallback */
+      }
+
+      if (!loading.value) {
+        companyError.value = e instanceof Error ? e.message : t('common.error')
+        company.value = null
+        companyFailed.value = true
+      }
     }
   } finally {
     companyLoading.value = false
@@ -107,8 +128,10 @@ const loadProducts = async () => {
         } as CategoryDto)
       }
     }
-    if (!company.value && products.value.length > 0) {
-      synthesizeFromProducts()
+    if (!company.value || companyFailed.value || !company.value.name) {
+      if (products.value.length > 0) {
+        synthesizeFromProducts()
+      }
     }
   } catch (e) {
     fetchError.value = e instanceof Error ? e.message : t('common.error')

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, computed, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { useAnimation } from '../../composables/useAnimation'
 import AdminLayout from '../../components/layout/AdminLayout.vue'
 import DataState from '../../components/ui/DataState.vue'
@@ -13,6 +14,7 @@ import { t, locale } from '../../i18n'
 import type { CityDto, CountryDto } from '../../domain/models/location'
 
 useAnimation()
+const route = useRoute()
 
 const cities = ref<CityDto[]>([])
 const countries = ref<CountryDto[]>([])
@@ -20,6 +22,8 @@ const loading = ref(true)
 const search = ref('')
 const filterCountry = ref('')
 const fetchError = ref('')
+
+const activeCountries = computed(() => countries.value.filter((c) => c && c.isActive !== false))
 
 const filtered = computed(() => {
   let l = Array.isArray(cities.value) ? cities.value : []
@@ -67,7 +71,12 @@ const load = async () => {
   }
 }
 
-onMounted(load)
+onMounted(async () => {
+  await load()
+  if (route.query.action === 'create') {
+    openCreate()
+  }
+})
 
 const getCountryName = (countryId: string) => {
   const co = countries.value.find((c) => c.id === countryId)
@@ -232,7 +241,7 @@ const closeDetails = () => {
           <div class="filter-wrap">
             <select v-model="filterCountry" class="toolbar-select">
               <option value="">{{ t('common.all') }} {{ t('admin.countries') }}</option>
-              <option v-for="co in countries" :key="co.id" :value="co.id">
+              <option v-for="co in activeCountries" :key="co.id" :value="co.id">
                 {{ localized(co.nameEn, co.nameAr) }}
               </option>
             </select>
@@ -370,7 +379,7 @@ const closeDetails = () => {
             <label class="field-label" for="city-country">{{ t('distributor.country') }} *</label>
             <select id="city-country" v-model="form.countryId" class="field-select" required>
               <option value="" disabled>{{ t('distributor.country') }}</option>
-              <option v-for="co in countries" :key="co.id" :value="co.id">
+              <option v-for="co in activeCountries" :key="co.id" :value="co.id">
                 {{ localized(co.nameEn, co.nameAr) }}
               </option>
             </select>

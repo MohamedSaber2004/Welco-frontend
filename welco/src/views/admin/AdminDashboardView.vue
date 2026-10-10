@@ -16,7 +16,7 @@ import { t, locale } from '../../i18n'
 
 const { getUserInfo, resolveLogsUsers, getRoleBadgeClass } = useUserLookup()
 
-const stats = ref({ countries: 0, cities: 0, zones: 0, users: 0, pendingApps: 0, products: 0, categories: 0 })
+const stats = ref({ countries: 0, cities: 0, zones: 0, users: 0, companies: 0, pendingApps: 0, products: 0, categories: 0 })
 const loading = ref(true)
 const activeChartPoint = ref<{ month: string; value: number; x: number; y: number } | null>(null)
 const recentAuditLogs = ref<AuditLogDto[]>([])
@@ -133,10 +133,10 @@ const activeDonutSegment = ref<{ label: string; value: number; pct: number; colo
 
 const platformData = computed(() => {
   const items = [
-    { label: t('admin.products'), value: stats.value.products, color: 'var(--brand, #6366F1)', to: '/marketplace' },
-    { label: t('admin.categoriesTitle'), value: stats.value.categories, color: 'var(--secondary, #14B8A6)', to: '/marketplace' },
+    { label: t('admin.products'), value: stats.value.products, color: 'var(--brand, #6366F1)', to: '/admin/products' },
+    { label: t('admin.categoriesTitle'), value: stats.value.categories, color: 'var(--secondary, #14B8A6)', to: '/admin/categories' },
     { label: t('admin.users'), value: stats.value.users, color: 'var(--accent, #8B5CF6)', to: '/admin/users' },
-    { label: t('admin.distributorApps'), value: stats.value.pendingApps, color: 'var(--color-warning, #F59E0B)', to: '/admin/companies' },
+    { label: t('admin.companies'), value: stats.value.companies, color: 'var(--color-warning, #F59E0B)', to: '/admin/companies' },
   ]
   const total = items.reduce((s, i) => s + i.value, 0) || 1
   let acc = 0
@@ -148,7 +148,7 @@ const platformData = computed(() => {
   })
 })
 
-const platformTotal = computed(() => stats.value.products + stats.value.categories + stats.value.users + stats.value.pendingApps)
+const platformTotal = computed(() => stats.value.products + stats.value.categories + stats.value.users + stats.value.companies)
 
 const DONUT_CIRCUMFERENCE = 314.159 // 2 * pi * 50
 const donutSegments = computed(() => {
@@ -201,14 +201,15 @@ const load = async () => {
   }
   loading.value = true
   try {
-    const [countries, cities, zones, usersPage, appsPage, productsPage, categoriesList] = await Promise.all([
+    const [countries, cities, zones, usersPage, appsPage, productsPage, categoriesList, companiesPage] = await Promise.all([
       locationRepository.getCountries().catch(() => []),
       locationRepository.getCities().catch(() => []),
       locationRepository.getZones().catch(() => []),
       userRepository.getUsers({ pageNumber: 1, pageSize: 1 }).catch(() => null),
-      companyRepository.getDistributorApplications({ pageNumber: 1, pageSize: 1, status: 1 }).catch(() => null),
+      companyRepository.getDistributorApplications({ pageNumber: 1, pageSize: 50 }).catch(() => null),
       marketplaceRepository.getProducts({ page: 1, pageSize: 1 }).catch(() => null),
       marketplaceRepository.getCategories().catch(() => []),
+      companyRepository.getCompanies({ pageNumber: 1, pageSize: 50 }).catch(() => null),
       services.commerceService.loadOrders({ page: 1, pageSize: 10 }).catch(() => null),
       services.contentService.loadTickets().catch(() => []),
       services.contentService.loadDocuments().catch(() => []),
@@ -239,9 +240,10 @@ const load = async () => {
       cities: Array.isArray(cities) ? cities.length : 0,
       zones: Array.isArray(zones) ? zones.length : 0,
       users: extractCount(usersPage),
+      companies: extractCount(companiesPage),
       pendingApps: extractCount(appsPage),
       products: extractCount(productsPage),
-      categories: Array.isArray(categoriesList) ? categoriesList.length : 0,
+      categories: Array.isArray(categoriesList) ? categoriesList.length : extractCount(categoriesList),
     }
     if (Array.isArray(countries)) locationService.countries.value = countries as never
     if (Array.isArray(cities)) locationService.cities.value = cities as never
@@ -448,7 +450,7 @@ onUnmounted(_removeListeners)
       <StatCard
         :label="t('admin.productsTitle')"
         :value="stats.products"
-        to="/marketplace"
+        to="/admin/products"
         tone="teal"
         icon-only
       >
@@ -741,7 +743,7 @@ onUnmounted(_removeListeners)
       </div>
 
       <div class="quick-actions-grid">
-        <button type="button" class="quick-btn" @click="$router.push('/marketplace')">
+        <button type="button" class="quick-btn" @click="$router.push('/admin/products?action=create')">
           <span class="material-symbols-outlined quick-btn__icon">add_circle</span>
           <div class="quick-btn__text">
             <strong>{{ t('admin.newProduct') }}</strong>
@@ -757,7 +759,7 @@ onUnmounted(_removeListeners)
           </div>
         </button>
 
-        <button type="button" class="quick-btn" @click="$router.push('/admin/countries')">
+        <button type="button" class="quick-btn" @click="$router.push('/admin/countries?action=create')">
           <span class="material-symbols-outlined quick-btn__icon">public</span>
           <div class="quick-btn__text">
             <strong>+ {{ t('admin.newCountry') }}</strong>
@@ -765,7 +767,7 @@ onUnmounted(_removeListeners)
           </div>
         </button>
 
-        <button type="button" class="quick-btn" @click="$router.push('/admin/cities')">
+        <button type="button" class="quick-btn" @click="$router.push('/admin/cities?action=create')">
           <span class="material-symbols-outlined quick-btn__icon">location_city</span>
           <div class="quick-btn__text">
             <strong>+ {{ t('admin.newCity') }}</strong>

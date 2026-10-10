@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, computed, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { useAnimation } from '../../composables/useAnimation'
 import AdminLayout from '../../components/layout/AdminLayout.vue'
 import DataState from '../../components/ui/DataState.vue'
@@ -13,6 +14,7 @@ import { t } from '../../i18n'
 import type { CountryDto } from '../../domain/models/location'
 
 useAnimation()
+const route = useRoute()
 
 const countries = ref<CountryDto[]>([])
 const loading = ref(true)
@@ -57,7 +59,12 @@ const load = async () => {
   }
 }
 
-onMounted(load)
+onMounted(async () => {
+  await load()
+  if (route.query.action === 'create') {
+    openCreate()
+  }
+})
 
 const showFormModal = ref(false)
 const editingCountry = ref<CountryDto | null>(null)

@@ -1386,3 +1386,17 @@ button:not(:disabled):hover { transform: translateY(-1px); }
   }
 }
 
+/* Ensure table headers, action buttons, and status tags don't break awkwardly across lines */
+th,
+td .btn,
+td button,
+.action-badge,
+.badge,
+.status-pill,
+.quick-btn strong,
+.product-name-pill {
+  word-break: keep-all;
+  overflow-wrap: normal;
+}
+
+

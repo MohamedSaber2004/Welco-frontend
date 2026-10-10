@@ -430,19 +430,29 @@ function goPage(p: number) {
                 <tr v-for="it in selectedOrder.items ?? []" :key="it?.id || it?.productId">
                   <td>{{ locale === 'ar' ? (it?.productNameAr || it?.productNameEn) : (it?.productNameEn || it?.productNameAr) }}</td>
                   <td class="text-end mono">{{ it?.quantity ?? 0 }}</td>
-                  <td class="text-end mono">{{ formatPrice(it?.unitPrice ?? 0, locale) }}</td>
-                  <td class="text-end mono">{{ Math.ceil((it?.quantity ?? 0) * (it?.unitPrice ?? 0)).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</td>
+                  <td class="text-end mono">{{ formatPrice(it?.unitPrice ?? 0, locale) }} {{ selectedOrder.currencyCode || '' }}</td>
+                  <td class="text-end mono">{{ formatPrice((it?.quantity ?? 0) * (it?.unitPrice ?? 0), locale) }} {{ selectedOrder.currencyCode || '' }}</td>
                 </tr>
               </tbody>
             </table>
           </div>
 
-          <div class="order-total-bar">
-            <span class="mono total-label">{{ t('commerce.total') }}</span>
-            <strong class="mono total-value"
-              >{{ Math.ceil(detailsSubtotal(selectedOrder)).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}
-              {{ selectedOrder.currencyCode }}</strong
-            >
+          <div class="order-summary-breakdown" style="display:flex; flex-direction:column; gap:0.5rem; margin-top:1rem; padding-top:0.75rem; border-top:1px dashed var(--wl-border);">
+            <div class="summary-line" style="display:flex; justify-content:space-between; align-items:center;">
+              <span class="mono text-xs text-slate-500">{{ t('admin.quoteSubtotal') }}</span>
+              <span class="mono text-xs font-semibold">{{ formatPrice(detailsSubtotal(selectedOrder), locale) }} {{ selectedOrder.currencyCode }}</span>
+            </div>
+            <div v-if="Math.abs(selectedOrder.totalAmount - detailsSubtotal(selectedOrder)) > 0.01" class="summary-line" style="display:flex; justify-content:space-between; align-items:center;">
+              <span class="mono text-xs text-slate-500">{{ t('checkout.shippingAndTax' as never) || 'Tax, Freight & Fees' }}</span>
+              <span class="mono text-xs font-semibold">{{ formatPrice(selectedOrder.totalAmount - detailsSubtotal(selectedOrder), locale) }} {{ selectedOrder.currencyCode }}</span>
+            </div>
+            <div class="order-total-bar" style="display:flex; justify-content:space-between; align-items:center; padding-top:0.5rem; border-top:1px solid var(--wl-border);">
+              <span class="mono total-label" style="font-size:14px; font-weight:700;">{{ t('commerce.total') }}</span>
+              <strong class="mono total-value" style="font-size:16px; color:var(--primary);">
+                {{ formatPrice(selectedOrder.totalAmount, locale) }}
+                {{ selectedOrder.currencyCode }}
+              </strong>
+            </div>
           </div>
 
           <div class="modal-foot">

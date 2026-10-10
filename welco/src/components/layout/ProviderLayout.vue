@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { t } from '../../i18n'
-import DashboardShell, { type DashboardNavSection } from './DashboardShell.vue'
+import DashboardShell, { type DashboardNavSection, type DashboardNavLink } from './DashboardShell.vue'
 
 const sections = computed<DashboardNavSection[]>(() => [
   {
@@ -39,6 +39,15 @@ const sections = computed<DashboardNavSection[]>(() => [
     ],
   },
 ])
+
+const mobileLinks = computed<DashboardNavLink[]>(() => [
+  { to: '/provider/quotes', label: t('provider.quotes'), icon: 'request_quote' },
+  { to: '/provider/orders', label: t('provider.orders'), icon: 'local_shipping' },
+  { to: '/provider/catalog', label: t('provider.myCatalog'), icon: 'inventory_2' },
+  { to: '/provider/categories', label: t('provider.categories'), icon: 'category' },
+  { to: '/provider/support', label: t('provider.support'), icon: 'contact_support' },
+  { to: '/profile', label: t('nav.profile'), icon: 'apartment' },
+])
 </script>
 
 <template>
@@ -47,6 +56,7 @@ const sections = computed<DashboardNavSection[]>(() => [
     :brand-text="t('provider.dashboard')"
     :sections="sections"
     :status-text="t('admin.systemLive')"
+    :mobile-links="mobileLinks"
   >
     <slot />
   </DashboardShell>

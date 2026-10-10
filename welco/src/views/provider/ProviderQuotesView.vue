@@ -69,6 +69,8 @@ const selectedRfqBaseTotal = computed(() => {
 const rfqs = salesService.rfqs
 const quotes = salesService.quotes
 const inquiries = ref<ProductInquiryDto[]>([])
+const inquirySearch = ref('')
+const inquiryStatusFilter = ref<'all' | 'pending' | 'responded'>('all')
 const loading = ref(true)
 const fetchError = ref('')
 const search = ref('')
@@ -195,6 +197,52 @@ const filteredRfqs = computed(() => {
         (it.productId?.toLowerCase() || '').includes(q)
       )
       return num.includes(q) || comp.includes(q) || note.includes(q) || hasItem
+    })
+  }
+
+  return list
+})
+
+const inquiriesPendingCount = computed(() =>
+  inquiries.value.filter((i) => !i.response && i.status !== 'Responded').length,
+)
+
+const inquiriesRespondedCount = computed(() =>
+  inquiries.value.filter((i) => Boolean(i.response || i.status === 'Responded')).length,
+)
+
+const filteredInquiries = computed(() => {
+  let list = inquiries.value
+
+  if (inquiryStatusFilter.value === 'responded') {
+    list = list.filter((i) => Boolean(i.response || i.status === 'Responded'))
+  } else if (inquiryStatusFilter.value === 'pending') {
+    list = list.filter((i) => !i.response && i.status !== 'Responded')
+  }
+
+  const q = inquirySearch.value.trim().toLowerCase()
+  if (q) {
+    list = list.filter((i) => {
+      const name = (i.name || '').toLowerCase()
+      const email = (i.email || '').toLowerCase()
+      const org = (i.organization || '').toLowerCase()
+      const msg = (i.message || '').toLowerCase()
+      const resp = (i.response || '').toLowerCase()
+      const prodEn = (i.productNameEn || '').toLowerCase()
+      const prodAr = (i.productNameAr || '').toLowerCase()
+      const sku = (i.productSku || '').toLowerCase()
+      const prodId = (i.productId || '').toLowerCase()
+      return (
+        name.includes(q) ||
+        email.includes(q) ||
+        org.includes(q) ||
+        msg.includes(q) ||
+        resp.includes(q) ||
+        prodEn.includes(q) ||
+        prodAr.includes(q) ||
+        sku.includes(q) ||
+        prodId.includes(q)
+      )
     })
   }
 
@@ -563,53 +611,146 @@ const handleDecline = async (rfq: RfqDto) => {
 
       <!-- Product Inquiries Tab -->
       <template v-else-if="tab === 'inquiries'">
-        <div class="table-card">
-          <div class="table-card-head">
-            <h2 class="section-title">{{ locale === 'ar' ? 'استفسارات المنتجات' : 'Product Inquiries' }} ({{ inquiries.length }})</h2>
+        <!-- Inquiries Filter Bar -->
+        <div class="filter-bar">
+          <div class="search-input-wrap">
+            <span class="material-symbols-outlined search-ic">search</span>
+            <input
+              v-model="inquirySearch"
+              type="search"
+              :placeholder="locale === 'ar' ? 'بحث باسم العميل، الاستفسار، الرد، أو المنتج...' : 'Search by client, question, response, or product...'"
+              class="search-input"
+            />
+            <button
+              v-if="inquirySearch"
+              type="button"
+              class="clear-search-btn"
+              :aria-label="t('common.clearInput')"
+              @click="inquirySearch = ''"
+            >
+              <span class="material-symbols-outlined text-[16px]">close</span>
+            </button>
           </div>
 
-          <DataState :loading="loading" :error="fetchError" :empty="!inquiries.length" :empty-title="locale === 'ar' ? 'لا توجد استفسارات حالياً' : 'No Product Inquiries Yet'" @retry="loadData">
+          <div class="filter-actions">
+            <select v-model="inquiryStatusFilter" class="filter-select mono">
+              <option value="all">{{ locale === 'ar' ? 'جميع الاستفسارات' : 'All Inquiries' }} ({{ inquiries.length }})</option>
+              <option value="pending">{{ locale === 'ar' ? 'قيد الانتظار' : 'Pending Response' }} ({{ inquiriesPendingCount }})</option>
+              <option value="responded">{{ locale === 'ar' ? 'تم الرد' : 'Responded' }} ({{ inquiriesRespondedCount }})</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Inquiries Table / Cards Container -->
+        <div class="table-card">
+          <div class="table-card-head flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <h2 class="section-title">{{ locale === 'ar' ? 'استفسارات المنتجات' : 'Product Inquiries' }}</h2>
+              <span class="items-count-badge mono">{{ filteredInquiries.length }} / {{ inquiries.length }}</span>
+            </div>
+            <div class="inquiry-status-chips flex items-center gap-2">
+              <button
+                type="button"
+                class="inquiry-filter-chip mono"
+                :class="{ 'is-active': inquiryStatusFilter === 'all' }"
+                @click="inquiryStatusFilter = 'all'"
+              >
+                {{ locale === 'ar' ? 'الكل' : 'All' }} ({{ inquiries.length }})
+              </button>
+              <button
+                type="button"
+                class="inquiry-filter-chip inquiry-filter-chip--pending mono"
+                :class="{ 'is-active': inquiryStatusFilter === 'pending' }"
+                @click="inquiryStatusFilter = 'pending'"
+              >
+                <span class="chip-dot chip-dot--pending"></span>
+                {{ locale === 'ar' ? 'بانتظار الرد' : 'Pending' }} ({{ inquiriesPendingCount }})
+              </button>
+              <button
+                type="button"
+                class="inquiry-filter-chip inquiry-filter-chip--responded mono"
+                :class="{ 'is-active': inquiryStatusFilter === 'responded' }"
+                @click="inquiryStatusFilter = 'responded'"
+              >
+                <span class="chip-dot chip-dot--responded"></span>
+                {{ locale === 'ar' ? 'تم الرد' : 'Responded' }} ({{ inquiriesRespondedCount }})
+              </button>
+            </div>
+          </div>
+
+          <DataState
+            :loading="loading"
+            :error="fetchError"
+            :empty="!filteredInquiries.length"
+            :empty-title="inquirySearch || inquiryStatusFilter !== 'all' ? (locale === 'ar' ? 'لا توجد نتائج مطابقة لبحثك' : 'No matching inquiries found') : (locale === 'ar' ? 'لا توجد استفسارات حالياً' : 'No Product Inquiries Yet')"
+            @retry="loadData"
+          >
             <div class="table-wrap">
-              <table class="data-table">
+              <table class="data-table inquiry-data-table">
                 <thead>
                   <tr class="mono">
                     <th>{{ locale === 'ar' ? 'العميل' : 'Client' }}</th>
                     <th>{{ t('marketplace.products') }}</th>
-                    <th>{{ t('pdp.inquiryMsg') }}</th>
+                    <th>{{ locale === 'ar' ? 'الاستفسار والمحادثة' : 'Inquiry & Response' }}</th>
                     <th>{{ t('commerce.status') }}</th>
                     <th class="text-end">{{ t('common.actions') }}</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr
-                    v-for="inq in inquiries"
+                    v-for="inq in filteredInquiries"
                     :key="inq.id"
                     class="table-row-clickable"
+                    :class="{ 'row-pending-inquiry': !inq.response && inq.status !== 'Responded' }"
                     @click="openInquiryResponse(inq)"
                   >
+                    <!-- Client column with avatar -->
                     <td>
-                      <div class="rfq-id-cell">
-                        <strong class="mono rfq-num">{{ inq.name }}</strong>
-                        <span v-if="inq.organization" class="text-xs text-muted block">{{ inq.organization }}</span>
-                        <span v-if="inq.email" class="text-xs text-muted font-mono block">{{ inq.email }}</span>
-                        <span class="text-xs text-muted font-mono block">{{ inq.createdAt ? new Date(inq.createdAt).toLocaleDateString() : '' }}</span>
-                      </div>
-                    </td>
-                    <td>
-                      <div class="flex flex-col gap-1">
-                        <strong class="text-sm font-semibold">{{ localized(inq.productNameEn, inq.productNameAr) || inq.productId }}</strong>
-                        <span v-if="inq.productSku" class="mono text-xs text-muted">SKU: {{ inq.productSku }}</span>
-                      </div>
-                    </td>
-                    <td>
-                      <div class="inquiry-msg-box">
-                        <p class="text-sm italic">"{{ inq.message }}"</p>
-                        <div v-if="inq.response" class="inquiry-response-preview mono">
-                          <span class="material-symbols-outlined text-[14px] text-emerald-600">reply</span>
-                          <span><strong>{{ locale === 'ar' ? 'ردك:' : 'Response:' }}</strong> {{ inq.response }}</span>
+                      <div class="client-cell flex items-start gap-2.5">
+                        <div class="client-avatar-bubble">
+                          <span class="material-symbols-outlined text-[18px]">person</span>
+                        </div>
+                        <div class="rfq-id-cell">
+                          <strong class="mono rfq-num text-sm">{{ inq.name }}</strong>
+                          <span v-if="inq.organization" class="text-xs text-muted block font-medium">{{ inq.organization }}</span>
+                          <span v-if="inq.email" class="text-xs text-muted font-mono block">{{ inq.email }}</span>
+                          <span class="text-xs text-muted font-mono block">{{ inq.createdAt ? new Date(inq.createdAt).toLocaleDateString() : '' }}</span>
                         </div>
                       </div>
                     </td>
+
+                    <!-- Product info column -->
+                    <td>
+                      <div class="flex flex-col gap-1">
+                        <strong class="text-sm font-semibold text-heading">{{ localized(inq.productNameEn, inq.productNameAr) || inq.productId }}</strong>
+                        <span v-if="inq.productSku" class="mono text-xs text-muted bg-neutral-100 px-2 py-0.5 rounded w-max">
+                          SKU: {{ inq.productSku }}
+                        </span>
+                      </div>
+                    </td>
+
+                    <!-- Conversation Thread (Message + Response) -->
+                    <td>
+                      <div class="inquiry-msg-box">
+                        <div class="inquiry-client-bubble">
+                          <span class="material-symbols-outlined text-[15px] text-muted flex-shrink-0">chat</span>
+                          <p class="text-sm italic">"{{ inq.message }}"</p>
+                        </div>
+                        <div v-if="inq.response" class="inquiry-response-preview mono">
+                          <span class="material-symbols-outlined text-[15px] text-emerald-600 flex-shrink-0">reply</span>
+                          <div>
+                            <strong class="text-emerald-700 block mb-0.5">{{ locale === 'ar' ? 'ردك للعميل:' : 'Your Response:' }}</strong>
+                            <span class="text-xs text-body">{{ inq.response }}</span>
+                          </div>
+                        </div>
+                        <div v-else class="inquiry-awaiting-badge mono">
+                          <span class="material-symbols-outlined text-[14px] text-amber-600">hourglass_top</span>
+                          <span>{{ locale === 'ar' ? 'بانتظار ردك على العميل' : 'Awaiting your response' }}</span>
+                        </div>
+                      </div>
+                    </td>
+
+                    <!-- Status Pill -->
                     <td>
                       <span
                         class="status-pill mono"
@@ -618,16 +759,18 @@ const handleDecline = async (rfq: RfqDto) => {
                         {{ inq.response || inq.status === 'Responded' ? (locale === 'ar' ? 'تم الرد' : 'Responded') : (locale === 'ar' ? 'قيد الانتظار' : 'Pending') }}
                       </span>
                     </td>
+
+                    <!-- Actions -->
                     <td class="text-end" @click.stop>
                       <button
                         type="button"
                         class="action-btn"
                         :class="inq.response ? 'btn-view' : 'btn-accept'"
-                        :title="inq.response ? (locale === 'ar' ? 'عرض الرد' : 'View') : (locale === 'ar' ? 'رد' : 'Respond')"
+                        :title="inq.response ? (locale === 'ar' ? 'تعديل أو عرض الرد' : 'Edit Response') : (locale === 'ar' ? 'رد على العميل' : 'Reply to Client')"
                         @click="openInquiryResponse(inq)"
                       >
                         <span class="material-symbols-outlined text-[16px]">reply</span>
-                        <span>{{ inq.response ? (locale === 'ar' ? 'عرض' : 'View') : (locale === 'ar' ? 'رد' : 'Respond') }}</span>
+                        <span>{{ inq.response ? (locale === 'ar' ? 'تعديل الرد' : 'Edit Reply') : (locale === 'ar' ? 'إرسال رد' : 'Reply') }}</span>
                       </button>
                     </td>
                   </tr>
@@ -1265,14 +1408,14 @@ const handleDecline = async (rfq: RfqDto) => {
 }
 
 .kpi-card.is-active {
-  border-color: var(--secondary, #00A389);
-  box-shadow: 0 4px 14px rgba(0, 163, 137, 0.18);
-  background: var(--brand-soft, #E8F8F5);
+  border-color: var(--brand, #6366F1);
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.18);
+  background: var(--brand-soft, #EEF2FF);
 }
 
 .kpi-card--highlight.is-active {
-  border-color: #059669;
-  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.12);
+  border-color: #10B981;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.18);
 }
 
 .kpi-icon-box {
@@ -1283,29 +1426,129 @@ const handleDecline = async (rfq: RfqDto) => {
   place-items: center;
 }
 
-.bg-primary-soft { background: var(--wl-primary-soft); }
-.bg-emerald-soft { background: #ecfdf5; }
-.bg-teal-soft { background: rgba(0, 163, 137, 0.12); }
-.bg-purple-soft { background: #f5f3ff; }
-.text-teal { color: var(--secondary, #00A389); }
+.bg-primary-soft { background: var(--brand-soft, #EEF2FF); }
+.bg-emerald-soft { background: #ECFDF5; }
+.bg-teal-soft { background: #CCFBF1; }
+.bg-purple-soft { background: #F3E8FF; }
+.text-teal { color: var(--secondary, #14B8A6); }
+
+.inquiry-status-chips {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.inquiry-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full, 9999px);
+  border: 1px solid var(--wl-border, #e2e8f0);
+  background: var(--wl-surface, #ffffff);
+  font-size: 12px;
+  color: var(--wl-ink-soft, #64748b);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.inquiry-filter-chip:hover {
+  border-color: var(--brand, #6366F1);
+  color: var(--brand, #6366F1);
+}
+
+.inquiry-filter-chip.is-active {
+  background: var(--brand-soft, #EEF2FF);
+  border-color: var(--brand, #6366F1);
+  color: var(--brand, #6366F1);
+  font-weight: 600;
+}
+
+.inquiry-filter-chip--pending.is-active {
+  background: #FEF3C7;
+  border-color: #F59E0B;
+  color: #B45309;
+}
+
+.inquiry-filter-chip--responded.is-active {
+  background: #ECFDF5;
+  border-color: #10B981;
+  color: #047857;
+}
+
+.chip-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.chip-dot--pending {
+  background: #F59E0B;
+}
+
+.chip-dot--responded {
+  background: #10B981;
+}
+
+.client-avatar-bubble {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--brand-soft, #EEF2FF);
+  color: var(--brand, #6366F1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.row-pending-inquiry {
+  background: rgba(254, 243, 199, 0.15);
+}
 
 .inquiry-msg-box {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  max-width: 480px;
+  gap: 8px;
+  max-width: 520px;
+}
+
+.inquiry-client-bubble {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--wl-surface-soft, #f8fafc);
+  border: 1px solid var(--wl-border, #e2e8f0);
+  border-radius: var(--radius-md, 8px);
+  color: var(--wl-ink-strong, #1e293b);
 }
 
 .inquiry-response-preview {
   display: flex;
   align-items: flex-start;
-  gap: 6px;
-  padding: 6px 10px;
-  background: var(--wl-surface-soft, #f8fafc);
-  border: 1px solid var(--wl-border, #e2e8f0);
-  border-radius: var(--radius-sm, 6px);
+  gap: 8px;
+  padding: 8px 12px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: var(--radius-md, 8px);
   font-size: 12px;
-  color: var(--wl-ink-soft, #334155);
+  color: #166534;
+}
+
+.inquiry-awaiting-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  background: #fffbeb;
+  border: 1px dashed #fde68a;
+  border-radius: var(--radius-sm, 6px);
+  font-size: 11px;
+  color: #b45309;
+  width: fit-content;
 }
 
 .inquiry-quote-bubble {

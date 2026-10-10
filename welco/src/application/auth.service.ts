@@ -1,7 +1,6 @@
 import { computed, ref } from 'vue'
 import { t, type MessageKey } from '../i18n'
-import type { User, AuthResponseDto, UserProfileDto } from '../domain/models/user'
-import { USER_TINTS, normalizeThemeMode } from '../domain/models/user'
+import { UserType, USER_TINTS, normalizeThemeMode, type User, type AuthResponseDto, type UserProfileDto } from '../domain/models/user'
 import type { AuthRepository } from '../domain/ports/auth-repository'
 import type {
   LoginPayload,
@@ -39,41 +38,176 @@ export interface StoredSession {
   user: User
 }
 
-const nameToUser = (raw: AuthResponseDto | UserProfileDto): User => {
-  const id = 'userId' in raw ? raw.userId : (raw as AuthResponseDto).userId
-  const fullName = raw.fullName
-  const email = raw.email
+interface JwtClaims {
+  sub?: string
+  nameid?: string
+  'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'?: string
+  email?: string
+  'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'?: string
+  name?: string
+  unique_name?: string
+  'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'?: string
+  role?: string | string[]
+  roles?: string | string[]
+  'http://schemas.microsoft.com/ws/2008/06/identity/claims/role'?: string | string[]
+  userType?: number | string
+  UserType?: number | string
+  companyId?: string
+  CompanyId?: string
+  exp?: number
+  [key: string]: unknown
+}
+
+const decodeJwtPayload = (token?: string | null): JwtClaims | null => {
+  if (!token || typeof token !== 'string') return null
+  try {
+    const parts = token.split('.')
+    if (parts.length < 2 || !parts[1]) return null
+    let base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/')
+    while (base64.length % 4) base64 += '='
+    const json = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join(''),
+    )
+    return JSON.parse(json) as JwtClaims
+  } catch {
+    try {
+      const parts = token.split('.')
+      if (parts.length >= 2 && parts[1]) {
+        return JSON.parse(atob(parts[1])) as JwtClaims
+      }
+    } catch {}
+    return null
+  }
+}
+
+const normalizeRolesList = (rolesInput: unknown): string[] => {
+  if (!rolesInput) return []
+  if (Array.isArray(rolesInput)) {
+    return rolesInput.map((r) => String(r).trim()).filter(Boolean)
+  }
+  if (typeof rolesInput === 'string') {
+    return rolesInput
+      .split(/[,;|\s]+/)
+      .map((r) => r.trim())
+      .filter(Boolean)
+  }
+  return []
+}
+
+const parseUserType = (rawType: unknown, roles: string[]): UserType => {
+  if (typeof rawType === 'number' && Number.isFinite(rawType)) {
+    return rawType as UserType
+  }
+  if (typeof rawType === 'string' && rawType.trim()) {
+    const n = Number(rawType.trim())
+    if (Number.isFinite(n) && n > 0) return n as UserType
+    const lower = rawType.trim().toLowerCase()
+    if (lower.includes('admin') || lower === 'staff') return 1 as UserType
+    if (['organizationuser', 'provider', 'distributor', 'supplier', 'seller', 'vendor'].some((k) => lower.includes(k))) {
+      return 2 as UserType
+    }
+    if (lower.includes('client') || lower.includes('buyer') || lower.includes('customer')) {
+      return 4 as UserType
+    }
+  }
+  const lowerRoles = roles.map((r) => r.toLowerCase())
+  if (lowerRoles.some((r) => r.includes('admin') || r === 'staff' || r === 'superadmin')) {
+    return 1 as UserType
+  }
+  if (lowerRoles.some((r) => ['organizationuser', 'provider', 'distributor', 'supplier', 'seller', 'vendor'].some((k) => r.includes(k)))) {
+    return 2 as UserType
+  }
+  return 4 as UserType
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const nameToUser = (raw: AuthResponseDto | UserProfileDto | User | Record<string, any> | any, token?: string): User => {
+  const rawObj = (raw || {}) as Record<string, any>
+  const claims = decodeJwtPayload(token || (rawObj.accessToken as string) || (rawObj.AccessToken as string))
+
+  const id =
+    String(
+      rawObj.userId ||
+        rawObj.UserId ||
+        rawObj.id ||
+        rawObj.Id ||
+        claims?.sub ||
+        claims?.nameid ||
+        claims?.['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'] ||
+        '',
+    )
+
+  const email =
+    String(
+      rawObj.email ||
+        rawObj.Email ||
+        claims?.email ||
+        claims?.['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'] ||
+        '',
+    )
+
+  const fullName =
+    String(
+      rawObj.fullName ||
+        rawObj.FullName ||
+        rawObj.name ||
+        rawObj.Name ||
+        claims?.name ||
+        claims?.unique_name ||
+        claims?.['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] ||
+        email ||
+        'User',
+    )
+
+  const combinedRoles = Array.from(
+    new Set([
+      ...normalizeRolesList(rawObj.roles),
+      ...normalizeRolesList(rawObj.Roles),
+      ...normalizeRolesList(claims?.role),
+      ...normalizeRolesList(claims?.roles),
+      ...normalizeRolesList(claims?.['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']),
+    ]),
+  )
+
+  const rawUserType = rawObj.userType ?? rawObj.UserType ?? claims?.userType ?? claims?.UserType
+  const userType = parseUserType(rawUserType, combinedRoles)
+
+  const companyId =
+    (rawObj.companyId as string) ||
+    (rawObj.CompanyId as string) ||
+    (claims?.companyId as string) ||
+    (claims?.CompanyId as string) ||
+    null
+
   const seed = `${id}${email}`.split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 0)
+
   return {
     id,
     fullName,
     email,
-    phoneNumber: 'phoneNumber' in raw ? (raw.phoneNumber ?? '') : null,
-    phoneCode: 'phoneCode' in raw ? (raw.phoneCode ?? null) : null,
-    profilePictureName: 'profilePictureName' in raw ? (raw.profilePictureName ?? null) : null,
-    userType: raw.userType,
-    language: raw.language,
-    themeMode: normalizeThemeMode((raw as { themeMode?: unknown }).themeMode ?? (raw as { ThemeMode?: unknown }).ThemeMode ?? null),
-    // AuthResponseDto carries no verification flag, and the backend only issues
-    // a session from /login (which rejects unconfirmed accounts) and
-    // /verify-register-otp (which rejects a wrong code). So reaching this branch
-    // means the address is confirmed. The profile fetch later carries the real
-    // value.
-    isEmailConfirmed: 'isEmailConfirmed' in raw ? Boolean((raw as UserProfileDto).isEmailConfirmed) : true,
-    createdAt: 'createdAt' in raw ? String((raw as UserProfileDto).createdAt) : new Date().toISOString(),
-    roles: raw.roles ?? [],
-    companyId: (raw as AuthResponseDto).companyId ?? (raw as UserProfileDto).companyId ?? null,
-    company: (raw as UserProfileDto).company ?? null,
+    phoneNumber: ((rawObj.phoneNumber || rawObj.PhoneNumber) as string) ?? null,
+    phoneCode: ((rawObj.phoneCode || rawObj.PhoneCode) as string) ?? null,
+    profilePictureName: ((rawObj.profilePictureName || rawObj.ProfilePictureName) as string) ?? null,
+    userType,
+    language: ((rawObj.language ?? rawObj.Language) as number) ?? 1,
+    themeMode: normalizeThemeMode(rawObj.themeMode ?? rawObj.ThemeMode ?? null),
+    isEmailConfirmed: 'isEmailConfirmed' in rawObj ? Boolean(rawObj.isEmailConfirmed) : true,
+    createdAt: (rawObj.createdAt as string) || (rawObj.CreatedAt as string) || new Date().toISOString(),
+    roles: combinedRoles,
+    companyId,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    company: ((rawObj.company || rawObj.Company) as any) || null,
     tint: TINTS[seed % TINTS.length] ?? '#0ea5e9',
   }
 }
 
 const decodeJwtExp = (token: string): number => {
   try {
-    const parts = token.split('.')
-    if (parts.length < 2 || !parts[1]) return Date.now() + 3_600_000
-    const payload = JSON.parse(atob(parts[1])) as { exp?: number }
-    return typeof payload.exp === 'number' ? payload.exp * 1000 : Date.now() + 3_600_000
+    const payload = decodeJwtPayload(token)
+    return typeof payload?.exp === 'number' ? payload.exp * 1000 : Date.now() + 3_600_000
   } catch {
     return Date.now() + 3_600_000
   }
@@ -257,15 +391,25 @@ export class AuthService {
   readonly isAdmin = computed(() => {
     const u = this.user.value
     if (!u) return false
-    return u.roles.map((r) => r.toLowerCase()).includes('admin') || u.userType === 1
+    const lowerRoles = (u.roles || []).map((r) => String(r).toLowerCase())
+    return (
+      lowerRoles.some((r) => r.includes('admin') || r === 'staff' || r === 'superadmin') ||
+      Number(u.userType) === 1
+    )
   })
 
   readonly isOrganizationUser = computed(() => {
     const u = this.user.value
     if (!u) return false
+    const lowerRoles = (u.roles || []).map((r) => String(r).toLowerCase())
     return (
-      u.roles.some((r) => ['organizationuser', 'provider', 'distributor', 'supplier'].includes(r.toLowerCase())) ||
-      u.userType === 2
+      lowerRoles.some((r) =>
+        ['organizationuser', 'provider', 'distributor', 'supplier', 'seller', 'vendor'].some(
+          (k) => r.includes(k),
+        ),
+      ) ||
+      Number(u.userType) === 2 ||
+      Boolean(u.companyId || u.company?.id)
     )
   })
 
@@ -276,9 +420,7 @@ export class AuthService {
     if (this.isAdmin.value) return false
     return (
       this.isOrganizationUser.value ||
-      u.roles.some((r) => ['provider', 'distributor', 'supplier'].includes(r.toLowerCase())) ||
-      !!u.companyId ||
-      !!u.company
+      Boolean(u.companyId || u.company?.id)
     )
   })
 
@@ -287,11 +429,7 @@ export class AuthService {
     const u = this.user.value
     if (!u) return false
     if (this.isAdmin.value || this.isProvider.value) return false
-    return (
-      u.userType === 4 ||
-      u.roles.some((r) => ['client', 'buyer', 'customer'].includes(r.toLowerCase())) ||
-      true
-    )
+    return true
   })
 
   /** Buyer = Client */
@@ -425,7 +563,7 @@ export class AuthService {
         return
       }
       this.session = session
-      this.user.value = session.user
+      this.user.value = nameToUser(session.user, session.accessToken)
       // Hydrate full profile (with profilePictureName) in background after restore
       if (typeof window !== 'undefined') {
         setTimeout(() => void this.loadProfile().catch(() => {}), 300)
@@ -438,7 +576,7 @@ export class AuthService {
   }
 
   private persistSession(auth: AuthResponseDto): void {
-    const user = nameToUser(auth)
+    const user = nameToUser(auth, auth.accessToken)
     // Approval self-heals the pending-org marker (Customer vs pending org
     // can't be told apart by the backend — it has no Customer role).
     syncPendingOrgMarker(user)
@@ -460,7 +598,8 @@ export class AuthService {
   }
 
   private updateUserFromProfile(profile: UserProfileDto): void {
-    const user = nameToUser(profile)
+    const token = this.tokenStore.getAccessToken() || this.session?.accessToken
+    const user = nameToUser(profile, token)
     syncPendingOrgMarker(user)
     if (this.session) {
       this.session.user = user

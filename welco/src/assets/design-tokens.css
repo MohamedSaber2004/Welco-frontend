@@ -2,204 +2,204 @@
 
 :root {
   /* --------------------------------------------------------------------------
-     Welco — Surgical Obsidian & Electropolished Titanium Design System
-     Art Directed for Tier-1 Surgical & Hospital Procurement Platforms
+     MarketPro — Modern E-Commerce & Provider Marketplace Design Tokens
+     Visual Source of Truth aligned with MarketPro Design Reference
      -------------------------------------------------------------------------- */
-  --color-primary: #071520;       /* Surgical Obsidian Navy — Executive ink & deep authority */
-  --color-primary-deep: #030B12;  /* Pure Obsidian Pitch */
-  --color-primary-light: #E6F4F2; /* Laser Teal Ice container */
+  --color-primary: #6366F1;       /* MarketPro Primary Indigo */
+  --color-primary-deep: #4F46E5;  /* Emphasized / Hover Indigo */
+  --color-primary-light: #EEF2FF; /* Primary Subtle Tint */
 
-  --color-steel-teal: #00A389;    /* Electropolished Laser Teal — Core Surgical Brand Accent */
-  --color-surgical-cyan: #0EA5E9; /* Cyan Telemetry Light — Focus halos & secondary telemetry */
+  --color-steel-teal: #14B8A6;    /* Secondary Teal Accent */
+  --color-surgical-cyan: #0EA5E9; /* Sky / Cyan Telemetry Light */
 
-  --color-canvas: #F4F7FA;        /* Specular Sterile Canvas */
-  --color-white: #FFFFFF;         /* Specular Sterile White */
-  --color-brand-ice: #E8F8F5;     /* Pure Laser Ice tint */
+  --color-canvas: #F9FAFB;        /* Clean Neutral Background */
+  --color-white: #FFFFFF;         /* Pure Surface White */
+  --color-brand-ice: #EEF2FF;     /* Primary Soft Tint */
 
-  --color-heading: #071520;       /* High-contrast Obsidian Headings */
-  --color-body: #334E68;          /* High-legibility Clinical Slate Body */
-  --color-muted: #5A7184;         /* Suture Steel Grey / Technical DIN / SKU Metadata */
+  --color-heading: #111827;       /* Main Content and Headings */
+  --color-body: #4B5563;          /* High-legibility Body Text */
+  --color-muted: #6B7280;         /* Secondary Metadata & Subdued Content */
 
-  --color-border: #D8E2EC;        /* Clinical Precision Hairline */
-  --color-border-strong: #BAC7D5; /* Specimen Tray Divide */
+  --color-border: #E5E7EB;        /* Dividers, Outlines & Component Borders */
+  --color-border-strong: #D1D5DB; /* Structural Borders */
 
-  --color-focus: #00A389;         /* Laser Teal Focus Halo */
+  --color-focus: #6366F1;         /* Primary Focus Halo */
 
   /* Semantic */
-  --color-success: #059669;       /* ISO 13485 Verified Green */
-  --color-warning: #D97706;       /* Lot Tracing / Caution Amber */
-  --color-danger: #E11D48;        /* Critical Deviation / Out-of-Spec Rose */
+  --color-success: #10B981;       /* Success Green */
+  --color-warning: #F59E0B;       /* Warning Amber */
+  --color-danger: #EF4444;        /* Error / Destructive Red */
 
   /* Optional surface */
-  --color-surface-subtle: #F8FAFC;
+  --color-surface-subtle: #F9FAFB;
 
   /* Brand gradient */
-  --gradient-brand: linear-gradient(135deg, #071520 0%, #00A389 100%);
-  --gradient-laser: linear-gradient(135deg, #00A389 0%, #0EA5E9 100%);
-  --gradient-obsidian: linear-gradient(180deg, #0D2235 0%, #071520 100%);
+  --gradient-brand: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%);
+  --gradient-laser: linear-gradient(135deg, #14B8A6 0%, #6366F1 100%);
+  --gradient-obsidian: linear-gradient(180deg, #1E1B4B 0%, #111827 100%);
 
   /* Base scales */
-  --color-brand-50:  #E8F8F5;
-  --color-brand-100: #D0F2EB;
-  --color-brand-200: #A2E5D8;
-  --color-brand-300: #67D2C1;
-  --color-brand-400: #2CBBA7;
-  --color-brand-500: #00A389;    /* Laser Teal Primary Accent */
-  --color-brand-600: #008872;
-  --color-brand-700: #006D5C;
-  --color-brand-800: #0A3D36;
-  --color-brand-900: #071520;    /* Obsidian */
+  --color-brand-50:  #EEF2FF;
+  --color-brand-100: #E0E7FF;
+  --color-brand-200: #C7D2FE;
+  --color-brand-300: #A5B4FC;
+  --color-brand-400: #818CF8;
+  --color-brand-500: #6366F1;    /* Primary Indigo */
+  --color-brand-600: #4F46E5;
+  --color-brand-700: #4338CA;
+  --color-brand-800: #3730A3;
+  --color-brand-900: #312E81;
 
-  --color-neutral-0:   #FFFFFF;  /* Sterile clean white */
-  --color-neutral-25:  #FCFDFE;
-  --color-neutral-50:  #F4F7FA;  /* Clinical canvas base */
-  --color-neutral-100: #EBF1F6;  /* Surface container low / subtle fill */
-  --color-neutral-200: #D8E2EC;  /* Border clinical hairline */
-  --color-neutral-300: #BAC7D5;  /* Outline variant / strong divide */
-  --color-neutral-400: #8295A8;  /* Placeholder / subdued */
-  --color-neutral-500: #5A7184;  /* Structural outline */
-  --color-neutral-600: #486581;  /* Muted steel grey / metadata (≥4.5:1 contrast) */
-  --color-neutral-700: #334E68;  /* Body typography / on-surface-variant */
-  --color-neutral-800: #102A43;  /* Elevated Obsidian surface */
-  --color-neutral-900: #071520;  /* High-legibility ink primary / headings */
+  --color-neutral-0:   #FFFFFF;  /* Crisp White */
+  --color-neutral-25:  #FAFAFA;
+  --color-neutral-50:  #F9FAFB;  /* MarketPro Application Background */
+  --color-neutral-100: #F3F4F6;  /* Surface Container Low */
+  --color-neutral-200: #E5E7EB;  /* MarketPro Border Hairline */
+  --color-neutral-300: #D1D5DB;  /* Border Strong */
+  --color-neutral-400: #9CA3AF;  /* Muted Text / Placeholder */
+  --color-neutral-500: #6B7280;  /* Secondary Text */
+  --color-neutral-600: #4B5563;  /* High-legibility Body */
+  --color-neutral-700: #374151;  /* Dark Slate */
+  --color-neutral-800: #1F2937;  /* High-contrast Neutral */
+  --color-neutral-900: #111827;  /* Deep Heading Ink */
 
-  /* Surgical & Specialty Accents */
-  --color-teal-500:   #147D92;
-  --color-teal-100:   #EDF4FF;
-  --color-cyan-500:   #28A7A1;
-  --color-cyan-100:   #E6FAF8;
-  --color-amber-500:  #E67E22;
+  /* MarketPro Accents */
+  --color-teal-500:   #14B8A6;
+  --color-teal-100:   #CCFBF1;
+  --color-cyan-500:   #0EA5E9;
+  --color-cyan-100:   #E0F2FE;
+  --color-amber-500:  #F59E0B;
   --color-amber-100:  #FEF3C7;
-  --color-rose-500:   #DC3545;
-  --color-rose-100:   #FFDAD6;
-  --color-orange-500: #E67E22;
-  --color-orange-100: #FEF3C7;
-  --color-green-500:  #198754;
-  --color-green-100:  #DCFCE7;
-  --color-violet-500: #147D92;
-  --color-violet-100: #EDF4FF;
+  --color-rose-500:   #EF4444;
+  --color-rose-100:   #FEE2E2;
+  --color-orange-500: #F97316;
+  --color-orange-100: #FFEDD5;
+  --color-green-500:  #10B981;
+  --color-green-100:  #D1FAE5;
+  --color-violet-500: #8B5CF6;
+  --color-violet-100: #F3E8FF;
 
-  /* Regulatory & Status — Enhanced Contrast (WCAG AA/AAA) */
-  --color-success-50:  #F0FDF4;
-  --color-success-100: #DCFCE7;
-  --color-success-200: #BBF7D0;
-  --color-success-300: #86EFAC;
-  --color-success-400: #4ADE80;
-  --color-success-500: #16A34A;  /* Verified ISO/CE compliance */
-  --color-success-600: #15803D;
-  --color-success-700: #166534;
-  --color-success-800: #166534;
-  --color-success-900: #0D2818;
+  /* Regulatory & Status — MarketPro High Contrast */
+  --color-success-50:  #ECFDF5;
+  --color-success-100: #D1FAE5;
+  --color-success-200: #A7F3D0;
+  --color-success-300: #6EE7B7;
+  --color-success-400: #34D399;
+  --color-success-500: #10B981;  /* MarketPro Success Green */
+  --color-success-600: #059669;
+  --color-success-700: #047857;
+  --color-success-800: #065F46;
+  --color-success-900: #064E3B;
 
   --color-warning-50:  #FFFBEB;
   --color-warning-100: #FEF3C7;
   --color-warning-200: #FDE68A;
   --color-warning-300: #FCD34D;
   --color-warning-400: #FBBF24;
-  --color-warning-500: #D97706;  /* Regulatory Amber / lot-tracing alert */
-  --color-warning-600: #B45309;
-  --color-warning-700: #92400E;
-  --color-warning-800: #78350F;
-  --color-warning-900: #451A03;
+  --color-warning-500: #F59E0B;  /* MarketPro Warning Amber */
+  --color-warning-600: #D97706;
+  --color-warning-700: #B45309;
+  --color-warning-800: #92400E;
+  --color-warning-900: #78350F;
 
   --color-danger-50:   #FEF2F2;
   --color-danger-100:  #FEE2E2;
   --color-danger-200:  #FECACA;
   --color-danger-300:  #FCA5A5;
   --color-danger-400:  #F87171;
-  --color-danger-500:  #EF4444;  /* Out-of-spec tolerance / critical warning */
+  --color-danger-500:  #EF4444;  /* MarketPro Error Red */
   --color-danger-600:  #DC2626;
   --color-danger-700:  #B91C1C;
   --color-danger-800:  #991B1B;
   --color-danger-900:  #7F1D1D;
 
-  --color-info-50:     #F0F9FF;
-  --color-info-100:    #E0F2FE;
-  --color-info-200:    #BAE6FD;
-  --color-info-300:    #7DD3FC;
-  --color-info-400:    #38BDF8;
-  --color-info-500:    #0EA5E9;  /* Steel Teal metric & info callout */
-  --color-info-600:    #0284C7;
-  --color-info-700:    #0369A1;
-  --color-info-800:    #075985;
-  --color-info-900:    #0C4A6E;
+  --color-info-50:     #EFF6FF;
+  --color-info-100:    #DBEAFE;
+  --color-info-200:    #BFDBFE;
+  --color-info-300:    #93C5FD;
+  --color-info-400:    #60A5FA;
+  --color-info-500:    #3B82F6;
+  --color-info-600:    #2563EB;
+  --color-info-700:    #1D4ED8;
+  --color-info-800:    #1E40AF;
+  --color-info-900:    #1E3A8A;
 
-  /* Data visualization — Clinical precision series */
-  --chart-1: #0F3D56;  /* Deep medical navy — primary metric */
-  --chart-2: #147D92;  /* Steel teal — secondary series */
-  --chart-3: #28A7A1;  /* Precision surgical cyan — target */
-  --chart-teal-soft: #E6FAF8;
-  --chart-4: #E67E22;  /* Regulatory amber alert — deviations */
-  --chart-5: #198754;  /* Verified green — compliance rate */
-  --chart-6: #627D98;  /* Muted steel grey — baseline */
-  --chart-track: #EDF4FF;      /* Gridlines, empty bar track */
-  --chart-map-idle: #D9E2EC;   /* Unhighlighted territories */
+  /* Data visualization — MarketPro series */
+  --chart-1: #6366F1;  /* Indigo primary */
+  --chart-2: #14B8A6;  /* Teal secondary */
+  --chart-3: #8B5CF6;  /* Accent purple */
+  --chart-teal-soft: #CCFBF1;
+  --chart-4: #F59E0B;  /* Amber warning */
+  --chart-5: #10B981;  /* Green success */
+  --chart-6: #9CA3AF;  /* Neutral slate */
+  --chart-track: #F3F4F6;
+  --chart-map-idle: #E5E7EB;
 
   /* ------------------------------------------------------------------
      3. Semantic tokens — what components actually reference
      ------------------------------------------------------------------ */
 
   /* Surfaces */
-  --bg-app:        var(--color-neutral-50);   /* #F7F9FB Canvas */
+  --bg-app:        var(--color-neutral-50);   /* #F9FAFB Canvas */
   --bg-surface:    var(--color-neutral-0);    /* #FFFFFF Clean white */
   --bg-sidebar:    var(--color-neutral-0);
-  --bg-subtle:     var(--color-neutral-100);  /* #EDF4FF Surface container */
-  --bg-hover:      var(--color-brand-100);    /* #E3EFFF Soft highlight */
-  --bg-overlay:    rgba(16, 42, 67, 0.45);
+  --bg-subtle:     var(--color-neutral-100);  /* #F3F4F6 Surface container */
+  --bg-hover:      var(--color-brand-50);     /* #EEF2FF Soft highlight */
+  --bg-overlay:    rgba(17, 24, 39, 0.45);
 
   /* Text & Inks */
-  --fg-heading:    var(--color-neutral-900);  /* #102A43 High-legibility ink primary */
-  --fg-body:       var(--color-neutral-700);  /* #42474D High-clarity body */
-  --fg-muted:      var(--color-neutral-600);  /* #627D98 Muted steel grey */
-  --fg-subtle:     var(--color-neutral-500);  /* #72787D Structural outline text */
-  --fg-placeholder:var(--color-neutral-400);  /* #80A8C5 Placeholder */
-  --fg-on-brand:   var(--color-neutral-0);    /* #FFFFFF Contrast text on navy/teal */
-  --fg-link:       #00A389;                   /* Laser Teal precision interactive links */
+  --fg-heading:    var(--color-neutral-900);  /* #111827 High-legibility ink primary */
+  --fg-body:       var(--color-neutral-600);  /* #4B5563 High-clarity body */
+  --fg-muted:      var(--color-neutral-500);  /* #6B7280 Muted secondary text */
+  --fg-subtle:     var(--color-neutral-400);  /* #9CA3AF Structural outline text */
+  --fg-placeholder:var(--color-neutral-400);  /* #9CA3AF Placeholder */
+  --fg-on-brand:   var(--color-neutral-0);    /* #FFFFFF Contrast text on primary */
+  --fg-link:       #6366F1;                   /* Primary Indigo link */
 
-  /* Brand Hierarchy — Surgical Obsidian & Electropolished Laser Teal */
-  --brand:         #071520;  /* Surgical Obsidian Navy */
-  --brand-hover:   #00A389;  /* Laser Teal on hover */
-  --brand-soft:    #E8F8F5;  /* Laser Teal Ice container tint */
-  --brand-accent:  #00A389;  /* Direct Laser Teal Accent */
-  --brand-accent-hover: #008872;
-  --brand-gradient: linear-gradient(135deg, #071520 0%, #00A389 100%);
-  --brand-surface: #0D2235;  /* Deep elevated tray */
+  /* Brand Hierarchy — MarketPro Indigo & Teal */
+  --brand:         #6366F1;  /* Primary Indigo */
+  --brand-hover:   #4F46E5;  /* Primary Hover */
+  --brand-soft:    #EEF2FF;  /* Primary Subtle Tint */
+  --brand-accent:  #8B5CF6;  /* Accent Purple */
+  --brand-accent-hover: #7C3AED;
+  --brand-gradient: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%);
+  --brand-surface: #EEF2FF;  /* Soft elevated tray */
 
   /* Secondary & Tertiary */
-  --secondary:       #00A389;  /* Electropolished Laser Teal */
-  --secondary-hover: #008872;
-  --secondary-soft:  #E8F8F5;
-  --tertiary:        #0EA5E9;  /* Cyan Telemetry Light */
-  --tertiary-hover:  #0284C7;
-  --tertiary-soft:   #E0F2FE;
+  --secondary:       #14B8A6;  /* Secondary Teal */
+  --secondary-hover: #0D9488;
+  --secondary-soft:  #CCFBF1;
+  --tertiary:        #8B5CF6;  /* Accent Purple */
+  --tertiary-hover:  #7C3AED;
+  --tertiary-soft:   #F3E8FF;
 
-  /* Borders — Hairline Precision */
-  --border:        #D8E2EC;  /* Border clinical hairline 1px */
-  --border-strong: #BAC7D5;  /* Outline variant / structural divide */
-  --border-focus:  #00A389;  /* Laser Teal focus boundary */
-  --border-error:  #E11D48;  /* Error state border */
-  --border-success: #059669; /* Success state border */
-  --border-warning: #D97706; /* Warning state border */
+  /* Borders — MarketPro Hairline Precision */
+  --border:        #E5E7EB;  /* Border clean modern hairline */
+  --border-strong: #D1D5DB;  /* Outline variant / structural divide */
+  --border-focus:  #6366F1;  /* Indigo focus boundary */
+  --border-error:  #EF4444;  /* Error state border */
+  --border-success: #10B981; /* Success state border */
+  --border-warning: #F59E0B; /* Warning state border */
 
   /* Feedback — Interactive States */
-  --fg-success: #16A34A;
-  --fg-success-hover: #15803D;
-  --fg-success-active: #166534;
-  --fg-warning: #D97706;
-  --fg-warning-hover: #B45309;
-  --fg-warning-active: #92400E;
+  --fg-success: #10B981;
+  --fg-success-hover: #059669;
+  --fg-success-active: #047857;
+  --fg-warning: #F59E0B;
+  --fg-warning-hover: #D97706;
+  --fg-warning-active: #B45309;
   --fg-danger:  #EF4444;
   --fg-danger-hover: #DC2626;
   --fg-danger-active: #B91C1C;
-  --fg-info:    #0EA5E9;
-  --fg-info-hover: #0284C7;
-  --fg-info-active: #0369A1;
+  --fg-info:    #3B82F6;
+  --fg-info-hover: #2563EB;
+  --fg-info-active: #1D4ED8;
 
   /* Interactive States */
   --state-hover-opacity: 0.08;
   --state-active-opacity: 0.12;
   --state-disabled-opacity: 0.48;
-  --state-focus-ring: 0 0 0 3px rgba(15, 61, 86, 0.1), 0 0 0 4px #147D92;
+  --state-focus-ring: 0 0 0 3px rgba(99, 102, 241, 0.2), 0 0 0 4px #6366F1;
 
   /* ------------------------------------------------------------------
      4. Typography Scale & Families
@@ -265,32 +265,32 @@
   --space-24: 96px;    /* 6rem */
 
   /* ------------------------------------------------------------------
-     6. Radius — Level 1 Soft Precision (Avoid bulbous consumer radii)
+     6. Radius — MarketPro Consistent Radii System
      ------------------------------------------------------------------ */
-  --radius-xs: 3px;    /* Micro-badges, inline certification tags */
-  --radius-sm: 4px;    /* Base radius: buttons, inputs, dropdown triggers */
-  --radius-md: 6px;    /* Intermediate inputs and toolbar buttons */
-  --radius-lg: 8px;    /* Container radius: instrument cards, tables, modal trays */
-  --radius-xl: 12px;   /* Outer container shell, hero sections */
-  --radius-2xl: 16px;  /* Max structural radius */
-  --radius-pill: 9999px; /* Round avatar & icon button only */
+  --radius-xs: 4px;    /* Micro-badges, inline tags */
+  --radius-sm: 8px;    /* Base radius: buttons, inputs, dropdown triggers */
+  --radius-md: 12px;   /* Intermediate inputs, cards and toolbar buttons */
+  --radius-lg: 16px;   /* Container radius: cards, tables, modal trays */
+  --radius-xl: 24px;   /* Outer container shell, promotional hero sections */
+  --radius-2xl: 28px;  /* Max structural radius */
+  --radius-pill: 9999px; /* Badges and pill buttons */
 
   /* ------------------------------------------------------------------
-     7. Elevation — Surgical Specular Inset & Laser Ambient Depths
+     7. Elevation — MarketPro Subtle Elevation System
      ------------------------------------------------------------------ */
-  --shadow-xs: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 1px 2px rgba(7, 21, 32, 0.04);
-  --shadow-sm: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 2px 6px rgba(7, 21, 32, 0.05), 0 1px 2px rgba(7, 21, 32, 0.03);
-  --shadow-md: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 6px 16px -2px rgba(7, 21, 32, 0.07), 0 2px 6px rgba(7, 21, 32, 0.04);
-  --shadow-lg: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 14px 30px -4px rgba(7, 21, 32, 0.10), 0 4px 10px rgba(7, 21, 32, 0.05);
-  --shadow-xl: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 24px 48px -8px rgba(7, 21, 32, 0.16), 0 8px 16px rgba(7, 21, 32, 0.06);
-  --shadow-2xl: 0 32px 64px -12px rgba(7, 21, 32, 0.22);
-  --shadow-brand: 0 6px 20px -2px rgba(0, 163, 137, 0.28), 0 2px 6px rgba(7, 21, 32, 0.12);
-  --shadow-tray: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 2px 8px -2px rgba(7, 21, 32, 0.06);
-  --shadow-tray-hover: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 12px 28px -4px rgba(7, 21, 32, 0.09), 0 2px 6px rgba(0, 163, 137, 0.14);
-  --shadow-inner: inset 0 2px 4px rgba(7, 21, 32, 0.06);
-  --ring-focus: 0 0 0 3px rgba(0, 163, 137, 0.18), 0 0 0 4px #00A389;
-  --ring-focus-error: 0 0 0 3px rgba(225, 29, 72, 0.18), 0 0 0 4px #E11D48;
-  --ring-focus-success: 0 0 0 3px rgba(5, 150, 105, 0.18), 0 0 0 4px #059669;
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.10);
+  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0 30px 50px -12px rgba(0, 0, 0, 0.18);
+  --shadow-2xl: 0 35px 60px -15px rgba(0, 0, 0, 0.22);
+  --shadow-brand: 0 4px 14px 0 rgba(99, 102, 241, 0.35);
+  --shadow-tray: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
+  --shadow-tray-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.12);
+  --shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+  --ring-focus: 0 0 0 3px rgba(99, 102, 241, 0.2), 0 0 0 4px #6366F1;
+  --ring-focus-error: 0 0 0 3px rgba(239, 68, 68, 0.2), 0 0 0 4px #EF4444;
+  --ring-focus-success: 0 0 0 3px rgba(16, 185, 129, 0.2), 0 0 0 4px #10B981;
 
   /* ------------------------------------------------------------------
      8. Layout

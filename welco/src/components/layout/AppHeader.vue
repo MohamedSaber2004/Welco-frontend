@@ -399,10 +399,10 @@ watch(isAuthed, (v) => {
 .navbar-menu__link:hover { color: #ffffff; background: rgba(255, 255, 255, 0.18); text-decoration: none; }
 .navbar-menu__link.router-link-active {
     color: #ffffff;
-    background: rgba(0, 163, 137, 0.22);
+    background: var(--brand, #6366F1);
     font-weight: 600;
-    box-shadow: none;
-    border: 1px solid rgba(0, 163, 137, 0.6);
+    box-shadow: 0 2px 6px rgba(99, 102, 241, 0.3);
+    border: 1px solid var(--brand, #6366F1);
   }
 .header__search {
   display: flex;
@@ -410,7 +410,7 @@ watch(isAuthed, (v) => {
   gap: 0.5rem;
   background: rgba(255, 255, 255, 0.10);
   border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: var(--radius-sm, 4px);
+  border-radius: var(--radius-sm, 8px);
   padding: 0 0.6rem 0 0.7rem;
   height: 38px;
   max-height: 38px;
@@ -421,8 +421,8 @@ watch(isAuthed, (v) => {
   overflow: hidden;
 }
 .header__search:focus-within {
-    border-color: #00A389;
-    box-shadow: 0 0 0 3px rgba(0, 163, 137, 0.28);
+    border-color: var(--brand, #6366F1);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.28);
     background: rgba(255, 255, 255, 0.16);
   }
 .header__search-icon { font-size: 18px; color: rgba(255, 255, 255, 0.75); flex-shrink: 0; }
@@ -535,12 +535,12 @@ watch(isAuthed, (v) => {
   min-width: 21px;
   height: 21px;
   padding: 0 5px;
-  background: #00A389;
+  background: var(--brand, #6366F1);
   color: #ffffff;
-  border-color: #071520;
+  border-color: #FFFFFF;
   font-size: 11px;
   font-weight: 800;
-  box-shadow: 0 2px 6px rgba(0, 163, 137, 0.4);
+  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.4);
 }
 .btn {
   font-family: var(--wl-font-body);
@@ -563,16 +563,16 @@ watch(isAuthed, (v) => {
 .btn-ghost:hover { background: var(--wl-surface-soft); }
 .btn-sm { padding: 6px 12px; font-size: 12.5px; }
 .header__auth-desktop .btn-primary {
-  background: #00A389;
+  background: var(--brand, #6366F1);
   color: #ffffff;
-  border-color: #00A389;
+  border-color: var(--brand, #6366F1);
   font-weight: 600;
 }
 .header__auth-desktop .btn-primary:hover {
-  background: #008872;
+  background: var(--brand-hover, #4F46E5);
   color: #ffffff;
-  border-color: #008872;
-  box-shadow: 0 2px 10px rgba(0, 163, 137, 0.35);
+  border-color: var(--brand-hover, #4F46E5);
+  box-shadow: 0 2px 10px rgba(99, 102, 241, 0.35);
 }
 .header__auth-desktop .btn-ghost {
   background: rgba(255, 255, 255, 0.12);

@@ -1,4 +1,4 @@
-﻿<script setup lang="ts">
+<script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch, nextTick } from 'vue'
 import { t } from '../../i18n'
 
@@ -146,13 +146,14 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-4, 16px);
+  padding: max(var(--space-4, 16px), env(safe-area-inset-top, 16px)) max(var(--space-4, 16px), env(safe-area-inset-right, 16px)) max(var(--space-4, 16px), env(safe-area-inset-bottom, 16px)) max(var(--space-4, 16px), env(safe-area-inset-left, 16px));
   z-index: var(--z-overlay, 1000);
 }
 
 .modal-container {
   width: 100%;
-  max-height: 90vh;
+  max-width: 100%;
+  max-height: calc(100dvh - 2rem);
   display: flex;
   flex-direction: column;
   margin: auto;
@@ -160,33 +161,35 @@ onUnmounted(() => {
 
 .modal-card {
   background: var(--bg-surface, #ffffff);
-  border: 1px solid var(--border, #d9e2ec);
-  border-radius: var(--radius-xl, 12px);
-  box-shadow: var(--shadow-lg, 0 12px 32px rgba(16, 42, 67, 0.10));
+  border: 1px solid var(--border, #E5E7EB);
+  border-radius: var(--radius-lg, 16px);
+  box-shadow: var(--shadow-xl);
   display: flex;
   flex-direction: column;
-  max-height: 90vh;
+  max-height: calc(100dvh - 2rem);
   overflow: hidden;
   z-index: var(--z-modal, 1050);
 }
 
 .modal-header {
   padding: var(--space-4, 1rem) var(--space-6, 1.5rem);
-  border-bottom: 1px solid var(--border, #d9e2ec);
+  border-bottom: 1px solid var(--border, #E5E7EB);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4, 1rem);
   background: var(--bg-surface, #ffffff);
+  flex-shrink: 0;
 }
 
 .modal-title {
   font-family: var(--font-display);
   font-size: var(--text-lg, 1.125rem);
   font-weight: var(--weight-semibold, 600);
-  color: var(--fg-heading, #102a43);
+  color: var(--fg-heading, #111827);
   margin: 0;
   letter-spacing: var(--tracking-tight, -0.02em);
+  word-break: break-word;
 }
 
 .modal-close {
@@ -197,38 +200,65 @@ onUnmounted(() => {
   background: transparent;
   border: 0;
   border-radius: var(--radius-pill, 9999px);
-  color: var(--fg-muted, #7a90a8);
+  color: var(--fg-muted, #6B7280);
   cursor: pointer;
   transition: all var(--duration-fast, 150ms) var(--ease-out, ease-out);
+  flex-shrink: 0;
 }
 
 .modal-close:hover {
-  color: var(--fg-heading, #102a43);
-  background: var(--bg-subtle, #edf4ff);
+  color: var(--fg-heading, #111827);
+  background: var(--bg-subtle, #F3F4F6);
 }
 
 .modal-body {
   padding: var(--space-6, 1.5rem);
   overflow-y: auto;
-  color: var(--fg-body, #42474d);
+  -webkit-overflow-scrolling: touch;
+  color: var(--fg-body, #4B5563);
+  flex: 1 1 auto;
 }
 
 .modal-footer {
   padding: var(--space-4, 1rem) var(--space-6, 1.5rem);
-  border-top: 1px solid var(--border, #d9e2ec);
+  border-top: 1px solid var(--border, #E5E7EB);
   display: flex;
   gap: var(--space-3, 0.75rem);
   justify-content: flex-end;
-  background: var(--bg-subtle, #f8fafc);
+  background: var(--bg-subtle, #F9FAFB);
+  flex-shrink: 0;
+  flex-wrap: wrap;
 }
 
 @media (max-width: 640px) {
   .modal-backdrop {
-    padding: var(--space-2, 0.5rem);
+    padding: max(0.5rem, env(safe-area-inset-top, 0.5rem)) max(0.5rem, env(safe-area-inset-right, 0.5rem)) max(0.5rem, env(safe-area-inset-bottom, 0.5rem)) max(0.5rem, env(safe-area-inset-left, 0.5rem));
+  }
+  .modal-container {
+    max-height: calc(100dvh - 1rem);
   }
   .modal-card {
-    border-radius: var(--radius-lg, 8px);
-    max-height: 94vh;
+    border-radius: var(--radius-lg, 12px);
+    max-height: calc(100dvh - 1rem);
+  }
+  .modal-header {
+    padding: 0.75rem 1rem;
+  }
+  .modal-title {
+    font-size: 1rem;
+  }
+  .modal-body {
+    padding: 1rem;
+  }
+  .modal-footer {
+    padding: 0.75rem 1rem;
+    flex-direction: column-reverse;
+    gap: 0.5rem;
+  }
+  .modal-footer :deep(.btn),
+  .modal-footer :deep(button) {
+    width: 100%;
+    justify-content: center;
   }
 }
 

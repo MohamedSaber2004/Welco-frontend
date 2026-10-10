@@ -367,9 +367,9 @@ const goPage = (p: number) => {
   gap: 0.45rem;
   font-size: 10px;
   font-weight: 700;
-  color: var(--secondary, #00A389);
-  background: var(--wl-primary-soft);
-  border: 1px solid var(--border-subtle, rgba(0, 163, 137, 0.3));
+  color: var(--brand, #6366F1);
+  background: var(--brand-subtle, #EEF2FF);
+  border: 1px solid rgba(99, 102, 241, 0.25);
   padding: 0.2rem 0.6rem;
   border-radius: 9999px;
   letter-spacing: 0.06em;
@@ -381,8 +381,8 @@ const goPage = (p: number) => {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--secondary, #00A389);
-  box-shadow: 0 0 8px rgba(0, 163, 137, 0.4);
+  background: var(--brand, #6366F1);
+  box-shadow: 0 0 8px rgba(99, 102, 241, 0.4);
 }
 
 .cert-hero {

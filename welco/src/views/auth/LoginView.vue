@@ -34,11 +34,13 @@ const handleLogin = async () => {
   if (res.ok) {
     await authService.loadProfile().catch(() => null)
     clearPendingOrg(authService.user.value?.email)
-  }
-  if (res.ok) {
     const redirect = (route.query.redirect as string) || ''
-    if (redirect && authService.canAccessPath(redirect)) await router.replace(redirect)
-    else await router.replace({ name: authService.getDashboardRouteName() })
+    if (redirect && redirect !== '/' && authService.canAccessPath(redirect)) {
+      await router.replace(redirect)
+    } else {
+      const targetRoute = authService.getDashboardRouteName()
+      await router.replace({ name: targetRoute })
+    }
   } else {
     error.value = res.error
     const lower = res.error.toLowerCase()

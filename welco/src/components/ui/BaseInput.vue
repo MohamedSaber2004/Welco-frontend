@@ -139,8 +139,8 @@ const sizeClass = computed(() => `field-control--${props.size}`)
   align-items: center;
   width: 100%;
   background: var(--bg-surface, #ffffff);
-  border: 1px solid var(--border, #d9e2ec);
-  border-radius: var(--radius-md, 6px);
+  border: 1px solid var(--border, #E5E7EB);
+  border-radius: var(--radius-sm, 8px);
   box-shadow: none;
   transition: border-color var(--duration-fast, 150ms) var(--ease-out, ease-out),
               box-shadow var(--duration-fast, 150ms) var(--ease-out, ease-out),
@@ -149,32 +149,32 @@ const sizeClass = computed(() => `field-control--${props.size}`)
 }
 
 .field-control:hover:not(.is-disabled) {
-  border-color: var(--border-strong, #c2c7cd);
+  border-color: var(--border-strong, #D1D5DB);
 }
 
 .field-control:focus-within {
-  border-color: var(--secondary, #00A389);
+  border-color: var(--brand, #6366F1);
   outline: none;
-  box-shadow: 0 0 0 3px rgba(0, 163, 137, 0.18) !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18) !important;
   background: var(--bg-surface, #ffffff);
 }
 
 .field-control--sm {
-  min-height: 36px;
-  height: 36px;
-  border-radius: var(--radius-sm, 4px);
+  min-height: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm, 8px);
 }
 
 .field-control--md {
-  min-height: 42px;
-  height: 42px;
-  border-radius: var(--radius-md, 6px);
+  min-height: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm, 8px);
 }
 
 .field-control--lg {
   min-height: 48px;
   height: 48px;
-  border-radius: var(--radius-lg, 8px);
+  border-radius: var(--radius-md, 12px);
 }
 
 .field__input {

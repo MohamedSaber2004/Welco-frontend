@@ -584,9 +584,9 @@ const submitStatusUpdate = async () => {
 }
 
 .kpi-card.is-active {
-  border-color: var(--secondary, #00A389);
-  box-shadow: 0 4px 14px rgba(0, 163, 137, 0.18);
-  background: var(--brand-soft, #E8F8F5);
+  border-color: var(--brand, #6366F1);
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.18);
+  background: var(--brand-subtle, #EEF2FF);
 }
 
 .kpi-icon-box {
@@ -970,10 +970,10 @@ const submitStatusUpdate = async () => {
 }
 
 .timeline-step.is-current .step-dot {
-  background: var(--brand-soft, #E8F8F5);
-  border-color: var(--secondary, #00A389);
-  color: var(--secondary, #00A389);
-  box-shadow: 0 0 0 3px rgba(0, 163, 137, 0.22);
+  background: var(--brand-subtle, #EEF2FF);
+  border-color: var(--brand, #6366F1);
+  color: var(--brand, #6366F1);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.22);
 }
 
 .step-label {
@@ -997,7 +997,7 @@ const submitStatusUpdate = async () => {
 }
 
 .step-line.is-active {
-  background: var(--secondary, #00A389);
+  background: var(--brand, #6366F1);
 }
 
 /* Tracking Banner */
@@ -1007,7 +1007,7 @@ const submitStatusUpdate = async () => {
   justify-content: space-between;
   gap: var(--space-3);
   padding: var(--space-3) var(--space-4);
-  background: var(--brand-soft, #E8F8F5);
+  background: var(--brand-subtle, #EEF2FF);
   border: 1px solid rgba(0, 163, 137, 0.28);
   border-radius: var(--radius-md);
 }

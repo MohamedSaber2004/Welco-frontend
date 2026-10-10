@@ -622,13 +622,18 @@ async function placeOrderFromQuote() {
   gap: 0.45rem;
   height: 44px;
   width: 100%;
-  background: var(--brand, #071520);
+  background: var(--brand, #6366F1);
   color: #ffffff;
   border: none;
-  border-radius: var(--radius-sm, 4px);
+  border-radius: var(--radius-sm, 8px);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-view-order:hover {
+  background: var(--brand-hover, #4F46E5);
 }
 
 .btn-place-order {
@@ -638,20 +643,20 @@ async function placeOrderFromQuote() {
   gap: 0.45rem;
   height: 44px;
   width: 100%;
-  background: var(--color-success, #059669);
+  background: var(--color-success, #10B981);
   color: #ffffff;
   border: none;
-  border-radius: var(--radius-sm, 4px);
+  border-radius: var(--radius-sm, 8px);
   font-size: 13.5px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 2px 8px -1px rgba(5, 150, 105, 0.25);
+  box-shadow: 0 2px 8px -1px rgba(16, 185, 129, 0.25);
   transition: all 0.18s ease;
   margin-bottom: 0.65rem;
 }
 
 .btn-place-order:hover:not(:disabled) {
-  background: #047857;
+  background: #059669;
   transform: translateY(-1px);
 }
 .btn-place-order:active:not(:disabled) {

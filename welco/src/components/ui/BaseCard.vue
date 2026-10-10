@@ -30,17 +30,17 @@ withDefaults(
   display: flex;
   flex-direction: column;
   background: var(--bg-surface, #ffffff);
-  border: 1px solid var(--border, #d9e2ec);
-  border-radius: 10px;
-  box-shadow: var(--shadow-xs, 0 1px 2px rgba(16, 42, 67, 0.04));
+  border: 1px solid var(--border, #E5E7EB);
+  border-radius: var(--radius-md, 12px);
+  box-shadow: var(--shadow-sm);
   transition: all var(--duration-base, 200ms) var(--ease-out, ease-out);
   overflow: hidden;
   position: relative;
 }
 
 .card--hover:hover {
-  box-shadow: var(--shadow-md, 0 4px 12px rgba(15, 61, 86, 0.08));
-  border-color: var(--brand, #0f3d56);
+  box-shadow: var(--shadow-md);
+  border-color: var(--brand, #6366F1);
   transform: translateY(-2px);
 }
 
@@ -51,7 +51,7 @@ withDefaults(
 
 .card__header {
   padding: var(--space-4, 1rem) var(--space-6, 1.5rem);
-  border-bottom: 1px solid var(--border, #d9e2ec);
+  border-bottom: 1px solid var(--border, #E5E7EB);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -61,11 +61,11 @@ withDefaults(
 
 .card__footer {
   padding: var(--space-4, 1rem) var(--space-6, 1.5rem);
-  border-top: 1px solid var(--border, #d9e2ec);
+  border-top: 1px solid var(--border, #E5E7EB);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4, 1rem);
-  background: var(--bg-subtle, #edf4ff);
+  background: var(--bg-subtle, #F9FAFB);
 }
 </style>

@@ -611,19 +611,19 @@ onMounted(async () => {
   gap: 0.45rem;
   height: 44px;
   width: 100%;
-  background: var(--secondary, #00A389);
+  background: var(--brand, #6366F1);
   color: #ffffff;
   border: none;
-  border-radius: var(--radius-sm, 4px);
+  border-radius: var(--radius-sm, 8px);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 2px 8px -1px rgba(0, 163, 137, 0.25);
+  box-shadow: 0 2px 8px -1px rgba(99, 102, 241, 0.25);
   transition: all 0.18s ease;
 }
 
 .btn-view-quote:hover {
-  background: var(--secondary-hover, #008872);
+  background: var(--brand-hover, #4F46E5);
 }
 
 .side-actions-stack {
@@ -639,9 +639,9 @@ onMounted(async () => {
   gap: 0.45rem;
   height: 44px;
   background: var(--surface, #ffffff);
-  color: var(--fg-muted, #5A7184);
-  border: 1px solid var(--border, #D8E2EC);
-  border-radius: var(--radius-sm, 4px);
+  color: var(--text-secondary, #6B7280);
+  border: 1px solid var(--border, #E5E7EB);
+  border-radius: var(--radius-sm, 8px);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -649,9 +649,9 @@ onMounted(async () => {
 }
 
 .btn-back-rfqs:hover {
-  border-color: var(--secondary, #00A389);
-  color: var(--secondary, #00A389);
-  background: var(--brand-soft, #E8F8F5);
+  border-color: var(--brand, #6366F1);
+  color: var(--brand, #6366F1);
+  background: var(--brand-subtle, #EEF2FF);
 }
 
 .btn-create-rfq {
@@ -660,10 +660,10 @@ onMounted(async () => {
   justify-content: center;
   gap: 0.45rem;
   height: 44px;
-  background: var(--brand-soft, #E8F8F5);
-  color: var(--secondary, #00A389);
-  border: 1px solid var(--border, #D8E2EC);
-  border-radius: var(--radius-sm, 4px);
+  background: var(--brand-subtle, #EEF2FF);
+  color: var(--brand, #6366F1);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: var(--radius-sm, 8px);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -671,7 +671,7 @@ onMounted(async () => {
 }
 
 .btn-create-rfq:hover {
-  background: var(--secondary, #00A389);
+  background: var(--brand, #6366F1);
   color: #ffffff;
 }
 

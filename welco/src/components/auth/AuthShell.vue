@@ -55,8 +55,8 @@ const toggleLang = () => {
 <style scoped>
 .auth-wrap {
   min-height: calc(100vh - var(--wl-header-height, 56px));
-  background: radial-gradient(circle at 12% 10%, rgba(214,243,106,.16), transparent 22rem), linear-gradient(135deg, #062f45 0%, #0b6370 58%, #e8f5f3 140%);
-  color: #f7fffe;
+  background: radial-gradient(circle at 12% 10%, rgba(99, 102, 241, 0.08), transparent 28rem), linear-gradient(135deg, #F9FAFB 0%, #EEF2FF 100%);
+  color: var(--fg-body, #4B5563);
   display: grid;
   place-items: center;
   padding: 2.5rem var(--wl-gutter);
@@ -69,11 +69,10 @@ const toggleLang = () => {
 .auth-card {
   width: 100%;
   max-width: 440px;
-  background: color-mix(in srgb, var(--bg-surface) 94%, transparent);
-  border: 1px solid rgba(255,255,255,.38);
-  border-radius: var(--radius-xl, 12px);
-  box-shadow: 0 28px 70px rgba(2, 25, 39, .24);
-  backdrop-filter: blur(18px);
+  background: var(--bg-surface, #FFFFFF);
+  border: 1px solid var(--border, #E5E7EB);
+  border-radius: var(--radius-lg, 16px);
+  box-shadow: var(--shadow-xl);
   position: relative;
   overflow: hidden;
   padding: var(--space-6);
@@ -107,7 +106,7 @@ const toggleLang = () => {
   justify-content: space-between;
   margin-bottom: 1.5rem;
   padding-bottom: 0.85rem;
-  border-bottom: 1px solid var(--wl-border);
+  border-bottom: 1px solid var(--border, #E5E7EB);
 }
 
 .auth-brand-link {

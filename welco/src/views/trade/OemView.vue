@@ -318,9 +318,9 @@ async function submit() {
   gap: 0.45rem;
   font-size: 10px;
   font-weight: 700;
-  color: var(--secondary, #00A389);
-  background: var(--wl-primary-soft);
-  border: 1px solid var(--border-subtle, rgba(0, 163, 137, 0.3));
+  color: var(--brand, #6366F1);
+  background: var(--brand-subtle, #EEF2FF);
+  border: 1px solid rgba(99, 102, 241, 0.25);
   padding: 0.2rem 0.6rem;
   border-radius: 9999px;
   letter-spacing: 0.06em;
@@ -332,14 +332,14 @@ async function submit() {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--secondary, #00A389);
-  box-shadow: 0 0 8px rgba(0, 163, 137, 0.4);
+  background: var(--brand, #6366F1);
+  box-shadow: 0 0 8px rgba(99, 102, 241, 0.4);
 }
 
 .oem-hero {
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
-  border-radius: var(--wl-radius-xl, 20px);
+  border-radius: var(--wl-radius-xl, 16px);
   padding: 2.5rem;
   box-shadow: var(--wl-shadow-card);
   position: relative;
@@ -352,7 +352,7 @@ async function submit() {
   top: 0;
   inset-inline: 0;
   height: 2.5px;
-  background: linear-gradient(90deg, var(--secondary, #00A389), var(--accent, #0EA5E9));
+  background: linear-gradient(90deg, var(--brand, #6366F1), var(--secondary, #14B8A6));
 }
 
 .hero-grid {

@@ -99,9 +99,9 @@ const displayWorkingHours = computed(() => {
 <style scoped>
 .footer {
   background: #FFFFFF !important;
-  color: #243B53 !important;
-  border-top: 1px solid var(--color-border, #D9E2EC) !important;
-  box-shadow: 0 -4px 24px rgba(16, 42, 67, 0.04);
+  color: var(--fg-body, #4B5563) !important;
+  border-top: 1px solid var(--border, #E5E7EB) !important;
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.03);
   padding: clamp(3.2rem, 5vw, 4.8rem) var(--wl-gutter) 1.5rem;
   position: relative;
   padding-inline-start: max(var(--wl-gutter), env(safe-area-inset-left, 0px));
@@ -115,7 +115,7 @@ const displayWorkingHours = computed(() => {
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, #071520 0%, #00A389 50%, #0EA5E9 100%);
+  background: linear-gradient(90deg, #6366F1 0%, #14B8A6 50%, #8B5CF6 100%);
   display: block !important;
 }
 .footer__inner {
@@ -139,7 +139,7 @@ const displayWorkingHours = computed(() => {
   height: 32px;
   width: auto;
   border-radius: 6px;
-  border: 1px solid #D8E2EC;
+  border: 1px solid var(--border, #E5E7EB);
   background: #FFFFFF;
 }
 
@@ -147,14 +147,14 @@ const displayWorkingHours = computed(() => {
   font-family: var(--wl-font-display);
   font-size: 1.25rem;
   font-weight: 800;
-  color: #071520;
+  color: var(--fg-heading, #111827);
   letter-spacing: -0.015em;
 }
 
 .brand-desc {
   margin: 0.85rem 0 1.25rem;
   font-size: 14px;
-  color: #486581;
+  color: var(--fg-muted, #6B7280);
   line-height: 1.65;
   max-width: 320px;
 }
@@ -168,9 +168,9 @@ const displayWorkingHours = computed(() => {
 .footer-badge {
   font-size: 11px;
   font-weight: 700;
-  color: #00A389;
-  background: #E8F8F5;
-  border: 1px solid rgba(0, 163, 137, 0.3);
+  color: var(--brand, #6366F1);
+  background: var(--brand-soft, #EEF2FF);
+  border: 1px solid rgba(99, 102, 241, 0.25);
   padding: 0.25rem 0.6rem;
   border-radius: 6px;
   letter-spacing: 0.03em;
@@ -182,7 +182,7 @@ const displayWorkingHours = computed(() => {
   font-size: 12.5px;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: #071520;
+  color: var(--fg-heading, #111827);
   margin-bottom: 1.1rem;
   font-weight: 800;
 }
@@ -192,13 +192,13 @@ const displayWorkingHours = computed(() => {
   font-size: 14px;
   font-weight: 500;
   padding: 0.35rem 0;
-  color: #243B53;
+  color: var(--fg-body, #4B5563);
   text-decoration: none;
   transition: color 0.15s ease, transform 0.15s ease;
 }
 
 .footer__link:hover {
-  color: #00A389;
+  color: var(--brand, #6366F1);
   transform: translateX(3px);
   font-weight: 600;
 }
@@ -287,7 +287,7 @@ const displayWorkingHours = computed(() => {
 .footer__bottom {
   max-width: var(--wl-max-width);
   margin: 2.75rem auto 0;
-  border-top: 1px solid #E2E8F0;
+  border-top: 1px solid var(--border, #E5E7EB);
   padding-top: 1.35rem;
   display: flex;
   justify-content: space-between;
@@ -295,7 +295,7 @@ const displayWorkingHours = computed(() => {
   gap: 1rem;
   flex-wrap: wrap;
   font-size: 12.5px;
-  color: #486581;
+  color: var(--fg-muted, #6B7280);
 }
 
 .footer__bottom-left {
@@ -306,7 +306,7 @@ const displayWorkingHours = computed(() => {
 
 .compliance-note {
   font-size: 11.5px;
-  color: #627D98;
+  color: var(--fg-subtle, #9CA3AF);
 }
 
 .telemetry-pill {
@@ -318,11 +318,11 @@ const displayWorkingHours = computed(() => {
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #15803D;
-  background: #F0FDF4;
-  border: 1px solid #86EFAC;
+  color: #047857;
+  background: #D1FAE5;
+  border: 1px solid rgba(16, 185, 129, 0.3);
   padding: 0.3rem 0.65rem;
-  border-radius: 6px;
+  border-radius: var(--radius-pill, 9999px);
 }
 .status-dot {
   width: 7px;
@@ -342,20 +342,72 @@ const displayWorkingHours = computed(() => {
   }
   .footer__brand { grid-column: 1 / -1; }
 }
+@media (max-width: 768px) {
+  .footer {
+    padding: 2.25rem var(--wl-gutter, 1rem) calc(84px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+}
 @media (max-width: 640px) {
-  .footer { padding: 2rem var(--wl-gutter) max(1.25rem, env(safe-area-inset-bottom, 0px)); }
-  .footer__inner { grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-  .footer__link { font-size: 13px; padding: 0.4rem 0; min-height: 32px; display: flex; align-items: center; }
-  .footer__bottom { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+  .footer__inner {
+    grid-template-columns: 1fr !important;
+    gap: 1.75rem !important;
+  }
+  .footer__brand {
+    grid-column: 1 / -1;
+  }
+  .brand-title {
+    font-size: 1.15rem !important;
+  }
+  .brand-desc {
+    max-width: 100% !important;
+    font-size: 13.5px !important;
+    margin: 0.6rem 0 1rem !important;
+  }
+  .footer__col h4,
+  .footer__title {
+    margin-bottom: 0.75rem !important;
+    font-size: 12px !important;
+  }
+  .footer__link {
+    font-size: 13.5px !important;
+    padding: 0.35rem 0 !important;
+    min-height: 34px !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+  .footer__contact-items {
+    margin-top: 0.5rem !important;
+    gap: 0.65rem !important;
+  }
+  .footer__contact-item {
+    font-size: 13px !important;
+  }
+  .footer__contact-hours {
+    max-width: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .footer__bottom {
+    margin-top: 1.75rem !important;
+    padding-top: 1rem !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.75rem !important;
+  }
 }
-@media (max-width: 480px) {
-  .footer__inner { grid-template-columns: 1fr; gap: 1.25rem; }
-  .footer__bottom { gap: 0.6rem; }
-  .brand-desc { max-width: 100%; }
-}
-@media (max-width: 360px) {
-  .footer__inner { gap: 1rem; }
-  .footer-badges { gap: 0.3rem; }
-  .footer-badge { font-size: 9px; padding: 0.15rem 0.4rem; }
+@media (max-width: 380px) {
+  .footer {
+    padding: 1.75rem 0.75rem calc(80px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  .footer__inner {
+    gap: 1.25rem !important;
+  }
+  .footer-badges {
+    gap: 0.35rem !important;
+  }
+  .footer-badge {
+    font-size: 10px !important;
+    padding: 0.2rem 0.5rem !important;
+  }
 }
 </style>

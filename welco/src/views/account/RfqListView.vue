@@ -314,20 +314,21 @@ onMounted(() => {
   align-items: center;
   gap: 0.45rem;
   padding: 0.65rem 1.15rem;
-  background: var(--secondary, #00A389);
+  background: var(--brand, #6366F1);
   color: #ffffff;
-  border: 1px solid var(--secondary, #00A389);
-  border-radius: var(--radius-md, 6px);
+  border: 1px solid var(--brand, #6366F1);
+  border-radius: var(--radius-md, 8px);
   font-size: 13.5px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 163, 137, 0.25);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
   transition: all 0.15s ease-out;
 }
 .btn-create-rfq:hover {
-  background: var(--secondary-hover, #008872);
-  border-color: var(--secondary-hover, #008872);
+  background: var(--brand-hover, #4F46E5);
+  border-color: var(--brand-hover, #4F46E5);
   transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
 }
 .btn-create-rfq:active {
   transform: scale(0.98);

@@ -165,9 +165,9 @@ const strokeColor = computed(() => {
   gap: var(--space-4, 1rem);
   padding: var(--space-5, 1.25rem) var(--space-4, 1rem);
   background: var(--bg-surface, #ffffff);
-  border: 1px solid var(--border, #d9e2ec);
-  border-radius: var(--radius-lg, 8px);
-  box-shadow: var(--shadow-xs, 0 1px 2px rgba(0, 0, 0, 0.04));
+  border: 1px solid var(--border, #E5E7EB);
+  border-radius: var(--radius-md, 12px);
+  box-shadow: var(--shadow-sm);
   text-decoration: none;
   color: inherit;
   position: relative;
@@ -182,14 +182,14 @@ const strokeColor = computed(() => {
   left: 0;
   right: 0;
   height: 3px;
-  background: var(--stat-fg, var(--brand, #0f3d56));
+  background: var(--stat-fg, var(--brand, #6366F1));
   opacity: 0.9;
 }
 
 .stat-card.is-interactive:hover {
-  border-color: rgba(0, 163, 137, 0.4);
+  border-color: var(--brand, #6366F1);
   transform: translateY(-2px);
-  box-shadow: var(--shadow-tray-hover, 0 10px 24px -4px rgba(7, 21, 32, 0.08));
+  box-shadow: var(--shadow-md);
 }
 
 .stat-card.is-icon-only {

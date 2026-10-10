@@ -113,9 +113,9 @@ const totalSevenMonthOps = computed(() => {
 const territoryData = computed(() => {
   const max = Math.max(liveCounts.value.countries, liveCounts.value.cities, liveCounts.value.zones, 1)
   return [
-    { label: t('admin.countries'), value: liveCounts.value.countries, pct: Math.round((liveCounts.value.countries / max) * 100), color: 'var(--color-primary, #071520)', icon: 'public', desc: t('admin.sovereignRoot') },
-    { label: t('admin.cities'), value: liveCounts.value.cities, pct: Math.round((liveCounts.value.cities / max) * 100), color: 'var(--secondary, #00A389)', icon: 'location_city', desc: t('admin.regionalHubs') },
-    { label: t('admin.zones'), value: liveCounts.value.zones, pct: Math.round((liveCounts.value.zones / max) * 100), color: 'var(--tertiary, #0EA5E9)', icon: 'my_location', desc: t('admin.deliveryAnchors') },
+    { label: t('admin.countries'), value: liveCounts.value.countries, pct: Math.round((liveCounts.value.countries / max) * 100), color: 'var(--brand, #6366F1)', icon: 'public', desc: t('admin.sovereignRoot') },
+    { label: t('admin.cities'), value: liveCounts.value.cities, pct: Math.round((liveCounts.value.cities / max) * 100), color: 'var(--secondary, #14B8A6)', icon: 'location_city', desc: t('admin.regionalHubs') },
+    { label: t('admin.zones'), value: liveCounts.value.zones, pct: Math.round((liveCounts.value.zones / max) * 100), color: 'var(--accent, #8B5CF6)', icon: 'my_location', desc: t('admin.deliveryAnchors') },
   ]
 })
 
@@ -133,10 +133,10 @@ const activeDonutSegment = ref<{ label: string; value: number; pct: number; colo
 
 const platformData = computed(() => {
   const items = [
-    { label: t('admin.products'), value: stats.value.products, color: 'var(--color-primary, #071520)', to: '/marketplace' },
-    { label: t('admin.categoriesTitle'), value: stats.value.categories, color: 'var(--secondary, #00A389)', to: '/marketplace' },
-    { label: t('admin.users'), value: stats.value.users, color: 'var(--tertiary, #0EA5E9)', to: '/admin/users' },
-    { label: t('admin.distributorApps'), value: stats.value.pendingApps, color: 'var(--color-warning, #D97706)', to: '/admin/companies' },
+    { label: t('admin.products'), value: stats.value.products, color: 'var(--brand, #6366F1)', to: '/marketplace' },
+    { label: t('admin.categoriesTitle'), value: stats.value.categories, color: 'var(--secondary, #14B8A6)', to: '/marketplace' },
+    { label: t('admin.users'), value: stats.value.users, color: 'var(--accent, #8B5CF6)', to: '/admin/users' },
+    { label: t('admin.distributorApps'), value: stats.value.pendingApps, color: 'var(--color-warning, #F59E0B)', to: '/admin/companies' },
   ]
   const total = items.reduce((s, i) => s + i.value, 0) || 1
   let acc = 0
@@ -496,14 +496,14 @@ onUnmounted(_removeListeners)
             <svg class="curve-chart-svg" viewBox="0 0 540 180" preserveAspectRatio="none">
               <defs>
                 <linearGradient id="curveGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#00A389" stop-opacity="0.25" />
-                  <stop offset="60%" stop-color="#00A389" stop-opacity="0.08" />
-                  <stop offset="100%" stop-color="#071520" stop-opacity="0.0" />
+                  <stop offset="0%" stop-color="#6366F1" stop-opacity="0.25" />
+                  <stop offset="60%" stop-color="#6366F1" stop-opacity="0.08" />
+                  <stop offset="100%" stop-color="#6366F1" stop-opacity="0.0" />
                 </linearGradient>
                 <linearGradient id="laserStrokeGrad" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0%" stop-color="#071520" />
-                  <stop offset="50%" stop-color="#00A389" />
-                  <stop offset="100%" stop-color="#0EA5E9" />
+                  <stop offset="0%" stop-color="#6366F1" />
+                  <stop offset="50%" stop-color="#14B8A6" />
+                  <stop offset="100%" stop-color="#8B5CF6" />
                 </linearGradient>
               </defs>
 

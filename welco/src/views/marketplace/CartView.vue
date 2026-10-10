@@ -1599,7 +1599,7 @@ const submitRfq = async () => {
   top: 0;
   inset-inline: 0;
   height: 2.5px;
-  background: linear-gradient(90deg, var(--secondary, #00A389), var(--accent, #0EA5E9));
+  background: linear-gradient(90deg, var(--brand, #6366F1), var(--secondary, #14B8A6));
   opacity: 0.95;
 }
 
@@ -1773,9 +1773,9 @@ const submitRfq = async () => {
 }
 
 .negotiation-card.is-active {
-  border: 1px solid var(--secondary, #00A389);
+  border: 1px solid var(--brand, #6366F1);
   background: var(--bg-surface);
-  box-shadow: 0 4px 14px rgba(0, 163, 137, 0.12);
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.12);
 }
 
 .negotiation-toggle {

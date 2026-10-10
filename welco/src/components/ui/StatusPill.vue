@@ -83,38 +83,38 @@ const isPulsing = computed(() => ['Pending', 'Draft', 'Partial', 'In Progress'].
 }
 
 .status-pill--emerald {
-  color: var(--color-success-600, #15803d);
-  background: var(--color-success-50, #f0fdf4);
-  border-color: rgba(22, 163, 74, 0.25);
+  color: #047857;
+  background: #D1FAE5;
+  border-color: rgba(16, 185, 129, 0.3);
 }
 
 .status-pill--teal {
-  color: #007D69;
-  background: var(--brand-soft, #E8F8F5);
-  border-color: rgba(0, 163, 137, 0.28);
+  color: #0F766E;
+  background: #CCFBF1;
+  border-color: rgba(20, 184, 166, 0.3);
 }
 
 .status-pill--indigo {
-  color: var(--brand, #071520);
-  background: #EBF1F6;
-  border-color: rgba(7, 21, 32, 0.2);
+  color: #4338CA;
+  background: #EEF2FF;
+  border-color: rgba(99, 102, 241, 0.3);
 }
 
 .status-pill--amber {
-  color: var(--color-warning-600, #b45309);
-  background: var(--color-warning-50, #fffbeb);
-  border-color: rgba(217, 119, 6, 0.25);
+  color: #B45309;
+  background: #FEF3C7;
+  border-color: rgba(245, 158, 11, 0.3);
 }
 
 .status-pill--rose {
-  color: var(--color-danger, #E11D48);
-  background: var(--color-danger-50, #fef2f2);
-  border-color: rgba(225, 29, 72, 0.25);
+  color: #B91C1C;
+  background: #FEE2E2;
+  border-color: rgba(239, 68, 68, 0.3);
 }
 
 .status-pill--slate {
-  color: var(--fg-muted, #5A7184);
-  background: var(--bg-subtle, #EBF1F6);
-  border-color: var(--border, #D8E2EC);
+  color: #4B5563;
+  background: #F3F4F6;
+  border-color: #E5E7EB;
 }
 </style>

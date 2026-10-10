@@ -38,28 +38,64 @@ const fabStyle = computed(() =>
 </template>
 
 <style scoped>
-.wa-fab{
-  position:fixed;bottom:24px;inset-inline-end:24px;z-index:200;
-  display:inline-flex;align-items:center;gap:8px;
-   background:#25D366;color:var(--wl-base);
-  padding:10px 14px 10px 10px;
-  border-radius:999px;
-  box-shadow:0 8px 22px rgba(0,0,0,.24),0 0 0 1px rgba(255,255,255,.06);
-  text-decoration:none;
-  transition:transform .18s var(--wl-ease-spring),box-shadow .18s,background .18s;
-  /* ensure not hidden behind footer on home: stay above safe area */
+.wa-fab {
+  position: fixed;
+  bottom: 24px;
+  inset-inline-end: 20px;
+  z-index: 99;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #25D366;
+  color: #ffffff;
+  padding: 8px 14px 8px 8px;
+  border-radius: 999px;
+  box-shadow: 0 8px 24px rgba(37, 211, 102, 0.35), 0 2px 8px rgba(0,0,0,0.12);
+  text-decoration: none;
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
   margin-bottom: env(safe-area-inset-bottom, 0);
 }
-.wa-fab:hover{transform:translateY(-2px);background:#20BA5A;box-shadow:0 12px 28px rgba(0,0,0,.28)}
-.wa-fab__icon{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);display:grid;place-items:center;flex-shrink:0}
-.wa-fab__label{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#fff}
-@media(max-width:768px){
+.wa-fab:hover {
+  transform: translateY(-2px);
+  background: #20BA5A;
+  box-shadow: 0 12px 30px rgba(37, 211, 102, 0.45);
+}
+.wa-fab__icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.2);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.wa-fab__label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: #ffffff;
+}
+
+@media (max-width: 768px) {
   .wa-fab {
-    bottom: calc(72px + env(safe-area-inset-bottom, 0px));
-    inset-inline-end: 16px;
-    padding: 11px;
+    bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
+    inset-inline-end: 14px !important;
+    padding: 0 !important;
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 50% !important;
+    justify-content: center !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22) !important;
   }
-  .wa-fab__label { display: none; }
-  .wa-fab__icon { width: 40px; height: 40px; }
+  .wa-fab__label {
+    display: none !important;
+  }
+  .wa-fab__icon {
+    width: 100% !important;
+    height: 100% !important;
+    background: transparent !important;
+    border: none !important;
+  }
 }
 </style>

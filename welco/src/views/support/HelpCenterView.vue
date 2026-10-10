@@ -120,7 +120,7 @@ const filteredArticles = computed(() => {
   })
 })
 
-const COLOR_PALETTE = ['#071520', '#00A389', '#0EA5E9', '#D97706', '#059669', '#5A7184', '#008872', '#0D2235']
+const COLOR_PALETTE = ['#6366F1', '#14B8A6', '#8B5CF6', '#F59E0B', '#10B981', '#6B7280', '#4F46E5', '#3B82F6']
 
 const visibleFaqs = computed(() => {
   const list = Array.isArray(faqs.value) ? faqs.value : []
@@ -1935,14 +1935,14 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
 }
 
 .quick-subject-btn:hover {
-  border-color: var(--secondary, #00A389);
+  border-color: var(--brand, #6366F1);
   background: #ffffff;
-  color: var(--secondary, #00A389);
+  color: var(--brand, #6366F1);
 }
 
 .quick-subject-btn.is-selected {
-  border-color: var(--secondary, #00A389);
-  background: var(--secondary, #00A389);
+  border-color: var(--brand, #6366F1);
+  background: var(--brand, #6366F1);
   color: #ffffff;
   font-weight: 700;
 }
@@ -1964,7 +1964,7 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
 }
 
 .article-modal__cat {
-  color: var(--secondary, #00A389);
+  color: var(--brand, #6366F1);
   font-weight: 700;
 }
 

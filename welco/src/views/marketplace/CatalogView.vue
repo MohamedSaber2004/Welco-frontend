@@ -1174,13 +1174,13 @@ const filteredSidebarCategories = computed(() => {
 }
 
 .card-action-btn--quote {
-  background: var(--secondary, #00A389);
+  background: var(--brand, #6366F1);
   color: #ffffff;
-  border: 1px solid var(--secondary, #00A389);
+  border: 1px solid var(--brand, #6366F1);
 }
 .card-action-btn--quote:hover {
-  background: var(--secondary-hover, #008872);
-  border-color: var(--secondary-hover, #008872);
+  background: var(--brand-hover, #4F46E5);
+  border-color: var(--brand-hover, #4F46E5);
 }
 .card-action-btn:active {
   transform: scale(0.97);
@@ -1192,8 +1192,8 @@ const filteredSidebarCategories = computed(() => {
 }
 
 .card-action-btn--quote:hover:not(:disabled) {
-  background: var(--wl-primary-hover);
-  border-color: var(--wl-primary-hover);
+  background: var(--brand-hover, #4F46E5);
+  border-color: var(--brand-hover, #4F46E5);
   color: #ffffff !important;
   transform: translateY(-0.5px);
   box-shadow: var(--shadow-hover);
@@ -1442,18 +1442,18 @@ const filteredSidebarCategories = computed(() => {
 }
 
 .card-action-btn--quote {
-  background: #00A389 !important;
-  border: 1px solid #00A389 !important;
+  background: var(--brand, #6366F1) !important;
+  border: 1px solid var(--brand, #6366F1) !important;
   color: #FFFFFF !important;
-  box-shadow: 0 2px 8px rgba(0, 163, 137, 0.25) !important;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25) !important;
 }
 
 .card-action-btn--quote:hover:not(:disabled) {
-  background: #008872 !important;
-  border-color: #008872 !important;
+  background: var(--brand-hover, #4F46E5) !important;
+  border-color: var(--brand-hover, #4F46E5) !important;
   color: #FFFFFF !important;
   transform: translateY(-1px) !important;
-  box-shadow: 0 4px 14px rgba(0, 163, 137, 0.35) !important;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35) !important;
 }
 
 /* Sidebar Elevation */

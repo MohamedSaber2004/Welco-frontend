@@ -610,7 +610,7 @@ async function convertToQuote() {
   top: 0;
   inset-inline: 0;
   height: 2.5px;
-  background: linear-gradient(90deg, var(--secondary, #00A389), var(--accent, #0EA5E9));
+  background: linear-gradient(90deg, var(--brand, #6366F1), var(--secondary, #14B8A6));
   opacity: 0.95;
 }
 

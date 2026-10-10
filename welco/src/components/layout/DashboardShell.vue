@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { t, locale, setLocale } from '../../i18n'
 import { authService } from '../../di/container'
 import { AppLanguage } from '../../domain/models/user'
@@ -33,6 +34,24 @@ const props = withDefaults(
     mobileLinks: undefined,
   },
 )
+
+const mobileMenuOpen = ref(false)
+
+try {
+  const route = useRoute()
+  if (route) {
+    watch(
+      () => route.path,
+      () => {
+        mobileMenuOpen.value = false
+      },
+    )
+  }
+} catch {}
+
+const closeMobileMenu = () => {
+  mobileMenuOpen.value = false
+}
 
 const collapsed = ref(false)
 try {
@@ -87,6 +106,7 @@ const toggleLang = async () => {
 
 <template>
   <div class="admin-shell">
+    <!-- Desktop Sidebar Rail -->
     <aside class="admin-rail" :class="{ 'admin-rail--collapsed': collapsed }">
       <div class="rail__top">
         <div class="rail__brand">
@@ -142,18 +162,125 @@ const toggleLang = async () => {
       </div>
     </aside>
 
-    <div class="admin-mobile" :aria-label="t('nav.navigation')">
-      <router-link
-        v-for="link in flatMobileLinks"
-        :key="link.to + link.label"
-        :to="link.to"
-        class="admin-mobile-pill"
-        :exact-active-class="link.exact ? 'is-active' : undefined"
-        :active-class="'is-active'"
-      >
-        {{ link.label }}
-      </router-link>
+    <!-- Mobile Top Navigation Header with Menu Drawer Trigger & Quick Pills -->
+    <div class="admin-mobile-header" :aria-label="t('nav.navigation')">
+      <div class="admin-mobile-bar">
+        <button
+          type="button"
+          class="mobile-menu-trigger mono"
+          :aria-expanded="mobileMenuOpen"
+          :aria-label="t('nav.navigation')"
+          @click="mobileMenuOpen = !mobileMenuOpen"
+        >
+          <span class="material-symbols-outlined text-[20px]">
+            {{ mobileMenuOpen ? 'close' : 'menu' }}
+          </span>
+          <span class="menu-text">{{ locale === 'ar' ? 'القائمة' : 'Menu' }}</span>
+        </button>
+
+        <div class="mobile-brand-pill mono">
+          <span class="rail__dot" aria-hidden="true"></span>
+          <span class="font-bold">{{ brandText }}</span>
+        </div>
+
+        <button
+          type="button"
+          class="rail__lang-btn mono"
+          :aria-label="locale === 'ar' ? 'English' : 'العربية'"
+          :title="locale === 'ar' ? 'Switch to English' : 'التحويل إلى العربية'"
+          @click="toggleLang"
+        >
+          <span class="material-symbols-outlined text-[15px]">language</span>
+          <span class="text-xs uppercase font-bold">{{ locale === 'ar' ? 'EN' : 'عربي' }}</span>
+        </button>
+      </div>
+
+      <!-- Quick horizontal pill strip for instant 1-tap navigation -->
+      <div class="admin-mobile-pills" :aria-label="t('nav.navigation')">
+        <router-link
+          v-for="link in flatMobileLinks"
+          :key="link.to + link.label"
+          :to="link.to"
+          class="admin-mobile-pill"
+          :exact-active-class="link.exact ? 'is-active' : undefined"
+          :active-class="'is-active'"
+        >
+          <span class="material-symbols-outlined text-[15px] nav-icon-inline">{{ link.icon }}</span>
+          <span>{{ link.label }}</span>
+        </router-link>
+      </div>
     </div>
+
+    <!-- Mobile Drawer Overlay -->
+    <Teleport to="body">
+      <Transition name="drawer-fade">
+        <div
+          v-if="mobileMenuOpen"
+          class="mobile-drawer-backdrop"
+          @click="closeMobileMenu"
+        ></div>
+      </Transition>
+
+      <Transition name="drawer-slide">
+        <aside
+          v-if="mobileMenuOpen"
+          class="mobile-drawer-sheet"
+          :aria-label="t('nav.navigation')"
+        >
+          <div class="drawer-head">
+            <div class="drawer-brand">
+              <span class="rail__dot" aria-hidden="true"></span>
+              <strong class="drawer-title mono">{{ brandText }}</strong>
+            </div>
+            <button
+              type="button"
+              class="drawer-close-btn"
+              :aria-label="t('common.close')"
+              @click="closeMobileMenu"
+            >
+              <span class="material-symbols-outlined text-[20px]">close</span>
+            </button>
+          </div>
+
+          <nav class="drawer-nav">
+            <template v-for="sec in visibleSections" :key="'drawer-' + sec.key">
+              <div v-if="sec.label" class="drawer-section-label mono">
+                {{ sec.label }}
+              </div>
+              <div class="drawer-section-links">
+                <router-link
+                  v-for="link in sec.links.filter((l) => l.visible !== false)"
+                  :key="'drawer-link-' + link.to + link.label"
+                  :to="link.to"
+                  class="drawer-link"
+                  :exact-active-class="link.exact ? 'drawer-link--active' : undefined"
+                  :active-class="'drawer-link--active'"
+                  @click="closeMobileMenu"
+                >
+                  <span class="material-symbols-outlined drawer-nav-icon">{{ link.icon }}</span>
+                  <span class="drawer-link__label">{{ link.label }}</span>
+                </router-link>
+              </div>
+            </template>
+          </nav>
+
+          <div class="drawer-foot">
+            <div v-if="statusText" class="rail__status mono">
+              <span class="rail__dot--live" aria-hidden="true"></span>
+              <span>{{ statusText }}</span>
+            </div>
+            <button
+              type="button"
+              class="rail__lang-btn mono"
+              @click="toggleLang"
+            >
+              <span class="material-symbols-outlined text-[16px]">language</span>
+              <span>{{ locale === 'ar' ? 'English' : 'العربية' }}</span>
+            </button>
+          </div>
+        </aside>
+      </Transition>
+    </Teleport>
 
     <div class="admin-main">
       <div class="admin-main__inner"><slot /></div>
@@ -294,13 +421,13 @@ const toggleLang = async () => {
   gap: 0.12rem;
 }
 
-/* Clinical Precision nav items — solid brand active */
+/* MarketPro nav items — solid brand active pill */
 .admin-link {
   display: flex;
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-sm, 4px);
+  border-radius: var(--radius-sm, 8px);
   font-size: var(--text-md);
   font-weight: var(--weight-medium);
   color: var(--fg-muted);
@@ -327,14 +454,15 @@ const toggleLang = async () => {
 }
 
 .admin-link--active {
-  background: var(--brand-soft, #E8F8F5) !important;
-  color: var(--secondary, #00A389) !important;
-  border-inline-start: 3px solid var(--secondary, #00A389) !important;
+  background: var(--brand, #6366F1) !important;
+  color: #FFFFFF !important;
+  border-radius: var(--radius-sm, 8px) !important;
   font-weight: var(--weight-semibold, 600);
+  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.25);
 }
 
 .admin-link--active .nav-icon {
-  color: var(--secondary, #00A389);
+  color: #FFFFFF !important;
 }
 
 .rail__foot {
@@ -436,7 +564,7 @@ const toggleLang = async () => {
   -webkit-overflow-scrolling: touch;
 }
 
-.admin-mobile {
+.admin-mobile-header {
   display: none;
 }
 
@@ -456,27 +584,68 @@ const toggleLang = async () => {
   .admin-rail {
     display: none;
   }
-  .admin-mobile {
+  .admin-mobile-header {
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: var(--wl-header-height, 56px);
+    z-index: 40;
+    background: var(--wl-surface, #ffffff);
+    border-bottom: 1px solid var(--border, #E5E7EB);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  }
+  .admin-mobile-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.5rem var(--gutter, 1rem);
+    padding-inline-start: max(var(--gutter, 1rem), env(safe-area-inset-left));
+    padding-inline-end: max(var(--gutter, 1rem), env(safe-area-inset-right));
+    border-bottom: 1px solid var(--border, #F3F4F6);
+  }
+  .mobile-menu-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: var(--radius-sm, 8px);
+    background: var(--brand-soft, #EEF2FF);
+    color: var(--brand, #6366F1);
+    border: 1px solid color-mix(in srgb, var(--brand, #6366F1) 20%, transparent);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    min-height: 38px;
+    transition: all 0.15s ease;
+  }
+  .mobile-menu-trigger:hover {
+    background: var(--brand, #6366F1);
+    color: #ffffff;
+  }
+  .mobile-brand-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 13px;
+    color: var(--fg-heading, #111827);
+  }
+  .admin-mobile-pills {
     display: flex;
     gap: 0.4rem;
-    padding: 0.6rem var(--gutter, 1rem);
+    padding: 0.45rem var(--gutter, 1rem);
     padding-inline-start: max(var(--gutter, 1rem), env(safe-area-inset-left));
     padding-inline-end: max(var(--gutter, 1rem), env(safe-area-inset-right));
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    background: var(--wl-surface);
-    border-bottom: 1px solid var(--wl-border);
-    position: sticky;
-    top: var(--wl-header-height, 56px);
-    z-index: 20;
     overscroll-behavior-x: contain;
   }
-  .admin-mobile::-webkit-scrollbar {
+  .admin-mobile-pills::-webkit-scrollbar {
     display: none;
   }
   .admin-mobile-pill {
-    padding: 0.42rem 0.8rem;
+    padding: 0.35rem 0.75rem;
     border-radius: 9999px;
     font-size: 12px;
     font-weight: 600;
@@ -486,21 +655,26 @@ const toggleLang = async () => {
     white-space: nowrap;
     text-decoration: none;
     transition: all 0.12s ease;
-    min-height: 44px;
+    min-height: 36px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 0.25rem;
     flex-shrink: 0;
+  }
+  .nav-icon-inline {
+    font-size: 15px;
   }
   .admin-mobile-pill:focus-visible {
     outline: 2px solid var(--brand);
     outline-offset: 2px;
   }
   .admin-mobile-pill.is-active {
-    background: var(--color-primary-light, #e3efff);
-    color: var(--color-primary, #0f3d56);
-    border-color: var(--color-primary-light, #e3efff);
+    background: var(--brand, #6366F1);
+    color: #FFFFFF;
+    border-color: var(--brand, #6366F1);
     font-weight: 600;
+    box-shadow: 0 2px 6px rgba(99, 102, 241, 0.25);
   }
   .admin-main {
     padding: 0;
@@ -510,5 +684,161 @@ const toggleLang = async () => {
     padding-inline-start: max(var(--gutter, 1rem), env(safe-area-inset-left));
     padding-inline-end: max(var(--gutter, 1rem), env(safe-area-inset-right));
   }
+}
+
+/* Mobile Drawer Overlay Styles */
+.mobile-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 24, 39, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+}
+
+.mobile-drawer-sheet {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  inset-inline-start: 0;
+  width: min(85vw, 320px);
+  background: var(--bg-surface, #ffffff);
+  border-inline-end: 1px solid var(--border, #E5E7EB);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.22);
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border, #E5E7EB);
+  background: var(--bg-subtle, #F9FAFB);
+}
+
+.drawer-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.drawer-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--fg-heading, #111827);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.drawer-close-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-xs, 6px);
+  border: 1px solid var(--border, #E5E7EB);
+  background: var(--bg-surface, #ffffff);
+  color: var(--fg-muted, #6B7280);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.drawer-close-btn:hover {
+  color: var(--brand, #6366F1);
+  border-color: var(--brand, #6366F1);
+}
+
+.drawer-nav {
+  flex: 1;
+  padding: 1rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.drawer-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-muted, #9CA3AF);
+  padding: 0.75rem 0.65rem 0.35rem;
+}
+
+.drawer-section-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.drawer-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0.65rem 0.85rem;
+  border-radius: var(--radius-sm, 8px);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--fg-body, #4B5563);
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.drawer-link:hover {
+  background: var(--bg-hover, #EEF2FF);
+  color: var(--brand, #6366F1);
+}
+
+.drawer-link--active {
+  background: var(--brand, #6366F1) !important;
+  color: #FFFFFF !important;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.25);
+}
+
+.drawer-link--active .drawer-nav-icon {
+  color: #FFFFFF !important;
+}
+
+.drawer-nav-icon {
+  font-size: 20px;
+  color: var(--fg-muted, #6B7280);
+}
+
+.drawer-foot {
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--border, #E5E7EB);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: var(--bg-subtle, #F9FAFB);
+}
+
+.drawer-fade-enter-active,
+.drawer-fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+.drawer-fade-enter-from,
+.drawer-fade-leave-to {
+  opacity: 0;
+}
+
+.drawer-slide-enter-active,
+.drawer-slide-leave-active {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+[dir='ltr'] .drawer-slide-enter-from,
+[dir='ltr'] .drawer-slide-leave-to {
+  transform: translateX(-100%);
+}
+[dir='rtl'] .drawer-slide-enter-from,
+[dir='rtl'] .drawer-slide-leave-to {
+  transform: translateX(100%);
 }
 </style>

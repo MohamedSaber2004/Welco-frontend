@@ -1248,13 +1248,13 @@ const resolvedDescription = computed(() => {
 }
 
 .pdp-image-viewport:hover .pdp-inspect-trigger {
-  background: var(--brand, #071520);
+  background: var(--brand, #6366F1);
   color: #ffffff;
-  border-color: var(--secondary, #00A389);
+  border-color: var(--brand, #6366F1);
 }
 
 .pdp-inspect-trigger:focus-visible {
-  outline: 2px solid var(--secondary, #00A389);
+  outline: 2px solid var(--brand, #6366F1);
   outline-offset: 2px;
 }
 
@@ -1508,7 +1508,7 @@ const resolvedDescription = computed(() => {
   top: 0;
   inset-inline: 0;
   height: 2.5px;
-  background: linear-gradient(90deg, var(--secondary, #00A389), var(--accent, #0EA5E9));
+  background: linear-gradient(90deg, var(--brand, #6366F1), var(--secondary, #14B8A6));
   opacity: 0.95;
 }
 
@@ -2055,7 +2055,7 @@ const resolvedDescription = computed(() => {
   top: 0;
   inset-inline: 0;
   height: 2.5px;
-  background: linear-gradient(90deg, var(--secondary, #00A389), var(--accent, #0EA5E9));
+  background: linear-gradient(90deg, var(--brand, #6366F1), var(--secondary, #14B8A6));
   opacity: 0.95;
 }
 

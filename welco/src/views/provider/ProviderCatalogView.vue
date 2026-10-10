@@ -593,10 +593,6 @@ onMounted(() => { void loadAll() })
             <span class="spec-k mono">{{ t('admin.sku') }}</span>
             <strong class="spec-v mono">{{ selectedProduct.sku }}</strong>
           </div>
-          <div class="spec-card">
-            <span class="spec-k mono">{{ t('admin.slug') }}</span>
-            <strong class="spec-v mono">{{ selectedProduct.slug }}</strong>
-          </div>
           <div v-if="selectedProduct.material" class="spec-card">
             <span class="spec-k mono">{{ t('admin.material') || 'Material' }}</span>
             <strong class="spec-v">{{ selectedProduct.material }}</strong>

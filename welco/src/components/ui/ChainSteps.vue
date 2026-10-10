@@ -77,13 +77,13 @@ const activeIndex = computed(() => Math.min(props.current, props.steps.length - 
 
 /* Active Step */
 .chain-steps__node.is-active {
-  color: var(--fg-heading, #102a43);
+  color: var(--text-primary, #111827);
   font-weight: var(--weight-semibold, 600);
 }
 
 .chain-steps__node.is-active .chain-steps__ring {
-  border-color: var(--secondary, #00A389);
-  box-shadow: 0 0 0 3px rgba(0, 163, 137, 0.2);
+  border-color: var(--brand, #6366F1);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
 }
 
 .chain-steps__node.is-active .chain-steps__ring::after {
@@ -92,25 +92,25 @@ const activeIndex = computed(() => Math.min(props.current, props.steps.length - 
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--secondary, #00A389);
+  background: var(--brand, #6366F1);
 }
 
 /* Completed Step */
 .chain-steps__node.is-done {
-  color: var(--color-success-600, #16a34a);
+  color: var(--color-success, #10B981);
   font-weight: var(--weight-medium, 500);
 }
 
 .chain-steps__node.is-done .chain-steps__ring {
-  border-color: var(--color-success-500, #16a34a);
-  background: var(--color-success-500, #16a34a);
+  border-color: var(--color-success, #10B981);
+  background: var(--color-success, #10B981);
 }
 
 /* Connecting line */
 .chain-steps__link {
   flex: 1;
   height: 2px;
-  background: var(--border, #d9e2ec);
+  background: var(--border, #E5E7EB);
   margin: 0 0.75rem;
   min-width: 16px;
   transition: background var(--duration-fast, 150ms) var(--ease-out, ease-out);

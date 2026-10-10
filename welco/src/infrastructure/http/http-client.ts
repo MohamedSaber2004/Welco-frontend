@@ -68,8 +68,8 @@ export class HttpClient {
   private waitQueue: (() => void)[] = []
 
   private rateLimiters: Record<string, FixedWindowLimiter> = {
-    login: new FixedWindowLimiter(3, 60_000),
-    general: new FixedWindowLimiter(60, 60_000),
+    login: new FixedWindowLimiter(30, 60_000),
+    general: new FixedWindowLimiter(120, 60_000),
   }
 
   private dedupeMap = new Map<string, Promise<unknown>>()

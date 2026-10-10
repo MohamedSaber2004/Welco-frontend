@@ -4,17 +4,17 @@
 
 /* Welco platform visual language: clinical trust, operational clarity, and a warm human accent. */
 :root {
-  --platform-ink: #102A43;
-  --platform-ink-soft: #42474D;
-  --platform-teal: #147D92;
-  --platform-teal-deep: #0F3D56;
-  --platform-aqua: #EDF4FF;
-  --platform-mist: #F7F9FB;
-  --platform-lime: #28A7A1;
-  --platform-coral: #ff8b6b;
-  --platform-border: #D9E2EC;
-  --platform-shadow: 0 18px 50px rgba(9, 47, 67, 0.11);
-  --platform-display: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  --platform-ink: #111827;
+  --platform-ink-soft: #4B5563;
+  --platform-teal: #6366F1;
+  --platform-teal-deep: #4F46E5;
+  --platform-aqua: #EEF2FF;
+  --platform-mist: #F9FAFB;
+  --platform-lime: #10B981;
+  --platform-coral: #EF4444;
+  --platform-border: #E5E7EB;
+  --platform-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.10);
+  --platform-display: var(--font-display);
 }
 
 @tailwind base;
@@ -1261,30 +1261,43 @@ button:not(:disabled):hover { transform: translateY(-1px); }
   .admin-head, .page-head { align-items: stretch !important; }
   .head-actions { width: 100% !important; }
   .head-actions .btn { flex: 1 1 auto !important; justify-content: center !important; }
-}
-
-@media (max-width: 900px) {
   .territory-grid { grid-template-columns: repeat(2, 1fr) !important; }
 }
 
 @media (max-width: 768px) {
+  :root {
+    --gutter: clamp(0.75rem, 3vw, 1.25rem);
+  }
+  .page-shell {
+    padding-inline: max(0.85rem, env(safe-area-inset-left)) !important;
+    padding-inline-end: max(0.85rem, env(safe-area-inset-right)) !important;
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
+  }
   .toolbar__controls .btn { flex: 1 1 auto !important; }
   .admin-details .details-grid { grid-template-columns: 1fr !important; }
   .line-item__meta { margin-inline-start: 0 !important; width: 100% !important; text-align: start !important; }
   .meter-row { flex-wrap: wrap !important; }
+  .table-wrap, .table-responsive {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-x: contain !important;
+    display: block !important;
+  }
+  .table-wrap table, .table-responsive table {
+    min-width: 520px !important;
+  }
 }
 
 @media (max-width: 640px) {
   .detail-grid, .details-grid, .territory-grid { grid-template-columns: 1fr !important; }
-}
-
-@media (max-width: 640px) {
-  .admin-head, .page-head, .dash-head { flex-direction: column !important; align-items: stretch !important; }
+  .admin-head, .page-head, .dash-head { flex-direction: column !important; align-items: stretch !important; gap: var(--space-3) !important; }
   .dash-head__actions { width: 100% !important; }
   .dash-head__actions .btn, .head-actions .btn { width: 100% !important; }
   .search-filter-bar { align-items: stretch !important; }
-  .search-wrap, .search-input-wrap { flex: 1 1 100% !important; max-width: none !important; }
-  .filter-select, .toolbar__select { flex: 1 1 calc(50% - var(--space-3)) !important; min-width: 0 !important; }
+  .search-wrap, .search-input-wrap { flex: 1 1 100% !important; max-width: none !important; width: 100% !important; }
+  .filter-select, .toolbar__select { flex: 1 1 calc(50% - var(--space-2)) !important; min-width: 0 !important; }
   .clear-filters-btn { flex: 1 1 100% !important; justify-content: center !important; }
   .admin-modal-form .form-row { flex-direction: column !important; }
   .admin-modal-form .form-row.two-cols > .form-field { flex: 1 1 auto !important; }
@@ -1293,17 +1306,83 @@ button:not(:disabled):hover { transform: translateY(-1px); }
   .admin-modal-form .modal-foot .btn,
   .modal-foot__group .btn { width: 100% !important; }
   .row-actions { gap: var(--space-1) !important; }
-  .pagination { flex-wrap: wrap !important; justify-content: center !important; }
+  .pagination { flex-wrap: wrap !important; justify-content: center !important; gap: 0.35rem !important; }
   .toast-stack { inset-inline: var(--space-4) !important; bottom: var(--space-4) !important; }
   .toast { min-width: 0 !important; width: 100% !important; }
-  .empty-state, .data-state__empty { padding: var(--space-8) var(--space-4) !important; }
+  .empty-state, .data-state__empty { padding: var(--space-6) var(--space-3) !important; }
   .kpi { flex-wrap: wrap !important; }
   .card__footer { flex-wrap: wrap !important; }
+  .card--pad, .card-body { padding: var(--space-4) !important; }
 }
 
 @media (max-width: 480px) {
-  .filter-select, .toolbar__select { flex: 1 1 100% !important; }
-  .row-action-btn { width: 36px !important; height: 36px !important; }
-  .pill { padding: 0.45rem 0.75rem !important; font-size: var(--text-sm) !important; }
+  :root {
+    --gutter: 0.65rem;
+  }
+  .page-head__info h1,
+  .admin-head h1,
+  .dash-title,
+  .page__title,
+  .view-title {
+    font-size: clamp(1.2rem, 5.5vw, 1.55rem) !important;
+    word-break: break-word !important;
+    overflow-wrap: anywhere !important;
+  }
+  .stats-grid, .metrics-grid, .dash-stats, .account-stats, .admin-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0.5rem !important;
+  }
+  .stat-card, .metric-card, .dash-stat-card, .kpi-card {
+    padding: 0.75rem 0.65rem !important;
+  }
+  .stat-card__value, .metric-card__value, .dash-stat-value, .kpi-card__value {
+    font-size: 1.3rem !important;
+  }
+  .stat-card__label, .metric-card__label, .dash-stat-label {
+    font-size: 0.8rem !important;
+  }
+  .filter-select, .toolbar__select { flex: 1 1 100% !important; width: 100% !important; }
+  .row-action-btn { width: 34px !important; height: 34px !important; }
+  .pill { padding: 0.35rem 0.65rem !important; font-size: var(--text-xs) !important; }
   .summary-row { font-size: var(--text-sm) !important; }
+  .toolbar { padding: var(--space-3) !important; }
+  .panel { padding: var(--space-4) !important; }
 }
+
+/* Extra small phones (<= 380px: Galaxy Fold cover screen, iPhone SE / mini) */
+@media (max-width: 380px) {
+  :root {
+    --gutter: 0.45rem;
+  }
+  .page-shell {
+    padding: 0.5rem 0.45rem calc(68px + env(safe-area-inset-bottom, 0px)) !important;
+    gap: var(--space-4) !important;
+  }
+  .card--pad, .card-body {
+    padding: 0.65rem !important;
+  }
+  .stats-grid, .metrics-grid, .dash-stats, .account-stats, .admin-stats {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.35rem !important;
+  }
+  .stat-card, .metric-card, .dash-stat-card, .kpi-card {
+    padding: 0.55rem 0.45rem !important;
+  }
+  .stat-card__value, .metric-card__value, .dash-stat-value, .kpi-card__value {
+    font-size: 1.15rem !important;
+  }
+  .stat-card__label, .metric-card__label, .dash-stat-label {
+    font-size: 0.72rem !important;
+  }
+  .page-btn {
+    min-width: 28px !important;
+    height: 28px !important;
+    padding: 0 6px !important;
+    font-size: 11px !important;
+  }
+  .btn {
+    padding-inline: 0.6rem !important;
+    font-size: 12px !important;
+  }
+}
+

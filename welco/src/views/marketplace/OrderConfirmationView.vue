@@ -190,20 +190,20 @@ onMounted(async () => {
   top: 0;
   inset-inline: 0;
   height: 2.5px;
-  background: linear-gradient(90deg, var(--secondary, #00A389), var(--accent, #0EA5E9));
+  background: linear-gradient(90deg, var(--brand, #6366F1), var(--secondary, #14B8A6));
 }
 
 .check-halo {
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: rgba(0, 163, 137, 0.12);
-  border: 1px solid rgba(0, 163, 137, 0.35);
-  color: var(--secondary, #00A389);
+  background: var(--success-subtle, #D1FAE5);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: var(--success, #10B981);
   display: grid;
   place-items: center;
   margin-bottom: 0.5rem;
-  box-shadow: 0 0 20px -4px rgba(0, 163, 137, 0.25);
+  box-shadow: 0 0 20px -4px rgba(16, 185, 129, 0.25);
 }
 
 .head-chip {
@@ -406,22 +406,22 @@ onMounted(async () => {
   gap: 0.45rem;
   height: 48px;
   padding: 0 1.25rem;
-  background: var(--secondary, #00A389);
+  background: var(--brand, #6366F1);
   color: #ffffff;
-  border: 1px solid var(--secondary, #00A389);
-  border-radius: var(--radius-md, 6px);
+  border: 1px solid var(--brand, #6366F1);
+  border-radius: var(--radius-md, 8px);
   font-size: 13.5px;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 4px 14px -2px rgba(0, 163, 137, 0.35);
+  box-shadow: 0 4px 14px -2px rgba(99, 102, 241, 0.35);
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .btn-primary-action:hover {
-  background: var(--secondary-hover, #008872);
-  border-color: var(--secondary-hover, #008872);
+  background: var(--brand-hover, #4F46E5);
+  border-color: var(--brand-hover, #4F46E5);
   transform: translateY(-1px);
-  box-shadow: 0 6px 18px -2px rgba(0, 163, 137, 0.45);
+  box-shadow: 0 6px 18px -2px rgba(99, 102, 241, 0.45);
 }
 
 .btn-secondary-action {

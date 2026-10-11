@@ -402,7 +402,7 @@ onMounted(loadDashboard)
       <!-- Product Inquiries & Provider Responses Section -->
       <section class="card inquiries-section">
         <div class="card-head">
-          <div>
+          <div class="card-head-content">
             <div class="card-eyebrow mono">
               <span class="material-symbols-outlined text-[14px]">contact_support</span>
               <span>{{ t('account.inquiryQueue') }}</span>
@@ -969,6 +969,8 @@ onMounted(loadDashboard)
       font-weight: 600;
       color: var(--wl-primary);
       text-decoration: none;
+      white-space: nowrap;
+      flex-shrink: 0;
       transition: color 0.15s;
     }
 
@@ -1384,31 +1386,75 @@ onMounted(loadDashboard)
       margin-bottom: var(--space-6);
     }
 
+    .inquiries-section .card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: var(--space-4);
+      margin-bottom: var(--space-4);
+      flex-wrap: wrap;
+    }
+
+    .card-head-content {
+      flex: 1 1 240px;
+      min-width: 0;
+    }
+
     .section-desc {
       font-size: var(--step--1);
       color: var(--wl-muted);
       margin-top: 0.25rem;
+      line-height: 1.45;
     }
 
     .head-side-actions {
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      gap: 0.75rem;
+      gap: 0.65rem;
+      flex-shrink: 0;
+      white-space: nowrap;
     }
 
     .view-all-link {
       display: inline-flex;
       align-items: center;
-      gap: 0.3rem;
+      gap: 0.35rem;
       font-size: 0.82rem;
       font-weight: 700;
       color: var(--wl-primary);
       text-decoration: none;
-      transition: color 0.15s ease;
+      white-space: nowrap;
+      flex-shrink: 0;
+      padding: 0.3rem 0.65rem;
+      border-radius: var(--radius-sm, 6px);
+      background: var(--wl-surface-soft, rgba(0, 0, 0, 0.03));
+      border: 1px solid var(--wl-border, rgba(0, 0, 0, 0.08));
+      transition: all 0.16s ease;
     }
 
     .view-all-link:hover {
-      text-decoration: underline;
+      background: var(--wl-primary-soft, rgba(79, 70, 229, 0.1));
+      border-color: var(--wl-primary);
+      color: var(--wl-primary-hover, var(--wl-primary));
+      text-decoration: none;
+      transform: translateY(-1px);
+    }
+
+    .view-all-link:active {
+      transform: translateY(0);
+    }
+
+    .view-all-link .icon--directional {
+      display: inline-block;
+      transition: transform 0.15s ease;
+    }
+
+    .view-all-link:hover .icon--directional {
+      transform: translateX(3px);
+    }
+
+    [dir="rtl"] .view-all-link:hover .icon--directional {
+      transform: translateX(-3px);
     }
 
     .inquiries-counter {
@@ -1416,9 +1462,10 @@ onMounted(loadDashboard)
       font-weight: 700;
       color: var(--wl-primary);
       background: var(--wl-primary-soft);
-      padding: 0.25rem 0.65rem;
+      padding: 0.2rem 0.6rem;
       border-radius: 9999px;
       border: 1px solid rgba(var(--wl-primary-rgb), 0.2);
+      flex-shrink: 0;
     }
 
     .inquiries-grid {
@@ -1564,6 +1611,31 @@ onMounted(loadDashboard)
     }
 
     @media (max-width: 640px) {
+      .inquiries-section .card-head {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--space-3);
+      }
+
+      .card-head-content {
+        flex: 1 1 auto;
+        width: 100%;
+      }
+
+      .head-side-actions {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: var(--space-3);
+        border-top: 1px dashed var(--border);
+      }
+
+      .view-all-link {
+        font-size: 0.8rem;
+        padding: 0.35rem 0.75rem;
+      }
+
       .inquiries-grid {
         grid-template-columns: 1fr;
       }

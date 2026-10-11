@@ -474,7 +474,8 @@ export class AuthService {
     const clean = path.split('?')[0]?.split('#')[0] ?? '/'
     if (clean.startsWith('/admin')) return this.isAdmin.value
     if (clean.startsWith('/provider')) return this.isProvider.value || this.isAdmin.value
-    if (clean.startsWith('/account') || clean === '/wishlist') return this.isClient.value && this.isAuthenticated
+    if (clean === '/wishlist') return this.isAuthenticated
+    if (clean.startsWith('/account')) return this.isClient.value && this.isAuthenticated
     if (clean === '/cart' || clean === '/checkout') return this.isClient.value
     return true
   }

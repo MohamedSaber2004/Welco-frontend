@@ -24,7 +24,6 @@ const ids = computed(() => wishlistService.ids.value)
 const loading = computed(() => wishlistService.loading.value)
 const count = computed(() => wishlistService.count.value)
 const isAuthenticated = computed(() => authService.isAuthenticated)
-const isOrgUser = computed(() => authService.isOrganizationUser.value)
 
 const localized = (en?: string | null, ar?: string | null) =>
   locale.value === 'ar' ? ar || en || '' : en || ar || ''
@@ -108,15 +107,7 @@ const goDetail = (id: string) => {
       @action="router.push({ name: 'login', query: { redirect: '/wishlist' } })"
     />
 
-    <!-- Gated: non-organization accounts -->
-    <EmptyState
-      v-else-if="!isOrgUser"
-      icon="favorite"
-      :title="t('marketplace.wishlistOrgOnly')"
-      :description="t('marketplace.wishlistOrgOnlyDesc')"
-      :action-text="t('marketplace.browseMarketplace')"
-      @action="router.push({ name: 'marketplace' })"
-    />
+
 
     <!-- Empty -->
     <EmptyState

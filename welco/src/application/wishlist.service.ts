@@ -25,18 +25,14 @@ export class WishlistService {
   private storageKey = 'welco-wishlist'
   private compareKey = 'welco-compare'
 
-  /** Only authenticated OrganizationUser may manage wishlist */
+  /** Authenticated users may manage wishlist */
   private canEditWishlist(): boolean {
-    return this.authService.isAuthenticated && this.authService.isOrganizationUser.value
+    return this.authService.isAuthenticated
   }
 
   private assertCanEdit(): boolean {
     if (!this.authService.isAuthenticated) {
       toastService.error(t('marketplace.wishlistLoginRequired'))
-      return false
-    }
-    if (!this.authService.isOrganizationUser.value) {
-      toastService.error(t('marketplace.wishlistOrgOnly'))
       return false
     }
     return true

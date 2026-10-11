@@ -1,7 +1,19 @@
 const RAW_API_BASE = ((import.meta.env.VITE_API_BASE_URL as string | undefined) ?? '').trim()
 
+function resolveApiBase(): string {
+  if (!RAW_API_BASE) return ''
+  if (
+    typeof window !== 'undefined' &&
+    window.location &&
+    RAW_API_BASE.includes('welco-gateway.runasp.net') &&
+    !window.location.origin.includes('welco-gateway.runasp.net')
+  ) {
+    return ''
+  }
+  return RAW_API_BASE.replace(/\/+$/, '')
+}
 
-export const API_BASE_URL = RAW_API_BASE ? RAW_API_BASE.replace(/\/+$/, '') : ''
+export const API_BASE_URL = resolveApiBase()
 
 const WELCO_GW = 'https://welco-gateway.runasp.net'
 

@@ -83,34 +83,45 @@ const loadCompany = async () => {
     const res = await companyRepository.getCompanyById(companyId.value)
     if (res && res.name) {
       company.value = res
-    } else if (products.value.length > 0) {
-      synthesizeFromProducts()
-    } else {
-      throw new Error('Company details not available')
+      return
     }
-  } catch (e) {
-    if (products.value.length > 0) {
-      synthesizeFromProducts()
-    } else {
-      try {
-        const dir = await companyRepository.getProvidersDirectory({ pageSize: 50 })
-        const found = dir.data?.find((c) => c.id === companyId.value)
-        if (found) {
-          company.value = found
-          return
-        }
-      } catch {
-        /* directory fallback */
-      }
+  } catch {
+    // getCompanyById failed, fallback to directory lookup
+  }
 
-      if (!loading.value) {
-        companyError.value = e instanceof Error ? e.message : t('common.error')
-        company.value = null
-        companyFailed.value = true
+  try {
+    const target = companyId.value.trim().toLowerCase()
+    const dir = await companyRepository.getProvidersDirectory({ pageSize: 50 })
+    let found = dir.data?.find((c) =>
+      c.id?.toLowerCase() === target ||
+      (c.name && c.name.toLowerCase().replace(/\s+/g, '-').includes(target)) ||
+      (c.name && target.includes(c.name.toLowerCase().replace(/\s+/g, '-'))),
+    )
+    if (found) {
+      company.value = found
+      return
+    }
+
+    const total = dir.totalPages || 1
+    for (let p = 2; p <= Math.min(total, 5); p++) {
+      const nextPage = await companyRepository.getProvidersDirectory({ pageNumber: p, pageSize: 50 })
+      const item = nextPage.data?.find((c) =>
+        c.id?.toLowerCase() === target ||
+        (c.name && c.name.toLowerCase().replace(/\s+/g, '-').includes(target)),
+      )
+      if (item) {
+        company.value = item
+        return
       }
     }
-  } finally {
-    companyLoading.value = false
+  } catch {
+    /* directory fallback */
+  }
+
+  if (products.value.length > 0) {
+    synthesizeFromProducts()
+  } else {
+    companyFailed.value = true
   }
 }
 
@@ -135,17 +146,16 @@ const loadProducts = async () => {
         } as CategoryDto)
       }
     }
-    if (!company.value || companyFailed.value || !company.value.name) {
-      if (products.value.length > 0) {
-        synthesizeFromProducts()
-      }
-    }
   } catch (e) {
     fetchError.value = e instanceof Error ? e.message : t('common.error')
     products.value = []
     totalCount.value = 0
   } finally {
     loading.value = false
+  }
+
+  if (!company.value && products.value.length > 0) {
+    synthesizeFromProducts()
   }
 }
 
@@ -154,17 +164,24 @@ const onPageChange = (p: number) => {
   void loadProducts()
 }
 
-const reloadAll = () => {
+const reloadAll = async () => {
   categoryFilter.value = initialCategory.value
   page.value = 1
-  void loadCompany()
-  void loadProducts()
+  companyLoading.value = true
+  await Promise.allSettled([loadCompany(), loadProducts()])
+  if (!company.value && products.value.length > 0) {
+    synthesizeFromProducts()
+  } else if (!company.value) {
+    companyError.value = t('provider.noCompanyTitle')
+    companyFailed.value = true
+  }
+  companyLoading.value = false
 }
 
-onMounted(reloadAll)
+onMounted(() => { void reloadAll() })
 watch(
   () => [route.params.id, route.query.category],
-  () => { reloadAll() },
+  () => { void reloadAll() },
 )
 
 const memberYear = computed(() => {
@@ -185,7 +202,7 @@ const memberYear = computed(() => {
       skeleton-type="store-hero"
       :empty="!company && !companyLoading && !products.length"
       :empty-title="t('provider.noCompanyTitle')"
-      @retry="() => { loadCompany(); loadProducts() }"
+      @retry="() => { void reloadAll() }"
     >
       <div v-if="company" class="store-hero card">
         <div class="store-hero__id">
@@ -232,7 +249,7 @@ const memberYear = computed(() => {
       </div>
     </DataState>
 
-    <div v-if="company || companyFailed" class="store-toolbar">
+    <div class="store-toolbar">
       <div class="search-wrap">
         <span class="material-symbols-outlined search-icon">search</span>
         <input
@@ -270,7 +287,6 @@ const memberYear = computed(() => {
     </div>
 
     <DataState
-      v-if="company || companyFailed"
       :loading="loading"
       :error="fetchError"
       skeleton-type="store-rows"

@@ -92,6 +92,11 @@ const toggleProvider = (id: string) => {
 }
 watch(tileProductPage, () => { void fetchTilePage() })
 
+const openProviderCatalog = (providerId: string) => {
+  if (!providerId) return
+  void router.push({ name: 'provider-storefront', params: { id: providerId } })
+}
+
 const explorerCatId = ref<string | null>(null)
 const explorerProviderPage = ref(1)
 const EXPLORER_PROVIDER_PAGE_SIZE = 5
@@ -561,7 +566,13 @@ const navigateToOemFromModal = () => {
               </div>
             </div>
           </button>
-          <div class="provider-tile__foot">
+          <div
+            class="provider-tile__foot"
+            role="button"
+            tabindex="0"
+            @click="toggleProvider(p.id)"
+            @keydown.enter="toggleProvider(p.id)"
+          >
             <span class="mono provider-tile__count">{{ t('provider.providerProducts') }}</span>
             <span class="material-symbols-outlined provider-tile__chev" :class="{ 'is-open': expandedProviderId === p.id }" aria-hidden="true">expand_more</span>
           </div>
@@ -596,10 +607,14 @@ const navigateToOemFromModal = () => {
                 <span class="material-symbols-outlined text-[16px] icon--directional">chevron_right</span>
               </button>
             </div>
-            <router-link :to="{ name: 'provider-storefront', params: { id: p.id } }" class="provider-viewall mono">
+            <button
+              type="button"
+              class="provider-viewall mono"
+              @click.stop="openProviderCatalog(p.id)"
+            >
               <span>{{ t('provider.viewCatalog') }}</span>
               <span class="material-symbols-outlined text-[14px] icon--directional">arrow_forward</span>
-            </router-link>
+            </button>
           </div>
         </article>
       </div>
@@ -1682,11 +1697,23 @@ const navigateToOemFromModal = () => {
   justify-content: center;
   gap: var(--space-1);
   font-size: var(--text-xs);
+  font-weight: 700;
   color: var(--brand);
+  background: none;
+  border: 1px solid transparent;
+  cursor: pointer;
   text-decoration: none;
-  padding: var(--space-1) 0;
+  padding: var(--space-2) var(--space-3);
+  min-height: 38px;
+  width: 100%;
+  border-radius: var(--radius-md);
+  transition: all 0.2s ease;
 }
-.provider-viewall:hover { text-decoration: underline; }
+.provider-viewall:hover {
+  background: var(--color-primary-light, #EEF2FF);
+  color: var(--color-primary-deep, #4F46E5);
+  border-color: rgba(99, 102, 241, 0.2);
+}
 
 /* Category → providers explorer — pure white card with subtle borders & soft hover */
 .cat-explorer {

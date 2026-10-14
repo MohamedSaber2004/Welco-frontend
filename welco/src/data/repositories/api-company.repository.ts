@@ -77,13 +77,22 @@ export class ApiCompanyRepository implements CompanyRepository {
 
     // Fallback for public / unauthenticated visitors:
     try {
+      const target = (id || '').trim().toLowerCase()
       const dir = await this.getProvidersDirectory({ pageSize: 50 })
-      const found = dir.data?.find((c) => c.id === id)
+      let found = dir.data?.find((c) =>
+        c.id?.toLowerCase() === target ||
+        (c.name && c.name.toLowerCase().replace(/\s+/g, '-').includes(target)) ||
+        (c.name && target.includes(c.name.toLowerCase().replace(/\s+/g, '-'))),
+      )
       if (found) return found
+
       const total = dir.totalPages || 1
       for (let p = 2; p <= Math.min(total, 5); p++) {
         const nextPage = await this.getProvidersDirectory({ pageNumber: p, pageSize: 50 })
-        const item = nextPage.data?.find((c) => c.id === id)
+        const item = nextPage.data?.find((c) =>
+          c.id?.toLowerCase() === target ||
+          (c.name && c.name.toLowerCase().replace(/\s+/g, '-').includes(target)),
+        )
         if (item) return item
       }
     } catch {
@@ -117,8 +126,22 @@ export class ApiCompanyRepository implements CompanyRepository {
       const qs = params.toString()
       const raw = await this.http.get<unknown>(`${COMPANY_ROUTES.companyProducts(companyId)}?${qs}`, { showFeedback: false })
       if (Array.isArray(raw)) return paginate(raw as ProductDto[])
-      return raw as PaginatedResult<ProductDto>
+      const pResult = raw as PaginatedResult<ProductDto> | null
+      if (pResult && pResult.isSuccess !== false && Array.isArray(pResult.data) && pResult.data.length > 0) {
+        return pResult
+      }
+      if (pResult && pResult.statusCode === 401) {
+        throw new Error('401 from companyProducts')
+      }
+      if (pResult && Array.isArray(pResult.data)) {
+        return pResult
+      }
     } catch {
+      // Fallback
+    }
+
+    // Fallback: search general products pool
+    try {
       const params = new URLSearchParams()
       params.set('pageNumber', '1')
       params.set('pageSize', '50')
@@ -128,16 +151,22 @@ export class ApiCompanyRepository implements CompanyRepository {
       const arr = (Array.isArray(raw) ? raw : (raw as PaginatedResult<ProductDto> | null)?.data ?? []) as ProductDto[]
       const q = (query.search || '').trim().toLowerCase()
       const sku = (query.sku || '').trim().toLowerCase()
+      const targetId = (companyId || '').trim().toLowerCase()
       return paginate(
         arr.filter((p) => {
           if (!p) return false
-          if (!(p.companyId === companyId || (!p.companyId && p.supplierId === companyId))) return false
+          const pCompId = (p.companyId || p.supplierId || '').toLowerCase()
+          const pCompName = (p.companyName || '').toLowerCase().replace(/\s+/g, '-')
+          const matchesCompany = pCompId === targetId || (pCompName && (pCompName.includes(targetId) || targetId.includes(pCompName)))
+          if (!matchesCompany) return false
           if (query.categoryId && p.categoryId !== query.categoryId) return false
           if (q && ![p.nameEn, p.nameAr, p.sku, p.material].some((v) => (v ? String(v).toLowerCase().includes(q) : false))) return false
           if (sku && !(p.sku ? String(p.sku).toLowerCase().includes(sku) : false)) return false
           return true
         }),
       )
+    } catch {
+      return paginate([])
     }
   }
 

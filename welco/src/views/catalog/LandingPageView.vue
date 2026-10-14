@@ -669,7 +669,7 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
 .cat-media__icon { font-size: 28px; color: var(--wl-muted); }
 .cat-body { display: flex; flex-direction: column; }
 .cat-name { font-size: 13px; font-weight: 600; color: var(--wl-ink-strong); }
-.cat-count { font-size: 10.5px; color: var(--wl-muted); }
+.cat-count { font-size: 11px; color: var(--color-primary-deep, #4F46E5); font-weight: 600; }
 
 /* Related Specialties */
 .lp-related-section {

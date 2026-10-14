@@ -539,15 +539,44 @@ const navigateToCategory = (catId: string) => {
   position: absolute;
   top: 10px;
   inset-inline-end: 10px;
-  padding: 3px 8px;
-  background: var(--wl-overlay-tint, rgba(0, 10, 25, 0.75));
-  backdrop-filter: blur(4px);
-  color: var(--wl-ink-strong);
-  font-size: 10.5px;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--color-primary-deep, #4F46E5);
+  font-size: 11px;
   font-weight: 700;
-  border-radius: 4px;
-  letter-spacing: 0.03em;
+  border-radius: var(--radius-pill, 9999px);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  box-shadow: 0 2px 5px rgba(17, 24, 39, 0.06);
+  letter-spacing: 0.02em;
   z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.2s ease;
+}
+
+.cat-badge::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--color-primary, #6366F1);
+  box-shadow: 0 0 4px rgba(99, 102, 241, 0.4);
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cat-card:hover .cat-badge {
+  background: var(--color-primary, #6366F1);
+  color: #FFFFFF;
+  border-color: var(--color-primary, #6366F1);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.cat-card:hover .cat-badge::before {
+  background: #FFFFFF;
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
 }
 
 .cat-card__body {

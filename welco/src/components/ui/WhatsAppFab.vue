@@ -41,7 +41,7 @@ const fabStyle = computed(() =>
 .wa-fab {
   position: fixed;
   bottom: 24px;
-  inset-inline-end: 20px;
+  right: 20px;
   z-index: 99;
   display: inline-flex;
   align-items: center;
@@ -79,8 +79,8 @@ const fabStyle = computed(() =>
 
 @media (max-width: 768px) {
   .wa-fab {
-    bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
-    inset-inline-end: 14px !important;
+    bottom: calc(76px + env(safe-area-inset-bottom, 0px)) !important;
+    right: 14px !important;
     padding: 0 !important;
     width: 44px !important;
     height: 44px !important;

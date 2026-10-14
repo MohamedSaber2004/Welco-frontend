@@ -154,7 +154,7 @@ async function placeOrderFromQuote() {
       <AccountNav />
 
       <div class="detail-grid">
-        <main class="manifest-card">
+        <section class="manifest-card">
           <div class="manifest-head">
             <div class="manifest-title-group">
               <span class="material-symbols-outlined text-[18px] text-indigo-600">format_list_bulleted</span>
@@ -191,7 +191,7 @@ async function placeOrderFromQuote() {
             </div>
             <p class="quote-note-text">{{ quote.note }}</p>
           </div>
-        </main>
+        </section>
 
         <aside class="side-panel">
           <section class="card amount-card">

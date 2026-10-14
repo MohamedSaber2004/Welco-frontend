@@ -227,7 +227,7 @@ const goToProduct = (id: string) => {
       </div>
     </header>
 
-    <main class="page-body">
+    <section class="page-body">
       <div class="container-app">
         <!-- Filter Controls Toolbar -->
         <section class="toolbar-card" aria-label="Filters and Controls">
@@ -473,7 +473,7 @@ const goToProduct = (id: string) => {
           </div>
         </DataState>
       </div>
-    </main>
+    </section>
   </div>
 </template>
 

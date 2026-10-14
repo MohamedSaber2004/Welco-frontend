@@ -61,26 +61,35 @@ export class ApiCompanyRepository implements CompanyRepository {
   }
 
   async getCompanyById(id: string): Promise<CompanyDto> {
-    try {
-      return await this.http.get<CompanyDto>(COMPANY_ROUTES.companyById(id), { showFeedback: false })
-    } catch (err) {
-      // Fallback for public / unauthenticated visitors:
-      // Try resolving the company from the public directory endpoint
-      try {
-        const dir = await this.getProvidersDirectory({ pageSize: 50 })
-        const found = dir.data?.find((c) => c.id === id)
-        if (found) return found
-        const total = dir.totalPages || 1
-        for (let p = 2; p <= Math.min(total, 5); p++) {
-          const nextPage = await this.getProvidersDirectory({ pageNumber: p, pageSize: 50 })
-          const item = nextPage.data?.find((c) => c.id === id)
-          if (item) return item
-        }
-      } catch {
-        // Directory fallback failed
-      }
-      throw err
+    const isCompanyDto = (c: unknown): c is CompanyDto => {
+      return Boolean(c && typeof c === 'object' && 'name' in c && (c as CompanyDto).name)
     }
+
+    try {
+      const raw = await this.http.get<unknown>(COMPANY_ROUTES.companyById(id), { showFeedback: false })
+      if (isCompanyDto(raw)) return raw
+      if (raw && typeof raw === 'object' && 'data' in raw && isCompanyDto((raw as { data: unknown }).data)) {
+        return (raw as { data: CompanyDto }).data
+      }
+    } catch {
+      // Continue to fallback
+    }
+
+    // Fallback for public / unauthenticated visitors:
+    try {
+      const dir = await this.getProvidersDirectory({ pageSize: 50 })
+      const found = dir.data?.find((c) => c.id === id)
+      if (found) return found
+      const total = dir.totalPages || 1
+      for (let p = 2; p <= Math.min(total, 5); p++) {
+        const nextPage = await this.getProvidersDirectory({ pageNumber: p, pageSize: 50 })
+        const item = nextPage.data?.find((c) => c.id === id)
+        if (item) return item
+      }
+    } catch {
+      // Directory fallback failed
+    }
+    throw new Error('Company not found')
   }
 
   async getCompanyProducts(companyId: string, query: CompanyProductsQuery = {}): Promise<PaginatedResult<ProductDto>> {

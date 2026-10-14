@@ -29,6 +29,7 @@ export interface CurrencyDto {
   symbol: string
   symbolNative?: string
   decimalDigits?: number
+  countryCode?: string | null
   isActive: boolean
 }
 

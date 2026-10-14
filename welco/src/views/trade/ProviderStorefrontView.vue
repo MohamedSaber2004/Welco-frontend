@@ -80,7 +80,14 @@ const loadCompany = async () => {
   companyError.value = ''
   companyFailed.value = false
   try {
-    company.value = await companyRepository.getCompanyById(companyId.value)
+    const res = await companyRepository.getCompanyById(companyId.value)
+    if (res && res.name) {
+      company.value = res
+    } else if (products.value.length > 0) {
+      synthesizeFromProducts()
+    } else {
+      throw new Error('Company details not available')
+    }
   } catch (e) {
     if (products.value.length > 0) {
       synthesizeFromProducts()

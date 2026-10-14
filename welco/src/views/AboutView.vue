@@ -27,15 +27,55 @@ onMounted(async () => {
 const heroTitle = computed(() => aboutPage.value?.heroTitle || t('home.aboutTitle'))
 const heroBody = computed(() => aboutPage.value?.heroBody || t('home.aboutBody'))
 
-const storyParagraphs = computed(() => {
-  if (aboutPage.value?.contentBlock) {
-    const split = aboutPage.value.contentBlock
-      .split(/\n\s*\n/)
-      .map((p) => p.trim())
-      .filter(Boolean)
-    if (split.length > 0) return split
+interface ContentBlockItem {
+  type: 'paragraph' | 'list' | 'heading'
+  text?: string
+  items?: string[]
+}
+
+const parsedStoryBlocks = computed<ContentBlockItem[] | null>(() => {
+  if (!aboutPage.value?.contentBlock) return null
+
+  const raw = aboutPage.value.contentBlock.trim()
+  if (!raw) return null
+
+  const blocks: ContentBlockItem[] = []
+  const sections = raw.split(/\n\s*\n/).map((s) => s.trim()).filter(Boolean)
+
+  for (const sec of sections) {
+    const lines = sec.split('\n').map((l) => l.trim()).filter(Boolean)
+    const listLines: string[] = []
+    const preambleLines: string[] = []
+    let inList = false
+
+    for (const line of lines) {
+      if (/^[-*•]\s+/.test(line)) {
+        inList = true
+        listLines.push(line.replace(/^[-*•]\s+/, '').trim())
+      } else if (inList) {
+        if (listLines.length > 0) {
+          listLines[listLines.length - 1] += ' ' + line
+        }
+      } else {
+        preambleLines.push(line)
+      }
+    }
+
+    if (preambleLines.length > 0) {
+      const preambleText = preambleLines.join(' ')
+      if (/^#{1,4}\s+/.test(preambleText)) {
+        blocks.push({ type: 'heading', text: preambleText.replace(/^#{1,4}\s+/, '') })
+      } else {
+        blocks.push({ type: 'paragraph', text: preambleText })
+      }
+    }
+
+    if (listLines.length > 0) {
+      blocks.push({ type: 'list', items: listLines })
+    }
   }
-  return null
+
+  return blocks.length > 0 ? blocks : null
 })
 
 const yearsOfExperience = computed(() => '30+')
@@ -163,10 +203,20 @@ const pillars = computed(() => [
           </div>
 
           <div class="story-content">
-            <template v-if="storyParagraphs">
-              <p v-for="(p, idx) in storyParagraphs" :key="idx" class="story-paragraph">
-                {{ p }}
-              </p>
+            <template v-if="parsedStoryBlocks">
+              <template v-for="(block, idx) in parsedStoryBlocks" :key="idx">
+                <h3 v-if="block.type === 'heading'" class="story-subheading">
+                  {{ block.text }}
+                </h3>
+                <ul v-else-if="block.type === 'list'" class="story-bullet-list">
+                  <li v-for="(item, iIdx) in block.items" :key="iIdx" class="story-bullet-item">
+                    {{ item }}
+                  </li>
+                </ul>
+                <p v-else class="story-paragraph">
+                  {{ block.text }}
+                </p>
+              </template>
             </template>
             <template v-else>
               <p class="story-paragraph">
@@ -579,6 +629,39 @@ const pillars = computed(() => [
   color: var(--wl-ink);
   margin: 0;
   text-wrap: pretty;
+}
+
+.story-subheading {
+  font-size: var(--step-1);
+  font-weight: 700;
+  color: var(--wl-ink-strong);
+  margin: var(--space-2) 0 0;
+}
+
+.story-bullet-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.story-bullet-item {
+  position: relative;
+  padding-inline-start: 1.5rem;
+  font-size: var(--step-0);
+  line-height: 1.6;
+  color: var(--wl-ink);
+}
+
+.story-bullet-item::before {
+  content: '•';
+  position: absolute;
+  inset-inline-start: 0.35rem;
+  color: var(--wl-primary);
+  font-weight: 800;
+  font-size: 1.2em;
 }
 
 /* Section Head */

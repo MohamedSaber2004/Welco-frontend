@@ -465,7 +465,7 @@ const setLang = async (v: AppLanguage) => {
       </aside>
 
       <!-- Right Column: Personal Information & Password Change -->
-      <main class="profile-main-stack">
+      <section class="profile-main-stack">
         <!-- Executive Identity & Phone Code Overview for All User Types -->
         <div class="account-specs-bar card" :class="{ 'account-specs-bar--admin': isAdminOrSales }">
           <div class="specs-bar-cell">
@@ -858,7 +858,7 @@ const setLang = async (v: AppLanguage) => {
             </button>
           </form>
         </div>
-      </main>
+      </section>
     </div>
   </div>
 </template>

@@ -111,7 +111,7 @@ onMounted(async () => {
       <!-- Detail 2-Column Grid -->
       <div class="detail-grid">
         <!-- Main: Line Items -->
-        <main class="manifest-card">
+        <section class="manifest-card">
           <div class="manifest-head">
             <div class="manifest-title-group">
               <span class="material-symbols-outlined text-[18px] text-indigo-600">checklist</span>
@@ -199,7 +199,7 @@ onMounted(async () => {
             <span class="material-symbols-outlined text-[16px] text-indigo-600">sticky_note_2</span>
             <span><strong>{{ t('sales.notes') }}:</strong> {{ parseNegotiationNote(rfq.note).cleanNote }}</span>
           </div>
-        </main>
+        </section>
 
         <!-- Sidebar: Estimated Total & Linked Quote -->
         <aside class="side-panel">

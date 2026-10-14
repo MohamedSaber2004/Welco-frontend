@@ -138,6 +138,9 @@ watch(isAuthed, (v) => {
         <template v-else>
           <router-link to="/" class="navbar-menu__link">{{ t('nav.home') }}</router-link>
           <router-link to="/marketplace" class="navbar-menu__link">{{ t('nav.marketplace') }}</router-link>
+          <router-link to="/categories" class="navbar-menu__link">{{ t('marketplace.categoriesTitle') }}</router-link>
+          <router-link to="/most-selling" class="navbar-menu__link">{{ t('home.mostSellingTitle') }}</router-link>
+          <router-link to="/oem" class="navbar-menu__link">{{ t('nav.oem') }}</router-link>
           <router-link to="/providers" class="navbar-menu__link">{{ t('nav.providers') }}</router-link>
           <router-link to="/about" class="navbar-menu__link">{{ t('nav.about') }}</router-link>
           <router-link to="/certifications" class="navbar-menu__link">{{ t('nav.certifications') }}</router-link>
@@ -294,6 +297,9 @@ watch(isAuthed, (v) => {
         <template v-else>
           <router-link to="/" class="header__drawer-link" @click="closeMobile">{{ t('nav.home') }}</router-link>
           <router-link to="/marketplace" class="header__drawer-link" @click="closeMobile">{{ t('nav.marketplace') }}</router-link>
+          <router-link to="/categories" class="header__drawer-link" @click="closeMobile">{{ t('marketplace.categoriesTitle') }}</router-link>
+          <router-link to="/most-selling" class="header__drawer-link" @click="closeMobile">{{ t('home.mostSellingTitle') }}</router-link>
+          <router-link to="/oem" class="header__drawer-link" @click="closeMobile">{{ t('nav.oem') }}</router-link>
           <router-link to="/providers" class="header__drawer-link" @click="closeMobile">{{ t('nav.providers') }}</router-link>
           <router-link to="/about" class="header__drawer-link" @click="closeMobile">{{ t('nav.about') }}</router-link>
           <router-link to="/certifications" class="header__drawer-link" @click="closeMobile">{{ t('nav.certifications') }}</router-link>

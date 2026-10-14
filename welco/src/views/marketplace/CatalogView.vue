@@ -340,7 +340,7 @@ const filteredSidebarCategories = computed(() => {
         </button>
       </aside>
 
-      <main class="catalog-results">
+      <section class="catalog-results">
         <SkeletonLoader v-if="loading" type="catalog-grid" :count="6" />
         <DataState
           v-else-if="error"
@@ -407,7 +407,7 @@ const filteredSidebarCategories = computed(() => {
           </div>
           <AppPagination v-if="totalPages > 1" :page="page" :total-pages="totalPages" :total-items="totalCount" :page-size="12" class="catalog-pagination" @change="handlePageChange" />
         </template>
-      </main>
+      </section>
     </div>
   </div>
 </template>

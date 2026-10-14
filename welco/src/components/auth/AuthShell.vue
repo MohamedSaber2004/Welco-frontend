@@ -40,9 +40,9 @@ const toggleLang = () => {
         <p class="auth-subtitle">{{ subtitle }}</p>
       </div>
 
-      <main class="auth-card__body">
+      <div class="auth-card__body">
         <slot />
-      </main>
+      </div>
 
       <footer class="auth-card__foot mono">
         <span class="material-symbols-outlined text-[14px] text-emerald-500">lock</span>

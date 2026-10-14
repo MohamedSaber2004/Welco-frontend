@@ -402,7 +402,7 @@ const submitRfq = async () => {
     <!-- Cart Layout -->
     <div v-else class="cart-layout">
       <!-- Main Column: Sterile Tray Line Items -->
-      <main class="cart-main">
+      <section class="cart-main">
         <!-- Active Currency Hub & Multi-Currency Switcher -->
         <section class="currency-hub-card" aria-labelledby="curr-hub-heading">
           <!-- Left: Active Currency Status Dossier -->
@@ -624,7 +624,7 @@ const submitRfq = async () => {
             </article>
           </div>
         </section>
-      </main>
+      </section>
 
       <!-- Right Column: Order / Quote Summary -->
       <aside class="cart-summary-col">
@@ -636,7 +636,7 @@ const submitRfq = async () => {
 
           <div class="summary-rows">
             <div class="summary-row">
-              <span class="mono">{{ items.length }} {{ t('marketplace.products') }}</span>
+              <span class="mono">{{ t('cart.itemsCount', { count }) }}</span>
               <strong class="mono">{{ activeCurrencyMeta.symbol }} {{ fmtQuote(displayTotal) }}<template v-if="activeCurrencyMeta.symbol !== targetCurrency"> {{ targetCurrency }}</template></strong>
             </div>
 

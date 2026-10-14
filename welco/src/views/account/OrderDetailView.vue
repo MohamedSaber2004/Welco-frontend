@@ -90,7 +90,7 @@ function statusIndex(o: OrderDto): number {
       <!-- Detail Grid: Manifest Items & Side Actions -->
       <div class="detail-grid">
         <!-- Main: Ordered Items List -->
-        <main class="manifest-card">
+        <section class="manifest-card">
           <div class="manifest-head">
             <div class="manifest-title-group">
               <span class="material-symbols-outlined text-[18px] text-indigo-600">inventory_2</span>
@@ -122,7 +122,7 @@ function statusIndex(o: OrderDto): number {
               {{ formatPrice(order.totalAmount, locale) }} {{ order.currencyCode }}
             </strong>
           </div>
-        </main>
+        </section>
 
         <!-- Sidebar: Navigation -->
         <aside class="side-panel">

@@ -270,7 +270,7 @@ export const ar: Messages = {
     loginSubtitle: 'سجل دخولك إلى حسابك',
     registerTitle: 'إنشاء حساب',
     registerSubtitle: 'انضم إلى ويلكو اليوم',
-    registerAsCustomerSubtitle: 'شراء مباشر — لا حاجة لشركة',
+    registerAsCustomerSubtitle: 'أنشئ حسابك لبدء تصفح وطلب الأدوات الجراحية',
     email: 'البريد الإلكتروني',
     password: 'كلمة المرور',
     confirmPassword: 'تأكيد كلمة المرور',

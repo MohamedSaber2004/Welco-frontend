@@ -42,6 +42,12 @@ const localizedAlt = (en?: string | null, ar?: string | null) => {
   return ar || ''
 }
 
+const hasDistinctAlt = (en?: string | null, ar?: string | null) => {
+  const primary = localized(en, ar).trim().toLowerCase()
+  const alt = localizedAlt(en, ar).trim().toLowerCase()
+  return Boolean(alt && alt !== primary)
+}
+
 const filteredCategories = computed(() => {
   let list = [...categories.value]
 
@@ -207,7 +213,7 @@ const navigateToCategory = (catId: string) => {
               <span v-if="c.slug" class="cat-code mono">{{ c.slug }}</span>
             </div>
 
-            <div v-if="localizedAlt(c.nameEn, c.nameAr)" class="cat-alt mono" dir="auto">
+            <div v-if="hasDistinctAlt(c.nameEn, c.nameAr)" class="cat-alt mono" dir="auto">
               {{ localizedAlt(c.nameEn, c.nameAr) }}
             </div>
 

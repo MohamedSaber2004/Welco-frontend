@@ -40,6 +40,7 @@ export interface ResolvedCurrency {
 export function normalizeCurrencyCode(code?: string | null): string {
   return (code ?? '').trim().toUpperCase()
 }
+
 export function getFlagEmoji(countryCode?: string | null): string {
   if (!countryCode) return '🌐'
   const upper = countryCode.trim().toUpperCase()
@@ -123,7 +124,7 @@ export function resolveCurrencyCountry(
 
   const currencyNameEn = (currency?.nameEn ?? '').trim() || code
   const currencyNameAr = (currency?.nameAr ?? '').trim() || currencyNameEn
-  const countryCode = (country?.code ?? '').trim().toUpperCase()
+  const countryCode = (country?.code ?? currency?.countryCode ?? '').trim().toUpperCase()
   const countryNameEn = (country?.nameEn ?? '').trim()
   const countryNameAr = (country?.nameAr ?? '').trim() || countryNameEn
 

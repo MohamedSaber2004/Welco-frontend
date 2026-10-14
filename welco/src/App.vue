@@ -88,7 +88,7 @@ const isDashboardRoute = computed(() => {
   <main id="main-content" tabindex="-1">
     <RouterView v-slot="{ Component }">
       <Transition name="page" mode="out-in">
-        <component :is="Component" :key="route.fullPath" />
+        <component :is="Component" :key="route.name || route.path" />
       </Transition>
     </RouterView>
   </main>

@@ -269,7 +269,7 @@ export const en: Messages = {
     loginSubtitle: 'Sign in to your account',
     registerTitle: 'Create account',
     registerSubtitle: 'Join Welco today',
-    registerAsCustomerSubtitle: 'Buy directly — no company needed',
+    registerAsCustomerSubtitle: 'Create your account to start ordering instruments',
     email: 'Email',
     password: 'Password',
     confirmPassword: 'Confirm password',

@@ -399,7 +399,7 @@ const navigateToOemFromModal = () => {
               <span class="hero__trust-sep" aria-hidden="true">&bull;</span>
               <span class="hero__trust-badge">
                 <span class="material-symbols-outlined trust-icon">public</span>
-                <span class="mono">40+ Countries 🌍</span>
+                <span class="mono">{{ t('auth.brandBadgeCountries') }} 🌍</span>
               </span>
             </div>
           </div>
@@ -705,7 +705,7 @@ const navigateToOemFromModal = () => {
               </button>
             </div>
             <p id="specialty-filter-count" class="cat-filter__count mono" role="status" aria-live="polite">
-              {{ t('home.specialtiesFound', { shown: visibleSpecialties.length, total: matchingSpecialties.length }) }}
+              {{ t('home.specialtiesFound', { shown: visibleSpecialties.length, total: allCats.length }) }}
             </p>
           </div>
 
@@ -717,12 +717,6 @@ const navigateToOemFromModal = () => {
             <button type="button" class="btn btn-ghost btn-sm" @click="clearSpecialtySearch">
               {{ t('home.clearSpecialtySearch') }}
             </button>
-          </div>
-
-          <div v-else class="cat-explorer__intro">
-            <div>
-              <h3 class="cat-explorer__heading">{{ t('marketplace.filterBySpecialty') }}</h3>
-            </div>
           </div>
           <div v-if="visibleSpecialties.length" class="cat-explorer__pills" role="tablist" :aria-label="t('marketplace.filterBySpecialty')">
               <button

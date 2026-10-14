@@ -354,7 +354,7 @@ const browseProviderProducts = (providerId: string) => {
     </header>
 
     <!-- Main Content Container -->
-    <main class="providers-content">
+    <section class="providers-content">
       <div class="providers-content__inner">
         <!-- Search + Filters Panel -->
         <section class="search-panel" role="search" :aria-label="t('providers.title')">
@@ -562,7 +562,7 @@ const browseProviderProducts = (providerId: string) => {
           />
         </div>
       </div>
-    </main>
+    </section>
   </div>
 </template>
 

@@ -149,7 +149,7 @@ async function convertToQuote() {
 
     <div class="checkout-layout">
       <!-- Left Column: Order Items -->
-      <main class="checkout-main">
+      <section class="checkout-main">
         <!-- Currency Selection Row - address based -->
         <div class="curr-selector-card">
           <div class="curr-selector-left">
@@ -213,7 +213,7 @@ async function convertToQuote() {
           </div>
         </section>
 
-      </main>
+      </section>
 
       <!-- Right Column: Commercial Summary (Sticky) -->
       <aside class="checkout-summary-col">

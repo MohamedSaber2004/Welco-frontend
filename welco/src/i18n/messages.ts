@@ -212,6 +212,14 @@ export type Messages = {
     mostSellingTitle: string
     mostSellingEyebrow: string
     mostSellingSubtitle: string
+    specialtyNoProvidersTitle: string
+    specialtyNoProvidersDesc: string
+    specialtyBrowseProducts: string
+    specialtyRequestQuote: string
+    specialtyNetworkProvidersTitle: string
+    specialtyNetworkProvidersSubtitle: string
+    allProvidersLink: string
+    ondemandSupply: string
   }
   mostSellingPage: {
     eyebrow: string

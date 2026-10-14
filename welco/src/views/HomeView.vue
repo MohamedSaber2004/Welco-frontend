@@ -177,6 +177,15 @@ const clearSpecialtySearch = () => {
   specialtyQuery.value = ''
 }
 
+const currentSpecialty = computed(() =>
+  allCats.value.find((c) => c.id === explorerCatId.value) || null,
+)
+
+const currentSpecialtyName = computed(() => {
+  const c = currentSpecialty.value
+  return c ? localized(c.nameEn, c.nameAr) : ''
+})
+
 /* Keep the provider explorer on a specialty the user can still see. */
 watch(matchingSpecialties, (list) => {
   const first = list[0]
@@ -312,12 +321,15 @@ const priceForm = ref({
   timeline: 'standard',
 })
 
-const openPriceModal = () => {
+const openPriceModal = (initialSpecialty?: string | Event) => {
   const u = authService.user.value
   if (u) {
     if (!priceForm.value.fullName) priceForm.value.fullName = u.fullName || ''
     if (!priceForm.value.email) priceForm.value.email = u.email || ''
     if (!priceForm.value.phone) priceForm.value.phone = u.phoneNumber || ''
+  }
+  if (typeof initialSpecialty === 'string' && initialSpecialty) {
+    priceForm.value.specialty = initialSpecialty
   }
   priceSubmitted.value = false
   priceModalOpen.value = true
@@ -777,18 +789,134 @@ const navigateToOemFromModal = () => {
             tabindex="0"
           >
             <div class="cat-explorer__head">
-              <h3 class="cat-explorer__title">{{ t('provider.providersInCategory') }}</h3>
-              <router-link :to="{ name: 'category-providers', params: { id: explorerCatId } }" class="provider-viewall mono">
-                <span>{{ t('common.viewAll') }}</span>
-                <span class="icon--directional">→</span>
-              </router-link>
+              <div class="cat-explorer__head-info">
+                <div class="cat-explorer__title-row">
+                  <span class="material-symbols-outlined cat-explorer__title-icon" aria-hidden="true">stethoscope</span>
+                  <h3 class="cat-explorer__title">{{ currentSpecialtyName || t('provider.providersInCategory') }}</h3>
+                </div>
+                <div class="cat-explorer__badge-row">
+                  <span v-if="explorerProviders.length" class="badge badge--pill badge--teal">
+                    <span class="material-symbols-outlined text-[13px]">apartment</span>
+                    <span>{{ explorerProviderTotal }} {{ t('provider.providersInCategory') }}</span>
+                  </span>
+                  <span v-else class="badge badge--pill badge--amber">
+                    <span class="material-symbols-outlined text-[13px]">verified</span>
+                    <span>{{ t('home.ondemandSupply') }}</span>
+                  </span>
+                </div>
+              </div>
+              <div class="cat-explorer__head-actions">
+                <router-link
+                  :to="{ name: 'marketplace', query: { categoryId: explorerCatId } }"
+                  class="btn btn-ghost btn-xs cat-explorer__action-btn"
+                >
+                  <span class="material-symbols-outlined text-[15px]">inventory_2</span>
+                  <span>{{ t('home.specialtyBrowseProducts') }}</span>
+                </router-link>
+                <router-link
+                  :to="{ name: 'category-providers', params: { id: explorerCatId } }"
+                  class="provider-viewall mono"
+                >
+                  <span>{{ t('common.viewAll') }}</span>
+                  <span class="icon--directional">→</span>
+                </router-link>
+              </div>
             </div>
             <Transition name="explorer-fade" mode="out-in">
               <div v-if="explorerProvidersLoading" key="loading" role="status" aria-label="Loading providers" class="cat-explorer__loading-wrap">
                 <SkeletonLoader type="provider-cards" :count="5" />
               </div>
-              <div v-else-if="!explorerProviders.length" key="empty" class="mono cat-explorer__empty">
-                {{ t('provider.noProvidersHere') }}
+              <div v-else-if="!explorerProviders.length" key="empty" class="cat-explorer__fallback-wrap">
+                <!-- Rich Clinical Empty Card -->
+                <div class="specialty-fallback-card">
+                  <div class="specialty-fallback-icon-wrap" aria-hidden="true">
+                    <span class="material-symbols-outlined specialty-fallback-icon">medical_services</span>
+                    <span class="specialty-fallback-ring ring-1"></span>
+                    <span class="specialty-fallback-ring ring-2"></span>
+                  </div>
+                  <div class="specialty-fallback-content">
+                    <h4 class="specialty-fallback-title">
+                      {{ t('home.specialtyNoProvidersTitle', { specialty: currentSpecialtyName }) }}
+                    </h4>
+                    <p class="specialty-fallback-desc">
+                      {{ t('home.specialtyNoProvidersDesc') }}
+                    </p>
+                    <div class="specialty-fallback-actions">
+                      <button
+                        type="button"
+                        class="btn btn-primary btn-sm specialty-cta-quote"
+                        @click="openPriceModal(currentSpecialty?.nameEn || currentSpecialty?.nameAr || '')"
+                      >
+                        <span class="material-symbols-outlined text-[17px]">request_quote</span>
+                        <span>{{ t('home.specialtyRequestQuote', { specialty: currentSpecialtyName }) }}</span>
+                      </button>
+                      <router-link
+                        :to="{ name: 'marketplace', query: { categoryId: explorerCatId } }"
+                        class="btn btn-secondary btn-sm specialty-cta-catalog"
+                      >
+                        <span class="material-symbols-outlined text-[17px]">inventory_2</span>
+                        <span>{{ t('home.specialtyBrowseProducts') }}</span>
+                      </router-link>
+                      <router-link
+                        to="/providers"
+                        class="btn btn-ghost btn-sm specialty-cta-providers"
+                      >
+                        <span class="material-symbols-outlined text-[17px]">storefront</span>
+                        <span>{{ t('home.allProvidersLink') }}</span>
+                      </router-link>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Network Verified Providers Showcase -->
+                <div v-if="providers.length" class="specialty-network-panel">
+                  <div class="specialty-network-head">
+                    <div class="specialty-network-titles">
+                      <span class="mono specialty-network-eyebrow">{{ t('home.ourProvidersEyebrow') }}</span>
+                      <h4 class="specialty-network-title">{{ t('home.specialtyNetworkProvidersTitle') }}</h4>
+                      <p class="specialty-network-sub">{{ t('home.specialtyNetworkProvidersSubtitle') }}</p>
+                    </div>
+                    <router-link to="/providers" class="provider-viewall mono">
+                      <span>{{ t('home.allProvidersLink') }}</span>
+                      <span class="icon--directional">→</span>
+                    </router-link>
+                  </div>
+                  <div class="specialty-network-grid">
+                    <article
+                      v-for="prov in providers.slice(0, 4)"
+                      :key="prov.id"
+                      class="network-provider-card"
+                      @click="openProviderStorefront(prov.id)"
+                    >
+                      <div class="network-provider-card__head">
+                        <AppImage
+                          :src="prov.imageName"
+                          placeholder-type="company"
+                          :placeholder-text="prov.name"
+                          :alt="prov.name"
+                          fit="contain"
+                          class="network-provider-card__logo"
+                        />
+                        <span class="badge badge--green badge--pill">
+                          <span class="material-symbols-outlined text-[13px]">verified</span>
+                          <span>{{ t('home.verifiedSupplier') }}</span>
+                        </span>
+                      </div>
+                      <div class="network-provider-card__body">
+                        <h5 class="network-provider-card__name" dir="auto">{{ prov.name }}</h5>
+                        <span v-if="prov.countryNameEn || prov.countryNameAr" class="network-provider-card__country mono">
+                          <span class="material-symbols-outlined text-[13px]">public</span>
+                          <span>{{ localized(prov.countryNameEn, prov.countryNameAr) }}</span>
+                        </span>
+                      </div>
+                      <div class="network-provider-card__foot">
+                        <span class="network-provider-card__cta mono">
+                          {{ t('provider.viewCatalog') }} <span class="icon--directional">→</span>
+                        </span>
+                      </div>
+                    </article>
+                  </div>
+                </div>
               </div>
               <div v-else key="content">
                 <div class="cat-explorer__providers">
@@ -945,14 +1073,24 @@ const navigateToOemFromModal = () => {
           <div class="modal-field">
             <label class="modal-lbl mono">{{ t('home.quoteSpecialty') }}</label>
             <select v-model="priceForm.specialty" class="modal-sel">
-              <option value="General Surgery">General Surgery</option>
-              <option value="Cardiovascular & Thoracic">Cardiovascular &amp; Thoracic</option>
-              <option value="Orthopedics & Trauma">Orthopedics &amp; Trauma</option>
-              <option value="Neurosurgery & Spine">Neurosurgery &amp; Spine</option>
-              <option value="Ophthalmology">Ophthalmology</option>
-              <option value="Dental & Maxillofacial">Dental &amp; Maxillofacial</option>
-              <option value="Custom Sterile Sets">Custom Sterile Sets</option>
-              <option value="Other Surgical Line">Other Surgical Line</option>
+              <option v-if="priceForm.specialty && !allCats.some(c => localized(c.nameEn, c.nameAr) === priceForm.specialty || c.nameEn === priceForm.specialty)" :value="priceForm.specialty">
+                {{ priceForm.specialty }}
+              </option>
+              <template v-if="allCats.length">
+                <option v-for="c in allCats" :key="c.id" :value="localized(c.nameEn, c.nameAr)">
+                  {{ localized(c.nameEn, c.nameAr) }}
+                </option>
+              </template>
+              <template v-else>
+                <option value="General Surgery">General Surgery</option>
+                <option value="Cardiovascular & Thoracic">Cardiovascular &amp; Thoracic</option>
+                <option value="Orthopedics & Trauma">Orthopedics &amp; Trauma</option>
+                <option value="Neurosurgery & Spine">Neurosurgery &amp; Spine</option>
+                <option value="Ophthalmology">Ophthalmology</option>
+                <option value="Dental & Maxillofacial">Dental &amp; Maxillofacial</option>
+                <option value="Custom Sterile Sets">Custom Sterile Sets</option>
+                <option value="Other Surgical Line">Other Surgical Line</option>
+              </template>
             </select>
           </div>
           <div class="modal-field">
@@ -1803,14 +1941,62 @@ const navigateToOemFromModal = () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 1rem;
-  padding-bottom: 0.25rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+.cat-explorer__head-info {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.cat-explorer__title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.cat-explorer__title-icon {
+  font-size: 1.25rem;
+  color: var(--platform-teal, #0b7f86);
 }
 .cat-explorer__title {
   font-size: 1.15rem;
   font-weight: 700;
   color: var(--platform-ink, #0f3d56);
   margin: 0;
+  letter-spacing: -0.015em;
+}
+.cat-explorer__badge-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.cat-explorer__head-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-inline-start: auto;
+}
+.cat-explorer__action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 600;
+  color: var(--platform-teal, #0b7f86);
+  background: rgba(11, 127, 134, 0.08);
+  border: 1px solid rgba(11, 127, 134, 0.2);
+  border-radius: 9999px;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.8rem;
+  transition: all 0.18s ease;
+}
+.cat-explorer__action-btn:hover {
+  background: rgba(11, 127, 134, 0.15);
+  border-color: var(--platform-teal, #0b7f86);
+  color: #085f65;
+  transform: translateY(-1px);
 }
 .cat-explorer__head .provider-viewall {
   display: inline-flex;
@@ -1826,11 +2012,243 @@ const navigateToOemFromModal = () => {
   text-decoration: underline;
   color: #085f65;
 }
-.cat-explorer__empty {
-  font-size: var(--text-sm);
+
+/* ── Fallback Wrap & Rich Clinical Card ── */
+.cat-explorer__fallback-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+.specialty-fallback-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.75rem 2rem;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(240, 249, 250, 0.95) 0%, rgba(255, 255, 255, 0.98) 100%);
+  border: 1px solid rgba(11, 127, 134, 0.22);
+  box-shadow: 0 4px 20px -2px rgba(15, 61, 86, 0.05);
+  overflow: hidden;
+}
+@media (max-width: 768px) {
+  .specialty-fallback-card {
+    flex-direction: column;
+    text-align: center;
+    padding: 1.5rem;
+    gap: 1rem;
+  }
+}
+.specialty-fallback-icon-wrap {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0b7f86 0%, #085f65 100%);
+  color: #ffffff;
+  box-shadow: 0 8px 20px -4px rgba(11, 127, 134, 0.4);
+}
+.specialty-fallback-icon {
+  font-size: 32px;
+}
+.specialty-fallback-ring {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 1px dashed rgba(11, 127, 134, 0.35);
+  pointer-events: none;
+  animation: ring-pulse 4s linear infinite;
+}
+.specialty-fallback-ring.ring-2 {
+  inset: -12px;
+  opacity: 0.5;
+  animation-duration: 6s;
+  animation-direction: reverse;
+}
+@keyframes ring-pulse {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.specialty-fallback-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.specialty-fallback-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--platform-ink, #0f3d56);
+  margin: 0;
+  line-height: 1.35;
+}
+.specialty-fallback-desc {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #475569;
+  margin: 0;
+}
+.specialty-fallback-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 0.4rem;
+}
+@media (max-width: 768px) {
+  .specialty-fallback-actions {
+    justify-content: center;
+  }
+}
+.specialty-cta-quote {
+  box-shadow: 0 4px 12px rgba(11, 127, 134, 0.25);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 600;
+}
+.specialty-cta-catalog,
+.specialty-cta-providers {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 600;
+}
+
+/* ── Network Verified Suppliers Panel ── */
+.specialty-network-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-top: 0.5rem;
+}
+.specialty-network-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.specialty-network-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.specialty-network-eyebrow {
+  font-size: 0.725rem;
+  font-weight: 700;
+  color: var(--platform-teal, #0b7f86);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.specialty-network-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--platform-ink, #0f3d56);
+  margin: 0;
+}
+.specialty-network-sub {
+  font-size: 0.825rem;
   color: var(--platform-ink-soft, #64748b);
-  padding: 2.5rem 0;
+  margin: 0;
+}
+.specialty-network-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 1rem;
+}
+.network-provider-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
+  padding: 1.25rem 1rem 1rem;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  box-shadow: 0 2px 6px rgba(15, 61, 86, 0.03);
+  cursor: pointer;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.2s ease,
+              box-shadow 0.22s ease;
+}
+.network-provider-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(11, 127, 134, 0.4);
+  box-shadow: 0 10px 24px -4px rgba(15, 61, 86, 0.09);
+  background: linear-gradient(180deg, #ffffff 0%, #f9fcfa 100%);
+}
+.network-provider-card__head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+.network-provider-card__logo {
+  width: 100%;
+  height: 68px;
+  min-height: 68px;
+  border-radius: 10px;
+  border: 1px solid #edf2f7;
+  background: #f8fafc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: transform 0.25s ease;
+}
+.network-provider-card:hover .network-provider-card__logo {
+  transform: scale(1.04);
+}
+.network-provider-card__body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.65rem;
+  width: 100%;
+}
+.network-provider-card__name {
+  font-size: 0.925rem;
+  font-weight: 700;
+  color: var(--platform-ink, #0f3d56);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+.network-provider-card__country {
+  font-size: 0.775rem;
+  color: var(--platform-ink-soft, #64748b);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+.network-provider-card__foot {
+  margin-top: auto;
+  padding-top: 0.75rem;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+.network-provider-card__cta {
+  font-size: 0.775rem;
+  font-weight: 700;
+  color: var(--platform-teal, #0b7f86);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: gap 0.2s ease;
+}
+.network-provider-card:hover .network-provider-card__cta {
+  gap: 0.55rem;
 }
 .cat-explorer__providers {
   display: grid;

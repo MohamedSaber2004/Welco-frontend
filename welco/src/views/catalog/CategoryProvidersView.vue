@@ -179,6 +179,8 @@ const openStorefront = (id: string) => {
       :empty="!providers.length && !loading"
       :empty-title="t('provider.noProvidersHere')"
       :empty-description="t('provider.noProvidersHereDesc')"
+      :action-text="t('home.allProvidersLink')"
+      @action="router.push('/providers')"
       @retry="loadProviders"
     >
       <div class="prov-grid">

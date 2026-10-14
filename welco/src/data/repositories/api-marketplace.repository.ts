@@ -597,37 +597,70 @@ export class ApiMarketplaceRepository implements MarketplaceRepository {
         `${MARKETPLACE_ROUTES.categoryProviders(categoryId)}?${params.toString()}`,
         { showFeedback: false },
       )
-      if (Array.isArray(raw)) return paginate(raw as CompanyDto[])
-      return raw as PaginatedResult<CompanyDto>
+      if (Array.isArray(raw) && raw.length > 0) return paginate(raw as CompanyDto[])
+      const envelope = raw as PaginatedResult<CompanyDto> | null
+      if (envelope && Array.isArray(envelope.data) && envelope.data.length > 0) {
+        return envelope
+      }
     } catch {
-      // Fallback for backends without the endpoint: group locally.
+      // Direct endpoint unavailable or errored; proceed to fallback
+    }
+
+    try {
+      // Fallback for backends without the direct endpoint or empty category-provider mapping:
+      // resolve providers through products listed in this category and its subcategories.
       const [prodRes, compRes, catRes] = await Promise.all([
-        this.getProducts({ page: 1, pageSize: 50 }).catch(() => null),
+        this.getProducts({ categoryId, page: 1, pageSize: 50 }).catch(() => null),
         this.http
           .get<unknown>(`${COMPANY_ROUTES.companyDirectory}?pageNumber=1&pageSize=50`, { showFeedback: false })
           .catch(() => null),
         this.getCategories().catch(() => [] as CategoryDto[]),
       ])
-      const inCategory = (p: ProductDto): boolean => {
-        if (!p || !categoryId) return false
-        if (p.categoryId === categoryId) return true
-        const cat = catRes.find((c) => c && c.id === p.categoryId)
-        return !!cat && cat.parentCategoryId === categoryId
+
+      const subCategoryIds = new Set<string>([categoryId])
+      for (const c of catRes) {
+        if (c && c.parentCategoryId === categoryId) {
+          subCategoryIds.add(c.id)
+        }
       }
+
+      const inCategory = (p: ProductDto): boolean => {
+        if (!p) return false
+        if (p.categoryId && subCategoryIds.has(p.categoryId)) return true
+        const cat = catRes.find((c) => c && c.id === p.categoryId)
+        return !!cat && (cat.id === categoryId || cat.parentCategoryId === categoryId)
+      }
+
       const owners = new Set<string>()
       for (const p of prodRes?.data ?? []) {
         if (!p || !inCategory(p)) continue
         const key = p.companyId || p.supplierId || ''
         if (key) owners.add(key)
       }
+
+      // If category-filtered call didn't yield products, check first page of general catalog
+      if (owners.size === 0) {
+        const broadProdRes = await this.getProducts({ page: 1, pageSize: 50 }).catch(() => null)
+        for (const p of broadProdRes?.data ?? []) {
+          if (!p || !inCategory(p)) continue
+          const key = p.companyId || p.supplierId || ''
+          if (key) owners.add(key)
+        }
+      }
+
       const all: CompanyDto[] = Array.isArray(compRes)
         ? (compRes as CompanyDto[])
         : (Array.isArray((compRes as PaginatedResult<CompanyDto> | null)?.data)
             ? (compRes as PaginatedResult<CompanyDto>).data
             : [])
-      return paginate(
-        all.filter((c) => c && owners.has(c.id) && c.isActive !== false && (c.isProvider !== false || c.isProvider === undefined)),
+
+      const matchedCompanies = all.filter(
+        (c) => c && owners.has(c.id) && c.isActive !== false && (c.isProvider !== false || c.isProvider === undefined),
       )
+
+      return paginate(matchedCompanies)
+    } catch {
+      return paginate([])
     }
   }
 

@@ -79,7 +79,7 @@ export class ApiCompanyRepository implements CompanyRepository {
     try {
       const target = (id || '').trim().toLowerCase()
       const dir = await this.getProvidersDirectory({ pageSize: 50 })
-      let found = dir.data?.find((c) =>
+      const found = dir.data?.find((c) =>
         c.id?.toLowerCase() === target ||
         (c.name && c.name.toLowerCase().replace(/\s+/g, '-').includes(target)) ||
         (c.name && target.includes(c.name.toLowerCase().replace(/\s+/g, '-'))),

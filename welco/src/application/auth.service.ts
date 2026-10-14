@@ -125,6 +125,7 @@ const parseUserType = (rawType: unknown, roles: string[]): UserType => {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const nameToUser = (raw: AuthResponseDto | UserProfileDto | User | Record<string, any> | any, token?: string): User => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const rawObj = (raw || {}) as Record<string, any>
   const claims = decodeJwtPayload(token || (rawObj.accessToken as string) || (rawObj.AccessToken as string))
 

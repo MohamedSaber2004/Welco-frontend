@@ -8,7 +8,6 @@ import SkeletonLoader from '../components/ui/SkeletonLoader.vue'
 
 const aboutPage = ref<LandingPageDto | null>(null)
 const loading = ref(true)
-const FOUNDING_YEAR = 1994
 
 onMounted(async () => {
   loading.value = true

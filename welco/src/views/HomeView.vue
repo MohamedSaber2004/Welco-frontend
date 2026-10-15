@@ -731,9 +731,10 @@ const navigateToOemFromModal = () => {
                 <span class="material-symbols-outlined" aria-hidden="true">close</span>
               </button>
             </div>
-            <p id="specialty-filter-count" class="cat-filter__count mono" role="status" aria-live="polite">
-              {{ t('home.specialtiesFound', { shown: visibleSpecialties.length, total: allCats.length }) }}
-            </p>
+            <div id="specialty-filter-count" class="cat-filter__count-badge mono" role="status" aria-live="polite">
+              <span class="count-badge__dot" aria-hidden="true"></span>
+              <span>{{ t('home.specialtiesFound', { shown: visibleSpecialties.length, total: allCats.length }) }}</span>
+            </div>
           </div>
 
           <div v-if="specialtySearchActive && !matchingSpecialties.length" class="cat-no-results">
@@ -746,35 +747,36 @@ const navigateToOemFromModal = () => {
             </button>
           </div>
           <div v-if="visibleSpecialties.length" class="cat-explorer__pills" role="tablist" :aria-label="t('marketplace.filterBySpecialty')">
-              <button
-                v-for="(c, index) in visibleSpecialties"
-                :id="`cat-tab-${c.id}`"
-                :key="c.id"
-                :data-cat-pill="c.id"
-                type="button"
-                role="tab"
-                class="pill cat-explorer__pill"
-                :aria-label="`${localized(c.nameEn, c.nameAr)} · ${index + 1}`"
+            <button
+              v-for="(c, index) in visibleSpecialties"
+              :id="`cat-tab-${c.id}`"
+              :key="c.id"
+              :data-cat-pill="c.id"
+              type="button"
+              role="tab"
+              class="pill cat-explorer__pill"
+              :aria-label="`${localized(c.nameEn, c.nameAr)} · ${index + 1}`"
               :class="{ 'pill--active': explorerCatId === c.id }"
-                :aria-selected="explorerCatId === c.id"
-                :aria-controls="'cat-tabpanel'"
-                :tabindex="explorerCatId === c.id ? 0 : -1"
-                @click="selectExplorerCat(c.id)"
-                @keydown="onCatExplorerKeydown($event, index)"
+              :aria-selected="explorerCatId === c.id"
+              :aria-controls="'cat-tabpanel'"
+              :tabindex="explorerCatId === c.id ? 0 : -1"
+              @click="selectExplorerCat(c.id)"
+              @keydown="onCatExplorerKeydown($event, index)"
             >
-              {{ localized(c.nameEn, c.nameAr) }}
+              <span v-if="explorerCatId === c.id" class="pill-dot" aria-hidden="true"></span>
+              <span>{{ localized(c.nameEn, c.nameAr) }}</span>
             </button>
           </div>
 
           <div v-if="canExpandSpecialties || showAllSpecialties" class="cat-expand">
             <button
               type="button"
-              class="btn btn-ghost btn-sm"
+              class="cat-expand__btn"
               :aria-expanded="showAllSpecialties"
               @click="toggleShowAllSpecialties"
             >
               <span>{{ showAllSpecialties ? t('home.showFewerSpecialties') : t('home.showAllSpecialties', { count: matchingSpecialties.length }) }}</span>
-              <span class="material-symbols-outlined icon--directional" aria-hidden="true">
+              <span class="material-symbols-outlined icon--directional cat-expand__icon" aria-hidden="true">
                 {{ showAllSpecialties ? 'expand_less' : 'expand_more' }}
               </span>
             </button>
@@ -791,7 +793,9 @@ const navigateToOemFromModal = () => {
             <div class="cat-explorer__head">
               <div class="cat-explorer__head-info">
                 <div class="cat-explorer__title-row">
-                  <span class="material-symbols-outlined cat-explorer__title-icon" aria-hidden="true">stethoscope</span>
+                  <div class="cat-explorer__icon-bubble" aria-hidden="true">
+                    <span class="material-symbols-outlined">stethoscope</span>
+                  </div>
                   <h3 class="cat-explorer__title">{{ currentSpecialtyName || t('provider.providersInCategory') }}</h3>
                 </div>
                 <div class="cat-explorer__badge-row">
@@ -808,17 +812,17 @@ const navigateToOemFromModal = () => {
               <div class="cat-explorer__head-actions">
                 <router-link
                   :to="{ name: 'marketplace', query: { categoryId: explorerCatId } }"
-                  class="btn btn-ghost btn-xs cat-explorer__action-btn"
+                  class="cat-action-link cat-action-link--catalog"
                 >
-                  <span class="material-symbols-outlined text-[15px]">inventory_2</span>
+                  <span class="material-symbols-outlined text-[16px]">inventory_2</span>
                   <span>{{ t('home.specialtyBrowseProducts') }}</span>
                 </router-link>
                 <router-link
                   :to="{ name: 'category-providers', params: { id: explorerCatId } }"
-                  class="provider-viewall mono"
+                  class="cat-action-link cat-action-link--viewall mono"
                 >
                   <span>{{ t('common.viewAll') }}</span>
-                  <span class="icon--directional">→</span>
+                  <span class="material-symbols-outlined text-[15px] icon--directional">arrow_forward</span>
                 </router-link>
               </div>
             </div>
@@ -920,33 +924,51 @@ const navigateToOemFromModal = () => {
               </div>
               <div v-else key="content">
                 <div class="cat-explorer__providers">
-                  <button
+                  <div
                     v-for="prov in explorerProviders"
                     :key="prov.id"
-                    type="button"
                     class="cat-provider"
+                    tabindex="0"
+                    role="button"
                     :aria-label="`${prov.name} · ${t('provider.viewCatalog')}`"
                     @click="openProviderStorefront(prov.id)"
+                    @keydown.enter="openProviderStorefront(prov.id)"
+                    @keydown.space.prevent="openProviderStorefront(prov.id)"
                   >
-                    <AppImage
-                      :src="prov.imageName"
-                      placeholder-type="company"
-                      :placeholder-text="''"
-                      :alt="prov.name"
-                      fit="contain"
-                      class="cat-provider__img"
-                    />
-                    <span class="cat-provider__name" dir="auto">{{ prov.name }}</span>
-                    <span v-if="prov.countryNameEn || prov.countryNameAr" class="cat-provider__country mono">
-                      {{ localized(prov.countryNameEn, prov.countryNameAr) }}
-                    </span>
-                    <span class="cat-provider__cta mono">{{ t('provider.viewCatalog') }} <span class="icon--directional">→</span></span>
-                  </button>
+                    <div class="cat-provider__banner">
+                      <AppImage
+                        :src="prov.imageName"
+                        placeholder-type="company"
+                        :placeholder-text="prov.name"
+                        :alt="prov.name"
+                        fit="contain"
+                        class="cat-provider__img"
+                      />
+                      <span class="cat-provider__badge" :title="t('home.verifiedSupplier')">
+                        <span class="material-symbols-outlined text-[13px]">verified</span>
+                      </span>
+                    </div>
+
+                    <div class="cat-provider__body">
+                      <h4 class="cat-provider__name" dir="auto" :title="prov.name">{{ prov.name }}</h4>
+                      <div v-if="prov.countryNameEn || prov.countryNameAr" class="cat-provider__country">
+                        <span class="material-symbols-outlined text-[13px]">public</span>
+                        <span>{{ localized(prov.countryNameEn, prov.countryNameAr) }}</span>
+                      </div>
+                    </div>
+
+                    <div class="cat-provider__foot">
+                      <span class="cat-provider__cta">
+                        <span>{{ t('provider.viewCatalog') }}</span>
+                        <span class="material-symbols-outlined text-[14px] icon--directional">arrow_forward</span>
+                      </span>
+                    </div>
+                  </div>
                 </div>
                 <div v-if="explorerProviderTotalPages > 1" class="provider-pager">
-                  <button type="button" class="page-btn" :disabled="explorerProviderPage <= 1" @click="explorerProviderPage--">‹</button>
+                  <button type="button" class="page-btn" :disabled="explorerProviderPage <= 1" :aria-label="t('common.prevPage')" @click="explorerProviderPage--">‹</button>
                   <span class="mono provider-pager__num">{{ explorerProviderPage }} / {{ explorerProviderTotalPages }}</span>
-                  <button type="button" class="page-btn" :disabled="explorerProviderPage >= explorerProviderTotalPages" @click="explorerProviderPage++">›</button>
+                  <button type="button" class="page-btn" :disabled="explorerProviderPage >= explorerProviderTotalPages" :aria-label="t('common.nextPage')" @click="explorerProviderPage++">›</button>
                 </div>
               </div>
             </Transition>
@@ -1853,19 +1875,19 @@ const navigateToOemFromModal = () => {
   border-color: rgba(99, 102, 241, 0.2);
 }
 
-/* Category → providers explorer — pure white card with subtle borders & soft hover */
+/* Category → providers explorer — elevated clinical card with soft depth */
 .cat-explorer {
-  margin-top: clamp(2rem, 4vw, 3.25rem);
-  padding: clamp(1.25rem, 3vw, 2.25rem);
+  margin-top: clamp(1.75rem, 3.5vw, 2.75rem);
+  padding: clamp(1.5rem, 3.5vw, 2.5rem);
   display: flex;
   flex-direction: column;
-  gap: clamp(1.25rem, 2.5vw, 1.75rem);
-  border: 1px solid var(--border, #d9e2ec);
-  border-radius: var(--radius-xl, 12px);
+  gap: 1.5rem;
+  border: 1px solid rgba(203, 213, 225, 0.7);
+  border-radius: 20px;
   background: #ffffff;
-  box-shadow: 0 4px 20px -2px rgba(15, 61, 86, 0.05), 0 1px 3px rgba(0, 0, 0, 0.02);
+  box-shadow: 0 10px 30px -5px rgba(15, 61, 86, 0.05), 0 2px 8px -2px rgba(15, 61, 86, 0.03);
   color: var(--platform-ink, #0f3d56);
-  transform: none;
+  position: relative;
 }
 .cat-explorer__intro {
   display: flex;
@@ -1893,9 +1915,9 @@ const navigateToOemFromModal = () => {
 .cat-explorer__pills {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.6rem;
   overflow-x: visible;
-  padding: 0.25rem 0.15rem 0.85rem;
+  padding: 0.4rem 0.15rem 1rem;
   border-bottom: 1px solid #f1f5f9;
 }
 .cat-explorer__pills::-webkit-scrollbar {
@@ -1906,36 +1928,78 @@ const navigateToOemFromModal = () => {
 }
 .cat-explorer__pill {
   flex-shrink: 0;
-  min-height: 44px;
+  min-height: 40px;
   display: inline-flex;
   align-items: center;
+  gap: 0.45rem;
   padding: 0.5rem 1.15rem;
   border-radius: 9999px;
   border: 1px solid #e2e8f0;
   background: #f8fafc;
-  color: #475569;
+  color: #334155;
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .cat-explorer__pill:hover:not(.pill--active) {
-  border-color: rgba(11, 127, 134, 0.35);
-  background: #f1f5f9;
-  color: var(--platform-ink, #0f3d56);
-  transform: translateY(-1px);
+  border-color: rgba(11, 127, 134, 0.4);
+  background: #ffffff;
+  color: #0b7f86;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(11, 127, 134, 0.08);
 }
 .cat-explorer__pill.pill--active {
-  background: var(--platform-teal, #0b7f86);
-  border-color: var(--platform-teal, #0b7f86);
+  background: linear-gradient(135deg, #0b7f86 0%, #0d9488 100%);
+  border-color: #0b7f86;
   color: #ffffff;
-  box-shadow: 0 4px 14px rgba(11, 127, 134, 0.28);
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(11, 127, 134, 0.32);
+  transform: translateY(-2px);
+}
+.cat-explorer__pill .pill-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: #a7f3d0;
+  display: inline-block;
+}
+.cat-expand {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+.cat-expand__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 1.15rem;
+  border-radius: 9999px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 0.825rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.cat-expand__btn:hover {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  color: #0f2b3c;
   transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+.cat-expand__icon {
+  font-size: 18px;
+  transition: transform 0.2s ease;
 }
 .cat-explorer__body {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1.5rem;
+  padding-top: 0.5rem;
 }
 .cat-explorer__head {
   display: flex;
@@ -1943,30 +2007,40 @@ const navigateToOemFromModal = () => {
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 1rem;
-  padding-bottom: 0.5rem;
+  padding-bottom: 1rem;
   border-bottom: 1px solid #f1f5f9;
 }
 .cat-explorer__head-info {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  gap: 0.85rem;
 }
 .cat-explorer__title-row {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.65rem;
 }
-.cat-explorer__title-icon {
-  font-size: 1.25rem;
-  color: var(--platform-teal, #0b7f86);
+.cat-explorer__icon-bubble {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: rgba(11, 127, 134, 0.1);
+  border: 1px solid rgba(11, 127, 134, 0.2);
+  color: #0b7f86;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.cat-explorer__icon-bubble .material-symbols-outlined {
+  font-size: 20px;
 }
 .cat-explorer__title {
-  font-size: 1.15rem;
-  font-weight: 700;
+  font-size: 1.25rem;
+  font-weight: 800;
   color: var(--platform-ink, #0f3d56);
   margin: 0;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.02em;
 }
 .cat-explorer__badge-row {
   display: flex;
@@ -1976,41 +2050,55 @@ const navigateToOemFromModal = () => {
 .cat-explorer__head-actions {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.65rem;
+  flex-wrap: wrap;
   margin-inline-start: auto;
 }
-.cat-explorer__action-btn {
+.cat-action-link {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  font-weight: 600;
-  color: var(--platform-teal, #0b7f86);
-  background: rgba(11, 127, 134, 0.08);
-  border: 1px solid rgba(11, 127, 134, 0.2);
+  gap: 0.45rem;
+  padding: 0.45rem 1rem;
   border-radius: 9999px;
-  padding: 0.35rem 0.85rem;
-  font-size: 0.8rem;
-  transition: all 0.18s ease;
-}
-.cat-explorer__action-btn:hover {
-  background: rgba(11, 127, 134, 0.15);
-  border-color: var(--platform-teal, #0b7f86);
-  color: #085f65;
-  transform: translateY(-1px);
-}
-.cat-explorer__head .provider-viewall {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-size: 0.85rem;
+  font-size: 0.825rem;
   font-weight: 600;
-  color: var(--platform-teal, #0b7f86);
+  white-space: nowrap;
+  flex-shrink: 0;
   text-decoration: none;
-  transition: color 0.15s ease, transform 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
 }
-.cat-explorer__head .provider-viewall:hover {
-  text-decoration: underline;
-  color: #085f65;
+.cat-action-link--catalog {
+  background: rgba(11, 127, 134, 0.08);
+  border: 1px solid rgba(11, 127, 134, 0.25);
+  color: #0b7f86;
+}
+.cat-action-link--catalog:hover {
+  background: #0b7f86;
+  border-color: #0b7f86;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(11, 127, 134, 0.25);
+}
+.cat-action-link--viewall {
+  background: #0f2b3c;
+  border: 1px solid #0f2b3c;
+  color: #ffffff;
+}
+.cat-action-link--viewall:hover {
+  background: #17425c;
+  border-color: #17425c;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(15, 43, 60, 0.3);
+}
+.cat-action-link .icon--directional {
+  transition: transform 0.2s ease;
+}
+.cat-action-link--viewall:hover .icon--directional {
+  transform: translateX(3px);
+}
+[dir="rtl"] .cat-action-link--viewall:hover .icon--directional {
+  transform: translateX(-3px);
 }
 
 /* ── Fallback Wrap & Rich Clinical Card ── */
@@ -2252,96 +2340,126 @@ const navigateToOemFromModal = () => {
 }
 .cat-explorer__providers {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(205px, 1fr));
+  gap: 1.25rem;
 }
 .cat-provider {
-  min-height: 195px;
-  padding: 1.1rem 1rem;
+  position: relative;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 0.45rem;
+  padding: 0.95rem;
   background: #ffffff;
   border: 1px solid #e2e8f0;
-  border-radius: 14px;
-  box-shadow: 0 1px 3px rgba(15, 61, 86, 0.04);
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(15, 61, 86, 0.04);
   cursor: pointer;
-  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
-              border-color 0.2s ease,
-              box-shadow 0.22s ease;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.25s ease,
+              box-shadow 0.25s ease;
   min-width: 0;
+  text-align: start;
 }
 .cat-provider:hover {
-  border-color: rgba(11, 127, 134, 0.4);
-  background: linear-gradient(180deg, #ffffff 0%, #f9fcfa 100%);
-  box-shadow: 0 10px 24px -4px rgba(15, 61, 86, 0.09);
-  transform: translateY(-3px);
+  border-color: rgba(11, 127, 134, 0.45);
+  box-shadow: 0 12px 28px -4px rgba(15, 61, 86, 0.12), 0 3px 8px rgba(0, 0, 0, 0.04);
+  transform: translateY(-4px);
 }
 .cat-provider:focus-visible {
   outline: 2px solid var(--platform-teal, #0b7f86);
   outline-offset: 2px;
 }
-.cat-provider__img {
+.cat-provider__banner {
+  position: relative;
   width: 100%;
-  height: 72px;
-  min-height: 72px;
-  border-radius: 10px;
+  height: 82px;
+  min-height: 82px;
+  border-radius: 12px;
   border: 1px solid #edf2f7;
   background: #f8fafc;
   padding: 0;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+.cat-provider:hover .cat-provider__banner {
+  background: #f1f5f9;
+}
+.cat-provider__img {
+  width: 100%;
+  height: 100%;
   object-fit: contain;
   transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.cat-provider__img:not(.is-placeholder) :deep(img) {
-  padding: 0.5rem;
-}
-.cat-provider__img :deep(.app-image-placeholder) {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-}
-.cat-provider__img :deep(.placeholder-icon-badge) {
-  margin: auto;
 }
 .cat-provider:hover .cat-provider__img {
-  transform: scale(1.04);
+  transform: scale(1.03);
+}
+.cat-provider__badge {
+  position: absolute;
+  top: 6px;
+  inset-inline-end: 6px;
+  width: 22px;
+  height: 22px;
+  border-radius: 9999px;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #059669;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+.cat-provider__body {
+  padding-top: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 1 1 auto;
 }
 .cat-provider__name {
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-weight: 700;
   color: var(--platform-ink, #0f3d56);
-  text-align: center;
+  margin: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 100%;
-  margin-top: 0.25rem;
+  line-height: 1.35;
 }
 .cat-provider__country {
-  font-size: 0.775rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.785rem;
   font-weight: 500;
   color: var(--platform-ink-soft, #64748b);
+}
+.cat-provider__country .material-symbols-outlined {
+  color: #0b7f86;
+}
+.cat-provider__foot {
+  margin-top: 0.85rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid #f1f5f9;
 }
 .cat-provider__cta {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  font-size: 0.775rem;
+  justify-content: space-between;
+  width: 100%;
+  font-size: 0.8rem;
   font-weight: 700;
   color: var(--platform-teal, #0b7f86);
-  margin-top: auto;
-  padding-top: 0.4rem;
-  transition: gap 0.2s ease;
+  transition: color 0.15s ease;
 }
 .cat-provider:hover .cat-provider__cta {
-  gap: 0.5rem;
+  color: #085f65;
+}
+.cat-provider:hover .cat-provider__cta .icon--directional {
+  transform: translateX(4px);
+}
+[dir="rtl"] .cat-provider:hover .cat-provider__cta .icon--directional {
+  transform: translateX(-4px);
 }
 
 /* ── Explorer content transition ── */
@@ -2494,30 +2612,32 @@ const navigateToOemFromModal = () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.75rem;
+  gap: 1rem;
   flex-wrap: wrap;
-  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
 }
 .cat-filter__field {
   position: relative;
   display: flex;
   align-items: center;
-  flex: 1 1 260px;
+  flex: 1 1 280px;
   min-width: 0;
-  max-width: 420px;
-  background: #fff;
-  border: 1px solid #e2e8f0;
+  max-width: 440px;
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
   border-radius: 9999px;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  height: 44px;
+  transition: all 0.2s ease;
 }
 .cat-filter__field:focus-within {
-  border-color: var(--wl-primary);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--wl-primary) 18%, transparent);
+  background: #ffffff;
+  border-color: var(--platform-teal, #0b7f86);
+  box-shadow: 0 0 0 3px rgba(11, 127, 134, 0.12);
 }
 .cat-filter__icon {
-  font-size: 18px;
-  color: #64748b;
-  margin-inline-start: 0.75rem;
+  font-size: 19px;
+  color: #0b7f86;
+  margin-inline-start: 0.85rem;
   pointer-events: none;
 }
 .cat-filter__input {
@@ -2525,8 +2645,8 @@ const navigateToOemFromModal = () => {
   min-width: 0;
   border: 0;
   background: transparent;
-  padding: 0.55rem 0.6rem;
-  font-size: 0.9rem;
+  padding: 0.55rem 0.65rem;
+  font-size: 0.885rem;
   color: #0f172a;
 }
 .cat-filter__input:focus {
@@ -2536,27 +2656,43 @@ const navigateToOemFromModal = () => {
 .cat-filter__clear {
   display: grid;
   place-items: center;
-  width: 32px;
-  height: 32px;
-  margin-inline-end: 0.25rem;
+  width: 28px;
+  height: 28px;
+  margin-inline-end: 0.35rem;
   border: 0;
   border-radius: 9999px;
-  background: transparent;
-  color: #64748b;
+  background: #e2e8f0;
+  color: #475569;
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease;
 }
 .cat-filter__clear:hover {
-  background: #f1f5f9;
+  background: #cbd5e1;
   color: #0f172a;
 }
 .cat-filter__clear .material-symbols-outlined {
-  font-size: 18px;
+  font-size: 16px;
 }
-.cat-filter__count {
-  font-size: 0.75rem;
-  color: #64748b;
+.cat-filter__count-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.785rem;
+  font-weight: 600;
+  color: #475569;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  padding: 0.4rem 0.95rem;
+  border-radius: 9999px;
   white-space: nowrap;
+}
+.count-badge__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 9999px;
+  background: #10b981;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25);
+  display: inline-block;
 }
 
 .cat-no-results {

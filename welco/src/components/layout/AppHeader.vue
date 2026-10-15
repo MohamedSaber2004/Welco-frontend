@@ -167,12 +167,20 @@ watch(isAuthed, (v) => {
         </button>
 
         <router-link v-if="isAuthed && !isStaff && !isProvider" to="/wishlist" class="icon-btn" :aria-label="t('nav.wishlist')" :title="t('nav.wishlist')">
-          <span class="material-symbols-outlined" style="font-size:18px">favorite</span>
-          <span v-if="wishlistCount > 0" class="icon-btn__badge">{{ wishlistCount > 9 ? '9+' : wishlistCount }}</span>
+          <span class="icon-btn__icon-wrap">
+            <span class="material-symbols-outlined" style="font-size:20px">favorite</span>
+            <Transition name="badge-pop">
+              <span v-if="wishlistCount > 0" class="icon-btn__badge">{{ wishlistCount > 99 ? '99+' : wishlistCount }}</span>
+            </Transition>
+          </span>
         </router-link>
         <router-link v-if="!isStaff && !isProvider" to="/cart" class="icon-btn" :aria-label="t('nav.cart')" :title="t('nav.cart')">
-          <span class="material-symbols-outlined" style="font-size:18px">shopping_bag</span>
-          <span v-if="cartCount > 0" class="icon-btn__badge icon-btn__badge--cart">{{ cartCount > 9 ? '9+' : cartCount }}</span>
+          <span class="icon-btn__icon-wrap">
+            <span class="material-symbols-outlined" style="font-size:20px">shopping_bag</span>
+            <Transition name="badge-pop">
+              <span v-if="cartCount > 0" class="icon-btn__badge icon-btn__badge--cart">{{ cartCount > 99 ? '99+' : cartCount }}</span>
+            </Transition>
+          </span>
         </router-link>
 
         <button class="icon-btn lang-btn" :aria-label="locale === 'ar' ? 'English' : 'العربية'" :title="locale === 'ar' ? 'Switch to English' : 'التحويل إلى العربية'" @click="toggleLang">
@@ -517,36 +525,62 @@ watch(isAuthed, (v) => {
   font-size: 18px;
   color: rgba(247, 255, 254, 0.9);
 }
+.icon-btn__icon-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  line-height: 1;
+}
 .icon-btn__badge {
   position: absolute;
   top: -6px;
-  inset-inline-end: -6px;
+  inset-inline-end: -8px;
   min-width: 18px;
   height: 18px;
   padding: 0 4px;
   background: #ef4444;
   color: #ffffff;
-  font-family: var(--wl-font-mono);
+  font-family: var(--wl-font-mono, ui-monospace, monospace);
   font-variant-numeric: tabular-nums;
   font-size: 10px;
   font-weight: 700;
-  display: grid;
-  place-items: center;
-  border-radius: var(--radius-full);
-  border: 2px solid #062f45;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-radius: 9999px;
+  border: 2px solid #081d2c;
+  pointer-events: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  z-index: 2;
 }
 .icon-btn__badge--cart {
-  top: -5px;
-  inset-inline-end: -5px;
-  min-width: 21px;
-  height: 21px;
-  padding: 0 5px;
-  background: var(--brand, #6366F1);
+  top: -6px;
+  inset-inline-end: -8px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
   color: #ffffff;
-  border-color: #FFFFFF;
-  font-size: 11px;
-  font-weight: 800;
-  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.4);
+  border: 2px solid #081d2c;
+  font-size: 10px;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.5);
+}
+.badge-pop-enter-active {
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease;
+}
+.badge-pop-leave-active {
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+.badge-pop-enter-from,
+.badge-pop-leave-to {
+  transform: scale(0.4);
+  opacity: 0;
 }
 .btn {
   font-family: var(--wl-font-body);

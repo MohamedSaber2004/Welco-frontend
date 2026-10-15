@@ -315,12 +315,15 @@ export function useCart() {
     if (!items.value.length && !localStorage.getItem('welco-target-currency')) {
       // keep target as is; will be overridden by address logic in views
     }
-    const qtyClamped = Math.max(product.minOrderQty, qty)
+    const minQty = Number(product.minOrderQty) > 0 ? Number(product.minOrderQty) : 1
+    const safeQty = Number(qty) > 0 ? Number(qty) : minQty
+    const qtyClamped = Math.max(minQty, safeQty)
+    const stockLimit = Number(product.stock) > 0 ? Number(product.stock) : 99999
     const existing = items.value.find(i => i.product.id === product.id)
     if (existing) {
-      existing.quantity = Math.min(product.stock, existing.quantity + qtyClamped)
+      existing.quantity = Math.min(stockLimit, existing.quantity + qtyClamped)
     } else {
-      items.value.push({ product, quantity: Math.min(qtyClamped, product.stock) })
+      items.value.push({ product, quantity: Math.min(qtyClamped, stockLimit) })
     }
     persist()
   }
@@ -328,8 +331,10 @@ export function useCart() {
   function setQty(productId: string, qty: number) {
     const it = items.value.find(i => i.product.id === productId)
     if (!it) return
+    const minQty = Number(it.product.minOrderQty) > 0 ? Number(it.product.minOrderQty) : 1
+    const stockLimit = Number(it.product.stock) > 0 ? Number(it.product.stock) : 99999
     if (qty <= 0) remove(productId)
-    else { it.quantity = Math.min(it.product.stock, Math.max(it.product.minOrderQty, qty)); persist() }
+    else { it.quantity = Math.min(stockLimit, Math.max(minQty, Number(qty) || minQty)); persist() }
   }
 
   function remove(productId: string) {

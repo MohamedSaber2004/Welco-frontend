@@ -165,7 +165,7 @@ const isPathActive = (path: string, exact = false) => {
         <router-link to="/cart" class="bar-tab" :class="{ 'is-active': isPathActive('/cart') }">
           <div class="tab-icon-wrap">
             <span class="material-symbols-outlined tab-icon">shopping_bag</span>
-            <span v-if="cartCount > 0" class="tab-badge">{{ cartCount > 9 ? '9+' : cartCount }}</span>
+            <span v-if="cartCount > 0" class="tab-badge">{{ cartCount > 99 ? '99+' : cartCount }}</span>
           </div>
           <span class="tab-label">{{ t('nav.cart') }}</span>
         </router-link>
@@ -733,17 +733,22 @@ const isPathActive = (path: string, exact = false) => {
     position: absolute;
     top: -5px;
     inset-inline-end: -8px;
-    min-width: 16px;
-    height: 16px;
+    min-width: 17px;
+    height: 17px;
     padding: 0 4px;
-  background: var(--wl-danger);
-  color: var(--wl-on-primary);
-    font-size: 9px;
+    background: var(--brand, #6366f1);
+    color: #ffffff;
+    font-family: var(--wl-font-mono, ui-monospace, monospace);
+    font-variant-numeric: tabular-nums;
+    font-size: 9.5px;
     font-weight: 700;
+    line-height: 1;
     border-radius: 999px;
-    display: grid;
-    place-items: center;
-    border: 2px solid var(--wl-surface);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--wl-surface, #ffffff);
+    box-shadow: 0 2px 5px rgba(99, 102, 241, 0.4);
   }
 
   .bar-tab--more {

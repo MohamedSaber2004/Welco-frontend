@@ -966,9 +966,9 @@ const navigateToOemFromModal = () => {
                   </div>
                 </div>
                 <div v-if="explorerProviderTotalPages > 1" class="provider-pager">
-                  <button type="button" class="page-btn" :disabled="explorerProviderPage <= 1" :aria-label="t('common.prevPage')" @click="explorerProviderPage--">‹</button>
+                  <button type="button" class="page-btn" :disabled="explorerProviderPage <= 1" :aria-label="t('common.prev')" @click="explorerProviderPage--">‹</button>
                   <span class="mono provider-pager__num">{{ explorerProviderPage }} / {{ explorerProviderTotalPages }}</span>
-                  <button type="button" class="page-btn" :disabled="explorerProviderPage >= explorerProviderTotalPages" :aria-label="t('common.nextPage')" @click="explorerProviderPage++">›</button>
+                  <button type="button" class="page-btn" :disabled="explorerProviderPage >= explorerProviderTotalPages" :aria-label="t('common.next')" @click="explorerProviderPage++">›</button>
                 </div>
               </div>
             </Transition>

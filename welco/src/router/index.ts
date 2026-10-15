@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { t, type MessageKey } from '../i18n'
+import { t, locale, type MessageKey } from '../i18n'
 import { services } from '../di/container'
 import { isPendingOrg } from '../utils/pending-org-marker'
 import { toastService } from '../infrastructure/feedback/toast.service'
@@ -475,7 +475,11 @@ router.beforeEach(async (to) => {
 router.afterEach((to) => {
   routeLoading.value = false
   const key = to.meta.titleKey
-  if (key) {
+  if (to.meta.isLandingPage || to.name === 'home') {
+    document.title = locale.value === 'ar'
+      ? 'ويلكو — منصة الأدوات الجراحية والمستلزمات الطبية'
+      : 'Welco — Surgical Instruments Platform'
+  } else if (key) {
     document.title = `${t(key)} · Welco`
   } else {
     document.title = 'Welco'

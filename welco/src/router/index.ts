@@ -475,14 +475,16 @@ router.beforeEach(async (to) => {
 router.afterEach((to) => {
   routeLoading.value = false
   const key = to.meta.titleKey
-  if (to.meta.isLandingPage || to.name === 'home') {
+  if (to.meta.isLandingPage || to.name === 'home' || to.path === '/') {
     document.title = locale.value === 'ar'
       ? 'ويلكو — منصة الأدوات الجراحية والمستلزمات الطبية'
       : 'Welco — Surgical Instruments Platform'
-  } else if (key) {
+  } else if (key && key !== 'nav.home') {
     document.title = `${t(key)} · Welco`
   } else {
-    document.title = 'Welco'
+    document.title = locale.value === 'ar'
+      ? 'ويلكو — منصة الأدوات الجراحية والمستلزمات الطبية'
+      : 'Welco — Surgical Instruments Platform'
   }
 
   const text = key ? t(key) : document.title

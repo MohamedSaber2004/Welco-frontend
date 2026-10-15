@@ -20,8 +20,14 @@ onMounted(() => {
 })
 
 watch(locale, () => {
-  const k = route.meta.titleKey as MessageKey | undefined
-  document.title = k ? `${t(k)} · Welco` : 'Welco'
+  if (route.meta?.isLandingPage || route.name === 'home' || route.path === '/') {
+    document.title = locale.value === 'ar'
+      ? 'ويلكو — منصة الأدوات الجراحية والمستلزمات الطبية'
+      : 'Welco — Surgical Instruments Platform'
+    return
+  }
+  const k = route.meta?.titleKey as MessageKey | undefined
+  document.title = k ? `${t(k)} · Welco` : 'Welco — Surgical Instruments Platform'
 })
 
 const showFooter = computed(() => {

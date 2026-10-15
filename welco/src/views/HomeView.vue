@@ -377,6 +377,12 @@ const navigateToOemFromModal = () => {
       <div class="hero__glow" aria-hidden="true"></div>
       <div class="hero__inner">
         <div class="hero__copy">
+          <div class="hero__eyebrow">
+            <span class="hero__eyebrow-badge">
+              <span class="hero__eyebrow-dot" aria-hidden="true"></span>
+              {{ t('home.heroEyebrow') }}
+            </span>
+          </div>
           <h1 class="hero__title">
             {{ t('home.heroTitle') }} <span class="hero__title-accent">{{ t('home.heroTitleAccent') }}</span>
           </h1>
@@ -3532,6 +3538,35 @@ const navigateToOemFromModal = () => {
 @keyframes pulse-glow {
   0%, 100% { transform: scale(1); opacity: 1; }
   50% { transform: scale(1.3); opacity: 0.7; }
+}
+
+.home .hero__eyebrow {
+  margin-bottom: 0.9rem;
+}
+
+.home .hero__eyebrow-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.9rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-steel-teal, #147D92);
+  background: rgba(20, 125, 146, 0.08);
+  border: 1px solid rgba(20, 125, 146, 0.22);
+  border-radius: 9999px;
+  backdrop-filter: blur(8px);
+}
+
+.home .hero__eyebrow-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #10B981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.7);
+  display: inline-block;
 }
 
 .home .hero__title {

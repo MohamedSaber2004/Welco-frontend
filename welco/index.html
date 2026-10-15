@@ -2,15 +2,19 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png">
     <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
     <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192x192.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="shortcut icon" href="/favicon-48x48.png">
+    <link rel="shortcut icon" href="/favicon.ico">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Welco — Surgical Instrument Manufacturer. Precision instruments built for the operating room, with OEM private-label production and full ISO / CE documentation.">
+    <meta name="description" content="Welco — Certified Surgical Instruments Platform & Precision Manufacturer. Premium operating room instruments, OEM private-label production, full ISO 13485 & CE certification.">
+    <meta name="keywords" content="Welco, Welco Surgical, Welco Surgical Instruments, Welco Surgical Instruments Platform, Surgical Instruments, Medical Supplies, OEM Surgical Instruments, أدوات جراحية, ويلكو, منصة الأدوات الجراحية">
+    <meta name="author" content="Welco">
+    <meta name="application-name" content="Welco">
+    <meta name="apple-mobile-web-app-title" content="Welco">
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
     <meta name="theme-color" content="#0F3D56">
     <link rel="canonical" href="https://welco-frontend.vercel.app/">
@@ -19,7 +23,7 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://welco-frontend.vercel.app/">
     <meta property="og:title" content="Welco — Surgical Instruments Platform">
-    <meta property="og:description" content="Precision instruments built for the operating room, with OEM private-label production and full ISO / CE documentation.">
+    <meta property="og:description" content="The trusted platform for certified surgical instruments and medical supplies, connecting healthcare practitioners, clinics, and hospitals with verified suppliers.">
     <meta property="og:image" content="https://welco-frontend.vercel.app/logo-512.png">
     <meta property="og:site_name" content="Welco">
 
@@ -27,7 +31,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://welco-frontend.vercel.app/">
     <meta name="twitter:title" content="Welco — Surgical Instruments Platform">
-    <meta name="twitter:description" content="Precision instruments built for the operating room, with OEM private-label production and full ISO / CE documentation.">
+    <meta name="twitter:description" content="The trusted platform for certified surgical instruments and medical supplies, connecting healthcare practitioners, clinics, and hospitals with verified suppliers.">
     <meta name="twitter:image" content="https://welco-frontend.vercel.app/logo-512.png">
 
     <!-- Schema.org WebSite & Organization Structured Data for Site Name and Brand SEO -->
@@ -42,17 +46,33 @@
             "name": "Welco",
             "alternateName": [
               "Welco Surgical",
+              "Welco - Surgical",
               "Welco Surgical Instruments",
+              "Welco Surgical Instruments Platform",
               "Welco Platform",
-              "ويلكو"
+              "ويلكو",
+              "ويلكو للأدوات الجراحية",
+              "منصة ويلكو للأدوات الجراحية"
             ],
-            "description": "The trusted platform for certified surgical instruments and medical supplies.",
-            "inLanguage": ["en", "ar"]
+            "description": "The trusted platform for certified surgical instruments and medical supplies, connecting healthcare practitioners, clinics, and hospitals with verified manufacturers.",
+            "inLanguage": ["en", "ar"],
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://welco-frontend.vercel.app/marketplace?search={search_term_string}"
+              },
+              "query-input": "required name=search_term_string"
+            }
           },
           {
             "@type": "Organization",
             "@id": "https://welco-frontend.vercel.app/#organization",
             "name": "Welco",
+            "alternateName": [
+              "Welco Surgical",
+              "Welco Surgical Instruments"
+            ],
             "url": "https://welco-frontend.vercel.app/",
             "logo": {
               "@type": "ImageObject",
@@ -61,7 +81,7 @@
               "height": 512
             },
             "image": "https://welco-frontend.vercel.app/logo-512.png",
-            "description": "Welco is a precision surgical instrument manufacturer with OEM private-label production and ISO / CE certification."
+            "description": "Welco is a certified surgical instruments platform and precision manufacturer with OEM private-label production and ISO 13485 / CE documentation."
           }
         ]
       }

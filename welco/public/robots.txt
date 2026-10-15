@@ -1,7 +1,11 @@
 User-agent: *
 Allow: /
+Allow: /providers
+Allow: /providers/
 Disallow: /admin
-Disallow: /provider
+Disallow: /admin/
+Disallow: /provider/
 Disallow: /account
+Disallow: /account/
 
 Sitemap: https://welco-frontend.vercel.app/sitemap.xml

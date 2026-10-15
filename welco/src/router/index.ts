@@ -500,6 +500,32 @@ router.afterEach((to) => {
   setTimeout(() => {
     if (announcer) announcer.textContent = text
   }, 100)
+
+  // SEO: Dynamically update Canonical URL and OpenGraph / Twitter tags per route
+  if (typeof window !== 'undefined') {
+    const origin = window.location.origin || 'https://welco-frontend.vercel.app'
+    const canonicalHref = `${origin}${to.path === '/' ? '' : to.path}`
+
+    let canonicalEl = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null
+    if (!canonicalEl) {
+      canonicalEl = document.createElement('link')
+      canonicalEl.setAttribute('rel', 'canonical')
+      document.head.appendChild(canonicalEl)
+    }
+    canonicalEl.setAttribute('href', canonicalHref)
+
+    const ogUrl = document.querySelector('meta[property="og:url"]')
+    if (ogUrl) ogUrl.setAttribute('content', canonicalHref)
+
+    const twUrl = document.querySelector('meta[name="twitter:url"]')
+    if (twUrl) twUrl.setAttribute('content', canonicalHref)
+
+    const ogTitle = document.querySelector('meta[property="og:title"]')
+    if (ogTitle) ogTitle.setAttribute('content', document.title)
+
+    const twTitle = document.querySelector('meta[name="twitter:title"]')
+    if (twTitle) twTitle.setAttribute('content', document.title)
+  }
 })
 
 router.onError(() => {

@@ -2,6 +2,7 @@ import { ref } from 'vue'
 import { t } from '../i18n'
 import type { AuditLogDto, AuditLogQuery } from '../domain/models/audit-log'
 import type { AuditLogRepository } from '../domain/ports/audit-log-repository'
+import { deduplicateLogs } from '../utils/audit-dedupe'
 
 export class AuditLogService {
   readonly logs = ref<AuditLogDto[]>([])
@@ -25,7 +26,8 @@ export class AuditLogService {
       const pageNumber = query.pageNumber ?? this.page.value
       const pageSize = query.pageSize ?? this.pageSize.value
       const res = await this.repo.getAuditLogs({ ...query, pageNumber, pageSize })
-      this.logs.value = res.data ?? []
+      const rawLogs = res.data ?? []
+      this.logs.value = deduplicateLogs(rawLogs)
       this.totalCount.value = res.totalCount ?? this.logs.value.length
       this.totalPages.value = res.totalPages ?? 1
     } catch (e) {

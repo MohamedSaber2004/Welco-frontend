@@ -10,6 +10,7 @@ import { useUserLookup } from '../../composables/useUserLookup'
 import { t, locale } from '../../i18n'
 import type { AuditLogDto, AuditAction } from '../../domain/models/audit-log'
 import { formatDateTime } from '../../utils/format'
+import { deduplicateLogs } from '../../utils/audit-dedupe'
 
 useAnimation()
 
@@ -19,7 +20,7 @@ const filters = ref<{ entity: string; action: string; search: string; hideTokenN
   entity: '',
   action: '',
   search: '',
-  hideTokenNoise: true,
+  hideTokenNoise: false,
 })
 const selectedLog = ref<AuditLogDto | null>(null)
 
@@ -37,47 +38,54 @@ const ACTIONS: { value: AuditAction; labelKey: string }[] = [
   { value: 'ASSIGN', labelKey: 'admin.auditActionAssign' },
 ]
 
-const ENTITY_TYPES = ['Product', 'Category', 'Order', 'RFQ', 'Quote', 'User', 'Company', 'Certification', 'Document', 'Ticket', 'Cart', 'Address', 'DistributorApplication']
+const ENTITY_TYPES = [
+  'ApplicationUser',
+  'UserRefreshToken',
+  'Product',
+  'Category',
+  'Order',
+  'RFQ',
+  'Quote',
+  'User',
+  'Company',
+  'Certification',
+  'Document',
+  'SupportTicket',
+  'Cart',
+  'UserAddress',
+  'DistributorApplication',
+  'Notification',
+]
 
 const localPage = ref(1)
 const localPageSize = 20
 
-function deduplicateLogs(list: AuditLogDto[]): AuditLogDto[] {
-  const result: AuditLogDto[] = []
-  for (let i = 0; i < list.length; i++) {
-    const curr = list[i]!
-    const prev = result[result.length - 1]
-    if (prev) {
-      const sameAction = prev.action === curr.action
-      const sameEntity = prev.entityName === curr.entityName && prev.entityId === curr.entityId
-      const sameUser = (prev.performedById || prev.performedBy) === (curr.performedById || curr.performedBy)
-      const timeDiff = Math.abs(new Date(curr.createdAt).getTime() - new Date(prev.createdAt).getTime())
-      if (sameAction && sameEntity && sameUser && timeDiff < 3000) {
-        continue
-      }
-    }
-    result.push(curr)
-  }
-  return result
-}
-
 const filteredLogs = computed(() => {
   const rawList = Array.isArray(auditLogService.logs.value) ? auditLogService.logs.value : []
   let list = deduplicateLogs(rawList)
-  if (filters.value.hideTokenNoise) {
+  if (filters.value.hideTokenNoise && filters.value.entity !== 'UserRefreshToken') {
     list = list.filter((l) => {
       if (!l) return false
       const ent = String(l.entityName || '').toLowerCase()
       const act = String(l.action || '').toLowerCase()
       const det = String(l.details || '').toLowerCase()
-      return ent !== 'token' && !act.includes('refresh') && !det.includes('token-refresh')
+      return !ent.includes('token') && !act.includes('refresh') && !det.includes('token-refresh')
     })
   }
   if (filters.value.entity) {
-    list = list.filter((l) => l && l.entityName === filters.value.entity)
+    const entFilter = filters.value.entity.toLowerCase()
+    list = list.filter((l) => {
+      if (!l || !l.entityName) return false
+      const eName = String(l.entityName).toLowerCase()
+      if (entFilter === 'user') return eName === 'applicationuser' || eName === 'user'
+      if (entFilter === 'address') return eName === 'useraddress' || eName === 'companyaddress' || eName === 'address'
+      if (entFilter === 'ticket') return eName === 'supportticket' || eName === 'ticket'
+      return eName === entFilter
+    })
   }
   if (filters.value.action) {
-    list = list.filter((l) => l && l.action === filters.value.action)
+    const actFilter = filters.value.action.toUpperCase()
+    list = list.filter((l) => l && String(l.action || '').toUpperCase() === actFilter)
   }
   if (filters.value.search.trim()) {
     const q = filters.value.search.trim().toLowerCase()
@@ -143,11 +151,13 @@ function closeDetails() {
 }
 
 function actionLabel(action: string): string {
-  const found = ACTIONS.find((a) => a.value === action)
+  const norm = String(action || '').toUpperCase()
+  const found = ACTIONS.find((a) => a.value.toUpperCase() === norm)
   return found ? t(found.labelKey as never) : action
 }
 
 function actionBadgeClass(action: string): string {
+  const norm = String(action || '').toUpperCase()
   const map: Record<string, string> = {
     CREATE: 'action-badge--teal',
     UPDATE: 'action-badge--indigo',
@@ -161,7 +171,7 @@ function actionBadgeClass(action: string): string {
     DOWNLOAD: 'action-badge--slate',
     ASSIGN: 'action-badge--amber',
   }
-  return map[action] ?? 'action-badge--slate'
+  return map[norm] ?? 'action-badge--slate'
 }
 
 function goPage(p: number) {
@@ -179,8 +189,19 @@ const maskedDetails = computed(() => {
 })
 
 onMounted(() => void loadLogs(1))
-watch([() => filters.value.entity, () => filters.value.action, () => filters.value.search], () => {
+
+watch([() => filters.value.entity, () => filters.value.action, () => filters.value.hideTokenNoise], () => {
   localPage.value = 1
+  void loadLogs(1)
+})
+
+let searchTimeout: ReturnType<typeof setTimeout> | null = null
+watch(() => filters.value.search, () => {
+  localPage.value = 1
+  if (searchTimeout) clearTimeout(searchTimeout)
+  searchTimeout = setTimeout(() => {
+    void loadLogs(1)
+  }, 350)
 })
 </script>
 
@@ -228,6 +249,22 @@ watch([() => filters.value.entity, () => filters.value.action, () => filters.val
               :placeholder="t('admin.auditSearchPlaceholder')"
             />
           </div>
+        </div>
+
+        <div class="filter-col filter-col--toggle">
+          <label class="filter-label mono">{{ locale === 'ar' ? 'التوكنات' : 'Token Noise' }}</label>
+          <button
+            type="button"
+            class="filter-toggle-btn mono text-xs"
+            :class="{ 'filter-toggle-btn--active': filters.hideTokenNoise }"
+            :title="filters.hideTokenNoise ? (locale === 'ar' ? 'التوكنات مخفية' : 'Tokens Hidden') : (locale === 'ar' ? 'التوكنات معروضة' : 'Tokens Visible')"
+            @click="filters.hideTokenNoise = !filters.hideTokenNoise"
+          >
+            <span class="material-symbols-outlined text-[16px]">
+              {{ filters.hideTokenNoise ? 'visibility_off' : 'visibility' }}
+            </span>
+            <span>{{ filters.hideTokenNoise ? (locale === 'ar' ? 'مخفية' : 'Hidden') : (locale === 'ar' ? 'معروضة' : 'Visible') }}</span>
+          </button>
         </div>
       </div>
 
@@ -473,6 +510,38 @@ watch([() => filters.value.entity, () => filters.value.action, () => filters.val
 .filter-search {
   width: 100%;
   padding-inline-start: 38px;
+}
+
+.filter-col--toggle {
+  min-width: 130px;
+}
+
+.filter-toggle-btn {
+  height: 44px;
+  padding: 0 14px;
+  background: var(--wl-surface-soft);
+  border: 1px solid var(--wl-border);
+  border-radius: var(--wl-radius-sm);
+  color: var(--wl-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+
+.filter-toggle-btn:hover {
+  background: var(--wl-surface);
+  border-color: var(--wl-primary);
+  color: var(--wl-ink-strong);
+}
+
+.filter-toggle-btn--active {
+  background: var(--wl-primary-soft);
+  border-color: rgba(var(--wl-primary-rgb), 0.4);
+  color: var(--wl-primary);
 }
 
 /* Executive Table */

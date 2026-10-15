@@ -14,6 +14,7 @@ import type { AuditLogDto } from '../../domain/models/audit-log'
 import type { CategoryDto, CreateCategoryPayload } from '../../domain/models/marketplace'
 import { t, locale } from '../../i18n'
 import { formatDateTime } from '../../utils/format'
+import { deduplicateLogs } from '../../utils/audit-dedupe'
 
 const { getUserInfo, resolveLogsUsers, getRoleBadgeClass } = useUserLookup()
 
@@ -177,6 +178,7 @@ function formatAuditTime(iso?: string): string {
 }
 
 function actionBadgeClass(action: string): string {
+  const norm = String(action || '').toUpperCase()
   const map: Record<string, string> = {
     CREATE: 'badge--teal',
     UPDATE: 'badge--slate',
@@ -190,7 +192,7 @@ function actionBadgeClass(action: string): string {
     DOWNLOAD: 'badge--slate',
     ASSIGN: 'badge--amber',
   }
-  return map[action] ?? 'badge--slate'
+  return map[norm] ?? 'badge--slate'
 }
 
 const load = async () => {
@@ -213,10 +215,10 @@ const load = async () => {
       services.contentService.loadTickets().catch(() => []),
       services.contentService.loadDocuments().catch(() => []),
       services.contentService.loadSupportContact().catch(() => null),
-      services.auditLogService.loadLogs({ pageSize: 6 }).catch(() => null),
+      services.auditLogService.loadLogs({ pageSize: 12 }).catch(() => null),
     ])
 
-    recentAuditLogs.value = services.auditLogService.logs.value.slice(0, 6)
+    recentAuditLogs.value = deduplicateLogs(services.auditLogService.logs.value).slice(0, 6)
     if (recentAuditLogs.value.length > 0) {
       void resolveLogsUsers(recentAuditLogs.value)
     }

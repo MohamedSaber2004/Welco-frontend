@@ -4,13 +4,14 @@ export const parseServerDate = (isoOrDate: string | Date | undefined | null): Da
   let str = String(isoOrDate).trim()
   if (!str) return new Date()
   if (!str.endsWith('Z') && !/[+-]\d{2}(:\d{2})?$/.test(str)) {
-    str += '+03:00'
+    str += 'Z'
   }
   const d = new Date(str)
   return isNaN(d.getTime()) ? new Date(isoOrDate) : d
 }
 
 export const formatDate = (iso: string | Date | undefined | null, locale = 'en'): string => {
+  if (!iso) return ''
   try {
     const d = parseServerDate(iso)
     return new Intl.DateTimeFormat(locale === 'ar' ? 'ar-EG' : 'en-US', {
@@ -24,6 +25,7 @@ export const formatDate = (iso: string | Date | undefined | null, locale = 'en')
 }
 
 export const formatDateTime = (iso: string | Date | undefined | null, locale = 'en'): string => {
+  if (!iso) return ''
   try {
     const d = parseServerDate(iso)
     return new Intl.DateTimeFormat(locale === 'ar' ? 'ar-EG' : 'en-US', {

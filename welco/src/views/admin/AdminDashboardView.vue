@@ -13,6 +13,7 @@ import { useUserLookup } from '../../composables/useUserLookup'
 import type { AuditLogDto } from '../../domain/models/audit-log'
 import type { CategoryDto, CreateCategoryPayload } from '../../domain/models/marketplace'
 import { t, locale } from '../../i18n'
+import { formatDateTime } from '../../utils/format'
 
 const { getUserInfo, resolveLogsUsers, getRoleBadgeClass } = useUserLookup()
 
@@ -172,9 +173,7 @@ const donutSegments = computed(() => {
 
 function formatAuditTime(iso?: string): string {
   if (!iso) return '—'
-  try {
-    return new Date(iso).toLocaleString(locale.value === 'ar' ? 'ar-EG' : 'en-US', { month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' })
-  } catch { return iso }
+  return formatDateTime(iso, locale.value)
 }
 
 function actionBadgeClass(action: string): string {

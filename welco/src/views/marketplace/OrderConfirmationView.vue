@@ -91,7 +91,7 @@ onMounted(async () => {
           <div class="total-row">
             <span class="total-label mono">{{ t('commerce.total') }}</span>
             <strong class="total-value mono">
-              {{ formatPrice(order.totalAmount, locale) }} {{ order.currencyCode }}
+              {{ formatPrice(order.totalAmount, locale) }} {{ order.currencyCode || 'USD' }}
             </strong>
           </div>
         </section>

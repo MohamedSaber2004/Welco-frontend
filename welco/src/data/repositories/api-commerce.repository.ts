@@ -21,6 +21,15 @@ export class ApiCommerceRepository implements CommerceRepository {
     return []
   }
 
+  private normalizeOrder(o: OrderDto): OrderDto {
+    if (!o) return o
+    return {
+      ...o,
+      currencyCode: o.currencyCode || 'USD',
+      currencySymbol: o.currencySymbol || '$',
+    }
+  }
+
   async getOrders(query: CommerceQuery = {}): Promise<PaginatedResult<OrderDto>> {
     const params = new URLSearchParams()
     if (query.pageNumber) params.set('pageNumber', String(query.pageNumber))
@@ -31,11 +40,14 @@ export class ApiCommerceRepository implements CommerceRepository {
     const qs = params.toString()
     try {
       const raw = await this.http.get<unknown>(qs ? `${COMMERCE_ROUTES.orders}?${qs}` : COMMERCE_ROUTES.orders, { showFeedback: false })
-      if (Array.isArray(raw)) return { isSuccess: true, data: raw as OrderDto[], totalCount: raw.length, pageNumber: query.pageNumber ?? 1, pageSize: query.pageSize ?? 10, totalPages: 1, hasPreviousPage: false, hasNextPage: false, message: 'OK', statusCode: 200 }
+      if (Array.isArray(raw)) {
+        const normalized = (raw as OrderDto[]).map((o) => this.normalizeOrder(o))
+        return { isSuccess: true, data: normalized, totalCount: normalized.length, pageNumber: query.pageNumber ?? 1, pageSize: query.pageSize ?? 10, totalPages: 1, hasPreviousPage: false, hasNextPage: false, message: 'OK', statusCode: 200 }
+      }
       if (raw && typeof raw === 'object') {
         const obj = raw as Record<string, unknown>
         const rawData = obj.data ?? obj.Data
-        const data = Array.isArray(rawData) ? (rawData as OrderDto[]) : []
+        const data = Array.isArray(rawData) ? (rawData as OrderDto[]).map((o) => this.normalizeOrder(o)) : []
         return {
           isSuccess: (obj.isSuccess ?? obj.IsSuccess ?? true) as boolean,
           data,
@@ -56,21 +68,23 @@ export class ApiCommerceRepository implements CommerceRepository {
   }
 
   async getOrderById(id: string): Promise<OrderDto> {
-    return await this.http.get<OrderDto>(COMMERCE_ROUTES.orderById(id), { showFeedback: false })
+    const raw = await this.http.get<OrderDto>(COMMERCE_ROUTES.orderById(id), { showFeedback: false })
+    return this.normalizeOrder(raw)
   }
 
   async createOrder(payload: CreateOrderPayload): Promise<OrderDto> {
-    return await this.http.post<OrderDto>(COMMERCE_ROUTES.orders, payload)
+    const raw = await this.http.post<OrderDto>(COMMERCE_ROUTES.orders, payload)
+    return this.normalizeOrder(raw)
   }
 
   async trackOrder(orderNumber: string): Promise<OrderDto> {
     const raw = await this.http.get<unknown>(COMMERCE_ROUTES.orderTrack(orderNumber), { showFeedback: false })
     if (raw && typeof raw === 'object') {
       const obj = raw as Record<string, unknown>
-      if (obj.data && typeof obj.data === 'object') return obj.data as OrderDto
+      if (obj.data && typeof obj.data === 'object') return this.normalizeOrder(obj.data as OrderDto)
       if (obj.isSuccess === false) throw new Error((obj.message as string) || 'Order not found')
     }
-    return raw as OrderDto
+    return this.normalizeOrder(raw as OrderDto)
   }
 
   async updateOrderStatus(id: string, status: string): Promise<string> {

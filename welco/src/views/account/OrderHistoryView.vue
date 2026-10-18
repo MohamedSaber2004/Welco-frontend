@@ -185,7 +185,7 @@ onMounted(() => {
                 </td>
                 <td>
                   <strong class="mono amount-text">
-                    {{ formatPrice(o.totalAmount, locale) }} {{ o.currencyCode }}
+                    {{ formatPrice(o.totalAmount, locale) }} {{ o.currencyCode || 'USD' }}
                   </strong>
                 </td>
                 <td>

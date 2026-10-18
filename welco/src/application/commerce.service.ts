@@ -15,7 +15,7 @@ export class CommerceService {
   readonly totalCount = ref(0)
   readonly totalPages = ref(1)
   readonly page = ref(1)
-  readonly pageSize = ref(10)
+  readonly pageSize = ref(50)
 
   private readonly repo: CommerceRepository
 

@@ -51,11 +51,8 @@ const dynamicThroughput = computed(() => {
     months.push({ month, ym, value: 0 })
   }
 
-  // Aggregate real events from orders and audit logs (audit logs for admin only)
-  const allDates = [
-    ...services.commerceService.orders.value.map((o) => o.createdAt),
-    ...recentAuditLogs.value.map((l) => l.createdAt),
-  ]
+  // Aggregate real events strictly from sales orders
+  const allDates = services.commerceService.orders.value.map((o) => o.createdAt)
 
   for (const iso of allDates) {
     if (!iso) continue
@@ -223,7 +220,7 @@ const load = async () => {
       marketplaceRepository.getProducts({ page: 1, pageSize: 1, isActive: true }).catch(() => null),
       marketplaceRepository.getCategories().catch(() => []),
       companyRepository.getCompanies({ pageNumber: 1, pageSize: 50 }).catch(() => null),
-      services.commerceService.loadOrders({ page: 1, pageSize: 10 }).catch(() => null),
+      services.commerceService.loadOrders({ page: 1, pageSize: 50 }).catch(() => null),
       services.contentService.loadTickets().catch(() => []),
       services.contentService.loadDocuments().catch(() => []),
       services.contentService.loadSupportContact().catch(() => null),

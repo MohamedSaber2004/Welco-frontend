@@ -111,7 +111,7 @@ function statusIndex(o: OrderDto): number {
               </div>
 
               <div class="item-subtotal mono">
-                {{ formatPrice(it.quantity * it.unitPrice, locale) }} {{ order.currencyCode }}
+                {{ formatPrice(it.quantity * it.unitPrice, locale) }} {{ order.currencyCode || 'USD' }}
               </div>
             </article>
           </div>
@@ -119,7 +119,7 @@ function statusIndex(o: OrderDto): number {
           <div class="manifest-foot">
             <span class="mono foot-label">{{ t('commerce.total') }}</span>
             <strong class="mono foot-total">
-              {{ formatPrice(order.totalAmount, locale) }} {{ order.currencyCode }}
+              {{ formatPrice(order.totalAmount, locale) }} {{ order.currencyCode || 'USD' }}
             </strong>
           </div>
         </section>

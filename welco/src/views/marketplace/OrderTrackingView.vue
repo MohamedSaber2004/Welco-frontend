@@ -117,7 +117,7 @@ async function track() {
         <div class="card-foot-summary">
           <span class="mono foot-label">{{ t('commerce.total') }}</span>
           <strong class="mono foot-total">
-            {{ formatPrice(order.totalAmount, locale) }} {{ order.currencyCode }}
+            {{ formatPrice(order.totalAmount, locale) }} {{ order.currencyCode || 'USD' }}
           </strong>
         </div>
       </div>

@@ -575,12 +575,6 @@ onMounted(() => { void loadAll() })
               </span>
             </div>
             <h2 class="details-name">{{ localized(selectedProduct.nameEn, selectedProduct.nameAr) }}</h2>
-            <p v-if="selectedProduct.nameAr && locale !== 'ar'" class="secondary-title mono" dir="rtl">
-              {{ selectedProduct.nameAr }}
-            </p>
-            <p v-if="selectedProduct.nameEn && locale === 'ar'" class="secondary-title mono" dir="ltr">
-              {{ selectedProduct.nameEn }}
-            </p>
 
             <div class="price-stock-bar">
               <div class="price-chunk">

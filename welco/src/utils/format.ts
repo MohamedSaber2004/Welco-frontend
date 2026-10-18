@@ -40,6 +40,27 @@ export const formatDateTime = (iso: string | Date | undefined | null, locale = '
   }
 }
 
+export const formatTicketReplyDate = (
+  repliedAt: string | Date | undefined | null,
+  createdAt: string | Date | undefined | null,
+  locale = 'en'
+): string => {
+  if (!repliedAt) return ''
+  try {
+    const rDate = parseServerDate(repliedAt)
+    if (createdAt) {
+      const cDate = parseServerDate(createdAt)
+      if (rDate.getTime() < cDate.getTime()) {
+        return formatDateTime(cDate, locale)
+      }
+    }
+    return formatDateTime(rDate, locale)
+  } catch {
+    return String(repliedAt || '')
+  }
+}
+
+
 export const truncate = (text: string, max = 60): string =>
   text.length > max ? `${text.slice(0, max)}…` : text
 

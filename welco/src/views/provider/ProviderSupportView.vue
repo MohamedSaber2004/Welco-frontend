@@ -9,9 +9,11 @@ import AppPagination from '../../components/ui/AppPagination.vue'
 import { toastService } from '../../infrastructure/feedback/toast.service'
 import { confirmService } from '../../infrastructure/feedback/confirm.service'
 import { companyService, contentService } from '../../di/container'
+import { formatDateTime, formatTicketReplyDate } from '../../utils/format'
 import { t, locale } from '../../i18n'
 import type { OemInquiryDto } from '../../domain/ports/company-repository'
 import type { SupportTicketDto, FaqItemDto } from '../../domain/models/content'
+
 
 useAnimation()
 
@@ -506,9 +508,10 @@ const acceptOemInquiry = async (inquiry: OemInquiryDto) => {
                     <span>{{ tk.status || 'Pending' }}</span>
                   </span>
                   <span class="ticket-date mono text-xs text-muted">
-                    {{ new Date(tk.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') }}
+                    {{ formatDateTime(tk.createdAt, locale) }}
                   </span>
                 </div>
+
 
                 <strong class="ticket-item-subject">{{ tk.subject }}</strong>
                 <p class="ticket-item-snippet">{{ tk.message }}</p>
@@ -702,7 +705,7 @@ const acceptOemInquiry = async (inquiry: OemInquiryDto) => {
               <span>{{ selectedTicket.status || 'Pending' }}</span>
             </span>
             <span class="mono text-xs text-muted">
-              {{ new Date(selectedTicket.createdAt).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}
+              {{ formatDateTime(selectedTicket.createdAt, locale) }}
             </span>
           </div>
 
@@ -723,11 +726,12 @@ const acceptOemInquiry = async (inquiry: OemInquiryDto) => {
               <span class="material-symbols-outlined text-[16px] text-emerald-600">verified_user</span>
               <strong class="mono text-xs text-emerald-700">Welco Admin Official Reply</strong>
               <span v-if="selectedTicket.repliedAt" class="mono text-xs text-muted ms-auto">
-                {{ new Date(selectedTicket.repliedAt).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}
+                {{ formatTicketReplyDate(selectedTicket.repliedAt, selectedTicket.createdAt, locale) }}
               </span>
             </div>
             <p class="message-content reply-content">{{ selectedTicket.reply }}</p>
           </div>
+
 
           <div v-else class="pending-reply-banner">
             <span class="material-symbols-outlined spin text-[20px] text-amber-600">hourglass_top</span>

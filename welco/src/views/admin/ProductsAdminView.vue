@@ -179,9 +179,9 @@ const totalProductsCount = computed(() => rawProducts.value.length)
 const activeCount = computed(() => rawProducts.value.filter((p) => (p.isActive ?? true)).length)
 const inactiveCount = computed(() => rawProducts.value.filter((p) => !(p.isActive ?? true)).length)
 const inStockCount = computed(() => rawProducts.value.filter((p) => (p.stock ?? 0) > 0).length)
-const outOfStockCount = computed(() => rawProducts.value.filter((p) => !p.stock || p.stock <= 0).length)
 
 // Reset pagination to page 1 whenever any filter or search term changes
+
 watch([search, categoryFilter, stockFilter, providerFilter, statusFilter], () => {
   page.value = 1
 })

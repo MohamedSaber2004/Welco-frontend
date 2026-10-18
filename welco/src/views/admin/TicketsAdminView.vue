@@ -2,9 +2,11 @@
 import { onMounted, ref, computed } from 'vue'
 import { t, locale } from '../../i18n'
 import { contentService } from '../../di/container'
+import { formatDateTime, formatTicketReplyDate } from '../../utils/format'
 import AdminLayout from '../../components/layout/AdminLayout.vue'
 import SkeletonLoader from '../../components/ui/SkeletonLoader.vue'
 import AppPagination from '../../components/ui/AppPagination.vue'
+
 
 const tickets = contentService.tickets
 const loading = ref(true)
@@ -145,7 +147,7 @@ function clearFilters() {
                 <strong class="ticket-subject">{{ tk.subject }}</strong>
               </div>
               <div class="mono ticket-meta">
-                <span>{{ new Date(tk.createdAt).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</span>
+                <span>{{ formatDateTime(tk.createdAt, locale) }}</span>
               </div>
             </div>
 
@@ -179,10 +181,11 @@ function clearFilters() {
             <div class="reply-header mono">
               <span class="material-symbols-outlined text-[15px]">support_agent</span>
               <span>{{ t('help.supportResponseTitle') }}</span>
-              <span v-if="tk.repliedAt" class="reply-time">• {{ new Date(tk.repliedAt).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</span>
+              <span v-if="tk.repliedAt" class="reply-time">• {{ formatTicketReplyDate(tk.repliedAt, tk.createdAt, locale) }}</span>
             </div>
             <p class="reply-content">{{ tk.reply }}</p>
           </div>
+
 
           <div v-if="tk.status !== 'Closed'" class="reply-input-bar">
             <input

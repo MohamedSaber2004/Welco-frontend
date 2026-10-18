@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { onMounted, ref, computed } from 'vue'
+
 import { t, locale } from '../../i18n'
 import { contentService } from '../../di/container'
+import { formatDateTime, formatTicketReplyDate } from '../../utils/format'
 import { toUploadPlace } from '../../application/attachment.service'
 import FileUpload from '../../components/ui/FileUpload.vue'
 import DataState from '../../components/ui/DataState.vue'
 import SkeletonLoader from '../../components/ui/SkeletonLoader.vue'
 import BackButton from '../../components/ui/BackButton.vue'
+
 
 const loading = ref(true)
 const subject = ref('')
@@ -192,7 +195,7 @@ async function closeTicket(id: string) {
               <div class="ticket-card-top">
                 <div class="ticket-header-info">
                   <h3 class="ticket-subject">{{ tk.subject }}</h3>
-                  <span class="mono ticket-date">{{ new Date(tk.createdAt).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</span>
+                  <span class="mono ticket-date">{{ formatDateTime(tk.createdAt, locale) }}</span>
                 </div>
 
                 <div class="ticket-status-actions">
@@ -226,9 +229,11 @@ async function closeTicket(id: string) {
                 <div class="reply-head mono">
                   <span class="material-symbols-outlined text-[15px]">support_agent</span>
                   <span>{{ t('help.deskResponse') }}</span>
+                  <span v-if="tk.repliedAt" class="reply-time">• {{ formatTicketReplyDate(tk.repliedAt, tk.createdAt, locale) }}</span>
                 </div>
                 <p class="reply-body-text">{{ tk.reply }}</p>
               </div>
+
             </article>
           </div>
         </DataState>
@@ -693,7 +698,15 @@ async function closeTicket(id: string) {
   margin-bottom: 0.35rem;
 }
 
+.reply-time {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--wl-muted-soft);
+  margin-inline-start: 0.25rem;
+}
+
 .reply-body-text {
+
   font-size: 13px;
   color: var(--wl-ink);
   line-height: 1.55;

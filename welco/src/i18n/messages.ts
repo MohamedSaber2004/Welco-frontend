@@ -921,6 +921,8 @@ export type Messages = {
     quoteProduct: string
     quoteUnitPrice: string
     quoteSubtotal: string
+    negotiatedDiscount: string
+    freightAndLogistics: string
     totalProposal: string
     tabRfqs: string
     tabQuotes: string

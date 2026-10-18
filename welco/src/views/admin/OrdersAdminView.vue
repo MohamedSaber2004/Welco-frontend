@@ -442,9 +442,13 @@ function goPage(p: number) {
               <span class="mono text-xs text-slate-500">{{ t('admin.quoteSubtotal') }}</span>
               <span class="mono text-xs font-semibold">{{ formatPrice(detailsSubtotal(selectedOrder), locale) }} {{ selectedOrder.currencyCode || 'USD' }}</span>
             </div>
-            <div v-if="Math.abs(selectedOrder.totalAmount - detailsSubtotal(selectedOrder)) > 0.01" class="summary-line" style="display:flex; justify-content:space-between; align-items:center;">
-              <span class="mono text-xs text-slate-500">{{ t('checkout.shippingAndTax' as never) || 'Tax, Freight & Fees' }}</span>
-              <span class="mono text-xs font-semibold">{{ formatPrice(selectedOrder.totalAmount - detailsSubtotal(selectedOrder), locale) }} {{ selectedOrder.currencyCode || 'USD' }}</span>
+            <div v-if="selectedOrder.totalAmount - detailsSubtotal(selectedOrder) < -0.01" class="summary-line" style="display:flex; justify-content:space-between; align-items:center;">
+              <span class="mono text-xs text-emerald-600 font-medium">{{ t('admin.negotiatedDiscount') }}</span>
+              <span class="mono text-xs font-semibold text-emerald-600">-{{ formatPrice(Math.abs(selectedOrder.totalAmount - detailsSubtotal(selectedOrder)), locale) }} {{ selectedOrder.currencyCode || 'USD' }}</span>
+            </div>
+            <div v-else-if="selectedOrder.totalAmount - detailsSubtotal(selectedOrder) > 0.01" class="summary-line" style="display:flex; justify-content:space-between; align-items:center;">
+              <span class="mono text-xs text-slate-500">{{ t('admin.freightAndLogistics') }}</span>
+              <span class="mono text-xs font-semibold">+{{ formatPrice(selectedOrder.totalAmount - detailsSubtotal(selectedOrder), locale) }} {{ selectedOrder.currencyCode || 'USD' }}</span>
             </div>
             <div class="order-total-bar" style="display:flex; justify-content:space-between; align-items:center; padding-top:0.5rem; border-top:1px solid var(--wl-border);">
               <span class="mono total-label" style="font-size:14px; font-weight:700;">{{ t('commerce.total') }}</span>

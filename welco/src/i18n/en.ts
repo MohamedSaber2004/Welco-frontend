@@ -922,6 +922,8 @@ export const en: Messages = {
     quoteProduct: 'Product',
     quoteUnitPrice: 'Unit Price (USD)',
     quoteSubtotal: 'Subtotal',
+    negotiatedDiscount: 'Negotiated Volume Discount',
+    freightAndLogistics: 'Freight & Logistics',
     totalProposal: 'Total Proposal',
     tabRfqs: 'Quote Requests (RFQs)',
     tabQuotes: 'Issued Quotations (Quotes)',

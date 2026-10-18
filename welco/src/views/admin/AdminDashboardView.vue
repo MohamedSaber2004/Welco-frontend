@@ -18,7 +18,18 @@ import { deduplicateLogs } from '../../utils/audit-dedupe'
 
 const { getUserInfo, resolveLogsUsers, getRoleBadgeClass } = useUserLookup()
 
-const stats = ref({ countries: 0, cities: 0, zones: 0, users: 0, companies: 0, pendingApps: 0, products: 0, categories: 0 })
+const stats = ref({
+  countries: 0,
+  cities: 0,
+  zones: 0,
+  users: 0,
+  companies: 0,
+  pendingApps: 0,
+  products: 0,
+  activeProducts: 0,
+  inactiveProducts: 0,
+  categories: 0,
+})
 const loading = ref(true)
 const activeChartPoint = ref<{ month: string; value: number; x: number; y: number } | null>(null)
 const recentAuditLogs = ref<AuditLogDto[]>([])
@@ -202,13 +213,14 @@ const load = async () => {
   }
   loading.value = true
   try {
-    const [countries, cities, zones, usersPage, appsPage, productsPage, categoriesList, companiesPage] = await Promise.all([
+    const [countries, cities, zones, usersPage, appsPage, productsPage, activeProductsPage, categoriesList, companiesPage] = await Promise.all([
       locationRepository.getCountries().catch(() => []),
       locationRepository.getCities().catch(() => []),
       locationRepository.getZones().catch(() => []),
       userRepository.getUsers({ pageNumber: 1, pageSize: 1 }).catch(() => null),
       companyRepository.getDistributorApplications({ pageNumber: 1, pageSize: 50 }).catch(() => null),
       marketplaceRepository.getProducts({ page: 1, pageSize: 1 }).catch(() => null),
+      marketplaceRepository.getProducts({ page: 1, pageSize: 1, isActive: true }).catch(() => null),
       marketplaceRepository.getCategories().catch(() => []),
       companyRepository.getCompanies({ pageNumber: 1, pageSize: 50 }).catch(() => null),
       services.commerceService.loadOrders({ page: 1, pageSize: 10 }).catch(() => null),
@@ -236,6 +248,9 @@ const load = async () => {
       return 0
     }
 
+    const totalProds = extractCount(productsPage)
+    const activeProds = extractCount(activeProductsPage)
+
     stats.value = {
       countries: Array.isArray(countries) ? countries.length : 0,
       cities: Array.isArray(cities) ? cities.length : 0,
@@ -243,7 +258,9 @@ const load = async () => {
       users: extractCount(usersPage),
       companies: extractCount(companiesPage),
       pendingApps: extractCount(appsPage),
-      products: extractCount(productsPage),
+      products: totalProds,
+      activeProducts: activeProds,
+      inactiveProducts: Math.max(0, totalProds - activeProds),
       categories: Array.isArray(categoriesList) ? categoriesList.length : extractCount(categoriesList),
     }
     if (Array.isArray(countries)) locationService.countries.value = countries as never
@@ -451,6 +468,7 @@ onUnmounted(_removeListeners)
       <StatCard
         :label="t('admin.productsTitle')"
         :value="stats.products"
+        :hint="stats.inactiveProducts > 0 ? `${stats.activeProducts} ${t('common.active')} · ${stats.inactiveProducts} ${t('common.inactive')}` : `${stats.activeProducts} ${t('common.active')}`"
         to="/admin/products"
         tone="teal"
         icon-only

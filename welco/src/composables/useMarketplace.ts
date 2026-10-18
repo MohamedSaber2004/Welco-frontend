@@ -30,8 +30,10 @@ export function useMarketplace(init?: {
   categoryId?: string | null
   sortBy?: MarketplaceQuery['sortBy']
   page?: number
+  isActive?: boolean
 }) {
   const svc = services.marketplaceService
+  const isActive = init?.isActive ?? true
   if (init?.page && init.page > 0) {
     svc.page.value = init.page
   }
@@ -82,6 +84,7 @@ export function useMarketplace(init?: {
       lengthMax: lMax ?? undefined,
       priceMin: pMin ?? undefined,
       priceMax: pMax ?? undefined,
+      isActive,
       page: svc.page.value,
       pageSize: svc.pageSize.value,
     })

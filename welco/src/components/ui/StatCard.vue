@@ -108,6 +108,7 @@ const strokeColor = computed(() => {
       <div class="stat-card__compact-info">
         <span class="stat-card__label mono">{{ label }}</span>
         <div class="stat-card__value mono-num">{{ value }}</div>
+        <div v-if="hint" class="stat-card__hint">{{ hint }}</div>
       </div>
     </div>
 

@@ -42,6 +42,8 @@ export type Messages = {
     verified: string
     pending: string
     failed: string
+    active: string
+    inactive: string
     details: string
     refresh: string
     noImage: string
@@ -695,6 +697,12 @@ export type Messages = {
     productDeactivated: string
     productImage: string
     productActive: string
+    activeProducts: string
+    inactiveProducts: string
+    hiddenFromCatalog: string
+    allStatuses: string
+    activeOnly: string
+    inactiveOnly: string
     currency: string
     productVideos: string
     addVideo: string

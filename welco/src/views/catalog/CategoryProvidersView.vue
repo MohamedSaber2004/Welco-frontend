@@ -81,7 +81,7 @@ const loadProducts = async () => {
   productsLoading.value = true
   productsError.value = ''
   try {
-    const res = await services.marketplaceRepository.getProducts({ categoryId: categoryId.value, page: 1, pageSize: 6 })
+    const res = await services.marketplaceRepository.getProducts({ categoryId: categoryId.value, page: 1, pageSize: 6, isActive: true })
     products.value = Array.isArray(res?.data) ? res.data : []
     productsTotalCount.value = res?.totalCount ?? products.value.length
   } catch (e) {

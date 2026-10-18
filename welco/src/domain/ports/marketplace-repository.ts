@@ -26,6 +26,7 @@ export interface MarketplaceQuery {
   priceMin?: number
   priceMax?: number
   currencyId?: string
+  isActive?: boolean
 }
 
 export interface CategoryQuery {

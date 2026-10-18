@@ -229,12 +229,16 @@ export class ApiMarketplaceRepository implements MarketplaceRepository {
     if (query.priceMin != null) params.set('priceMin', String(query.priceMin))
     if (query.priceMax != null) params.set('priceMax', String(query.priceMax))
     if (query.currencyId) params.set('currencyId', query.currencyId)
+    if (typeof query.isActive === 'boolean') {
+      params.set('isActive', String(query.isActive))
+      params.set('IsActive', String(query.isActive))
+    }
     const pageNum = String(query.page ?? 1)
     params.set('pageNumber', pageNum)
     params.set('PageNumber', pageNum)
     params.set('page', pageNum)
     params.set('Page', pageNum)
-    const pageSz = String(Math.min(100, Math.max(1, query.pageSize ?? 12)))
+    const pageSz = String(Math.min(50, Math.max(1, query.pageSize ?? 12)))
     params.set('pageSize', pageSz)
     params.set('PageSize', pageSz)
     const qs = params.toString()

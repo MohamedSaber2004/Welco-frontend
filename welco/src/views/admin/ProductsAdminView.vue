@@ -37,9 +37,8 @@ export interface ProductProviderInfo {
   isDirect?: boolean
 }
 
-export interface GroupedAdminProduct extends ProductDto {
-  providers: ProductProviderInfo[]
-  rawInstances: ProductDto[]
+export interface AdminProductItem extends ProductDto {
+  provider: ProductProviderInfo
 }
 
 const rawProducts = ref<ProductDto[]>([])
@@ -53,6 +52,7 @@ const search = ref('')
 const categoryFilter = ref('all')
 const stockFilter = ref<'all' | 'inStock' | 'outOfStock'>('all')
 const providerFilter = ref('all')
+const statusFilter = ref<'all' | 'active' | 'inactive'>('all')
 const page = ref(1)
 const pageSize = 12
 
@@ -153,14 +153,9 @@ const loadProducts = async () => {
   }
 }
 
-// Group products by normalized SKU / name and aggregate multiple providers without duplicating rows
-const groupedProducts = computed<GroupedAdminProduct[]>(() => {
-  const map = new Map<string, GroupedAdminProduct>()
-
-  for (const p of rawProducts.value) {
-    if (!p) continue
-    const key = (p.sku && p.sku.trim().toLowerCase()) || (p.slug && p.slug.trim().toLowerCase()) || (p.nameEn && p.nameEn.trim().toLowerCase()) || p.id
-
+// Map every product entity with its resolved provider info (no artificial deduplication)
+const adminProducts = computed<AdminProductItem[]>(() => {
+  return rawProducts.value.map((p) => {
     const providerId = p.companyId || p.supplierId || ''
     let providerName = p.companyName || p.supplierNameEn || ''
     if (!providerName && providerId && companyMap.value.has(providerId)) {
@@ -168,65 +163,58 @@ const groupedProducts = computed<GroupedAdminProduct[]>(() => {
       providerName = comp.name
     }
 
-    const providerItem: ProductProviderInfo | null = providerName ? {
-      id: providerId || providerName,
-      name: providerName,
-    } : null
+    const provider: ProductProviderInfo = providerName
+      ? { id: providerId || providerName, name: providerName, isDirect: false }
+      : { id: 'direct', name: t('admin.noProvidersAssigned'), isDirect: true }
 
-    const existing = map.get(key)
-    if (existing) {
-      existing.rawInstances.push(p)
-      if (providerItem && !existing.providers.some(pr => pr.name.toLowerCase() === providerItem.name.toLowerCase() || (pr.id && pr.id === providerItem.id))) {
-        existing.providers.push(providerItem)
-      }
-      existing.stock = (existing.stock ?? 0) + (p.stock ?? 0)
-      if (p.imageName && !existing.imageName) existing.imageName = p.imageName
-    } else {
-      const initialProviders: ProductProviderInfo[] = providerItem ? [providerItem] : []
-      map.set(key, {
-        ...p,
-        providers: initialProviders,
-        rawInstances: [p],
-      })
+    return {
+      ...p,
+      provider,
     }
-  }
-
-  const list = Array.from(map.values())
-  for (const item of list) {
-    if (!item.providers.length) {
-      item.providers.push({
-        id: 'direct',
-        name: t('admin.noProvidersAssigned'),
-        isDirect: true,
-      })
-    }
-  }
-  return list
+  })
 })
 
+// Metrics across 100% of the catalog (all 94 entities)
+const totalProductsCount = computed(() => rawProducts.value.length)
+const activeCount = computed(() => rawProducts.value.filter((p) => (p.isActive ?? true)).length)
+const inactiveCount = computed(() => rawProducts.value.filter((p) => !(p.isActive ?? true)).length)
+const inStockCount = computed(() => rawProducts.value.filter((p) => (p.stock ?? 0) > 0).length)
+const outOfStockCount = computed(() => rawProducts.value.filter((p) => !p.stock || p.stock <= 0).length)
+
 // Reset pagination to page 1 whenever any filter or search term changes
-watch([search, categoryFilter, stockFilter, providerFilter], () => {
+watch([search, categoryFilter, stockFilter, providerFilter, statusFilter], () => {
   page.value = 1
 })
 
 // Full-catalog search and filters across 100% of products (not limited to current page)
-const filteredGroupedProducts = computed(() => {
-  let list = groupedProducts.value
+// Full-catalog search and filters across 100% of products (not limited to current page)
+const filteredProducts = computed(() => {
+  let list = adminProducts.value
 
+  // Status Filter: all | active | inactive
+  if (statusFilter.value === 'active') {
+    list = list.filter((p) => (p.isActive ?? true))
+  } else if (statusFilter.value === 'inactive') {
+    list = list.filter((p) => !(p.isActive ?? true))
+  }
+
+  // Category Filter
   if (categoryFilter.value !== 'all') {
     list = list.filter((p) => p.categoryId === categoryFilter.value)
   }
 
+  // Stock Filter
   if (stockFilter.value === 'inStock') {
     list = list.filter((p) => (p.stock ?? 0) > 0)
   } else if (stockFilter.value === 'outOfStock') {
     list = list.filter((p) => !p.stock || p.stock <= 0)
   }
 
+  // Provider Filter
   if (providerFilter.value !== 'all') {
     const pf = providerFilter.value.toLowerCase()
     list = list.filter((p) =>
-      p.providers.some((pr) => pr.id.toLowerCase() === pf || pr.name.toLowerCase().includes(pf)),
+      p.provider.id.toLowerCase() === pf || p.provider.name.toLowerCase().includes(pf),
     )
   }
 
@@ -245,7 +233,7 @@ const filteredGroupedProducts = computed(() => {
       const slug = (p.slug || '').toLowerCase()
       const descEn = (p.descriptionEn || p.description || '').toLowerCase()
       const descAr = normalizeText(p.descriptionAr)
-      const provText = p.providers.map((pr) => `${pr.name.toLowerCase()} ${normalizeText(pr.name)}`).join(' ')
+      const provText = `${p.provider.name.toLowerCase()} ${normalizeText(p.provider.name)}`
 
       const haystack = `${en} ${ar} ${sku} ${catEn} ${catAr} ${catCurrent} ${mat} ${slug} ${descEn} ${descAr} ${provText}`
 
@@ -256,15 +244,12 @@ const filteredGroupedProducts = computed(() => {
   return list
 })
 
-const totalCount = computed(() => filteredGroupedProducts.value.length)
+const totalCount = computed(() => filteredProducts.value.length)
 const totalPages = computed(() => Math.max(1, Math.ceil(totalCount.value / pageSize)))
-
-const inStockCount = computed(() => groupedProducts.value.filter((p) => (p.stock ?? 0) > 0).length)
-const outOfStockCount = computed(() => groupedProducts.value.filter((p) => !p.stock || p.stock <= 0).length)
 
 const paginatedProducts = computed(() => {
   const start = (page.value - 1) * pageSize
-  return filteredGroupedProducts.value.slice(start, start + pageSize)
+  return filteredProducts.value.slice(start, start + pageSize)
 })
 
 // Unique providers options for toolbar filter dropdown
@@ -273,11 +258,9 @@ const providerOptions = computed(() => {
   for (const c of companies.value) {
     if (c?.id && c?.name) map.set(c.id, { id: c.id, name: c.name })
   }
-  for (const p of groupedProducts.value) {
-    for (const pr of p.providers) {
-      if (pr.id && !pr.isDirect && !map.has(pr.id)) {
-        map.set(pr.id, { id: pr.id, name: pr.name })
-      }
+  for (const p of adminProducts.value) {
+    if (p.provider.id && !p.provider.isDirect && !map.has(p.provider.id)) {
+      map.set(p.provider.id, { id: p.provider.id, name: p.provider.name })
     }
   }
   return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name))
@@ -285,7 +268,7 @@ const providerOptions = computed(() => {
 
 // --- Product Modal State ---
 const showModal = ref(false)
-const editing = ref<GroupedAdminProduct | ProductDto | null>(null)
+const editing = ref<AdminProductItem | ProductDto | null>(null)
 const formLoading = ref(false)
 const formError = ref('')
 const slugTouched = ref(false)
@@ -327,7 +310,7 @@ const openCreate = () => {
   showModal.value = true
 }
 
-const openEdit = (p: GroupedAdminProduct | ProductDto) => {
+const openEdit = (p: AdminProductItem | ProductDto) => {
   editing.value = p
   form.value = {
     nameEn: p.nameEn ?? '',
@@ -416,7 +399,7 @@ const submit = async () => {
   }
 }
 
-const confirmDelete = async (p: GroupedAdminProduct | ProductDto) => {
+const confirmDelete = async (p: AdminProductItem | ProductDto) => {
   const confirmed = await confirmService.confirm({
     title: t('admin.deleteProductTitle'),
     message: `${t('common.delete')}: ${localized(p.nameEn, p.nameAr)}?`,
@@ -434,7 +417,7 @@ const confirmDelete = async (p: GroupedAdminProduct | ProductDto) => {
   }
 }
 
-const toggleActive = async (p: GroupedAdminProduct) => {
+const toggleActive = async (p: AdminProductItem) => {
   try {
     const next = !(p.isActive ?? true)
     await services.marketplaceRepository.updateProduct(p.id, {
@@ -448,6 +431,8 @@ const toggleActive = async (p: GroupedAdminProduct) => {
       isActive: next,
     })
     p.isActive = next
+    const target = rawProducts.value.find((x) => x.id === p.id)
+    if (target) target.isActive = next
     toastService.success(next ? t('admin.productActivated') : t('admin.productDeactivated'))
   } catch (e) {
     toastService.error(e instanceof Error ? e.message : t('common.error'))
@@ -460,10 +445,6 @@ onMounted(async () => {
     openCreate()
     void router.replace({ query: { ...route.query, action: undefined } })
   }
-})
-
-watch([search, categoryFilter, stockFilter, providerFilter], () => {
-  page.value = 1
 })
 </script>
 
@@ -491,19 +472,73 @@ watch([search, categoryFilter, stockFilter, providerFilter], () => {
 
       <!-- KPI Summary Cards -->
       <div class="kpi-ribbon" role="region" :aria-label="t('admin.productsTitle')">
-        <div class="kpi-card mono">
+        <div
+          class="kpi-card mono clickable-kpi"
+          :class="{ 'kpi-card--active': statusFilter === 'all' }"
+          role="button"
+          tabindex="0"
+          @click="statusFilter = 'all'"
+          @keydown.enter="statusFilter = 'all'"
+        >
           <div class="kpi-icon-box" style="background: rgba(99,102,241,0.1); color: #6366F1;">
             <span class="material-symbols-outlined">inventory_2</span>
           </div>
           <div class="kpi-content">
             <span class="kpi-label">{{ t('admin.productsTitle') }}</span>
-            <span class="kpi-value">{{ groupedProducts.length }}</span>
+            <div class="kpi-val-row">
+              <span class="kpi-value">{{ totalProductsCount }}</span>
+              <span class="kpi-badge mono">{{ activeCount }} {{ t('common.active') }} · {{ inactiveCount }} {{ t('common.inactive') }}</span>
+            </div>
           </div>
         </div>
 
-        <div class="kpi-card mono">
+        <div
+          class="kpi-card mono clickable-kpi"
+          :class="{ 'kpi-card--active': statusFilter === 'active' }"
+          role="button"
+          tabindex="0"
+          @click="statusFilter = 'active'"
+          @keydown.enter="statusFilter = 'active'"
+        >
           <div class="kpi-icon-box" style="background: rgba(16,185,129,0.1); color: #10B981;">
             <span class="material-symbols-outlined">check_circle</span>
+          </div>
+          <div class="kpi-content">
+            <span class="kpi-label">{{ t('admin.activeProducts') }}</span>
+            <span class="kpi-value" style="color: #059669;">{{ activeCount }}</span>
+          </div>
+        </div>
+
+        <div
+          class="kpi-card mono clickable-kpi"
+          :class="{ 'kpi-card--active': statusFilter === 'inactive' }"
+          role="button"
+          tabindex="0"
+          @click="statusFilter = 'inactive'"
+          @keydown.enter="statusFilter = 'inactive'"
+        >
+          <div class="kpi-icon-box" style="background: rgba(245,158,11,0.1); color: #F59E0B;">
+            <span class="material-symbols-outlined">visibility_off</span>
+          </div>
+          <div class="kpi-content">
+            <span class="kpi-label">{{ t('admin.inactiveProducts') }}</span>
+            <div class="kpi-val-row">
+              <span class="kpi-value" style="color: #D97706;">{{ inactiveCount }}</span>
+              <span v-if="inactiveCount > 0" class="kpi-badge kpi-badge--warn mono">{{ t('admin.hiddenFromCatalog') }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="kpi-card mono clickable-kpi"
+          :class="{ 'kpi-card--active': stockFilter === 'inStock' }"
+          role="button"
+          tabindex="0"
+          @click="stockFilter = stockFilter === 'inStock' ? 'all' : 'inStock'"
+          @keydown.enter="stockFilter = stockFilter === 'inStock' ? 'all' : 'inStock'"
+        >
+          <div class="kpi-icon-box" style="background: rgba(20,184,166,0.1); color: #14B8A6;">
+            <span class="material-symbols-outlined">warehouse</span>
           </div>
           <div class="kpi-content">
             <span class="kpi-label">{{ t('catalog.inStock') }}</span>
@@ -512,17 +547,7 @@ watch([search, categoryFilter, stockFilter, providerFilter], () => {
         </div>
 
         <div class="kpi-card mono">
-          <div class="kpi-icon-box" style="background: rgba(244,63,94,0.1); color: #F43F5E;">
-            <span class="material-symbols-outlined">warning</span>
-          </div>
-          <div class="kpi-content">
-            <span class="kpi-label">{{ t('admin.outOfStock') }}</span>
-            <span class="kpi-value">{{ outOfStockCount }}</span>
-          </div>
-        </div>
-
-        <div class="kpi-card mono">
-          <div class="kpi-icon-box" style="background: rgba(20,184,166,0.1); color: #14B8A6;">
+          <div class="kpi-icon-box" style="background: rgba(139,92,246,0.1); color: #8B5CF6;">
             <span class="material-symbols-outlined">category</span>
           </div>
           <div class="kpi-content">
@@ -553,6 +578,13 @@ watch([search, categoryFilter, stockFilter, providerFilter], () => {
         </div>
 
         <div class="filter-group">
+          <!-- Status Filter -->
+          <select v-model="statusFilter" class="filter-select mono" :aria-label="t('commerce.status')">
+            <option value="all">{{ t('admin.allStatuses') }} ({{ totalProductsCount }})</option>
+            <option value="active">{{ t('admin.activeOnly') }} ({{ activeCount }})</option>
+            <option value="inactive">{{ t('admin.inactiveOnly') }} ({{ inactiveCount }})</option>
+          </select>
+
           <!-- Category Filter -->
           <select v-model="categoryFilter" class="filter-select mono">
             <option value="all">{{ t('marketplace.allCategories') }}</option>
@@ -584,7 +616,7 @@ watch([search, categoryFilter, stockFilter, providerFilter], () => {
 
       <!-- Data Table -->
       <DataState
-        :loading="loading && !groupedProducts.length"
+        :loading="loading && !adminProducts.length"
         :error="fetchError"
         :empty="!paginatedProducts.length && !loading"
         :empty-title="t('admin.noProducts')"
@@ -637,28 +669,12 @@ watch([search, categoryFilter, stockFilter, providerFilter], () => {
                   </td>
                   <td>
                     <div class="provider-cell">
-                      <template v-if="p.providers.length === 1">
-                        <span class="provider-tag mono" :class="{ 'provider-tag--direct': p.providers[0]?.isDirect }">
-                          <span class="material-symbols-outlined text-[13px]">
-                            {{ p.providers[0]?.isDirect ? 'verified' : 'storefront' }}
-                          </span>
-                          <span>{{ p.providers[0]?.name }}</span>
+                      <span class="provider-tag mono" :class="{ 'provider-tag--direct': p.provider.isDirect }">
+                        <span class="material-symbols-outlined text-[13px]">
+                          {{ p.provider.isDirect ? 'verified' : 'storefront' }}
                         </span>
-                      </template>
-                      <template v-else-if="p.providers.length > 1">
-                        <div class="multi-provider-wrap">
-                          <span class="provider-tag provider-tag--multi mono" :title="p.providers.map(pr => pr.name).join(', ')">
-                            <span class="material-symbols-outlined text-[13px]">groups</span>
-                            <span>{{ p.providers[0]?.name }}</span>
-                            <span class="multi-badge">+{{ p.providers.length - 1 }}</span>
-                          </span>
-                          <div class="provider-sublist mono text-xs text-muted">
-                            <span v-for="(pr, pidx) in p.providers.slice(1, 3)" :key="pidx" class="sub-pr-name">
-                              &bull; {{ pr.name }}
-                            </span>
-                          </div>
-                        </div>
-                      </template>
+                        <span>{{ p.provider.name }}</span>
+                      </span>
                     </div>
                   </td>
                   <td>
@@ -672,7 +688,7 @@ watch([search, categoryFilter, stockFilter, providerFilter], () => {
                   <td>
                     <span class="status-pill mono" :class="(p.isActive ?? true) ? 'status-pill--active' : 'status-pill--inactive'">
                       <span class="pill-dot"></span>
-                      <span>{{ (p.isActive ?? true) ? t('admin.activate') : t('admin.deactivate') }}</span>
+                      <span>{{ (p.isActive ?? true) ? t('common.active') : t('common.inactive') }}</span>
                     </span>
                   </td>
                   <td class="text-end" style="white-space: nowrap;">
@@ -884,7 +900,7 @@ watch([search, categoryFilter, stockFilter, providerFilter], () => {
 /* ── KPI Ribbon ── */
 .kpi-ribbon {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
   gap: 0.85rem;
 }
 
@@ -897,6 +913,54 @@ watch([search, categoryFilter, stockFilter, providerFilter], () => {
   border: 1px solid var(--wl-border, #e2e8f0);
   border-radius: 12px;
   box-shadow: var(--wl-shadow-card, 0 1px 3px rgba(0,0,0,0.04));
+}
+
+.clickable-kpi {
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.clickable-kpi:hover {
+  border-color: var(--wl-primary, #6366f1);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(99, 102, 241, 0.12);
+}
+
+.clickable-kpi:focus-visible {
+  outline: 2px solid var(--wl-primary, #6366f1);
+  outline-offset: 2px;
+}
+
+.kpi-card--active {
+  border-color: var(--wl-primary, #6366f1);
+  background: var(--wl-surface-soft, #f8fafc);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.18);
+}
+
+.kpi-val-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.kpi-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
+
+.kpi-badge--warn {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #fde68a;
 }
 
 .kpi-icon-box {

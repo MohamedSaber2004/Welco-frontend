@@ -45,7 +45,7 @@ async function load(s: string) {
       page.value = found
       const [list, prodRes, catRes] = await Promise.allSettled([
         contentRepository.getLandingPages({ pageNumber: 1, pageSize: 50 }),
-        found.categoryId ? marketplaceRepository.getProducts({ categoryId: found.categoryId, page: 1, pageSize: 8 }).catch(() => ({ data: [] as ProductDto[] })) : Promise.resolve({ data: [] as ProductDto[] }),
+        found.categoryId ? marketplaceRepository.getProducts({ categoryId: found.categoryId, page: 1, pageSize: 8, isActive: true }).catch(() => ({ data: [] as ProductDto[] })) : Promise.resolve({ data: [] as ProductDto[] }),
         marketplaceRepository.getCategories().catch(() => [] as CategoryDto[]),
       ])
       if (catRes.status === 'fulfilled' && Array.isArray(catRes.value)) {
@@ -59,7 +59,7 @@ async function load(s: string) {
       }
     } else {
       const [prodRes, catRes, listRes] = await Promise.allSettled([
-        marketplaceRepository.getProducts({ page: 1, pageSize: 12 }).catch(() => ({ data: [] as ProductDto[] })),
+        marketplaceRepository.getProducts({ page: 1, pageSize: 12, isActive: true }).catch(() => ({ data: [] as ProductDto[] })),
         marketplaceRepository.getCategories().catch(() => [] as CategoryDto[]),
         contentRepository.getLandingPages({ pageNumber: 1, pageSize: 8 }).catch(() => ({ data: [] as LandingPageDto[] })),
       ])
@@ -67,7 +67,7 @@ async function load(s: string) {
         categories.value = catRes.value as CategoryDto[]
         const matched = (catRes.value as CategoryDto[]).find((c) => c.slug === s || c.nameEn?.toLowerCase().replace(/\s+/g, '-') === s.toLowerCase())
         if (matched) {
-          const byCat = await marketplaceRepository.getProducts({ categoryId: matched.id, page: 1, pageSize: 12 }).catch(() => ({ data: [] as ProductDto[] }))
+          const byCat = await marketplaceRepository.getProducts({ categoryId: matched.id, page: 1, pageSize: 12, isActive: true }).catch(() => ({ data: [] as ProductDto[] }))
           if ((byCat as { data?: ProductDto[] })?.data) products.value = (byCat as { data: ProductDto[] }).data
         } else if (prodRes.status === 'fulfilled') {
           products.value = ((prodRes.value as { data?: ProductDto[] })?.data as ProductDto[]) || []

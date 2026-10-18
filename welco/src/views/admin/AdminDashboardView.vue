@@ -302,6 +302,23 @@ async function submitCategoryModal() {
     categoryFormError.value = t('admin.errBothNames')
     return
   }
+  const enTrimmed = f.nameEn.trim().toLowerCase()
+  const arTrimmed = f.nameAr.trim().toLowerCase()
+  const parentId = f.parentCategoryId || null
+
+  const isDuplicate = (parentCategories.value || []).some((c) => {
+    if (!c) return false
+    const sameParent = (c.parentCategoryId || null) === parentId
+    if (!sameParent) return false
+    const cEn = (c.nameEn || '').trim().toLowerCase()
+    const cAr = (c.nameAr || '').trim().toLowerCase()
+    return cEn === enTrimmed || cAr === arTrimmed
+  })
+
+  if (isDuplicate) {
+    categoryFormError.value = t('admin.categoryAlreadyExists')
+    return
+  }
   categoryFormLoading.value = true
   categoryFormError.value = ''
   try {

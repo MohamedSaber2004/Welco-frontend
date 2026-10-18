@@ -687,6 +687,7 @@ export type Messages = {
     categoryCreated: string
     categoryUpdated: string
     categoryDeleted: string
+    categoryAlreadyExists: string
     deleteProductConfirm: string
     productDetails: string
     activate: string

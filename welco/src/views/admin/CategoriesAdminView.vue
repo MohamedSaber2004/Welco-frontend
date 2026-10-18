@@ -109,6 +109,24 @@ const submit = async () => {
     formError.value = t('admin.parentCategory')
     return
   }
+  const enTrimmed = f.nameEn.trim().toLowerCase()
+  const arTrimmed = f.nameAr.trim().toLowerCase()
+  const parentId = f.parentCategoryId || null
+
+  const isDuplicate = (categories.value || []).some((c) => {
+    if (!c) return false
+    if (editing.value && c.id === editing.value.id) return false
+    const sameParent = (c.parentCategoryId || null) === parentId
+    if (!sameParent) return false
+    const cEn = (c.nameEn || '').trim().toLowerCase()
+    const cAr = (c.nameAr || '').trim().toLowerCase()
+    return cEn === enTrimmed || cAr === arTrimmed
+  })
+
+  if (isDuplicate) {
+    formError.value = t('admin.categoryAlreadyExists')
+    return
+  }
   formLoading.value = true
   formError.value = ''
   try {

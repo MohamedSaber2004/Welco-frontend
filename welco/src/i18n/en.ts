@@ -689,6 +689,7 @@ export const en: Messages = {
     categoryCreated: 'Category created successfully',
     categoryUpdated: 'Category updated successfully',
     categoryDeleted: 'Category deleted successfully',
+    categoryAlreadyExists: 'A category with this name already exists under the selected parent category.',
     deleteProductConfirm: 'Are you sure you want to delete this product?',
     productDetails: 'Product Details',
     activate: 'Activate',

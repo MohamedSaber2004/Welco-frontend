@@ -119,13 +119,16 @@ const closeModal = () => {
   existsHint.value = false
 }
 
-const duplicateOf = (nameEn: string, nameAr: string): CategoryDto | null => {
+const duplicateOf = (nameEn: string, nameAr: string, parentId?: string | null): CategoryDto | null => {
   const en = nameEn.trim().toLowerCase()
   const ar = nameAr.trim().toLowerCase()
   if (!en && !ar) return null
+  const targetParent = parentId || null
   return (
     categories.value.find((c) => {
       if (!c) return false
+      const sameParent = (c.parentCategoryId || null) === targetParent
+      if (!sameParent) return false
       const cen = (c.nameEn || '').trim().toLowerCase()
       const car = (c.nameAr || '').trim().toLowerCase()
       return (en && (cen === en || car === en)) || (ar && (cen === ar || car === ar))
@@ -139,7 +142,7 @@ const submit = async () => {
     formError.value = t('admin.errBothNames')
     return
   }
-  if (duplicateOf(f.nameEn, f.nameAr)) {
+  if (duplicateOf(f.nameEn, f.nameAr, f.parentCategoryId)) {
     existsHint.value = true
     return
   }

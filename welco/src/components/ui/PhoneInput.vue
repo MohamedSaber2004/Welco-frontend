@@ -6,13 +6,14 @@ import { locationService } from '../../di/container'
 const props = withDefaults(
   defineProps<{
     modelValue?: string
+    phoneCode?: string | null
     label?: string
     placeholder?: string
     required?: boolean
     disabled?: boolean
     error?: string
     id?: string
-    /** Optional ISO 2 (AE, EG) to default the dial code — decoupled from territory Country */
+    /** Optional ISO 2 (AE, EG, PK, US, etc.) to default the country/dial code */
     countryCode?: string | null
     /** Territory Country id — when set, dial auto-syncs to Country.phoneCode (backend linked) */
     countryId?: string | null
@@ -21,6 +22,7 @@ const props = withDefaults(
   }>(),
   {
     modelValue: '',
+    phoneCode: null,
     label: '',
     placeholder: '300 1234567',
     required: false,
@@ -35,8 +37,10 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   'update:modelValue': [value: string]
+  'update:phoneCode': [value: string]
 }>()
 
+const selectedCountryCode = ref('')
 const selectedDial = ref('')
 const localNumber = ref('')
 
@@ -62,37 +66,93 @@ const findByDial = (dial: string) => mergedDials.value.find((c) => c.dial === di
 const findByCode = (code: string) => mergedDials.value.find((c) => c.code.toLowerCase() === code.toLowerCase())
 const findByCountryId = (id: string) => locationService.getCountryById(id)
 
+const setCountry = (iso: string, dial?: string) => {
+  selectedCountryCode.value = iso.toUpperCase()
+  if (dial) {
+    selectedDial.value = dial
+  } else {
+    const found = findByCode(iso)
+    if (found) selectedDial.value = found.dial
+  }
+  emit('update:phoneCode', selectedDial.value)
+}
+
 const parseModelValue = (fullVal: string) => {
   if (!fullVal) {
     localNumber.value = ''
     return
   }
-  const clean = fullVal.trim()
+  let clean = fullVal.trim()
+  if (clean.startsWith('00')) {
+    clean = '+' + clean.slice(2)
+  }
+
+  // Corrupted Pakistan number edge case (mistakenly prepended with +1 on 0300... e.g. +1 03000959336)
+  const pkMangled = clean.replace(/\s+/g, '')
+  if (/^\+103\d{9}$/.test(pkMangled)) {
+    setCountry('PK', '+92')
+    localNumber.value = pkMangled.slice(3)
+    return
+  }
+
+  // Local Pakistani number without country code
+  if (/^03\d{9}$/.test(pkMangled)) {
+    setCountry('PK', '+92')
+    localNumber.value = pkMangled.slice(1)
+    return
+  }
+
+  // If explicit phoneCode prop is passed and matches
+  if (props.phoneCode && props.phoneCode.trim()) {
+    const rawDial = props.phoneCode.trim()
+    const withPlus = rawDial.startsWith('+') ? rawDial : `+${rawDial}`
+    const found = findByDial(withPlus)
+    if (found) {
+      setCountry(found.code, found.dial)
+      let nat = clean
+      if (clean.startsWith(withPlus)) nat = clean.slice(withPlus.length).trim()
+      else if (clean.startsWith(withPlus.slice(1))) nat = clean.slice(withPlus.length - 1).trim()
+      localNumber.value = nat.replace(/^0+/, '')
+      return
+    }
+  }
+
   const sorted = [...mergedDials.value].sort((a, b) => b.dial.length - a.dial.length)
   for (const c of sorted) {
     if (clean.startsWith(c.dial)) {
-      selectedDial.value = c.dial
-      localNumber.value = clean.slice(c.dial.length).trim()
+      setCountry(c.code, c.dial)
+      localNumber.value = clean.slice(c.dial.length).trim().replace(/^0+/, '')
       return
     }
   }
   const match = clean.match(/^(\+\d{1,4})(.*)$/)
   if (match && match[1] && match[2] !== undefined) {
-    selectedDial.value = match[1]
-    localNumber.value = match[2].trim()
+    const d = match[1]
+    const found = findByDial(d)
+    if (found) {
+      setCountry(found.code, found.dial)
+    } else {
+      selectedDial.value = d
+    }
+    localNumber.value = match[2].trim().replace(/^0+/, '')
   } else {
     localNumber.value = clean
   }
 }
 
 const emitCombined = () => {
-  const num = localNumber.value.trim().replace(/^\+/, '').replace(/\s+/g, ' ')
+  let num = localNumber.value.trim().replace(/^\+/, '').replace(/\s+/g, ' ')
   if (!num) {
     emit('update:modelValue', '')
+    emit('update:phoneCode', selectedDial.value || '')
     return
   }
-  // If no dial selected yet but we have a dial list, use first dial as fallback upon emit
+  // Strip trunk zero when combining with dial code
+  if (selectedDial.value.startsWith('+') && num.startsWith('0')) {
+    num = num.replace(/^0+/, '')
+  }
   const dialToUse = selectedDial.value || (mergedDials.value[0]?.dial ?? '')
+  emit('update:phoneCode', dialToUse)
   if (!dialToUse) {
     emit('update:modelValue', num)
     return
@@ -100,66 +160,120 @@ const emitCombined = () => {
   emit('update:modelValue', `${dialToUse} ${num}`.trim())
 }
 
-watch(selectedDial, () => emitCombined())
+// When user selects a different country from dropdown
+watch(selectedCountryCode, (newIso) => {
+  if (!newIso) return
+  const found = findByCode(newIso)
+  if (found) {
+    selectedDial.value = found.dial
+    emit('update:phoneCode', found.dial)
+    emitCombined()
+  }
+})
+
 watch(localNumber, () => emitCombined())
 
-// Auto-select first dial when API loads and nothing selected yet
+// Smart input detection when user types or pastes in phone number field
+const onInputNumber = (e: Event) => {
+  const input = e.target as HTMLInputElement
+  const raw = input.value.trim()
+
+  // 1. If user typed or pasted a number with '+' or '00'
+  if (raw.startsWith('+') || raw.startsWith('00')) {
+    const clean = raw.startsWith('00') ? '+' + raw.slice(2) : raw
+    // Check if it matches any dial in mergedDials
+    const sorted = [...mergedDials.value].sort((a, b) => b.dial.length - a.dial.length)
+    for (const d of sorted) {
+      if (clean.startsWith(d.dial)) {
+        setCountry(d.code, d.dial)
+        localNumber.value = clean.slice(d.dial.length).trim().replace(/^0+/, '')
+        return
+      }
+    }
+  }
+
+  // 2. If user pasted/typed a local Pakistani number e.g. 0300... (11 digits starting with 03)
+  const digitsOnly = raw.replace(/\D/g, '')
+  if (/^03\d{9}$/.test(digitsOnly)) {
+    const pk = findByCode('PK')
+    if (pk) {
+      setCountry('PK', pk.dial)
+      localNumber.value = digitsOnly.slice(1) // 300...
+      return
+    }
+  }
+
+  // 3. If user pasted/typed a local Egyptian number e.g. 010..., 011..., 012..., 015... (11 digits)
+  if (/^01[0125]\d{8}$/.test(digitsOnly)) {
+    const eg = findByCode('EG')
+    if (eg) {
+      setCountry('EG', eg.dial)
+      localNumber.value = digitsOnly.slice(1)
+      return
+    }
+  }
+}
+
+// Auto-select dial when API loads and nothing selected yet
 watch(
   () => mergedDials.value.length,
   (len) => {
-    if (len && !selectedDial.value) {
-      // Prefer dial for given countryId/code if provided, else first API dial
+    if (len && (!selectedCountryCode.value || !selectedDial.value)) {
       if (props.countryId) {
         const c = findByCountryId(props.countryId)
-        if (c?.phoneCode) {
-          selectedDial.value = c.phoneCode.trim()
+        if (c?.code) {
+          setCountry(c.code, c.phoneCode?.trim())
           return
         }
       }
       if (props.countryCode) {
         const found = findByCode(props.countryCode)
         if (found) {
-          selectedDial.value = found.dial
+          setCountry(found.code, found.dial)
           return
         }
       }
-      // Fallback: prefer AE (UAE) or EG (Egypt) or SA (Saudi) before alphabetical first dial (+1 Canada)
-      const defaultPref = findByCode('AE') || findByCode('EG') || findByCode('SA') || mergedDials.value[0]
-      if (defaultPref) selectedDial.value = defaultPref.dial
+      if (props.phoneCode) {
+        const found = findByDial(props.phoneCode.trim())
+        if (found) {
+          setCountry(found.code, found.dial)
+          return
+        }
+      }
+      // Fallback: prefer AE (UAE), EG (Egypt), SA (Saudi), or PK (Pakistan) before alphabetical first dial (+1 Canada)
+      const defaultPref = findByCode('AE') || findByCode('EG') || findByCode('SA') || findByCode('PK') || mergedDials.value[0]
+      if (defaultPref) {
+        setCountry(defaultPref.code, defaultPref.dial)
+      }
     }
     if (props.modelValue) parseModelValue(props.modelValue)
     if (props.countryId) {
       const country = findByCountryId(props.countryId)
-      if (country?.phoneCode) selectedDial.value = country.phoneCode.trim()
+      if (country?.code) setCountry(country.code, country.phoneCode?.trim())
     }
   },
 )
 
-// Sync from countryCode prop (e.g. address's country) without loading territory Countries
+// Sync from countryCode prop (e.g. address's country)
 watch(
   () => props.countryCode,
   (code) => {
     if (!code) return
     const found = findByCode(code)
-    if (found) selectedDial.value = found.dial
+    if (found) setCountry(found.code, found.dial)
   },
   { immediate: true },
 )
 
-// Sync from territory Country id — backend-linked phoneCode (e.g. register with address country)
+// Sync from territory Country id — backend-linked phoneCode
 watch(
   () => props.countryId,
   (cid) => {
     if (!cid) return
     const country = findByCountryId(cid)
-    const dial = country?.phoneCode?.trim()
-    if (dial) {
-      // auto-sync if requested or if current model is empty / newly selected country
-      if (props.syncWithCountry || !localNumber.value || !selectedDial.value) {
-        selectedDial.value = dial
-      } else if (!findByDial(selectedDial.value)) {
-        // current dial not in list → correct it
-        selectedDial.value = dial
+    if (country?.code) {
+      if (props.syncWithCountry || !localNumber.value || !selectedCountryCode.value) {
+        setCountry(country.code, country.phoneCode?.trim())
       }
     }
   },
@@ -178,16 +292,18 @@ watch(
   { immediate: true },
 )
 
-// Initialize from modelValue or countryCode
+// Initialize from props
 if (props.countryCode) {
   const found = findByCode(props.countryCode)
-  if (found) selectedDial.value = found.dial
+  if (found) setCountry(found.code, found.dial)
 }
 if (props.countryId) {
   const c = findByCountryId(props.countryId)
-  if (c?.phoneCode) selectedDial.value = c.phoneCode.trim()
+  if (c?.code) setCountry(c.code, c.phoneCode?.trim())
 }
-parseModelValue(props.modelValue)
+if (props.modelValue) {
+  parseModelValue(props.modelValue)
+}
 </script>
 
 <template>
@@ -198,11 +314,21 @@ parseModelValue(props.modelValue)
     </label>
 
     <div class="phone-field__control">
-      <!-- Dial code selector — loaded purely from API Countries (phoneCode) -->
+      <!-- Dial code selector — loaded purely from API Countries (phoneCode) with unique ISO codes -->
       <div class="phone-code-select-wrap">
-        <select v-model="selectedDial" :disabled="disabled || !mergedDials.length" class="phone-code-select" :aria-label="t('auth.phoneNumber')">
+        <select
+          v-model="selectedCountryCode"
+          :disabled="disabled || !mergedDials.length"
+          class="phone-code-select"
+          :aria-label="t('auth.phoneNumber')"
+        >
           <option v-if="!mergedDials.length" value="" disabled>{{ t('common.loading') }}</option>
-          <option v-for="d in mergedDials" :key="`${d.code}-${d.dial}-${d.countryId ?? ''}`" :value="d.dial" :title="`${d.dial} ${localizedDialName(d)}`">
+          <option
+            v-for="d in mergedDials"
+            :key="`${d.code}-${d.countryId ?? ''}`"
+            :value="d.code"
+            :title="`${d.dial} ${localizedDialName(d)}`"
+          >
             {{ getFlagEmoji(d.code) }} {{ d.dial }}
           </option>
         </select>
@@ -221,6 +347,7 @@ parseModelValue(props.modelValue)
         :disabled="disabled"
         :required="required"
         class="phone-number-input"
+        @input="onInputNumber"
       />
     </div>
 

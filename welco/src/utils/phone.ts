@@ -63,9 +63,21 @@ export function extractDial(fullPhone: string, dials: MergedDial[] = []): string
 /** Split full phone into dial + national part */
 export function splitPhone(fullPhone: string, dials: MergedDial[] = []): { dial: string | null; national: string } {
   if (!fullPhone.trim()) return { dial: null, national: '' }
+  const clean = fullPhone.trim()
+
+  // Corrupted +1 on Pakistani mobile number (e.g. +1 03000959336)
+  const pkMangled = clean.replace(/\s+/g, '')
+  if (/^\+103\d{9}$/.test(pkMangled)) {
+    return { dial: '+92', national: pkMangled.slice(3) }
+  }
+
   const dial = extractDial(fullPhone, dials)
-  if (!dial) return { dial: null, national: fullPhone.trim() }
-  return { dial, national: fullPhone.trim().slice(dial.length).trim() }
+  if (!dial) return { dial: null, national: clean }
+  let national = clean.slice(dial.length).trim()
+  if (dial.startsWith('+') && national.startsWith('0')) {
+    national = national.replace(/^0+/, '')
+  }
+  return { dial, national }
 }
 
 /** Validate national number length roughly (6-15 digits) */
@@ -76,9 +88,12 @@ export function isValidNational(national: string): boolean {
 
 /** Build E.164 string from dial + national */
 export function combinePhone(dial: string, national: string): string {
-  const n = national.trim().replace(/^\+/, '').replace(/\s+/g, ' ').trim()
+  let n = national.trim().replace(/^\+/, '').replace(/\s+/g, ' ').trim()
   if (!n) return ''
   const d = dial.trim()
+  if (d.startsWith('+') && n.startsWith('0')) {
+    n = n.replace(/^0+/, '')
+  }
   return `${d} ${n}`.trim()
 }
 
@@ -88,7 +103,7 @@ export function combinePhone(dial: string, national: string): string {
  * PhoneNumberNormalizer so the uniqueness check compares like with like.
  * Returns undefined when there are no digits.
  */
-export function normalizePhoneForServer(phone?: string | null): string | undefined {
+export function normalizePhoneForServer(phone?: string | null, phoneCode?: string | null): string | undefined {
   if (!phone) return undefined
   const trimmed = phone.trim()
   if (!trimmed) return undefined
@@ -99,8 +114,41 @@ export function normalizePhoneForServer(phone?: string | null): string | undefin
   if (!digits) return undefined
   if (digits.startsWith('00')) {
     digits = digits.slice(2)
-    return digits ? `+${digits}` : undefined
   }
+
+  // If explicit phoneCode provided
+  if (phoneCode && phoneCode.trim()) {
+    const cleanCode = phoneCode.trim().replace(/[^\d]/g, '')
+    if (cleanCode) {
+      if (digits.startsWith(cleanCode)) {
+        let national = digits.slice(cleanCode.length)
+        if (national.startsWith('0')) national = national.replace(/^0+/, '')
+        return `+${cleanCode}${national}`
+      } else {
+        const national = digits.replace(/^0+/, '')
+        return `+${cleanCode}${national}`
+      }
+    }
+  }
+
+  // Edge case: +1 03xx (e.g. +1 03000959336) corrupted North American prefix on Pakistan number
+  if (digits.startsWith('103') && digits.length === 12) {
+    const pkNational = digits.slice(2)
+    return `+92${pkNational}`
+  }
+
+  // Trunk 0 stripping after common dial codes
+  const trunkCodes = ['971', '966', '965', '974', '973', '968', '962', '961', '963', '964', '970', '972', '20', '92', '44', '49', '33', '39', '34', '91', '90']
+  for (const tc of trunkCodes) {
+    if (digits.startsWith(tc)) {
+      const rest = digits.slice(tc.length)
+      if (rest.startsWith('0')) {
+        return `+${tc}${rest.replace(/^0+/, '')}`
+      }
+      break
+    }
+  }
+
   return hasPlus ? `+${digits}` : digits
 }
 
@@ -162,7 +210,7 @@ export function resolvePhoneDetails(
     clean = '+' + clean.slice(2)
   }
 
-  // 1. If explicit dial code from backend is provided (e.g. +966)
+  // 1. If explicit dial code from backend is provided (e.g. +966 or +92)
   if (explicitDialCode && explicitDialCode.trim()) {
     const rawDial = explicitDialCode.trim()
     const withPlus = rawDial.startsWith('+') ? rawDial : `+${rawDial}`
@@ -193,6 +241,39 @@ export function resolvePhoneDetails(
     }
   }
 
+  // Corrupted Pakistan number edge case (stored as +1 03xx xxxxxxx e.g. +1 03000959336)
+  const pkMangled = clean.replace(/\s+/g, '')
+  if (/^\+103\d{9}$/.test(pkMangled)) {
+    const pkCountry = countries.find((c) => (c.code || '').toUpperCase() === 'PK' || c.phoneCode?.trim() === '+92')
+    const iso = 'PK'
+    const countryName = locale === 'ar' ? (pkCountry?.nameAr || 'باكستان') : (pkCountry?.nameEn || 'Pakistan')
+    const nationalNumber = pkMangled.slice(3) // 10 digits starting with 3...
+    return {
+      dialCode: '+92',
+      countryName,
+      iso,
+      flag: getFlagEmoji(iso),
+      nationalNumber,
+      fullFormatted: `+92 ${nationalNumber}`,
+    }
+  }
+
+  // Local Pakistani number without country code (03xx xxxxxxx)
+  if (/^03\d{9}$/.test(pkMangled)) {
+    const pkCountry = countries.find((c) => (c.code || '').toUpperCase() === 'PK' || c.phoneCode?.trim() === '+92')
+    const iso = 'PK'
+    const countryName = locale === 'ar' ? (pkCountry?.nameAr || 'باكستان') : (pkCountry?.nameEn || 'Pakistan')
+    const nationalNumber = pkMangled.slice(1)
+    return {
+      dialCode: '+92',
+      countryName,
+      iso,
+      flag: getFlagEmoji(iso),
+      nationalNumber,
+      fullFormatted: `+92 ${nationalNumber}`,
+    }
+  }
+
   // Sort countries with non-empty phoneCode by descending length of phoneCode
   const sorted = [...countries]
     .filter((c) => c && c.phoneCode)
@@ -217,8 +298,14 @@ export function resolvePhoneDetails(
 
     if (matched) {
       const nationalNumber = clean.slice(prefixLength).trim().replace(/^0+/, '')
-      const iso = (c.code || '').toUpperCase()
-      const countryName = locale === 'ar' ? (c.nameAr || c.nameEn) : (c.nameEn || c.nameAr)
+      // Disambiguate duplicate dial codes (e.g. +1): if clean starts with +1 and length 10 national
+      let matchedCountry = c
+      if (withPlus === '+1') {
+        const usCountry = countries.find((x) => (x.code || '').toUpperCase() === 'US')
+        if (usCountry) matchedCountry = usCountry
+      }
+      const iso = (matchedCountry.code || '').toUpperCase()
+      const countryName = locale === 'ar' ? (matchedCountry.nameAr || matchedCountry.nameEn) : (matchedCountry.nameEn || matchedCountry.nameAr)
       return {
         dialCode: withPlus,
         countryName,

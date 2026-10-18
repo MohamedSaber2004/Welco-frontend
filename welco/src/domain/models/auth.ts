@@ -8,6 +8,7 @@ export interface RegisterPayload {
   password: string
   confirmPassword: string
   phoneNumber?: string
+  phoneCode?: string
   phoneCountryId?: string
   phoneCountryCode?: string
   userType?: UserType
@@ -63,6 +64,7 @@ export interface RefreshTokenPayload {
 export interface UpdateProfilePayload {
   fullName?: string
   phoneNumber?: string
+  phoneCode?: string
   profilePictureName?: string
   language?: AppLanguage
   themeMode?: ThemeMode

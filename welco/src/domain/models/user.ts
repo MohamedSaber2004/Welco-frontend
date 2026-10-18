@@ -104,6 +104,7 @@ export interface CreateUserPayload {
   fullName: string
   email: string
   phoneNumber?: string
+  phoneCode?: string | null
   password: string
   userType?: UserType
   profilePictureName?: string | null
@@ -113,6 +114,7 @@ export interface CreateUserPayload {
 export interface UpdateUserPayload {
   fullName?: string
   phoneNumber?: string
+  phoneCode?: string | null
   profilePictureName?: string | null
   userType?: UserType
   isActive?: boolean

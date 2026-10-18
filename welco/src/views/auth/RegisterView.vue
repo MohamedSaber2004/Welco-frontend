@@ -18,6 +18,7 @@ const email = ref('')
 const password = ref('')
 const confirmPassword = ref('')
 const phoneNumber = ref('')
+const phoneCode = ref('')
 const companyName = ref('')
 const companyType = ref<CompanyType | ''>('')
 const companyEmail = ref('')
@@ -45,7 +46,18 @@ onMounted(async () => {
 })
 
 const localized = (en: string, ar: string) => (locale.value === 'ar' ? ar : en)
+const selectedRegCountryCode = computed(() => {
+  if (accountType.value === 'organization' && distributorCountryId.value) {
+    const matched = countries.value.find((c) => c.id === distributorCountryId.value)
+    if (matched?.code) return matched.code
+  }
+  return 'AE'
+})
 const phoneCountry = computed(() => {
+  if (phoneCode.value) {
+    const matchByCode = locationService.countries.value.find((c) => c.phoneCode === phoneCode.value)
+    if (matchByCode) return matchByCode
+  }
   if (!phoneNumber.value) return null
   return locationService.findCountryByPhone(phoneNumber.value) ?? null
 })
@@ -130,6 +142,7 @@ const handleRegister = async () => {
     password: password.value,
     confirmPassword: confirmPassword.value,
     phoneNumber: phoneNumber.value.trim() || undefined,
+    phoneCode: phoneCode.value.trim() || phoneCountry.value?.phoneCode || undefined,
     phoneCountryId: phoneCountryId ?? undefined,
     phoneCountryCode: phoneCountry.value?.code ?? undefined,
     userType,
@@ -263,9 +276,15 @@ const handleRegister = async () => {
             </div>
 
             <div class="form-group col-span-2">
-              <PhoneInput v-model="phoneNumber" country-code="AE" :label="t('auth.phoneNumber')" :placeholder="t('auth.phonePlaceholder')" />
+              <PhoneInput
+                v-model="phoneNumber"
+                v-model:phone-code="phoneCode"
+                :country-code="selectedRegCountryCode"
+                :label="t('auth.phoneNumber')"
+                :placeholder="t('auth.phonePlaceholder')"
+              />
               <p v-if="phoneCountryLabel" class="phone-hint mono">
-                ↳ {{ t('locations.phoneCode') }} {{ phoneCountry?.phoneCode }} — {{ phoneCountryLabel }} ({{ phoneCountry?.code }})
+                ↳ {{ t('locations.phoneCode') }} {{ phoneCode || phoneCountry?.phoneCode }} — {{ phoneCountryLabel }} ({{ phoneCountry?.code }})
               </p>
             </div>
 

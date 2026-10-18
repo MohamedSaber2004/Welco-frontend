@@ -17,6 +17,7 @@ import { resolvePhoneDetails, type DetailedPhoneInfo } from '../utils/phone'
 
 const fullName = ref('')
 const phoneNumber = ref('')
+const phoneCode = ref('')
 const language = ref<AppLanguage>(AppLanguage.En)
 const loading = ref(false)
 const error = ref('')
@@ -90,7 +91,7 @@ const userPhoneDetails = computed<DetailedPhoneInfo | null>(() => {
   const phone = phoneNumber.value || user.value?.phoneNumber || ''
   const countries = locationService.countries.value
   const fallbackId = myCompany.value?.countryId || profileCompany.value?.countryId || null
-  const explicitCode = user.value?.phoneCode || null
+  const explicitCode = phoneCode.value || user.value?.phoneCode || null
   return resolvePhoneDetails(phone, countries, locale.value, fallbackId, explicitCode)
 })
 
@@ -148,6 +149,7 @@ const load = async () => {
   if (res.ok && res.profile) {
     fullName.value = res.profile.fullName
     phoneNumber.value = res.profile.phoneNumber ?? ''
+    phoneCode.value = res.profile.phoneCode ?? ''
     language.value = res.profile.language
     profilePictureName.value = res.profile.profilePictureName ?? null
     const fromProfile = (res.profile.company as CompanyDto) ?? null
@@ -162,6 +164,7 @@ const load = async () => {
   } else if (user.value) {
     fullName.value = user.value.fullName
     phoneNumber.value = user.value.phoneNumber ?? ''
+    phoneCode.value = user.value.phoneCode ?? ''
     language.value = user.value.language
     profilePictureName.value = user.value.profilePictureName ?? null
   }
@@ -251,6 +254,7 @@ const handleSave = async () => {
   const res = await authService.updateProfile({
     fullName: fullName.value.trim(),
     phoneNumber: phoneNumber.value.trim() || undefined,
+    phoneCode: phoneCode.value.trim() || undefined,
     language: language.value,
   })
   loading.value = false
@@ -561,6 +565,7 @@ const setLang = async (v: AppLanguage) => {
 
                 <PhoneInput
                   v-model="phoneNumber"
+                  v-model:phone-code="phoneCode"
                   :country-id="myCompany?.countryId || profileCompany?.countryId"
                   :placeholder="t('auth.phonePlaceholder')"
                 />

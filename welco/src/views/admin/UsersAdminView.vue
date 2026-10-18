@@ -7,6 +7,7 @@ import AppPagination from '../../components/ui/AppPagination.vue'
 import BaseModal from '../../components/ui/BaseModal.vue'
 import BaseButton from '../../components/ui/BaseButton.vue'
 import FileUpload from '../../components/ui/FileUpload.vue'
+import PhoneInput from '../../components/ui/PhoneInput.vue'
 import { useUsers } from '../../composables/useUsers'
 import { t, locale } from '../../i18n'
 import { UserType, USER_TYPE_ROLE_KEY } from '../../domain/models/user'
@@ -468,8 +469,13 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
           </div>
           <div class="form-row two-cols">
             <div class="form-field">
-              <label class="field-label" for="user-phone">{{ t('admin.phone') }}</label>
-              <input id="user-phone" v-model="form.phoneNumber" type="tel" class="field-input mono" />
+              <PhoneInput
+                id="user-phone"
+                v-model="form.phoneNumber"
+                v-model:phone-code="form.phoneCode"
+                :label="t('admin.phone')"
+                :placeholder="t('auth.phonePlaceholder')"
+              />
             </div>
             <div class="form-field">
               <label class="field-label" for="user-role">{{ t('admin.userType') }} *</label>

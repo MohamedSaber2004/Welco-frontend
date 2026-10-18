@@ -49,7 +49,7 @@ onMounted(async () => {
       await companyService.loadCompanyAddresses(cid).catch(() => {})
       const addrs = companyService.companyAddresses.value as unknown as { countryId: string }[]
       const countries = services.locationService.countries.value as unknown as { id: string; code?: string | null; nameEn?: string | null; nameAr?: string | null }[]
-      addressCurrencyOptions.value = distinctCurrenciesFromAddresses(addrs, countries)
+      addressCurrencyOptions.value = distinctCurrenciesFromAddresses(addrs, countries, services.marketplaceService.currencies.value)
     }
   } catch { }
 })

@@ -95,7 +95,7 @@ onMounted(async () => {
         await companyService.loadCompanyAddresses(cid).catch(() => {})
         const addrs = companyService.companyAddresses.value as unknown as { countryId: string }[]
         const countries = locationService.countries.value as unknown as { id: string; code?: string | null; nameEn?: string | null; nameAr?: string | null }[]
-        const distinct = distinctCurrenciesFromAddresses(addrs, countries)
+        const distinct = distinctCurrenciesFromAddresses(addrs, countries, availableCurrencies.value)
         addressCurrencies.value = distinct
         if (distinct.length > 0) {
           const current = targetCurrency.value.toUpperCase()

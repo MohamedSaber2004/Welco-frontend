@@ -43,12 +43,22 @@ const normalizeProduct = (p: ProductDto): ProductDto => {
   if (!p || typeof p !== 'object') return p
   const raw = p as unknown as Record<string, unknown>
 
-  // Currency fallbacks
-  if (!p.currency && p.currencyCode) p.currency = p.currencyCode
-  if (!p.currencySymbol && p.currencyCode) {
-    p.currencySymbol = p.currencyCode === 'USD' ? '$' : p.currencyCode === 'EUR' ? '€' : p.currencyCode === 'AED' ? 'AED' : p.currencyCode
-  } else if (!p.currencySymbol) {
-    p.currencySymbol = p.currency || '$'
+  // Currency fallbacks: guarantee valid currency and symbol
+  if (!p.currency) p.currency = p.currencyCode || 'USD'
+  if (!p.currencyCode) p.currencyCode = p.currency || 'USD'
+  if (!p.currencySymbol) {
+    p.currencySymbol =
+      p.currencyCode === 'USD'
+        ? '$'
+        : p.currencyCode === 'EUR'
+        ? '€'
+        : p.currencyCode === 'AED'
+        ? 'AED'
+        : p.currencyCode === 'EGP'
+        ? 'EGP'
+        : p.currencyCode === 'SAR'
+        ? 'SAR'
+        : p.currency || '$'
   }
 
   // Units and stock defaults
@@ -132,11 +142,6 @@ const normalizeProduct = (p: ProductDto): ProductDto => {
   }
 
   const lowerName = (p.nameEn || '').toLowerCase()
-
-  // Remove bogus sofa photo for Weitlaner Retractor so clean medical placeholder is used
-  if (lowerName.includes('weitlaner')) {
-    p.imageName = null
-  }
 
   // Fix miscategorized products
   if (lowerName.includes('metzenbaum')) {

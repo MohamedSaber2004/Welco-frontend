@@ -3,8 +3,8 @@ import { ref, computed, onMounted } from 'vue'
 import { t, locale } from '../i18n'
 import { useAddresses } from '../composables/useAddresses'
 import { useCompanyAddresses } from '../composables/useCompanyAddresses'
-import { locationService, authService, companyService } from '../di/container'
-import { currencyForAddressCountry } from '../utils/country-currency-map'
+import { locationService, authService, companyService, marketplaceService } from '../di/container'
+import { currencyForAddressCountry, currencySymbolForAddressCountry } from '../utils/country-currency-map'
 import BaseModal from '../components/ui/BaseModal.vue'
 import BackButton from '../components/ui/BackButton.vue'
 import SkeletonLoader from '../components/ui/SkeletonLoader.vue'
@@ -18,7 +18,10 @@ const activeTab = ref<'personal' | 'company'>('personal')
 const isCompanyUser = computed(() => authService.isOrganizationUser.value)
 
 onMounted(async () => {
-  await locationService.loadCountries().catch(() => {})
+  await Promise.all([
+    locationService.loadCountries().catch(() => {}),
+    marketplaceService.loadCurrencies().catch(() => {}),
+  ])
   if (isCompanyUser.value) {
     await companyService.loadMyCompany().catch(() => {})
     if (companyService.myCompany.value?.id) void company.load()
@@ -57,9 +60,13 @@ const countryLabel = (countryId: string) => {
 }
 const countryPhone = (countryId: string) => locationService.getCountryPhoneCode(countryId)
 const countryIso = (countryId: string) => locationService.getCountryIso(countryId)
-// Billing currency from the group's country when the API links one (null = unknown, pill hidden)
-const groupCurrency = (countryId: string): string | null =>
-  currencyForAddressCountry(locationService.countries.value, countryId)
+// Billing currency and symbol from the group's country loaded dynamically from backend
+const groupCurrency = (countryId: string): string | null => {
+  const code = currencyForAddressCountry(locationService.countries.value, countryId, marketplaceService.currencies.value)
+  if (!code) return null
+  const symbol = currencySymbolForAddressCountry(locationService.countries.value, countryId, marketplaceService.currencies.value, locale.value)
+  return symbol && symbol !== code ? `${code} (${symbol})` : code
+}
 
 const totalPersonal = computed(() => personal.addresses.value.length)
 const totalCompany = computed(() => company.addresses.value.length)
@@ -165,6 +172,7 @@ const totalCompany = computed(() => company.addresses.value.length)
             <span class="material-symbols-outlined text-[18px] text-indigo-600">public</span>
             <h2 class="cluster-title">{{ countryLabel(countryId) }}</h2>
             <span class="mono country-pill">{{ countryIso(countryId) || '—' }} {{ countryPhone(countryId) || '' }}</span>
+            <span v-if="groupCurrency(countryId)" class="mono currency-pill" :title="t('checkout.currency')">{{ groupCurrency(countryId) }}</span>
             <span class="mono cluster-count">{{ t('addresses.countInCountry', { count: group.length }) }}</span>
           </div>
 

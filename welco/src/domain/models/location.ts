@@ -4,6 +4,9 @@ export interface CountryDto {
   nameAr: string
   code?: string | null
   phoneCode?: string | null
+  currencyCode?: string | null
+  currencySymbol?: string | null
+  currencySymbolNative?: string | null
   isActive: boolean
   createdAt: string
 }

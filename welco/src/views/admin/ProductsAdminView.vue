@@ -310,13 +310,27 @@ const form = ref(emptyForm())
 const slugify = (v: string): string =>
   v.trim().toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/[\s_]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')
 
+const updateAutoSlug = () => {
+  // If editing an existing product that already has a slug, do not overwrite it
+  if (editing.value && editing.value.slug) return
+  const fromName = slugify(form.value.nameEn)
+  if (fromName) {
+    form.value.slug = fromName
+  } else if (form.value.sku) {
+    form.value.slug = slugify(form.value.sku)
+  }
+}
+
 const onNameEnInput = () => {
-  if (!slugTouched.value) form.value.slug = slugify(form.value.nameEn)
+  updateAutoSlug()
 }
 
 const generateSku = () => {
   const prefix = form.value.nameEn ? form.value.nameEn.slice(0, 3).toUpperCase().replace(/[^A-Z]/g, 'PRD') : 'PRD'
   form.value.sku = `WL-${prefix}-${Math.floor(1000 + Math.random() * 9000)}`
+  if (!form.value.slug && (!editing.value || !editing.value.slug)) {
+    updateAutoSlug()
+  }
 }
 
 const openCreate = () => {
@@ -333,7 +347,7 @@ const openEdit = (p: AdminProductItem | ProductDto) => {
     nameEn: p.nameEn ?? '',
     nameAr: p.nameAr ?? '',
     sku: p.sku ?? '',
-    slug: p.slug ?? '',
+    slug: p.slug || slugify(p.nameEn || '') || (p.sku ? slugify(p.sku) : ''),
     description: p.descriptionEn || p.description || '',
     price: p.price ?? 0,
     stock: p.stock ?? 0,
@@ -358,7 +372,7 @@ const submit = async () => {
   const f = form.value
   if (!f.nameEn.trim() || !f.nameAr.trim()) { formError.value = t('admin.errBothNames'); return }
   if (!f.sku.trim()) { formError.value = t('admin.errSku'); return }
-  if (!f.slug.trim()) { f.slug = slugify(f.nameEn) || `prd-${Date.now()}` }
+  if (!f.slug.trim()) { f.slug = slugify(f.nameEn) || (f.sku ? slugify(f.sku) : '') || `prd-${Date.now()}` }
   if (!f.categoryId) { formError.value = t('admin.errCategory'); return }
   const numPrice = Number(f.price)
   if (isNaN(numPrice) || numPrice <= 0) {
@@ -785,10 +799,38 @@ onMounted(async () => {
             <div class="form-group">
               <div class="label-with-action">
                 <label class="form-label mono">{{ t('admin.sku') }} <span class="req">*</span></label>
-                <button type="button" class="btn-gen-sku mono" @click="generateSku">{{ t('admin.sku') }}</button>
+                <button
+                  type="button"
+                  class="btn-gen-sku mono"
+                  :title="locale === 'ar' ? 'توليد رمز SKU تلقائي' : 'Auto-generate SKU'"
+                  @click="generateSku"
+                >
+                  <span class="material-symbols-outlined text-[13px]">autorenew</span>
+                  <span>{{ locale === 'ar' ? 'توليد تلقائي' : 'Auto' }}</span>
+                </button>
               </div>
               <input v-model="form.sku" type="text" required class="form-input mono" />
             </div>
+            <div class="form-group">
+              <div class="label-with-action">
+                <label class="form-label mono">{{ t('admin.slug') }} <span class="req">*</span></label>
+                <span class="slug-badge mono">
+                  <span class="material-symbols-outlined text-[12px]">lock</span>
+                  <span>{{ locale === 'ar' ? 'توليد تلقائي' : 'Auto-generated' }}</span>
+                </span>
+              </div>
+              <input
+                v-model="form.slug"
+                type="text"
+                class="form-input form-input--readonly mono"
+                :placeholder="locale === 'ar' ? 'يتم توليده تلقائياً' : 'Auto-generated from name'"
+                readonly
+                tabindex="-1"
+              />
+            </div>
+          </div>
+
+          <div class="form-grid-2">
             <div class="form-group">
               <label class="form-label mono">{{ t('admin.category') }} <span class="req">*</span></label>
               <select v-model="form.categoryId" required class="form-input mono">
@@ -798,17 +840,15 @@ onMounted(async () => {
                 </option>
               </select>
             </div>
-          </div>
-
-          <!-- Provider Assignment -->
-          <div class="form-group">
-            <label class="form-label mono">{{ t('admin.assignedProvider') }}</label>
-            <select v-model="form.companyId" class="form-input mono">
-              <option value="">{{ t('admin.noProvidersAssigned') }}</option>
-              <option v-for="pr in providerOptions" :key="pr.id" :value="pr.id">
-                {{ pr.name }}
-              </option>
-            </select>
+            <div class="form-group">
+              <label class="form-label mono">{{ t('admin.assignedProvider') }}</label>
+              <select v-model="form.companyId" class="form-input mono">
+                <option value="">{{ t('admin.noProvidersAssigned') }}</option>
+                <option v-for="pr in providerOptions" :key="pr.id" :value="pr.id">
+                  {{ pr.name }}
+                </option>
+              </select>
+            </div>
           </div>
 
           <div class="form-grid-3">
@@ -1367,6 +1407,40 @@ onMounted(async () => {
   font-weight: 700;
   color: var(--wl-primary, #6366f1);
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 0;
+}
+
+.btn-gen-sku:hover {
+  text-decoration: underline;
+}
+
+.form-input--readonly {
+  background: var(--wl-surface-soft, #f8fafc) !important;
+  color: var(--wl-muted, #64748b) !important;
+  cursor: not-allowed;
+  border-style: dashed;
+  user-select: all;
+}
+
+.form-input--readonly:focus {
+  outline: none !important;
+  border-color: var(--wl-border, #e2e8f0) !important;
+  box-shadow: none !important;
+}
+
+.slug-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--wl-muted, #64748b);
+  background: var(--wl-surface-soft, rgba(100, 116, 139, 0.08));
+  padding: 1px 6px;
+  border-radius: 4px;
 }
 
 .form-label {

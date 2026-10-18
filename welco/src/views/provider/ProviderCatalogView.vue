@@ -131,13 +131,27 @@ const form = ref(emptyForm())
 const slugify = (v: string): string =>
   v.trim().toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/[\s_]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')
 
+const updateAutoSlug = () => {
+  // If editing an existing product that already has a slug, do not overwrite it
+  if (editing.value && editing.value.slug) return
+  const fromName = slugify(form.value.nameEn)
+  if (fromName) {
+    form.value.slug = fromName
+  } else if (form.value.sku) {
+    form.value.slug = slugify(form.value.sku)
+  }
+}
+
 const onNameEnInput = () => {
-  if (!slugTouched.value) form.value.slug = slugify(form.value.nameEn)
+  updateAutoSlug()
 }
 
 const generateSku = () => {
   const prefix = form.value.nameEn ? form.value.nameEn.slice(0, 3).toUpperCase().replace(/[^A-Z]/g, 'PRD') : 'PRD'
   form.value.sku = `${prefix}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`
+  if (!form.value.slug && (!editing.value || !editing.value.slug)) {
+    updateAutoSlug()
+  }
 }
 
 /* ── Video Handling ── */
@@ -180,7 +194,7 @@ const openEdit = (p: ProductDto) => {
     nameEn: p.nameEn ?? '',
     nameAr: p.nameAr ?? '',
     sku: p.sku ?? '',
-    slug: p.slug ?? '',
+    slug: p.slug || slugify(p.nameEn || '') || (p.sku ? slugify(p.sku) : ''),
     description: p.descriptionEn || p.description || '',
     price: p.price ?? 0,
     stock: p.stock ?? 0,
@@ -205,7 +219,7 @@ const submit = async () => {
   const f = form.value
   if (!f.nameEn.trim() || !f.nameAr.trim()) { formError.value = t('admin.errBothNames'); return }
   if (!f.sku.trim()) { formError.value = t('admin.errSku'); return }
-  if (!f.slug.trim()) { f.slug = slugify(f.nameEn) || `prd-${Date.now()}` }
+  if (!f.slug.trim()) { f.slug = slugify(f.nameEn) || (f.sku ? slugify(f.sku) : '') || `prd-${Date.now()}` }
   if (!f.categoryId) { formError.value = t('admin.errCategory'); return }
   const numPrice = Number(f.price)
   if (isNaN(numPrice) || numPrice <= 0) {
@@ -697,11 +711,25 @@ onMounted(() => { void loadAll() })
                 <span>{{ locale === 'ar' ? 'توليد تلقائي' : 'Auto' }}</span>
               </button>
             </div>
-            <input id="pp-sku" v-model="form.sku" type="text" class="field-input mono" placeholder="e.g. PRD-MED-001" required @input="slugTouched = true" />
+            <input id="pp-sku" v-model="form.sku" type="text" class="field-input mono" placeholder="e.g. PRD-MED-001" required />
           </div>
           <div class="form-field">
-            <label class="field-label" for="pp-slug">{{ t('admin.slug') }} *</label>
-            <input id="pp-slug" v-model="form.slug" type="text" class="field-input mono" placeholder="e.g. surgical-forceps-316l" required @input="slugTouched = true" />
+            <div class="field-label-row">
+              <label class="field-label" for="pp-slug">{{ t('admin.slug') }} *</label>
+              <span class="slug-badge mono">
+                <span class="material-symbols-outlined text-[12px]">lock</span>
+                <span>{{ locale === 'ar' ? 'توليد تلقائي' : 'Auto-generated' }}</span>
+              </span>
+            </div>
+            <input
+              id="pp-slug"
+              v-model="form.slug"
+              type="text"
+              class="field-input field-input--readonly mono"
+              :placeholder="locale === 'ar' ? 'يتم توليده تلقائياً' : 'Auto-generated from name'"
+              readonly
+              tabindex="-1"
+            />
           </div>
         </div>
 
@@ -1836,6 +1864,32 @@ onMounted(() => { void loadAll() })
   border-radius: var(--radius-md);
   background: var(--wl-surface);
   border: 1px solid var(--wl-border);
+}
+
+.field-input--readonly {
+  background: var(--wl-surface-soft, #f8fafc) !important;
+  color: var(--wl-muted, #64748b) !important;
+  cursor: not-allowed;
+  border-style: dashed;
+  user-select: all;
+}
+
+.field-input--readonly:focus {
+  outline: none !important;
+  border-color: var(--wl-border, #e2e8f0) !important;
+  box-shadow: none !important;
+}
+
+.slug-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--wl-muted, #64748b);
+  background: var(--wl-surface-soft, rgba(100, 116, 139, 0.08));
+  padding: 1px 6px;
+  border-radius: 4px;
 }
 
 @media (max-width: 640px) {

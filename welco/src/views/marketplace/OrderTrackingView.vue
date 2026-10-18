@@ -8,7 +8,7 @@ import StatusPill from '../../components/ui/StatusPill.vue'
 import SkeletonLoader from '../../components/ui/SkeletonLoader.vue'
 import BackButton from '../../components/ui/BackButton.vue'
 import type { OrderDto } from '../../domain/models/commerce'
-import { formatPrice } from '../../utils/format'
+import { formatDate, formatPrice } from '../../utils/format'
 
 const router = useRouter()
 const query = ref('')
@@ -101,7 +101,7 @@ async function track() {
           <div>
             <span class="mono ref-label">{{ t('commerce.consignmentLabel') }}</span>
             <h2 class="mono order-heading">#{{ order.orderNumber }}</h2>
-            <span class="mono order-date-text">{{ new Date(order.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</span>
+            <span class="mono order-date-text">{{ formatDate(order.createdAt, locale) }}</span>
           </div>
 
           <StatusPill :status="order.status" />

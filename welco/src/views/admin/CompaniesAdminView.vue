@@ -20,6 +20,7 @@ import type { CompanyDto, CreateCompanyPayload, UpdateCompanyPayload, Distributo
 import type { UserDetailsDto, UserDto } from '../../domain/models/user'
 import { USER_TYPE_ROLE_KEY } from '../../domain/models/user'
 import { AppLanguage } from '../../domain/models/user'
+import { formatDate } from '../../utils/format'
 
 const route = useRoute()
 const router = useRouter()
@@ -207,36 +208,32 @@ const toggleCompanyActive = async (c: CompanyDto) => {
 }
 
 const confirmDeleteCompany = async (c: CompanyDto) => {
-  const ok = await confirmService.confirmDelete(
-    `${t('admin.deleteCompanyConfirm')}\n${c.name}`,
-    t('common.delete'),
-  )
-  if (!ok) return
-  companyActionPendingId.value = c.id
-  try {
-    await companyRepository.deleteCompany(c.id)
-    toastService.success(t('admin.companyDeleted'))
-    await loadCompanies()
-  } catch (e) {
-    toastService.error(e instanceof Error ? e.message : t('common.error'))
-  } finally {
-    companyActionPendingId.value = null
+  const isProvider = Boolean(c.isProvider || c.type === 4)
+  let ok = false
+  if (isProvider) {
+    ok = await confirmService.confirm({
+      title: t('admin.deleteProviderCascadeTitle'),
+      message: `${t('admin.deleteProviderCascadeConfirm')}\n${c.name}`,
+      variant: 'danger',
+      confirmText: t('admin.deleteWithCascade'),
+      cancelText: t('common.cancel'),
+    })
+  } else {
+    ok = await confirmService.confirmDelete(
+      `${t('admin.deleteCompanyConfirm')}\n${c.name}`,
+      t('common.delete'),
+    )
   }
-}
-
-const confirmDeleteProviderWithCascade = async (c: CompanyDto) => {
-  const ok = await confirmService.confirm({
-    title: t('admin.deleteProviderCascadeTitle'),
-    message: `${t('admin.deleteProviderCascadeConfirm')}\n${c.name}`,
-    variant: 'danger',
-    confirmText: t('admin.deleteWithCascade'),
-    cancelText: t('common.cancel'),
-  })
   if (!ok) return
   companyActionPendingId.value = c.id
   try {
-    await companyService.deleteProviderWithCascade(c.id)
-    toastService.success(t('admin.providerDeletedWithCascade'))
+    if (isProvider) {
+      await companyService.deleteProviderWithCascade(c.id)
+      toastService.success(t('admin.providerDeletedWithCascade'))
+    } else {
+      await companyRepository.deleteCompany(c.id)
+      toastService.success(t('admin.companyDeleted'))
+    }
     await loadCompanies()
   } catch (e) {
     toastService.error(e instanceof Error ? e.message : t('common.error'))
@@ -689,17 +686,6 @@ watch([applicationSearch, statusFilter, typeFilter], () => {
                         >
                           <span class="material-symbols-outlined text-[18px]">delete</span>
                         </button>
-                        <button
-                          v-if="c.isProvider || c.type === 4"
-                          type="button"
-                          class="row-action-btn row-action-btn--danger"
-                          :title="t('admin.deleteWithCascade')"
-                          :aria-label="t('admin.deleteWithCascade')"
-                          :disabled="companyActionPendingId === c.id"
-                          @click="confirmDeleteProviderWithCascade(c)"
-                        >
-                          <span class="material-symbols-outlined text-[18px]">delete_forever</span>
-                        </button>
                       </div>
                     </td>
                   </tr>
@@ -1013,7 +999,7 @@ watch([applicationSearch, statusFilter, typeFilter], () => {
                       </span>
                     </td>
                     <td class="mono text-xs text-slate-500 whitespace-nowrap">
-                      {{ new Date(app.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') }}
+                      {{ formatDate(app.createdAt, locale) }}
                     </td>
                     <td class="text-end">
                       <div class="app-actions">
@@ -1236,7 +1222,7 @@ watch([applicationSearch, statusFilter, typeFilter], () => {
                   <span>•</span>
                   <span class="hero-meta-item">
                     <span class="material-symbols-outlined text-[13px]">calendar_today</span>
-                    {{ t('admin.submittedDate') }}: {{ new Date(selectedApplication.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US', { year: 'numeric', month: 'short', day: 'numeric' }) }}
+                    {{ t('admin.submittedDate') }}: {{ formatDate(selectedApplication.createdAt, locale) }}
                   </span>
                   <span v-if="selectedApplication.id">•</span>
                   <span v-if="selectedApplication.id" class="hero-meta-id mono text-muted">#{{ String(selectedApplication.id).slice(0, 8) }}</span>
@@ -1382,7 +1368,7 @@ watch([applicationSearch, statusFilter, typeFilter], () => {
 
                     <div class="user-spec-item">
                       <span class="spec-k mono">{{ t('admin.submittedDate') }}</span>
-                      <span class="mono spec-v">{{ new Date(relatedUser.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</span>
+                      <span class="mono spec-v">{{ formatDate(relatedUser.createdAt, locale) }}</span>
                     </div>
                   </div>
 

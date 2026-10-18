@@ -204,7 +204,7 @@ const previewParagraphs = computed(() => {
                   :placeholder="defaultFallbacks.heroTitle"
                 />
                 <span class="field-hint mono text-xs">
-                  {{ locale === 'ar' ? 'يظهر كعنوان بارز في كرت الصفحة الرئيسية وأعلى صفحة من نحن.' : 'Displays as main hero title on the homepage section and the /about page.' }}
+                  {{ locale === 'ar' ? 'العنوان الرئيسي الذي يبرز هوية ويلكو ورسالتها في تصنيع وتوريد المستلزمات الطبية والجراحية.' : 'The primary headline introducing Welco\'s medical and surgical manufacturing mission.' }}
                 </span>
               </div>
 
@@ -220,7 +220,7 @@ const previewParagraphs = computed(() => {
                   :placeholder="defaultFallbacks.heroBody"
                 ></textarea>
                 <span class="field-hint mono text-xs">
-                  {{ locale === 'ar' ? 'وصف موجز للمهمة والتخصص الطبي.' : 'Succinct description of Welco medical mission and platform expertise.' }}
+                  {{ locale === 'ar' ? 'نظرة عامة موجزة حول معايير التصنيع الجراحي والقدرات الإنتاجية وشراكات المستشفيات والمراكز الطبية.' : 'High-level overview of manufacturing standards, surgical capabilities, and clinical client partnerships.' }}
                 </span>
               </div>
 
@@ -241,7 +241,7 @@ const previewParagraphs = computed(() => {
                   :placeholder="defaultFallbacks.contentBlock"
                 ></textarea>
                 <span class="field-hint mono text-xs">
-                  {{ locale === 'ar' ? 'افصل بين الفقرات بمسافة سطر فارغة لتنسيقها كفقرات مستقلة.' : 'Separate paragraphs with a blank line for clean structured typography.' }}
+                  {{ locale === 'ar' ? 'النبذة المؤسسية الشاملة حول تراخيص ISO 13485 ومعايير CE MDR وجودة المعادن وشبكة التوزيع المعتمدة. افصل بين الفقرات بمسافة سطر.' : 'Comprehensive company background, ISO 13485 / CE MDR compliance, metallurgy standards, and distribution network. Separate distinct sections with a blank line.' }}
                 </span>
               </div>
 

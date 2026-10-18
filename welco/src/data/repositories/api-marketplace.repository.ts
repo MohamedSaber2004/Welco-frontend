@@ -216,13 +216,10 @@ export class ApiMarketplaceRepository implements MarketplaceRepository {
     const params = new URLSearchParams()
     const cleanSearch = (query.search || '').trim()
     if (cleanSearch) {
-      params.set('SearchTerm', cleanSearch)
-      params.set('search', cleanSearch)
+      params.set('searchTerm', cleanSearch)
     }
     if (query.sku?.trim()) {
-      const s = query.sku.trim()
-      params.set('Sku', s)
-      params.set('sku', s)
+      params.set('sku', query.sku.trim())
     }
     if (query.categoryId) params.set('categoryId', query.categoryId)
     if (query.sortBy === 'price-asc') params.set('sortBy', 'price-asc')
@@ -237,16 +234,11 @@ export class ApiMarketplaceRepository implements MarketplaceRepository {
     if (query.currencyId) params.set('currencyId', query.currencyId)
     if (typeof query.isActive === 'boolean') {
       params.set('isActive', String(query.isActive))
-      params.set('IsActive', String(query.isActive))
     }
     const pageNum = String(query.page ?? 1)
     params.set('pageNumber', pageNum)
-    params.set('PageNumber', pageNum)
-    params.set('page', pageNum)
-    params.set('Page', pageNum)
     const pageSz = String(Math.min(50, Math.max(1, query.pageSize ?? 12)))
     params.set('pageSize', pageSz)
-    params.set('PageSize', pageSz)
     const qs = params.toString()
     const path = `${MARKETPLACE_ROUTES.products}?${qs}`
     const raw = await this.http.get<unknown>(path, { showFeedback: false })

@@ -20,6 +20,7 @@ import type {
   UpdateProductPayload,
   ProductMediaDto,
 } from '../../domain/models/marketplace'
+import { formatDate } from '../../utils/format'
 
 const localized = (en?: string, ar?: string) => (locale.value === 'ar' ? ar || en || '' : en || ar || '')
 const myCompanyId = computed(() => companyService.myCompany.value?.id || authService.user.value?.companyId || null)
@@ -608,7 +609,7 @@ onMounted(() => { void loadAll() })
           <div class="spec-card">
             <span class="spec-k mono">{{ t('admin.submittedDate') || 'Created' }}</span>
             <span class="spec-v mono text-xs">
-              {{ selectedProduct.createdAt ? new Date(selectedProduct.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') : '—' }}
+              {{ selectedProduct.createdAt ? formatDate(selectedProduct.createdAt, locale) : '—' }}
             </span>
           </div>
         </div>

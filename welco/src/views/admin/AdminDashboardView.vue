@@ -143,10 +143,9 @@ const activeDonutSegment = ref<{ label: string; value: number; pct: number; colo
 
 const platformData = computed(() => {
   const items = [
-    { label: t('admin.products'), value: stats.value.products, color: 'var(--brand, #6366F1)', to: '/admin/products' },
+    { label: t('admin.activeProducts'), value: stats.value.activeProducts, color: 'var(--brand, #6366F1)', to: '/admin/products' },
+    { label: t('admin.inactiveProducts'), value: stats.value.inactiveProducts, color: 'var(--accent, #8B5CF6)', to: '/admin/products' },
     { label: t('admin.categoriesTitle'), value: stats.value.categories, color: 'var(--secondary, #14B8A6)', to: '/admin/categories' },
-    { label: t('admin.users'), value: stats.value.users, color: 'var(--accent, #8B5CF6)', to: '/admin/users' },
-    { label: t('admin.companies'), value: stats.value.companies, color: 'var(--color-warning, #F59E0B)', to: '/admin/companies' },
   ]
   const total = items.reduce((s, i) => s + i.value, 0) || 1
   let acc = 0
@@ -158,7 +157,7 @@ const platformData = computed(() => {
   })
 })
 
-const platformTotal = computed(() => stats.value.products + stats.value.categories + stats.value.users + stats.value.companies)
+const platformTotal = computed(() => stats.value.products + stats.value.categories)
 
 const DONUT_CIRCUMFERENCE = 314.159 // 2 * pi * 50
 const donutSegments = computed(() => {
@@ -223,7 +222,6 @@ const load = async () => {
       services.commerceService.loadOrders({ page: 1, pageSize: 50 }).catch(() => null),
       services.contentService.loadTickets().catch(() => []),
       services.contentService.loadDocuments().catch(() => []),
-      services.contentService.loadSupportContact().catch(() => null),
       services.auditLogService.loadLogs({ pageSize: 12 }).catch(() => null),
     ])
 

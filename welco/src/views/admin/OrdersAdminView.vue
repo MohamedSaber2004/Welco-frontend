@@ -13,7 +13,7 @@ import { t, locale } from '../../i18n'
 import type { OrderDto } from '../../domain/models/commerce'
 import { ORDER_STATUSES } from '../../domain/models/commerce'
 import type { CompanyDto } from '../../domain/models/company'
-import { formatPrice } from '../../utils/format'
+import { formatDate, formatDateTime, formatPrice } from '../../utils/format'
 
 useAnimation()
 
@@ -310,7 +310,7 @@ function goPage(p: number) {
                   <td>
                     <strong class="mono order-num">{{ o.orderNumber || '—' }}</strong>
                   </td>
-                  <td class="mono text-xs text-slate-500">{{ new Date(o.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</td>
+                  <td class="mono text-xs text-slate-500">{{ formatDate(o.createdAt, locale) }}</td>
                   <td>
                     <div v-if="getOrderProviderName(o)" class="provider-cell">
                       <span class="material-symbols-outlined text-[15px] text-teal-600">storefront</span>
@@ -380,7 +380,7 @@ function goPage(p: number) {
           <div class="order-status-bar">
             <StatusPill :status="selectedOrder.status" />
             <span class="mono order-date">{{
-              new Date(selectedOrder.createdAt).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US')
+              formatDateTime(selectedOrder.createdAt, locale)
             }}</span>
             <BaseButton
               v-if="NEXT[selectedOrder.status]"

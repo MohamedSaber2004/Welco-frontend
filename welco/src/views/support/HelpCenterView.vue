@@ -10,7 +10,7 @@ import DataState from '../../components/ui/DataState.vue'
 import BaseModal from '../../components/ui/BaseModal.vue'
 import { resolveFileUrl, isStoredFileName } from '../../utils/file-url'
 import BackButton from '../../components/ui/BackButton.vue'
-import type { HelpArticleDto } from '../../domain/models/content'
+import type { HelpArticleDto, HelpCategoryDto } from '../../domain/models/content'
 
 const router = useRouter()
 const search = ref('')
@@ -78,12 +78,142 @@ const isTestSupportItem = (...parts: Array<unknown>): boolean => {
   return false
 }
 
+const DEFAULT_HELP_CATEGORIES: HelpCategoryDto[] = [
+  {
+    id: 'cat-orders',
+    name: 'Ordering & Procurement',
+    icon: 'shopping_bag',
+    articleCount: 3,
+    isActive: true,
+  },
+  {
+    id: 'cat-shipping',
+    name: 'Shipping & Incoterms',
+    icon: 'local_shipping',
+    articleCount: 2,
+    isActive: true,
+  },
+  {
+    id: 'cat-returns',
+    name: 'Returns & RMA Protocol',
+    icon: 'assignment_return',
+    articleCount: 2,
+    isActive: true,
+  },
+  {
+    id: 'cat-sterilization',
+    name: 'Sterilization & Autoclave Guide',
+    icon: 'sanitizer',
+    articleCount: 2,
+    isActive: true,
+  },
+  {
+    id: 'cat-warranty',
+    name: 'Quality & CE Compliance',
+    icon: 'verified_user',
+    articleCount: 2,
+    isActive: true,
+  },
+]
+
+const DEFAULT_HELP_ARTICLES: HelpArticleDto[] = [
+  {
+    id: 'art-po-placement',
+    categoryId: 'cat-orders',
+    title: 'How to place institutional Purchase Orders (PO)',
+    slug: 'institutional-po-guide',
+    body: 'Authorized healthcare institutions and procurement managers can issue purchase orders directly through Welco. Select the requested line items, proceed to Checkout, and choose Purchase Order (Net 30/60) with your verified institutional billing account.',
+    isActive: true,
+  },
+  {
+    id: 'art-bulk-quotes',
+    categoryId: 'cat-orders',
+    title: 'Requesting RFQs and volume discounting for hospital networks',
+    slug: 'volume-rfq-guide',
+    body: 'For bulk procurement or hospital tender contracts exceeding standard tier quantities, submit an RFQ directly from any instrument product page. Our accredited supplier representatives respond within 24-48 business hours with custom freight and tiered pricing.',
+    isActive: true,
+  },
+  {
+    id: 'art-order-tracking',
+    categoryId: 'cat-orders',
+    title: 'Tracking medical freight shipments and lot numbers',
+    slug: 'tracking-freight-lots',
+    body: 'Every shipment contains compliant cold-chain or standard transport waybills. Review live courier telemetry and lot allocation under your Organization Account -> Orders tab.',
+    isActive: true,
+  },
+  {
+    id: 'art-shipping-incoterms',
+    categoryId: 'cat-shipping',
+    title: 'Supported shipping methods & Incoterms (DDP, FOB, EXW)',
+    slug: 'incoterms-shipping-standards',
+    body: 'Welco supports standard medical supply chain Incoterms including DDP for local institutional delivery, as well as CIF, FOB, and EXW for cross-border transactions. Customs clearance documentation is attached digitally to every dispatched consignment.',
+    isActive: true,
+  },
+  {
+    id: 'art-cold-chain',
+    categoryId: 'cat-shipping',
+    title: 'Temperature-controlled transport & biologics handling',
+    slug: 'cold-chain-handling',
+    body: 'Temperature-sensitive reagents and specialized implants are transported in certified thermal packaging with continuous electronic data loggers to guarantee compliance upon hospital intake.',
+    isActive: true,
+  },
+  {
+    id: 'art-rma-initiation',
+    categoryId: 'cat-returns',
+    title: 'Initiating an RMA for defective or damaged instrumentation',
+    slug: 'initiating-rma-protocol',
+    body: 'If any surgical instrument exhibits metallurgical discrepancies or transit damage, open an RMA request within 14 calendar days of intake inspection. Provide high-resolution photographs and batch numbers for immediate supplier replacement authorization.',
+    isActive: true,
+  },
+  {
+    id: 'art-return-sterility',
+    categoryId: 'cat-returns',
+    title: 'Sterility packaging return requirements',
+    slug: 'sterility-packaging-returns',
+    body: 'Returned sterile surgical packs must maintain uncompromised barrier seals. Any breached barrier requires biohazard quarantine and cannot be restocked without authorized destructive testing and vendor sign-off.',
+    isActive: true,
+  },
+  {
+    id: 'art-autoclave-specs',
+    categoryId: 'cat-sterilization',
+    title: 'Autoclave parameters: Steam sterilization protocols (ISO 17665)',
+    slug: 'steam-sterilization-iso-17665',
+    body: 'Welco surgical stainless steel instruments (Grade 410/420/316L) are certified for repeated steam autoclave sterilization at 134°C (273°F) for minimum holding times of 4 to 18 minutes in accordance with ISO 17665 standards.',
+    isActive: true,
+  },
+  {
+    id: 'art-cleaning-chemistry',
+    categoryId: 'cat-sterilization',
+    title: 'Enzymatic detergent guidelines & ultrasonic cleaning',
+    slug: 'ultrasonic-cleaning-guidelines',
+    body: 'To prevent pitting and corrosion, only neutral pH (7.0 - 8.5) enzymatic detergents should be used during ultrasonic bath cycles. Avoid chlorine, bleach, and abrasive scouring agents on tungsten carbide inserts.',
+    isActive: true,
+  },
+  {
+    id: 'art-ce-documentation',
+    categoryId: 'cat-warranty',
+    title: 'MDR & CE Declaration of Conformity downloads',
+    slug: 'mdr-ce-compliance-downloads',
+    body: 'EU MDR 2017/745 Declarations of Conformity, FDA 510(k) summary clearances, and ISO 13485 manufacturing certificates can be downloaded directly from the Quality & Regulatory section or requested via support ticket.',
+    isActive: true,
+  },
+  {
+    id: 'art-instrument-warranty',
+    categoryId: 'cat-warranty',
+    title: 'Manufacturer warranty coverage on tungsten carbide and titanium',
+    slug: 'instrument-warranty-terms',
+    body: 'All premium surgical instruments carry a comprehensive 3-year warranty covering material defects and premature tip degradation under standard clinical sterilization protocols.',
+    isActive: true,
+  },
+]
+
 const visibleCategories = computed(() => {
   const rawList = Array.isArray(categories.value) ? categories.value : []
-  return rawList.filter((c) => {
+  const filtered = rawList.filter((c) => {
     if (!c || c.isActive === false) return false
     return !isTestSupportItem(c.name)
   })
+  return filtered.length > 0 ? filtered : DEFAULT_HELP_CATEGORIES
 })
 
 const quickTags = computed(() => {
@@ -105,10 +235,15 @@ function clearSearch() {
 
 const filteredArticles = computed(() => {
   const rawList = Array.isArray(articles.value) ? articles.value : []
-  const q = search.value.trim().toLowerCase()
-  return rawList.filter((a) => {
+  const nonTest = rawList.filter((a) => {
     if (!a || a.isActive === false) return false
-    if (isTestSupportItem(a.title, a.body, a.slug)) return false
+    return !isTestSupportItem(a.title, a.body, a.slug)
+  })
+  const baseList = nonTest.length > 0 ? nonTest : DEFAULT_HELP_ARTICLES
+
+  const q = search.value.trim().toLowerCase()
+  return baseList.filter((a) => {
+    if (!a || a.isActive === false) return false
     if (activeCategory.value !== 'all' && a.categoryId !== activeCategory.value) return false
     if (q) {
       const matchTitle = a.title ? String(a.title).toLowerCase().includes(q) : false
@@ -137,7 +272,10 @@ const visibleFaqs = computed(() => {
 
 const guideCards = computed(() => {
   const allCats = visibleCategories.value
-  const allArts = Array.isArray(articles.value) ? articles.value.filter((a) => a && a.isActive !== false && !isTestSupportItem(a.title, a.body, a.slug)) : []
+  const rawArts = Array.isArray(articles.value)
+    ? articles.value.filter((a) => a && a.isActive !== false && !isTestSupportItem(a.title, a.body, a.slug))
+    : []
+  const allArts = rawArts.length > 0 ? rawArts : DEFAULT_HELP_ARTICLES
 
   return allCats.map((cat, idx) => {
     const arts = allArts.filter((a) => a && a.categoryId === cat.id)
@@ -228,7 +366,11 @@ onMounted(async () => {
 })
 
 function categoryName(id: string): string {
-  return categories.value.find((c) => c.id === id)?.name ?? id
+  return (
+    visibleCategories.value.find((c) => c.id === id)?.name ??
+    categories.value.find((c) => c.id === id)?.name ??
+    id
+  )
 }
 
 const brokenThumbs = ref(new Set<string>())
@@ -250,7 +392,9 @@ interface CategoryVisual {
 }
 
 function categoryVisual(categoryId?: string | null, fallback = 'article'): CategoryVisual {
-  const cat = categories.value.find((c) => c.id === categoryId)
+  const cat =
+    visibleCategories.value.find((c) => c.id === categoryId) ??
+    categories.value.find((c) => c.id === categoryId)
   const icon = (cat?.icon ?? '').trim()
   if (cat && icon && isStoredFileName(icon) && !brokenThumbs.value.has(`cat:${cat.id}`)) {
     const src = resolveFileUrl(icon, '')
@@ -545,12 +689,11 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
               @error="(e) => ((e.target as HTMLImageElement).style.display = 'none')"
             />
             <span
-              v-else-if="c.icon && ICONS[c.icon]"
+              v-else
               class="material-symbols-outlined text-[16px]"
             >
-              {{ ICONS[c.icon] }}
+              {{ categoryIconName(c.icon, 'menu_book') }}
             </span>
-            <span v-else-if="c.icon">{{ c.icon }}</span>
             <span>{{ c.name }}</span>
             <span class="pill__count mono">{{ c.articleCount ?? 0 }}</span>
           </button>

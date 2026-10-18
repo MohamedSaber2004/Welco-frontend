@@ -10,7 +10,7 @@ import DataState from '../../components/ui/DataState.vue'
 import BackButton from '../../components/ui/BackButton.vue'
 import AppPagination from '../../components/ui/AppPagination.vue'
 import { RFQ_STATUSES } from '../../domain/models/sales'
-import { formatPrice } from '../../utils/format'
+import { formatDate, formatPrice } from '../../utils/format'
 
 useAnimation()
 
@@ -172,7 +172,7 @@ onMounted(() => {
                 :style="{ animationDelay: `${i * 30}ms` }"
                 @click="router.push({ name: 'account-rfq-detail', params: { id: r.id } })"
               >
-                <td class="mono text-xs text-slate-500">{{ new Date(r.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</td>
+                <td class="mono text-xs text-slate-500">{{ formatDate(r.createdAt, locale) }}</td>
                 <td>
                   <strong class="mono rfq-num">{{ r.rfqNumber || '—' }}</strong>
                   <span v-if="r.requestedCurrency" class="mono text-[10px] text-indigo-700 bg-indigo-50 px-1.5 py-0.5 rounded font-semibold ms-1">

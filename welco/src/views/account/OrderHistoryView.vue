@@ -10,7 +10,7 @@ import DataState from '../../components/ui/DataState.vue'
 import BackButton from '../../components/ui/BackButton.vue'
 import AppPagination from '../../components/ui/AppPagination.vue'
 import { ORDER_STATUSES } from '../../domain/models/commerce'
-import { formatPrice } from '../../utils/format'
+import { formatDate, formatPrice } from '../../utils/format'
 
 useAnimation()
 
@@ -169,7 +169,7 @@ onMounted(() => {
                 <td>
                   <strong class="mono order-num">{{ o.orderNumber || '—' }}</strong>
                 </td>
-                <td class="mono text-xs text-slate-500">{{ new Date(o.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</td>
+                <td class="mono text-xs text-slate-500">{{ formatDate(o.createdAt, locale) }}</td>
                 <td>
                   <div class="product-names-cell">
                     <span

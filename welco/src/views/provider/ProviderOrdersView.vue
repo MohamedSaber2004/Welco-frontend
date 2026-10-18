@@ -12,7 +12,7 @@ import { toastService } from '../../infrastructure/feedback/toast.service'
 import { t, locale } from '../../i18n'
 import type { OrderDto } from '../../domain/models/commerce'
 import { ORDER_STATUSES } from '../../domain/models/commerce'
-import { formatPrice } from '../../utils/format'
+import { formatDate, formatDateTime, formatPrice } from '../../utils/format'
 
 const router = useRouter()
 const localized = (en?: string | null, ar?: string | null) =>
@@ -290,7 +290,7 @@ const submitStatusUpdate = async () => {
                   </td>
 
                   <td class="mono text-muted text-sm">
-                    {{ order.createdAt ? new Date(order.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') : '—' }}
+                    {{ order.createdAt ? formatDate(order.createdAt, locale) : '—' }}
                   </td>
 
                   <td>
@@ -411,7 +411,7 @@ const submitStatusUpdate = async () => {
             </div>
             <div class="detail-item">
               <span class="lbl">{{ t('commerce.placed') }}</span>
-              <strong class="val">{{ selectedOrder.createdAt ? new Date(selectedOrder.createdAt).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-US') : '—' }}</strong>
+              <strong class="val">{{ selectedOrder.createdAt ? formatDateTime(selectedOrder.createdAt, locale) : '—' }}</strong>
             </div>
             <div class="detail-item">
               <span class="lbl">{{ t('commerce.status') }}</span>

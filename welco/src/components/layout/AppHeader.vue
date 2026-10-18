@@ -92,11 +92,13 @@ watch(isAuthed, (v) => { if (v) void authService.loadProfile().catch(() => {}) }
 onMounted(() => {
   document.addEventListener('click', onClickOutside)
   if (isAuthed.value) void authService.loadProfile().catch(() => {})
-  void wishlistService.load().catch(() => {})
+  if (isAuthed.value && !isStaff.value && !isProvider.value) {
+    void wishlistService.load().catch(() => {})
+  }
 })
 onUnmounted(() => document.removeEventListener('click', onClickOutside))
 watch(isAuthed, (v) => {
-  if (v) void wishlistService.refresh().catch(() => {})
+  if (v && !isStaff.value && !isProvider.value) void wishlistService.refresh().catch(() => {})
   else wishlistService.clear()
 })
 </script>

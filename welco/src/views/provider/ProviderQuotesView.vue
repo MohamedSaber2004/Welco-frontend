@@ -13,7 +13,7 @@ import { t, locale } from '../../i18n'
 import type { RfqDto, QuoteDto, RfqItemDto } from '../../domain/models/sales'
 import type { ProductInquiryDto } from '../../domain/ports/sales-repository'
 import { parseNegotiationNote } from '../../utils/negotiation'
-import { formatPrice } from '../../utils/format'
+import { formatDate, formatDateTime, formatPrice } from '../../utils/format'
 
 const localized = (en?: string | null, ar?: string | null) =>
   locale.value === 'ar' ? ar || en || '' : en || ar || ''
@@ -580,13 +580,13 @@ const handleDecline = async (rfq: RfqDto) => {
                       <strong class="mono">{{ q.quoteNumber }}</strong>
                     </td>
                     <td class="mono text-muted text-sm">
-                      {{ q.createdAt ? new Date(q.createdAt).toLocaleDateString() : '—' }}
+                      {{ q.createdAt ? formatDate(q.createdAt, locale) : '—' }}
                     </td>
                     <td>
                       <strong class="mono text-primary">{{ formatPrice(q.amount, locale) }} {{ q.currency || 'USD' }}</strong>
                     </td>
                     <td class="mono text-sm">
-                      {{ q.validUntil ? new Date(q.validUntil).toLocaleDateString() : '—' }}
+                      {{ q.validUntil ? formatDate(q.validUntil, locale) : '—' }}
                     </td>
                     <td>
                       <StatusPill :status="q.status" />
@@ -714,7 +714,7 @@ const handleDecline = async (rfq: RfqDto) => {
                           <strong class="mono rfq-num text-sm">{{ inq.name }}</strong>
                           <span v-if="inq.organization" class="text-xs text-muted block font-medium">{{ inq.organization }}</span>
                           <span v-if="inq.email" class="text-xs text-muted font-mono block">{{ inq.email }}</span>
-                          <span class="text-xs text-muted font-mono block">{{ inq.createdAt ? new Date(inq.createdAt).toLocaleDateString() : '' }}</span>
+                          <span class="text-xs text-muted font-mono block">{{ inq.createdAt ? formatDate(inq.createdAt, locale) : '' }}</span>
                         </div>
                       </div>
                     </td>
@@ -841,7 +841,7 @@ const handleDecline = async (rfq: RfqDto) => {
                           <strong v-if="rfq.negotiation.discountPercent">(-{{ rfq.negotiation.discountPercent }}%)</strong>
                         </span>
                         <span class="mono text-xs text-muted">
-                          {{ rfq.createdAt ? new Date(rfq.createdAt).toLocaleDateString() : '—' }}
+                          {{ rfq.createdAt ? formatDate(rfq.createdAt, locale) : '—' }}
                         </span>
                       </div>
                     </td>
@@ -1026,7 +1026,7 @@ const handleDecline = async (rfq: RfqDto) => {
             </div>
             <div class="detail-item">
               <span class="lbl">{{ t('sales.requestDate') }}</span>
-              <strong class="val">{{ selectedRfq.createdAt ? new Date(selectedRfq.createdAt).toLocaleString() : '—' }}</strong>
+              <strong class="val">{{ selectedRfq.createdAt ? formatDateTime(selectedRfq.createdAt, locale) : '—' }}</strong>
             </div>
             <div class="detail-item">
               <span class="lbl">{{ t('commerce.status') }}</span>
@@ -1223,11 +1223,11 @@ const handleDecline = async (rfq: RfqDto) => {
             </div>
             <div class="detail-item">
               <span class="lbl">{{ t('sales.requestDate') }}</span>
-              <strong class="val">{{ selectedQuote.createdAt ? new Date(selectedQuote.createdAt).toLocaleDateString() : '—' }}</strong>
+              <strong class="val">{{ selectedQuote.createdAt ? formatDate(selectedQuote.createdAt, locale) : '—' }}</strong>
             </div>
             <div class="detail-item">
               <span class="lbl">{{ t('sales.validThrough') }}</span>
-              <strong class="val">{{ selectedQuote.validUntil ? new Date(selectedQuote.validUntil).toLocaleDateString() : '—' }}</strong>
+              <strong class="val">{{ selectedQuote.validUntil ? formatDate(selectedQuote.validUntil, locale) : '—' }}</strong>
             </div>
             <div class="detail-item">
               <span class="lbl">{{ t('commerce.status') }}</span>

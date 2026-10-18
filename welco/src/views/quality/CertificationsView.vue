@@ -7,6 +7,7 @@ import DataState from '../../components/ui/DataState.vue'
 import BackButton from '../../components/ui/BackButton.vue'
 import AppPagination from '../../components/ui/AppPagination.vue'
 import AppImage from '../../components/ui/AppImage.vue'
+import { formatDate } from '../../utils/format'
 
 const certs = certificationService.certifications
 const loading = ref(true)
@@ -221,11 +222,11 @@ const goPage = (p: number) => {
               </div>
               <div class="meta-item">
                 <dt class="mono">{{ t('certifications.issueDate') }}:</dt>
-                <dd class="mono">{{ new Date(c.issueDate).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</dd>
+                <dd class="mono">{{ formatDate(c.issueDate, locale) }}</dd>
               </div>
               <div v-if="c.expiryDate" class="meta-item">
                 <dt class="mono">{{ t('certifications.expiryDate') }}:</dt>
-                <dd class="mono">{{ new Date(c.expiryDate).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</dd>
+                <dd class="mono">{{ formatDate(c.expiryDate, locale) }}</dd>
               </div>
             </dl>
             </div>

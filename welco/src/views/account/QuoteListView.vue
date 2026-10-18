@@ -10,7 +10,7 @@ import DataState from '../../components/ui/DataState.vue'
 import BackButton from '../../components/ui/BackButton.vue'
 import AppPagination from '../../components/ui/AppPagination.vue'
 import { QUOTE_STATUSES } from '../../domain/models/sales'
-import { formatPrice } from '../../utils/format'
+import { formatDate, formatPrice } from '../../utils/format'
 
 useAnimation()
 
@@ -160,12 +160,12 @@ onMounted(() => {
                 :style="{ animationDelay: `${i * 30}ms` }"
                 @click="router.push({ name: 'account-quote-detail', params: { id: q.id } })"
               >
-                <td class="mono text-xs text-slate-500">{{ new Date(q.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</td>
+                <td class="mono text-xs text-slate-500">{{ formatDate(q.createdAt, locale) }}</td>
                 <td>
                   <strong class="mono quote-num">{{ q.quoteNumber }}</strong>
                 </td>
                 <td class="mono text-xs text-slate-600">{{ q.rfqNumber }}</td>
-                <td class="mono text-xs text-slate-500">{{ new Date(q.validUntil).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</td>
+                <td class="mono text-xs text-slate-500">{{ formatDate(q.validUntil, locale) }}</td>
                 <td>
                   <strong class="mono amount-text">
                     {{ formatPrice(q.amount, locale) }} {{ q.currency || 'USD' }}

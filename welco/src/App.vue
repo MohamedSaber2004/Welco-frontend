@@ -16,7 +16,15 @@ import type { MessageKey } from './i18n'
 const route = useRoute()
 
 onMounted(() => {
-  void services.contentService.loadSupportContact()
+  if (!route.path?.startsWith('/admin')) {
+    void services.contentService.loadSupportContact()
+  }
+})
+
+watch(() => showFooter.value, (visible) => {
+  if (visible && !services.contentService.supportContact.value?.supportEmail) {
+    void services.contentService.loadSupportContact()
+  }
 })
 
 watch(locale, () => {

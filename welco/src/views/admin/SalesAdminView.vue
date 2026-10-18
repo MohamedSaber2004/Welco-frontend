@@ -14,7 +14,7 @@ import { confirmService } from '../../infrastructure/feedback/confirm.service'
 import { t, locale } from '../../i18n'
 import type { QuoteDto, RfqDto } from '../../domain/models/sales'
 import { RFQ_STATUSES, QUOTE_STATUSES } from '../../domain/models/sales'
-import { formatPrice } from '../../utils/format'
+import { formatDate, formatPrice } from '../../utils/format'
 import { parseNegotiationNote } from '../../utils/negotiation'
 
 useAnimation()
@@ -537,7 +537,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
                   <td>
                     <strong class="company-name">{{ getRfqOrganization(r) }}</strong>
                   </td>
-                  <td class="mono text-xs text-slate-500">{{ new Date(r.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</td>
+                  <td class="mono text-xs text-slate-500">{{ formatDate(r.createdAt, locale) }}</td>
                   <td>
                     <div class="product-names-cell">
                       <span
@@ -695,9 +695,9 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
                   <td>
                     <strong class="company-name">{{ getRfqForQuote(q)?.companyName || t('admin.institutionalClientFallback') }}</strong>
                   </td>
-                  <td class="mono text-xs text-slate-500">{{ new Date(q.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</td>
+                  <td class="mono text-xs text-slate-500">{{ formatDate(q.createdAt, locale) }}</td>
                   <td class="mono text-xs" :class="new Date(q.validUntil) < new Date() && q.status !== 'Approved' ? 'text-rose-600 font-bold' : 'text-slate-500'">
-                    {{ new Date(q.validUntil).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') }}
+                    {{ formatDate(q.validUntil, locale) }}
                   </td>
                   <td>
                     <strong class="mono amount-num">
@@ -814,12 +814,12 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
             </div>
             <div class="summary-tile">
               <span class="summary-label mono">{{ t('sales.requestDate') }}</span>
-              <strong class="summary-value mono">{{ new Date(selectedQuote.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</strong>
+              <strong class="summary-value mono">{{ formatDate(selectedQuote.createdAt, locale) }}</strong>
             </div>
             <div class="summary-tile">
               <span class="summary-label mono">{{ t('sales.validThrough') }}</span>
               <strong class="summary-value mono" :class="new Date(selectedQuote.validUntil) < new Date() && selectedQuote.status !== 'Approved' ? 'text-rose-600 font-bold' : ''">
-                {{ new Date(selectedQuote.validUntil).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') }}
+                {{ formatDate(selectedQuote.validUntil, locale) }}
               </strong>
             </div>
           </div>

@@ -9,7 +9,7 @@ import AppPagination from '../../components/ui/AppPagination.vue'
 import { toastService } from '../../infrastructure/feedback/toast.service'
 import { confirmService } from '../../infrastructure/feedback/confirm.service'
 import { companyService, contentService } from '../../di/container'
-import { formatDateTime, formatTicketReplyDate } from '../../utils/format'
+import { formatDate, formatDateTime, formatTicketReplyDate } from '../../utils/format'
 import { t, locale } from '../../i18n'
 import type { OemInquiryDto } from '../../domain/ports/company-repository'
 import type { SupportTicketDto, FaqItemDto } from '../../domain/models/content'
@@ -639,7 +639,7 @@ const acceptOemInquiry = async (inquiry: OemInquiryDto) => {
                          <span class="vol-pill mono">{{ o.serviceType }}</span>
                        </td>
                        <td class="mono text-xs">{{ o.email }}</td>
-                       <td class="mono text-xs">{{ new Date(o.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') }}</td>
+                       <td class="mono text-xs">{{ formatDate(o.createdAt, locale) }}</td>
                        <td class="text-end">
                          <div class="row-actions">
                            <button

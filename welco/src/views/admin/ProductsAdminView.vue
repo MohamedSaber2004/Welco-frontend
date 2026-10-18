@@ -220,6 +220,7 @@ const filteredProducts = computed(() => {
 
   const rawSearch = search.value.trim()
   if (rawSearch) {
+    const searchLower = rawSearch.toLowerCase()
     const searchTokens = rawSearch.split(/\s+/).filter(Boolean).map((tok) => normalizeText(tok))
 
     list = list.filter((p) => {
@@ -231,13 +232,29 @@ const filteredProducts = computed(() => {
       const catCurrent = normalizeText(getCategoryName(p.categoryId))
       const mat = (p.material || '').toLowerCase()
       const slug = (p.slug || '').toLowerCase()
-      const descEn = (p.descriptionEn || p.description || '').toLowerCase()
-      const descAr = normalizeText(p.descriptionAr)
-      const provText = `${p.provider.name.toLowerCase()} ${normalizeText(p.provider.name)}`
 
-      const haystack = `${en} ${ar} ${sku} ${catEn} ${catAr} ${catCurrent} ${mat} ${slug} ${descEn} ${descAr} ${provText}`
+      // Exclude verbose descriptions and provider names to prevent loose false-positive matches (e.g. searching "Kelly" returning other instruments)
+      const haystack = `${en} ${ar} ${sku} ${catEn} ${catAr} ${catCurrent} ${mat} ${slug}`
 
       return searchTokens.every((tok) => haystack.includes(tok))
+    })
+
+    // Rank matching products by relevance: StartsWith > Name Contains > Sku Contains
+    list = [...list].sort((a, b) => {
+      const aName = (a.nameEn || '').toLowerCase()
+      const bName = (b.nameEn || '').toLowerCase()
+      const aSku = (a.sku || '').toLowerCase()
+      const bSku = (b.sku || '').toLowerCase()
+
+      const aStarts = aName.startsWith(searchLower) || aSku.startsWith(searchLower) ? 1 : 0
+      const bStarts = bName.startsWith(searchLower) || bSku.startsWith(searchLower) ? 1 : 0
+      if (aStarts !== bStarts) return bStarts - aStarts
+
+      const aContains = aName.includes(searchLower) ? 1 : 0
+      const bContains = bName.includes(searchLower) ? 1 : 0
+      if (aContains !== bContains) return bContains - aContains
+
+      return 0
     })
   }
 

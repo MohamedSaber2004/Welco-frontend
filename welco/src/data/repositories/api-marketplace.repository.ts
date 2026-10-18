@@ -209,14 +209,15 @@ export class ApiMarketplaceRepository implements MarketplaceRepository {
 
   async getProducts(query: MarketplaceQuery = {}): Promise<PaginatedResult<ProductDto>> {
     const params = new URLSearchParams()
-    if (query.search) {
-      params.set('SearchTerm', query.search)
-      params.set('searchTerm', query.search)
-      params.set('search', query.search)
+    const cleanSearch = (query.search || '').trim()
+    if (cleanSearch) {
+      params.set('SearchTerm', cleanSearch)
+      params.set('search', cleanSearch)
     }
-    if (query.sku) {
-      params.set('Sku', query.sku)
-      params.set('sku', query.sku)
+    if (query.sku?.trim()) {
+      const s = query.sku.trim()
+      params.set('Sku', s)
+      params.set('sku', s)
     }
     if (query.categoryId) params.set('categoryId', query.categoryId)
     if (query.sortBy === 'price-asc') params.set('sortBy', 'price-asc')
@@ -315,8 +316,16 @@ export class ApiMarketplaceRepository implements MarketplaceRepository {
     // NOTE: http.get resolves (not throws) 401 GETs as an empty page.
     try {
       const params = new URLSearchParams()
-      if (query.search) params.set('SearchTerm', query.search)
-      if (query.sku) params.set('Sku', query.sku)
+      if (query.search?.trim()) {
+        const s = query.search.trim()
+        params.set('SearchTerm', s)
+        params.set('search', s)
+      }
+      if (query.sku?.trim()) {
+        const s = query.sku.trim()
+        params.set('Sku', s)
+        params.set('sku', s)
+      }
       if (query.categoryId) params.set('categoryId', query.categoryId)
       params.set('pageNumber', '1')
       params.set('pageSize', '50')

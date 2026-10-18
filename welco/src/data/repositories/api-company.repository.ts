@@ -119,8 +119,16 @@ export class ApiCompanyRepository implements CompanyRepository {
     try {
       const params = new URLSearchParams()
       if (query.categoryId) params.set('categoryId', query.categoryId)
-      if (query.search) params.set('SearchTerm', query.search)
-      if (query.sku) params.set('Sku', query.sku)
+      if (query.search?.trim()) {
+        const s = query.search.trim()
+        params.set('SearchTerm', s)
+        params.set('search', s)
+      }
+      if (query.sku?.trim()) {
+        const s = query.sku.trim()
+        params.set('Sku', s)
+        params.set('sku', s)
+      }
       params.set('pageNumber', String(page))
       params.set('pageSize', String(pageSize))
       const qs = params.toString()
@@ -143,6 +151,17 @@ export class ApiCompanyRepository implements CompanyRepository {
     // Fallback: search general products pool
     try {
       const params = new URLSearchParams()
+      if (query.categoryId) params.set('categoryId', query.categoryId)
+      if (query.search?.trim()) {
+        const s = query.search.trim()
+        params.set('SearchTerm', s)
+        params.set('search', s)
+      }
+      if (query.sku?.trim()) {
+        const s = query.sku.trim()
+        params.set('Sku', s)
+        params.set('sku', s)
+      }
       params.set('pageNumber', '1')
       params.set('pageSize', '50')
       const raw = await this.http

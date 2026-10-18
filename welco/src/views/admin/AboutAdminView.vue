@@ -152,14 +152,6 @@ const previewParagraphs = computed(() => {
         </div>
 
         <div class="head-actions">
-          <router-link to="/about" target="_blank" class="preview-ext-btn mono">
-            <span>{{ t('nav.about') }}</span>
-            <span class="material-symbols-outlined text-[15px] icon--directional">open_in_new</span>
-          </router-link>
-          <router-link to="/" target="_blank" class="preview-ext-btn mono">
-            <span>{{ t('nav.home') }}</span>
-            <span class="material-symbols-outlined text-[15px] icon--directional">open_in_new</span>
-          </router-link>
           <BaseButton variant="primary" :loading="saving" icon="save" @click="handleSave">
             {{ t('common.save') }}
           </BaseButton>
@@ -432,25 +424,6 @@ const previewParagraphs = computed(() => {
   flex-wrap: wrap;
 }
 
-.preview-ext-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.5rem 0.85rem;
-  border-radius: var(--radius-md, 8px);
-  background: var(--slate-100, #f1f5f9);
-  color: var(--slate-700, #334155);
-  font-size: 12px;
-  font-weight: 600;
-  text-decoration: none;
-  border: 1px solid var(--slate-200, #e2e8f0);
-  transition: all 0.15s ease;
-}
-
-.preview-ext-btn:hover {
-  background: var(--slate-200, #e2e8f0);
-  color: var(--slate-900, #0f172a);
-}
 
 /* Grid Layout */
 .editor-grid {

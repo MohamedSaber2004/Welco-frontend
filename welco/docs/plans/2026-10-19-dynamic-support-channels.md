@@ -2,190 +2,132 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use subagent-driven-development (recommended) or executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Enable dynamic configuration of Facebook, Instagram, WhatsApp, Phone, and Email support channels in the Admin Dashboard, and dynamically render them across the Home Page, Specialty Landing Pages, Provider Support, and Footer.
+**Goal:** Enable dynamic configuration and canonical defaults for Facebook, Instagram, WhatsApp, Phone, and Email support channels in the Admin Dashboard, with instant reactive synchronization across the Home Page, Specialty Landing Pages, Provider Support Hub, Help Center, and Footer.
 
-**Architecture:** Extend Admin Dashboard support channel controls to include Facebook and Instagram URLs; build a reusable `SupportChannelsSection.vue` component that reactively displays active channels with brand SVG icons and direct actions; embed this section into `HomeView.vue` and `LandingPageView.vue`; extend `ProviderSupportView.vue` with Facebook and Instagram channel cards.
+**Architecture:** Define canonical brand defaults in `api-content.repository.ts`; extend `updateSupportContact` to persist to `localStorage` and broadcast custom events (`welco:support-contact-updated`); configure `content.service.ts` to listen for cross-tab and cross-component updates; make `SupportChannelsSection.vue` self-loading on mount; ensure Provider Support, Help Center, and Footer display the active channels dynamically.
 
-**Tech Stack:** Vue 3 (Composition API, `<script setup>`), TypeScript, Vite, TailwindCSS / Vanilla CSS design tokens, Vue Router.
+**Tech Stack:** Vue 3 (Composition API, `<script setup>`), TypeScript, Vite, TailwindCSS & Vanilla CSS design tokens, Pinia / Service DI pattern, Vue Router.
 
 ---
 
-### Task 1: Admin Dashboard Support Channels Modal Enhancement
+### Task 1: Canonical Defaults and Live Event Broadcast in Content Repository
 
 **Files:**
-- Modify: `src/views/admin/AdminDashboardView.vue`
+- Modify: `src/data/repositories/api-content.repository.ts`
+- Test: `src/__tests__/App.test.ts` (or add unit test)
 
-- [ ] **Step 1: Update `contactForm` state and `openContactModal`**
-In `src/views/admin/AdminDashboardView.vue`, add `facebookUrl` and `instagramUrl` to `contactForm` ref:
+- [ ] **Step 1: Define `CANONICAL_SUPPORT_CONTACT` and update `toSupportContact`**
+In `src/data/repositories/api-content.repository.ts`:
+Define default fallback URLs:
 ```typescript
-const contactForm = ref({
-  supportEmail: '',
-  phoneNumber: '',
-  whatsAppNumber: '',
-  facebookUrl: '',
-  instagramUrl: '',
-  workingHours: '',
+export const CANONICAL_SUPPORT_DEFAULTS = {
+  supportEmail: 'support@welco.health',
+  phoneNumber: '+971 4 800 9352',
+  whatsAppNumber: '+971500000000',
+  facebookUrl: 'https://facebook.com/welcosurgical',
+  instagramUrl: 'https://instagram.com/welcosurgical',
+  workingHours: 'Mon - Fri: 8:00 AM - 6:00 PM (GST)',
+} as const
+```
+Update `toSupportContact(raw)` to fall back to `localSocial.facebookUrl || CANONICAL_SUPPORT_DEFAULTS.facebookUrl` if the backend returns empty or null, ensuring cards are never blank.
+
+- [ ] **Step 2: Update `updateSupportContact` to broadcast window event**
+In `src/data/repositories/api-content.repository.ts`:
+When saving:
+1. Save `facebookUrl` and `instagramUrl` to `localStorage['welco_social_contacts']`.
+2. Perform `PUT` request to `/api/v1/support/contact`.
+3. Normalize response with `toSupportContact(res)`.
+4. Dispatch `window.dispatchEvent(new CustomEvent('welco:support-contact-updated', { detail: updated }))` to notify all views immediately.
+5. Return normalized DTO.
+
+---
+
+### Task 2: Reactive State and Event Listening in Content Service
+
+**Files:**
+- Modify: `src/application/content.service.ts`
+
+- [ ] **Step 1: Initialize `supportContact` with canonical defaults**
+In `src/application/content.service.ts`, initialize `this.supportContact` with `CANONICAL_SUPPORT_DEFAULTS` so views render immediately before the API responds.
+
+- [ ] **Step 2: Listen for storage and broadcast events**
+In `src/application/content.service.ts` constructor or setup method:
+Add event listeners for:
+- `window.addEventListener('welco:support-contact-updated', ...)`
+- `window.addEventListener('storage', ...)`
+When triggered, reload or re-assign `this.supportContact.value = event.detail || await this.repo.getSupportContact()`.
+
+---
+
+### Task 3: Self-Loading and Robust Card Rendering in `SupportChannelsSection.vue`
+
+**Files:**
+- Modify: `src/components/support/SupportChannelsSection.vue`
+
+- [ ] **Step 1: Add `onMounted` hook in `SupportChannelsSection.vue`**
+Import `onMounted` from `vue` and trigger:
+```typescript
+onMounted(() => {
+  void services.contentService.loadSupportContact()
 })
 ```
-And update `openContactModal()`:
-```typescript
-function openContactModal() {
-  const current = services.contentService.supportContact.value
-  contactForm.value = {
-    supportEmail: current.supportEmail || '',
-    phoneNumber: current.phoneNumber || '',
-    whatsAppNumber: current.whatsAppNumber || '',
-    facebookUrl: current.facebookUrl || '',
-    instagramUrl: current.instagramUrl || '',
-    workingHours: current.workingHours || '',
-  }
-  contactError.value = null
-  showContactModal.value = true
-}
-```
+This guarantees that whenever `SupportChannelsSection` mounts (such as on direct navigation to a landing page `/landing/:slug`), the support channels data is loaded and rendered.
 
-- [ ] **Step 2: Update `handleSaveContact()`**
-In `src/views/admin/AdminDashboardView.vue`, pass `facebookUrl` and `instagramUrl` (trimmed or undefined) when calling `services.contentService.updateSupportContact(...)`:
-```typescript
-await services.contentService.updateSupportContact({
-  supportEmail: contactForm.value.supportEmail.trim(),
-  phoneNumber: contactForm.value.phoneNumber.trim(),
-  whatsAppNumber: contactForm.value.whatsAppNumber.trim(),
-  facebookUrl: contactForm.value.facebookUrl.trim() || undefined,
-  instagramUrl: contactForm.value.instagramUrl.trim() || undefined,
-  workingHours: contactForm.value.workingHours.trim() || undefined,
-})
-```
-
-- [ ] **Step 3: Add Facebook and Instagram inputs to the modal template**
-In `showContactModal` form in `AdminDashboardView.vue`, add two `BaseInput` components:
-```vue
-<div class="modal-grid-2">
-  <BaseInput
-    v-model="contactForm.facebookUrl"
-    :label="t('admin.facebookUrlLabel') || 'Facebook Page URL'"
-    placeholder="https://facebook.com/welco"
-    :required="false"
-  />
-  <BaseInput
-    v-model="contactForm.instagramUrl"
-    :label="t('admin.instagramUrlLabel') || 'Instagram Profile URL'"
-    placeholder="https://instagram.com/welco"
-    :required="false"
-  />
-</div>
-```
+- [ ] **Step 2: Verify Facebook and Instagram cards**
+Ensure Facebook and Instagram cards display clean URLs, responsive grid layouts, SVG icons, and valid external links (`target="_blank" rel="noopener noreferrer"`).
 
 ---
 
-### Task 2: Provider Support View Enhancement
+### Task 4: Integrate and Verify Home Page and Landing Page
 
 **Files:**
-- Modify: `src/views/provider/ProviderSupportView.vue`
+- Verify: `src/views/HomeView.vue`
+- Verify: `src/views/catalog/LandingPageView.vue`
 
-- [ ] **Step 1: Add Facebook & Instagram computed properties**
-In `src/views/provider/ProviderSupportView.vue`:
-```typescript
-const liveFacebook = computed(() => supportContact.value?.facebookUrl || '')
-const liveInstagram = computed(() => supportContact.value?.instagramUrl || '')
-```
+- [ ] **Step 1: Verify `<SupportChannelsSection />` in `HomeView.vue`**
+Confirm `<SupportChannelsSection />` is properly mounted above the footer and rendered on desktop and mobile.
 
-- [ ] **Step 2: Add Facebook and Instagram Desk Cards to channels grid**
-In `src/views/provider/ProviderSupportView.vue`, right after the Email Desk Card:
-```vue
-<!-- Facebook Channel Card -->
-<div v-if="liveFacebook" class="channel-card">
-  <div class="channel-icon bg-blue-soft">
-    <svg class="w-5 h-5 text-blue-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-    </svg>
-  </div>
-  <div class="channel-info">
-    <span class="channel-label mono">{{ t('help.facebookChannel') }}</span>
-    <strong class="channel-main mono text-sm truncate max-w-[220px]">{{ liveFacebook }}</strong>
-    <p class="channel-sub">{{ t('help.facebookChannelNote') }}</p>
-  </div>
-  <a :href="liveFacebook" target="_blank" rel="noopener noreferrer" class="btn-channel btn-fb mono">
-    <span class="material-symbols-outlined text-[16px]">open_in_new</span>
-    <span>{{ t('common.open') || 'Visit' }}</span>
-  </a>
-</div>
-
-<!-- Instagram Channel Card -->
-<div v-if="liveInstagram" class="channel-card">
-  <div class="channel-icon bg-pink-soft">
-    <svg class="w-5 h-5 text-pink-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-    </svg>
-  </div>
-  <div class="channel-info">
-    <span class="channel-label mono">{{ t('help.instagramChannel') }}</span>
-    <strong class="channel-main mono text-sm truncate max-w-[220px]">{{ liveInstagram }}</strong>
-    <p class="channel-sub">{{ t('help.instagramChannelNote') }}</p>
-  </div>
-  <a :href="liveInstagram" target="_blank" rel="noopener noreferrer" class="btn-channel btn-ig mono">
-    <span class="material-symbols-outlined text-[16px]">open_in_new</span>
-    <span>{{ t('common.open') || 'Visit' }}</span>
-  </a>
-</div>
-```
+- [ ] **Step 2: Verify `<SupportChannelsSection />` in `LandingPageView.vue`**
+Confirm `<SupportChannelsSection />` is properly mounted inside the landing page container.
 
 ---
 
-### Task 3: Create Shared Component `SupportChannelsSection.vue`
+### Task 5: Verify Provider Support, Help Center, and App Footer
 
 **Files:**
-- Create: `src/components/support/SupportChannelsSection.vue`
+- Verify/Modify: `src/views/provider/ProviderSupportView.vue`
+- Verify/Modify: `src/views/support/HelpCenterView.vue`
+- Verify/Modify: `src/components/layout/AppFooter.vue`
 
-- [ ] **Step 1: Write `SupportChannelsSection.vue`**
-Build a sleek, high-tech, accessible component:
-- Computes reactive fields from `services.contentService.supportContact.value`:
-  - `whatsAppNumber`, `phoneNumber`, `supportEmail`, `facebookUrl`, `instagramUrl`, `workingHours`.
-- Has `hasAnyChannel` computed flag so it only renders if at least one channel exists.
-- Clean cards with crisp SVG brand icons, direct click links, accessible labels.
-- Scoped CSS using Welco design tokens (`--wl-surface`, `--wl-border`, `--wl-primary`, `--wl-ease-spring`, etc.).
+- [ ] **Step 1: Verify Facebook & Instagram Desk Cards in `ProviderSupportView.vue`**
+Ensure `liveFacebook` and `liveInstagram` use the reactive `supportContact` and render with official SVG icons and links.
+
+- [ ] **Step 2: Verify Help Center cards in `HelpCenterView.vue`**
+Ensure Facebook and Instagram cards render in the channels grid and open the URLs.
+
+- [ ] **Step 3: Verify Footer in `AppFooter.vue`**
+Ensure Facebook and Instagram links are rendered in the footer social section.
 
 ---
 
-### Task 4: Integrate `SupportChannelsSection.vue` into Home Page
+### Task 6: Admin Dashboard & Help Admin Live Verification
 
 **Files:**
-- Modify: `src/views/HomeView.vue`
+- Verify: `src/views/admin/AdminDashboardView.vue`
+- Verify: `src/views/admin/HelpAdminView.vue`
 
-- [ ] **Step 1: Import `SupportChannelsSection`**
-```typescript
-import SupportChannelsSection from '../components/support/SupportChannelsSection.vue'
-```
-- [ ] **Step 2: Add component to template before the footer**
-Mount `<SupportChannelsSection />` right before the price quote modal or after the About section.
+- [ ] **Step 1: Verify form inputs and saving in Admin Dashboard**
+Confirm Facebook and Instagram URL fields in the Quick Support Modal submit without error.
 
----
-
-### Task 5: Integrate `SupportChannelsSection.vue` into Landing Page
-
-**Files:**
-- Modify: `src/views/catalog/LandingPageView.vue`
-
-- [ ] **Step 1: Import `SupportChannelsSection`**
-```typescript
-import SupportChannelsSection from '../../components/support/SupportChannelsSection.vue'
-```
-- [ ] **Step 2: Add component to template**
-Mount `<SupportChannelsSection />` towards the bottom above the footer.
+- [ ] **Step 2: Verify Help Admin Tab 4 (Support Channels)**
+Confirm saving updates both the backend and localStorage, triggering the broadcast event.
 
 ---
 
-### Task 6: Translations Verification
+### Task 7: Build, Typecheck, and Tests
 
-**Files:**
-- Modify: `src/i18n/messages.ts`, `src/i18n/en.ts`, `src/i18n/ar.ts`
+- [ ] **Step 1: Run type checking**
+Run `npx vue-tsc --noEmit` to verify 0 TypeScript compiler errors.
 
-- [ ] **Step 1: Ensure keys exist for facebookUrlLabel, instagramUrlLabel in admin**
-Add `facebookUrlLabel` and `instagramUrlLabel` keys so the Admin form shows localized labels in English and Arabic.
-
----
-
-### Task 7: Build & Validation
-
-- [ ] **Step 1: Run type checking and tests**
-Run `npm run build` or `npx vue-tsc --noEmit` and vitest to guarantee zero regressions.
+- [ ] **Step 2: Run test suite**
+Run `npm test` or `npx vitest run` to ensure all tests pass.

@@ -21,6 +21,7 @@ import type { UserDetailsDto, UserDto } from '../../domain/models/user'
 import { USER_TYPE_ROLE_KEY } from '../../domain/models/user'
 import { AppLanguage } from '../../domain/models/user'
 import { formatDate } from '../../utils/format'
+import { exportCompaniesReportPdf } from '../../utils/pdf-export'
 
 const route = useRoute()
 const router = useRouter()
@@ -538,6 +539,12 @@ watch(companySearch, () => {
 watch([applicationSearch, statusFilter, typeFilter], () => {
   applicationPage.value = 1
 })
+
+function downloadCompaniesReport() {
+  if (!filteredCompanies.value.length) return
+  exportCompaniesReportPdf(filteredCompanies.value)
+  toastService.success(locale.value === 'ar' ? 'تم تصدير دليل الشركات (PDF) بنجاح' : 'Companies directory PDF exported successfully')
+}
 </script>
 
 <template>
@@ -552,6 +559,18 @@ watch([applicationSearch, statusFilter, typeFilter], () => {
           </div>
           <h1 class="head-title">{{ t('admin.companies') }}</h1>
           <p class="head-subtitle">{{ t('admin.companiesDesc') }}</p>
+        </div>
+
+        <div class="head-actions">
+          <BaseButton
+            variant="secondary"
+            class="mono"
+            :disabled="!filteredCompanies.length"
+            @click="downloadCompaniesReport"
+          >
+            <span class="material-symbols-outlined text-[18px]">picture_as_pdf</span>
+            <span>{{ locale === 'ar' ? 'تصدير الشركات (PDF)' : 'Export Directory (PDF)' }}</span>
+          </BaseButton>
         </div>
       </header>
 
@@ -590,6 +609,15 @@ watch([applicationSearch, statusFilter, typeFilter], () => {
               class="toolbar-input"
             />
           </div>
+          <BaseButton
+            variant="secondary"
+            class="mono"
+            :disabled="!filteredCompanies.length"
+            @click="downloadCompaniesReport"
+          >
+            <span class="material-symbols-outlined text-[18px]">picture_as_pdf</span>
+            <span>{{ locale === 'ar' ? 'تصدير الشركات (PDF)' : 'Export PDF' }}</span>
+          </BaseButton>
           <BaseButton variant="primary" @click="openCreateCompany">
             <span class="material-symbols-outlined text-[18px]">add</span>
             <span>{{ t('admin.newCompany') }}</span>

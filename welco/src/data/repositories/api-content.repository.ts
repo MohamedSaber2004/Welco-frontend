@@ -202,11 +202,22 @@ export class ApiContentRepository implements ContentRepository {
     }
     const str = (v: unknown): string | undefined =>
       typeof v === 'string' && v.trim() ? v.trim() : undefined
+    const localSocial = (() => {
+      try {
+        const item = typeof localStorage !== 'undefined' ? localStorage.getItem('welco_social_contacts') : null
+        return item ? JSON.parse(item) : {}
+      } catch {
+        return {}
+      }
+    })()
+
     return {
       id: str(payload.id ?? payload.Id),
       supportEmail: pick('supportEmail', 'SupportEmail', 'email', 'Email'),
       phoneNumber: pick('phoneNumber', 'PhoneNumber', 'phone', 'Phone'),
       whatsAppNumber: pick('whatsAppNumber', 'WhatsAppNumber', 'whatsapp', 'Whatsapp'),
+      facebookUrl: pick('facebookUrl', 'FacebookUrl', 'facebook', 'Facebook') || localSocial.facebookUrl || undefined,
+      instagramUrl: pick('instagramUrl', 'InstagramUrl', 'instagram', 'Instagram') || localSocial.instagramUrl || undefined,
       workingHours: pick('workingHours', 'WorkingHours') || undefined,
       updatedAt: str(payload.updatedAt ?? payload.UpdatedAt),
     }
@@ -222,6 +233,19 @@ export class ApiContentRepository implements ContentRepository {
   }
 
   async updateSupportContact(payload: UpdateSupportContactPayload): Promise<SupportContactDto> {
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem(
+          'welco_social_contacts',
+          JSON.stringify({
+            facebookUrl: payload.facebookUrl,
+            instagramUrl: payload.instagramUrl,
+          }),
+        )
+      }
+    } catch {
+      // non-blocking
+    }
     const res = await this.http.put<unknown>(SUPPORT_ROUTES.contact, payload)
     return this.toSupportContact(res)
   }

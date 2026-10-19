@@ -22,6 +22,8 @@ export class ContentService {
     supportEmail: '',
     phoneNumber: '',
     whatsAppNumber: '',
+    facebookUrl: '',
+    instagramUrl: '',
     workingHours: '',
   })
   readonly loading = ref(false)
@@ -171,7 +173,7 @@ export class ContentService {
     try {
       const data = await this.repo.getSupportContact()
       // Keep last-known-good: an empty/failed fetch must not blank the footer.
-      if (data && (data.supportEmail || data.phoneNumber || data.whatsAppNumber)) {
+      if (data && (data.supportEmail || data.phoneNumber || data.whatsAppNumber || data.facebookUrl || data.instagramUrl)) {
         this.supportContact.value = data
       }
       return this.supportContact.value

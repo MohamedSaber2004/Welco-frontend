@@ -107,6 +107,8 @@ export interface SupportContactDto {
   supportEmail: string
   phoneNumber: string
   whatsAppNumber: string
+  facebookUrl?: string
+  instagramUrl?: string
   workingHours?: string
   updatedAt?: string
 }
@@ -115,6 +117,8 @@ export interface UpdateSupportContactPayload {
   supportEmail: string
   phoneNumber: string
   whatsAppNumber: string
+  facebookUrl?: string
+  instagramUrl?: string
   workingHours?: string
 }
 

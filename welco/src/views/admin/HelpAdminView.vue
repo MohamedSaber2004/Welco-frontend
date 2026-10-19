@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref, computed } from 'vue'
 import { useAnimation } from '../../composables/useAnimation'
-import { t } from '../../i18n'
+import { t, locale } from '../../i18n'
 import { contentService } from '../../di/container'
 import AdminLayout from '../../components/layout/AdminLayout.vue'
 import SkeletonLoader from '../../components/ui/SkeletonLoader.vue'
@@ -84,7 +84,14 @@ const paginatedFaqs = computed(() => {
 })
 const faqTotalPages = computed(() => Math.max(1, Math.ceil(filteredFaqs.value.length / pageSize)))
 
-const contactForm = ref({ supportEmail: '', phoneNumber: '', whatsAppNumber: '', workingHours: '' })
+const contactForm = ref({
+  supportEmail: '',
+  phoneNumber: '',
+  whatsAppNumber: '',
+  facebookUrl: '',
+  instagramUrl: '',
+  workingHours: '',
+})
 const contactLoading = ref(false)
 const contactError = ref('')
 const contactDirty = ref(false)
@@ -95,6 +102,8 @@ const fillContactForm = () => {
     supportEmail: c.supportEmail ?? '',
     phoneNumber: c.phoneNumber ?? '',
     whatsAppNumber: c.whatsAppNumber ?? '',
+    facebookUrl: c.facebookUrl ?? '',
+    instagramUrl: c.instagramUrl ?? '',
     workingHours: c.workingHours ?? '',
   }
   contactDirty.value = false
@@ -112,6 +121,8 @@ const saveContact = async () => {
       supportEmail: contactForm.value.supportEmail.trim(),
       phoneNumber: contactForm.value.phoneNumber.trim(),
       whatsAppNumber: contactForm.value.whatsAppNumber.trim(),
+      facebookUrl: contactForm.value.facebookUrl.trim() || undefined,
+      instagramUrl: contactForm.value.instagramUrl.trim() || undefined,
       workingHours: contactForm.value.workingHours.trim() || undefined,
     })
     contactDirty.value = false
@@ -967,6 +978,55 @@ const closeFaqDetails = () => {
                     :placeholder="t('admin.workingHoursPlaceholder')"
                     @input="contactDirty = true"
                   />
+                </div>
+              </div>
+
+              <!-- Social Media Channels: Facebook & Instagram -->
+              <div class="form-row two-cols">
+                <div class="form-field">
+                  <div class="flex items-center justify-between mb-1">
+                    <label class="field-label mb-0" for="contact-facebook">
+                      {{ locale === 'ar' ? 'صفحة فيسبوك' : 'Facebook Page URL' }}
+                    </label>
+                    <span class="text-xs text-slate-400">({{ locale === 'ar' ? 'اختياري' : 'Optional' }})</span>
+                  </div>
+                  <div class="relative">
+                    <input
+                      id="contact-facebook"
+                      v-model="contactForm.facebookUrl"
+                      type="url"
+                      dir="ltr"
+                      class="field-input mono text-xs ps-8"
+                      :placeholder="locale === 'ar' ? 'https://facebook.com/welcosurgical' : 'https://facebook.com/welcosurgical'"
+                      @input="contactDirty = true"
+                    />
+                    <span class="material-symbols-outlined absolute inset-inline-start-2.5 top-2.5 text-blue-600 text-[16px] pointer-events-none">
+                      public
+                    </span>
+                  </div>
+                </div>
+
+                <div class="form-field">
+                  <div class="flex items-center justify-between mb-1">
+                    <label class="field-label mb-0" for="contact-instagram">
+                      {{ locale === 'ar' ? 'حساب إنستغرام' : 'Instagram Profile URL' }}
+                    </label>
+                    <span class="text-xs text-slate-400">({{ locale === 'ar' ? 'اختياري' : 'Optional' }})</span>
+                  </div>
+                  <div class="relative">
+                    <input
+                      id="contact-instagram"
+                      v-model="contactForm.instagramUrl"
+                      type="url"
+                      dir="ltr"
+                      class="field-input mono text-xs ps-8"
+                      :placeholder="locale === 'ar' ? 'https://instagram.com/welcosurgical' : 'https://instagram.com/welcosurgical'"
+                      @input="contactDirty = true"
+                    />
+                    <span class="material-symbols-outlined absolute inset-inline-start-2.5 top-2.5 text-pink-600 text-[16px] pointer-events-none">
+                      photo_camera
+                    </span>
+                  </div>
                 </div>
               </div>
               <p v-if="contactError" class="form-error" role="alert">{{ contactError }}</p>

@@ -9,6 +9,8 @@ const isAuthed = computed(() => authService.isAuthenticated)
 
 const effectiveEmail = computed(() => support.value?.supportEmail || 'support@welco.health')
 const effectivePhone = computed(() => support.value?.phoneNumber || '+971 4 800 9352')
+const effectiveFacebook = computed(() => support.value?.facebookUrl || '')
+const effectiveInstagram = computed(() => support.value?.instagramUrl || '')
 
 const displayWorkingHours = computed(() => {
   const raw = support.value?.workingHours
@@ -76,6 +78,36 @@ const displayWorkingHours = computed(() => {
               <span class="hours-label">{{ t('footer.workingHoursLabel') }}</span>
               <span class="hours-val">{{ displayWorkingHours }}</span>
             </div>
+          </div>
+
+          <!-- Social Media Channels (Facebook & Instagram) -->
+          <div v-if="effectiveFacebook || effectiveInstagram" class="footer__social-row">
+            <a
+              v-if="effectiveFacebook"
+              :href="effectiveFacebook"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="footer__social-link footer__social-link--facebook"
+              title="Facebook"
+            >
+              <svg class="social-svg" viewBox="0 0 24 24" aria-hidden="true">
+                <path fill="currentColor" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              </svg>
+              <span>Facebook</span>
+            </a>
+            <a
+              v-if="effectiveInstagram"
+              :href="effectiveInstagram"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="footer__social-link footer__social-link--instagram"
+              title="Instagram"
+            >
+              <svg class="social-svg" viewBox="0 0 24 24" aria-hidden="true">
+                <path fill="currentColor" d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+              </svg>
+              <span>Instagram</span>
+            </a>
           </div>
         </div>
       </div>
@@ -267,6 +299,52 @@ const displayWorkingHours = computed(() => {
   font-size: 12.5px;
   font-weight: 600;
   color: #0F3D56;
+}
+
+.footer__social-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.footer__social-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.15s ease;
+  border: 1px solid #E2E8F0;
+  background: #FFFFFF;
+}
+
+.footer__social-link--facebook {
+  color: #1877F2;
+}
+
+.footer__social-link--facebook:hover {
+  background: #EBF5FF;
+  border-color: #BFDBFE;
+}
+
+.footer__social-link--instagram {
+  color: #E1306C;
+}
+
+.footer__social-link--instagram:hover {
+  background: #FDF2F8;
+  border-color: #FBCFE8;
+}
+
+.social-svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
 }
 
 .footer__note {

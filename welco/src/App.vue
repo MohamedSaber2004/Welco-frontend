@@ -15,29 +15,6 @@ import type { MessageKey } from './i18n'
 
 const route = useRoute()
 
-onMounted(() => {
-  if (!route.path?.startsWith('/admin')) {
-    void services.contentService.loadSupportContact()
-  }
-})
-
-watch(() => showFooter.value, (visible) => {
-  if (visible && !services.contentService.supportContact.value?.supportEmail) {
-    void services.contentService.loadSupportContact()
-  }
-})
-
-watch(locale, () => {
-  if (route.meta?.isLandingPage || route.name === 'home' || route.path === '/') {
-    document.title = locale.value === 'ar'
-      ? 'ويلكو — منصة الأدوات الجراحية والمستلزمات الطبية'
-      : 'Welco — Surgical Instruments Platform'
-    return
-  }
-  const k = route.meta?.titleKey as MessageKey | undefined
-  document.title = k ? `${t(k)} · Welco` : 'Welco — Surgical Instruments Platform'
-})
-
 const showFooter = computed(() => {
   if (route.meta?.isLandingPage) return true
   if (route.meta?.hideFooter) return false
@@ -76,19 +53,38 @@ const showWhatsApp = computed(() => route.name === 'home' || route.path === '/')
 
 const whatsAppOffset = computed(() => '')
 
-/* Dashboard routes (admin / staff / provider) use the unified dashboard
- * shell and never show the public landing chrome. Client-facing pages
- * always keep the landing layout (navbar + footer + mobile nav). */
 const isDashboardRoute = computed(() => {
   const path = route.path || ''
-  // NOTE: '/provider' prefix must not swallow public '/providers/*' —
-  // match the exact dashboard roots only.
+
   return (
     path === '/admin' ||
     path.startsWith('/admin/') ||
     path === '/provider' ||
     path.startsWith('/provider/')
   )
+})
+
+onMounted(() => {
+  if (!route.path?.startsWith('/admin')) {
+    void services.contentService.loadSupportContact()
+  }
+})
+
+watch(showFooter, (visible) => {
+  if (visible && !services.contentService.supportContact.value?.supportEmail) {
+    void services.contentService.loadSupportContact()
+  }
+})
+
+watch(locale, () => {
+  if (route.meta?.isLandingPage || route.name === 'home' || route.path === '/') {
+    document.title = locale.value === 'ar'
+      ? 'ويلكو — منصة الأدوات الجراحية والمستلزمات الطبية'
+      : 'Welco — Surgical Instruments Platform'
+    return
+  }
+  const k = route.meta?.titleKey as MessageKey | undefined
+  document.title = k ? `${t(k)} · Welco` : 'Welco — Surgical Instruments Platform'
 })
 </script>
 
@@ -110,7 +106,7 @@ const isDashboardRoute = computed(() => {
   <AppMobileNav v-if="!isDashboardRoute" />
   <WhatsAppFab
     v-if="showWhatsApp && !isDashboardRoute"
-    :phone="services.contentService.supportContact.value.whatsAppNumber"
+    :phone="services.contentService.supportContact.value?.whatsAppNumber || ''"
     :bottom-offset="whatsAppOffset"
   />
 </template>

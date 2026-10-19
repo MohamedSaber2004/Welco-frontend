@@ -6,7 +6,6 @@ import {
   currencySymbolForAddressCountry,
   distinctCurrenciesFromAddresses,
   resolveCurrencyCountry,
-  currencyDisplaySymbol,
   type CountryRef,
   type CurrencyRef,
 } from '../country-currency-map'

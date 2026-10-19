@@ -2,7 +2,7 @@
 import { onMounted, ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAnimation } from '../../composables/useAnimation'
-import { t, locale } from '../../i18n'
+import { t, locale, localized } from '../../i18n'
 import { salesService } from '../../di/container'
 import AccountNav from '../../components/account/AccountNav.vue'
 import BackButton from '../../components/ui/BackButton.vue'
@@ -138,7 +138,7 @@ onMounted(() => {
           <span class="material-symbols-outlined">contact_support</span>
         </div>
         <div class="kpi-body">
-          <span class="kpi-label mono">{{ locale === 'ar' ? 'إجمالي الاستفسارات' : 'Total Inquiries' }}</span>
+          <span class="kpi-label mono">{{ t('account.totalInquiries') }}</span>
           <strong class="kpi-val mono">{{ totalCount }}</strong>
         </div>
       </div>
@@ -148,7 +148,7 @@ onMounted(() => {
           <span class="material-symbols-outlined">verified</span>
         </div>
         <div class="kpi-body">
-          <span class="kpi-label mono">{{ locale === 'ar' ? 'تم الرد عليها' : 'Responded Inquiries' }}</span>
+          <span class="kpi-label mono">{{ t('account.respondedInquiries') }}</span>
           <strong class="kpi-val mono text-emerald-600">{{ respondedCount }}</strong>
         </div>
       </div>
@@ -158,7 +158,7 @@ onMounted(() => {
           <span class="material-symbols-outlined">hourglass_top</span>
         </div>
         <div class="kpi-body">
-          <span class="kpi-label mono">{{ locale === 'ar' ? 'قيد الانتظار' : 'Awaiting Reply' }}</span>
+          <span class="kpi-label mono">{{ t('account.awaitingReply') }}</span>
           <strong class="kpi-val mono text-amber-600">{{ pendingCount }}</strong>
         </div>
       </div>
@@ -183,7 +183,7 @@ onMounted(() => {
           :class="{ 'is-active': statusFilter === 'responded' }"
           @click="setFilter('responded')"
         >
-          <span>{{ locale === 'ar' ? 'تم الرد' : 'Responded' }}</span>
+          <span>{{ t('account.inquiryResponded') }}</span>
           <span class="tab-count tab-count--success">{{ respondedCount }}</span>
         </button>
 
@@ -203,7 +203,7 @@ onMounted(() => {
         <input
           v-model="searchQuery"
           type="search"
-          :placeholder="locale === 'ar' ? 'البحث عن منتج أو كود SKU أو محتوى استفسار...' : 'Search by product name, SKU, or message...'"
+          :placeholder="t('account.inquirySearchPh')"
           class="search-input"
           @input="onSearch"
         />
@@ -283,7 +283,7 @@ onMounted(() => {
                 :to="`/marketplace/product/${inq.productId}`"
                 class="product-title-link"
               >
-                <span>{{ (locale === 'ar' ? (inq.productNameAr || inq.productNameEn) : (inq.productNameEn || inq.productNameAr)) || (locale === 'ar' ? 'منتج غير محدد' : 'Instrument Detail') }}</span>
+                <span>{{ localized(inq.productNameEn, inq.productNameAr) || t('account.unspecifiedProduct') }}</span>
                 <span class="material-symbols-outlined icon--directional text-[16px] text-slate-400">arrow_forward</span>
               </router-link>
               <div class="product-meta-row mono">
@@ -305,7 +305,7 @@ onMounted(() => {
               <span class="material-symbols-outlined text-[14px]">
                 {{ inq.response ? 'check_circle' : 'hourglass_empty' }}
               </span>
-              <span>{{ inq.response ? (locale === 'ar' ? 'تم الرد' : 'Responded') : (locale === 'ar' ? 'قيد الانتظار' : 'Pending') }}</span>
+              <span>{{ inq.response ? t('account.inquiryResponded') : t('common.pending') }}</span>
             </span>
           </div>
         </header>
@@ -314,7 +314,7 @@ onMounted(() => {
         <div class="inquiry-client-bubble">
           <div class="bubble-tag mono">
             <span class="material-symbols-outlined text-[14px]">send</span>
-            <span>{{ locale === 'ar' ? 'استفسارك المرسل' : 'Your Inquiry' }}</span>
+            <span>{{ t('account.yourSentInquiry') }}</span>
             <span v-if="inq.organization" class="org-sub">({{ inq.organization }})</span>
           </div>
           <p class="bubble-content">{{ inq.message }}</p>
@@ -338,7 +338,7 @@ onMounted(() => {
           <span class="material-symbols-outlined text-[18px] text-amber-600">schedule</span>
           <div>
             <strong>{{ t('account.awaitingProviderResponse') }}</strong>
-            <span class="pending-sub"> &mdash; {{ locale === 'ar' ? 'سيقوم المورّد بمراجعة المواصفات والرد عليك في أقرب وقت.' : 'The provider is reviewing technical specifications and will respond shortly.' }}</span>
+            <span class="pending-sub"> &mdash; {{ t('account.providerReviewingPending') }}</span>
           </div>
         </div>
       </article>

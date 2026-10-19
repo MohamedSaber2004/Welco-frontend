@@ -85,7 +85,7 @@ onMounted(() => {
 
 const handleSave = async () => {
   if (!form.value.heroTitle.trim()) {
-    toastService.error(locale.value === 'ar' ? 'يرجى إدخال عنوان الصفحة' : 'Please provide a hero title.')
+    toastService.error(t('admin.errHeroTitle'))
     return
   }
 
@@ -115,7 +115,7 @@ const handleSave = async () => {
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('welco:content-changed'))
     }
-    toastService.success(locale.value === 'ar' ? 'تم حفظ ومزامنة بيانات صفحة من نحن بنجاح' : 'About Us content saved and synchronized successfully!')
+    toastService.success(t('admin.aboutSavedSuccess'))
   } catch (e) {
     toastService.error(e instanceof Error ? e.message : t('common.error'))
   } finally {
@@ -142,7 +142,7 @@ const previewParagraphs = computed(() => {
             <span class="pulse-dot"></span>
             <span>CONTENT SYNCHRONIZATION</span>
           </div>
-          <h1 class="head-title">{{ locale === 'ar' ? 'إدارة صفحة من نحن والمزامنة' : 'About Us Management' }}</h1>
+          <h1 class="head-title">{{ t('admin.aboutAdminTitle') }}</h1>
           <p class="head-subtitle">
             {{ locale === 'ar'
               ? 'التحكم في محتوى ورسالة الشركة لمزامنتها آلياً بين الصفحة الرئيسية وصفحة من نحن.'
@@ -171,7 +171,7 @@ const previewParagraphs = computed(() => {
             <div class="card-head">
               <div class="card-head__title">
                 <span class="material-symbols-outlined card-icon">tune</span>
-                <h2 class="card-title">{{ locale === 'ar' ? 'إعدادات المحتوى والبيانات' : 'Content Controls' }}</h2>
+                <h2 class="card-title">{{ t('admin.aboutContentControls') }}</h2>
               </div>
               <div class="status-toggle-wrap">
                 <label class="switch-label mono text-xs">
@@ -185,7 +185,7 @@ const previewParagraphs = computed(() => {
             <form class="editor-form" @submit.prevent="handleSave">
               <div class="form-group">
                 <label class="field-label" for="about-title">
-                  {{ locale === 'ar' ? 'عنوان القسم الرئيسي (Hero Title)' : 'Hero Title' }} *
+                  {{ t('admin.aboutHeroTitle') }} *
                 </label>
                 <input
                   id="about-title"
@@ -196,13 +196,13 @@ const previewParagraphs = computed(() => {
                   :placeholder="defaultFallbacks.heroTitle"
                 />
                 <span class="field-hint mono text-xs">
-                  {{ locale === 'ar' ? 'العنوان الرئيسي الذي يبرز هوية ويلكو ورسالتها في تصنيع وتوريد المستلزمات الطبية والجراحية.' : 'The primary headline introducing Welco\'s medical and surgical manufacturing mission.' }}
+                  {{ t('admin.aboutHeroTitleDesc') }}
                 </span>
               </div>
 
               <div class="form-group">
                 <label class="field-label" for="about-body">
-                  {{ locale === 'ar' ? 'الملخص التعريفي / الشعار (Tagline / Hero Body)' : 'Hero Body & Subtitle' }}
+                  {{ t('admin.aboutHeroBody') }}
                 </label>
                 <textarea
                   id="about-body"
@@ -212,17 +212,17 @@ const previewParagraphs = computed(() => {
                   :placeholder="defaultFallbacks.heroBody"
                 ></textarea>
                 <span class="field-hint mono text-xs">
-                  {{ locale === 'ar' ? 'نظرة عامة موجزة حول معايير التصنيع الجراحي والقدرات الإنتاجية وشراكات المستشفيات والمراكز الطبية.' : 'High-level overview of manufacturing standards, surgical capabilities, and clinical client partnerships.' }}
+                  {{ t('admin.aboutHeroBodyDesc') }}
                 </span>
               </div>
 
               <div class="form-group">
                 <div class="flex items-center justify-between">
                   <label class="field-label" for="about-story">
-                    {{ locale === 'ar' ? 'القصة الكاملة والتفاصيل (Full Story / Narrative)' : 'Full Story Narrative' }}
+                    {{ t('admin.aboutFullStory') }}
                   </label>
                   <span class="mono text-xs text-muted">
-                    {{ previewParagraphs.length }} {{ locale === 'ar' ? 'فقرات' : 'paragraphs' }}
+                    {{ previewParagraphs.length }} {{ t('admin.aboutParagraphs') }}
                   </span>
                 </div>
                 <textarea
@@ -233,13 +233,13 @@ const previewParagraphs = computed(() => {
                   :placeholder="defaultFallbacks.contentBlock"
                 ></textarea>
                 <span class="field-hint mono text-xs">
-                  {{ locale === 'ar' ? 'النبذة المؤسسية الشاملة حول تراخيص ISO 13485 ومعايير CE MDR وجودة المعادن وشبكة التوزيع المعتمدة. افصل بين الفقرات بمسافة سطر.' : 'Comprehensive company background, ISO 13485 / CE MDR compliance, metallurgy standards, and distribution network. Separate distinct sections with a blank line.' }}
+                  {{ t('admin.aboutFullStoryDesc') }}
                 </span>
               </div>
 
               <div class="editor-actions">
                 <BaseButton variant="primary" type="submit" :loading="saving" icon="check">
-                  {{ locale === 'ar' ? 'حفظ ومزامنة فورية' : 'Save & Synchronize' }}
+                  {{ t('admin.aboutSaveSync') }}
                 </BaseButton>
                 <BaseButton
                   variant="ghost"
@@ -250,7 +250,7 @@ const previewParagraphs = computed(() => {
                     form.contentBlock = defaultFallbacks.contentBlock;
                   "
                 >
-                  {{ locale === 'ar' ? 'استعادة الافتراضي' : 'Reset to Default' }}
+                  {{ t('admin.aboutResetDefault') }}
                 </BaseButton>
               </div>
             </form>
@@ -261,7 +261,7 @@ const previewParagraphs = computed(() => {
             <div class="card-head">
               <div class="card-head__title">
                 <span class="material-symbols-outlined card-icon">visibility</span>
-                <h2 class="card-title">{{ locale === 'ar' ? 'المعاينة الحية للمزامنة' : 'Live Sync Preview' }}</h2>
+                <h2 class="card-title">{{ t('admin.aboutLivePreview') }}</h2>
               </div>
               <div class="preview-tabs mono">
                 <button
@@ -271,7 +271,7 @@ const previewParagraphs = computed(() => {
                   @click="previewMode = 'landing'"
                 >
                   <span class="material-symbols-outlined text-[15px]">home</span>
-                  <span>{{ locale === 'ar' ? 'الصفحة الرئيسية' : 'Homepage' }}</span>
+                  <span>{{ t('admin.aboutHomepage') }}</span>
                 </button>
                 <button
                   type="button"
@@ -280,7 +280,7 @@ const previewParagraphs = computed(() => {
                   @click="previewMode = 'about'"
                 >
                   <span class="material-symbols-outlined text-[15px]">info</span>
-                  <span>{{ locale === 'ar' ? 'صفحة من نحن' : 'About Page' }}</span>
+                  <span>{{ t('admin.aboutPage') }}</span>
                 </button>
               </div>
             </div>
@@ -288,7 +288,7 @@ const previewParagraphs = computed(() => {
             <!-- Preview View: Landing Page Section -->
             <div v-if="previewMode === 'landing'" class="preview-body preview-landing">
               <div class="preview-frame-label mono text-xs">
-                <span>{{ locale === 'ar' ? 'معاينة قسم من نحن في الصفحة الرئيسية' : 'Homepage Section Simulation' }}</span>
+                <span>{{ t('admin.aboutHomeSimulation') }}</span>
                 <span class="preview-tag">SYNCED</span>
               </div>
 
@@ -320,7 +320,7 @@ const previewParagraphs = computed(() => {
             <!-- Preview View: Dedicated /about Page -->
             <div v-else class="preview-body preview-about">
               <div class="preview-frame-label mono text-xs">
-                <span>{{ locale === 'ar' ? 'معاينة الواجهة في صفحة /about' : '/about Page Simulation' }}</span>
+                <span>{{ t('admin.aboutPageSimulation') }}</span>
                 <span class="preview-tag">SYNCED</span>
               </div>
 
@@ -342,7 +342,7 @@ const previewParagraphs = computed(() => {
                   <p v-for="(p, i) in previewParagraphs" :key="i" class="mock-p">{{ p }}</p>
                 </div>
                 <p v-else class="mock-p text-muted italic">
-                  {{ locale === 'ar' ? 'أضف فقرات السرد في خانة القصة الكاملة ليتم عرضها هنا.' : 'Add paragraphs to the narrative box to preview story layout here.' }}
+                  {{ t('admin.aboutEmptyNarrative') }}
                 </p>
               </div>
             </div>

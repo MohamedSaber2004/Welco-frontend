@@ -194,7 +194,7 @@ export function useUsers() {
   const handleDelete = async (u: UserDto) => {
     const ok = await confirmService.confirm({
       title: t('common.delete'),
-      message: `${t('admin.confirmDelete')} "${u.fullName}"? This action cannot be undone.`,
+      message: `${t('admin.confirmDelete')} "${u.fullName}"? ${t('admin.deleteUndoneHint')}`,
       variant: 'danger',
       confirmText: t('common.delete'),
       cancelText: t('common.cancel'),

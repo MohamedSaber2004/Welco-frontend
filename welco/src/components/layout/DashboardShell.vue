@@ -153,8 +153,8 @@ const toggleLang = async () => {
         <button
           type="button"
           class="rail__lang-btn mono"
-          :aria-label="locale === 'ar' ? 'English' : 'العربية'"
-          :title="locale === 'ar' ? 'Switch to English' : 'التحويل إلى العربية'"
+          :aria-label="t('nav.toggleLanguage')"
+          :title="t('nav.toggleLanguage')"
           @click="toggleLang"
         >
           <span class="material-symbols-outlined text-[16px]">language</span>
@@ -175,7 +175,7 @@ const toggleLang = async () => {
           <span class="material-symbols-outlined text-[20px]">
             {{ mobileMenuOpen ? 'close' : 'menu' }}
           </span>
-          <span class="menu-text">{{ locale === 'ar' ? 'القائمة' : 'Menu' }}</span>
+          <span class="menu-text">{{ t('nav.menu') }}</span>
         </button>
 
         <div class="mobile-brand-pill mono">
@@ -186,8 +186,8 @@ const toggleLang = async () => {
         <button
           type="button"
           class="rail__lang-btn mono"
-          :aria-label="locale === 'ar' ? 'English' : 'العربية'"
-          :title="locale === 'ar' ? 'Switch to English' : 'التحويل إلى العربية'"
+          :aria-label="t('nav.toggleLanguage')"
+          :title="t('nav.toggleLanguage')"
           @click="toggleLang"
         >
           <span class="material-symbols-outlined text-[15px]">language</span>
@@ -272,10 +272,11 @@ const toggleLang = async () => {
             <button
               type="button"
               class="rail__lang-btn mono"
+              :aria-label="t('nav.toggleLanguage')"
               @click="toggleLang"
             >
               <span class="material-symbols-outlined text-[16px]">language</span>
-              <span>{{ locale === 'ar' ? 'English' : 'العربية' }}</span>
+              <span>{{ locale === 'ar' ? t('common.english') : t('common.arabic') }}</span>
             </button>
           </div>
         </aside>

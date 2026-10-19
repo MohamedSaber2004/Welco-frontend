@@ -252,18 +252,18 @@ watch(() => filters.value.search, () => {
         </div>
 
         <div class="filter-col filter-col--toggle">
-          <label class="filter-label mono">{{ locale === 'ar' ? 'التوكنات' : 'Token Noise' }}</label>
+          <label class="filter-label mono">{{ t('admin.tokenNoise') }}</label>
           <button
             type="button"
             class="filter-toggle-btn mono text-xs"
             :class="{ 'filter-toggle-btn--active': filters.hideTokenNoise }"
-            :title="filters.hideTokenNoise ? (locale === 'ar' ? 'التوكنات مخفية' : 'Tokens Hidden') : (locale === 'ar' ? 'التوكنات معروضة' : 'Tokens Visible')"
+            :title="filters.hideTokenNoise ? t('admin.tokensHidden') : t('admin.tokensVisible')"
             @click="filters.hideTokenNoise = !filters.hideTokenNoise"
           >
             <span class="material-symbols-outlined text-[16px]">
               {{ filters.hideTokenNoise ? 'visibility_off' : 'visibility' }}
             </span>
-            <span>{{ filters.hideTokenNoise ? (locale === 'ar' ? 'مخفية' : 'Hidden') : (locale === 'ar' ? 'معروضة' : 'Visible') }}</span>
+            <span>{{ filters.hideTokenNoise ? t('admin.hidden') : t('admin.visible') }}</span>
           </button>
         </div>
       </div>

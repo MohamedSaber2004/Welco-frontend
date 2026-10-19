@@ -29,6 +29,8 @@ export interface OrderItemDto {
   productNameAr?: string | null
   quantity: number
   unitPrice: number
+  sku?: string | null
+  productSku?: string | null
 }
 
 export interface OrderDto {

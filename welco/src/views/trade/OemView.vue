@@ -108,26 +108,26 @@ async function submit() {
           <div class="hud-top">
             <div class="hud-badge mono">
               <span class="hud-pulse"></span>
-              <span>{{ locale === 'ar' ? 'وحدة الإنتاج #04' : 'PRODUCTION CELL #04' }}</span>
+              <span>{{ t('oem.productionCell') }}</span>
             </div>
-            <span class="mono hud-est">{{ locale === 'ar' ? 'تأسست 1994' : 'EST. 1994' }}</span>
+            <span class="mono hud-est">{{ t('oem.estYear') }}</span>
           </div>
 
           <div class="hud-specs">
             <div class="hud-item">
-              <span class="hud-key mono">{{ locale === 'ar' ? 'درجة الفولاذ:' : 'STEEL GRADE:' }}</span>
+              <span class="hud-key mono">{{ t('oem.steelGradeKey') }}</span>
               <span class="hud-val mono">AISI 410 / 420 Martensitic</span>
             </div>
             <div class="hud-item">
-              <span class="hud-key mono">{{ locale === 'ar' ? 'الحشوات المقواة:' : 'INSERTS:' }}</span>
+              <span class="hud-key mono">{{ t('oem.insertsKey') }}</span>
               <span class="hud-val mono">Tungsten Carbide (HRC 70+)</span>
             </div>
             <div class="hud-item">
-              <span class="hud-key mono">{{ locale === 'ar' ? 'معالجة التخميل:' : 'PASSIVATION:' }}</span>
+              <span class="hud-key mono">{{ t('oem.passivationKey') }}</span>
               <span class="hud-val mono">ASTM A967 Citric / Nitric</span>
             </div>
             <div class="hud-item">
-              <span class="hud-key mono">{{ locale === 'ar' ? 'التتبع الدقيق:' : 'TRACEABILITY:' }}</span>
+              <span class="hud-key mono">{{ t('oem.traceabilityKey') }}</span>
               <span class="hud-val mono">GS1-128 / UDI Micro-Laser</span>
             </div>
           </div>
@@ -137,8 +137,8 @@ async function submit() {
               <div class="meter-fill" style="width: 88%"></div>
             </div>
             <div class="meter-meta mono">
-              <span>{{ locale === 'ar' ? 'الطاقة السنوية: +1.2M أداة جراحية' : 'Annual Capacity: 1.2M+ Surgical Units' }}</span>
-              <span>{{ locale === 'ar' ? '88% مستغل' : '88% Utilized' }}</span>
+              <span>{{ t('oem.annualCapacity') }}</span>
+              <span>{{ t('oem.capacityUtilized') }}</span>
             </div>
           </div>
         </div>

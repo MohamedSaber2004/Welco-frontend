@@ -167,7 +167,7 @@ const openStorefront = (id: string) => {
               type="button"
               class="count-chip mono"
               :class="{ 'count-chip--active': activeTab === 'providers' }"
-              :title="locale === 'ar' ? 'عرض المورّدين' : 'View Providers'"
+              :title="t('provider.viewProviders')"
               @click="setTab('providers')"
             >
               <span class="material-symbols-outlined text-[15px]">apartment</span>
@@ -178,7 +178,7 @@ const openStorefront = (id: string) => {
               type="button"
               class="count-chip mono"
               :class="{ 'count-chip--active': activeTab === 'products' }"
-              :title="locale === 'ar' ? 'عرض المنتجات' : 'View Products'"
+              :title="t('provider.viewProducts')"
               @click="setTab('products')"
             >
               <span class="material-symbols-outlined text-[15px]">inventory_2</span>
@@ -251,14 +251,14 @@ const openStorefront = (id: string) => {
             v-model="providerSearch"
             type="search"
             class="prov-filter-input"
-            :placeholder="locale === 'ar' ? 'بحث بالاسم أو الدولة...' : 'Filter by name or country...'"
-            :aria-label="locale === 'ar' ? 'البحث في المورّدين' : 'Search providers'"
+            :placeholder="t('provider.filterNameCountry')"
+            :aria-label="t('provider.searchProviders')"
           />
           <button
             v-if="providerSearch"
             type="button"
             class="prov-filter-clear"
-            :title="locale === 'ar' ? 'مسح البحث' : 'Clear search'"
+            :title="t('catalog.clearSearch')"
             @click="providerSearch = ''"
           >
             <span class="material-symbols-outlined text-[15px]">close</span>
@@ -281,12 +281,12 @@ const openStorefront = (id: string) => {
         <!-- Filter Empty State -->
         <div v-if="providerSearch && !filteredProviders.length" class="empty-filter-state card">
           <span class="material-symbols-outlined empty-filter-icon">search_off</span>
-          <h3 class="empty-filter-title">{{ locale === 'ar' ? 'لا توجد شركات مطابقة' : 'No matching providers found' }}</h3>
+          <h3 class="empty-filter-title">{{ t('catalog.noMatchingProviders') }}</h3>
           <p class="empty-filter-desc">
             {{ locale === 'ar' ? `لم يتم العثور على أي مورد يطابق "${providerSearch}".` : `No provider matched "${providerSearch}".` }}
           </p>
           <button type="button" class="btn btn--secondary btn--sm mt-2" @click="providerSearch = ''">
-            {{ locale === 'ar' ? 'إعادة ضبط البحث' : 'Clear search' }}
+            {{ t('catalog.clearSearch') }}
           </button>
         </div>
 
@@ -339,17 +339,13 @@ const openStorefront = (id: string) => {
           <span class="material-symbols-outlined">inventory_2</span>
         </div>
         <div class="cat-teaser-card__content">
-          <h4>{{ locale === 'ar' ? 'هل تبحث عن المنتجات الجراحية في هذا التصنيف مباشرة؟' : 'Looking for products in this category directly?' }}</h4>
+          <h4>{{ t('provider.lookingForProducts') }}</h4>
           <p>
-            {{
-              locale === 'ar'
-                ? `يتوفر ${displayProductCount} منتج جراحي وطبي في هذا التصنيف جاهز للاستعراض أو طلب عرض السعر.`
-                : `${displayProductCount} medical & surgical products available in this category for immediate quote or order.`
-            }}
+            {{ t('provider.productsAvailableDesc', { count: displayProductCount }) }}
           </p>
         </div>
         <button type="button" class="btn btn--secondary btn--sm cat-teaser-card__btn" @click="setTab('products')">
-          <span>{{ locale === 'ar' ? 'استعراض المنتجات' : 'Browse Products' }}</span>
+          <span>{{ t('provider.browseProducts') }}</span>
           <span class="icon--directional">→</span>
         </button>
       </div>
@@ -371,7 +367,7 @@ const openStorefront = (id: string) => {
           class="btn btn--secondary btn--sm"
           @click="router.push({ name: 'marketplace', query: { categoryId: categoryId } })"
         >
-          <span>{{ locale === 'ar' ? 'عرض الكتالوج بالكامل في المتجر' : 'View Full Catalog' }}</span>
+          <span>{{ t('provider.viewFullCatalog') }}</span>
           <span class="icon--directional">→</span>
         </button>
       </div>
@@ -417,17 +413,13 @@ const openStorefront = (id: string) => {
           <span class="material-symbols-outlined">apartment</span>
         </div>
         <div class="cat-teaser-card__content">
-          <h4>{{ locale === 'ar' ? 'هل تبحث عن المورّدين والمصانع المعتمدة؟' : 'Looking for certified suppliers & manufacturers?' }}</h4>
+          <h4>{{ t('provider.lookingForProviders') }}</h4>
           <p>
-            {{
-              locale === 'ar'
-                ? `يوجد ${totalCount} مورد ومصنع معتمد يوفر منتجات هذا التصنيف مع إمكانية تصنيع مخصص OEM.`
-                : `${totalCount} verified suppliers offering products in this category with custom OEM options.`
-            }}
+            {{ t('provider.providersAvailableDesc', { count: totalCount }) }}
           </p>
         </div>
         <button type="button" class="btn btn--secondary btn--sm cat-teaser-card__btn" @click="setTab('providers')">
-          <span>{{ locale === 'ar' ? 'استعراض المورّدين' : 'Browse Providers' }}</span>
+          <span>{{ t('provider.browseProviders') }}</span>
           <span class="icon--directional">→</span>
         </button>
       </div>

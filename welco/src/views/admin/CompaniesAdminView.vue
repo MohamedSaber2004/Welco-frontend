@@ -542,8 +542,8 @@ watch([applicationSearch, statusFilter, typeFilter], () => {
 
 function downloadCompaniesReport() {
   if (!filteredCompanies.value.length) return
-  exportCompaniesReportPdf(filteredCompanies.value)
-  toastService.success(locale.value === 'ar' ? 'تم تصدير دليل الشركات (PDF) بنجاح' : 'Companies directory PDF exported successfully')
+  exportCompaniesReportPdf(filteredCompanies.value, true, locale.value)
+  toastService.success(t('admin.companiesReportPdfExported'))
 }
 </script>
 
@@ -569,7 +569,7 @@ function downloadCompaniesReport() {
             @click="downloadCompaniesReport"
           >
             <span class="material-symbols-outlined text-[18px]">picture_as_pdf</span>
-            <span>{{ locale === 'ar' ? 'تصدير الشركات (PDF)' : 'Export Directory (PDF)' }}</span>
+            <span>{{ t('admin.exportCompaniesPdf') }}</span>
           </BaseButton>
         </div>
       </header>
@@ -616,7 +616,7 @@ function downloadCompaniesReport() {
             @click="downloadCompaniesReport"
           >
             <span class="material-symbols-outlined text-[18px]">picture_as_pdf</span>
-            <span>{{ locale === 'ar' ? 'تصدير الشركات (PDF)' : 'Export PDF' }}</span>
+            <span>{{ t('admin.exportCompaniesPdf') }}</span>
           </BaseButton>
           <BaseButton variant="primary" @click="openCreateCompany">
             <span class="material-symbols-outlined text-[18px]">add</span>

@@ -635,7 +635,7 @@ const getUserPhoneDetails = (phone?: string | null, explicitCode?: string | null
 
             <div v-else class="company-empty-box mono text-xs">
               <span class="material-symbols-outlined text-[17px] text-amber-500">info</span>
-              <span>{{ locale === 'ar' ? 'لم يتم ربط شركة بهذا المستخدم حتى الآن.' : 'No company record is currently linked to this user.' }}</span>
+              <span>{{ t('admin.noCompanyLinkedUser') }}</span>
             </div>
           </div>
           <div class="modal-foot modal-foot--split">

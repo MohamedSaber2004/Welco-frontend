@@ -231,15 +231,15 @@ function goPage(p: number) {
 function downloadSingleOrder(o: OrderDto | null) {
   if (!o) return
   const pname = getOrderProviderName(o)
-  exportOrderPdf(o, pname)
-  toastService.success(locale.value === 'ar' ? 'تم تنزيل وثيقة الطلب (PDF) بنجاح' : 'Order PDF downloaded successfully')
+  exportOrderPdf(o, pname, true, locale.value)
+  toastService.success(t('commerce.orderPdfDownloaded'))
 }
 
 function downloadInvoice(o: OrderDto | null) {
   if (!o) return
   const pname = getOrderProviderName(o)
-  exportInvoicePdf(o, pname)
-  toastService.success(locale.value === 'ar' ? 'تم تنزيل الفاتورة (PDF) بنجاح' : 'Invoice PDF downloaded successfully')
+  exportInvoicePdf(o, pname, true, locale.value)
+  toastService.success(t('commerce.invoicePdfDownloaded'))
 }
 
 function downloadOrdersReport() {
@@ -248,8 +248,8 @@ function downloadOrdersReport() {
   for (const p of providersList.value) {
     if (p?.id && p?.name) pmap.set(p.id, p.name)
   }
-  exportOrdersReportPdf(filteredOrders.value, pmap)
-  toastService.success(locale.value === 'ar' ? 'تم تصدير تقرير الطلبات (PDF) بنجاح' : 'Master orders PDF exported successfully')
+  exportOrdersReportPdf(filteredOrders.value, pmap, true, locale.value)
+  toastService.success(t('commerce.ordersReportPdfExported'))
 }
 </script>
 
@@ -275,7 +275,7 @@ function downloadOrdersReport() {
             @click="downloadOrdersReport"
           >
             <span class="material-symbols-outlined text-[18px]">picture_as_pdf</span>
-            <span>{{ locale === 'ar' ? 'تصدير كل الطلبات (PDF)' : 'Export Orders (PDF)' }}</span>
+            <span>{{ t('admin.exportOrdersPdf') }}</span>
           </BaseButton>
           <span class="mono count-badge">{{ t('admin.consignmentsTracked', { count: filteredOrders.length }) }}</span>
         </div>
@@ -374,8 +374,8 @@ function downloadOrdersReport() {
                       <button
                         type="button"
                         class="row-action-btn"
-                        :title="locale === 'ar' ? 'تصدير وثيقة الطلب (PDF)' : 'Download Order (PDF)'"
-                        :aria-label="locale === 'ar' ? 'تصدير وثيقة الطلب (PDF)' : 'Download Order (PDF)'"
+                        :title="t('admin.downloadOrderPdf')"
+                        :aria-label="t('admin.downloadOrderPdf')"
                         @click="downloadSingleOrder(o)"
                       >
                         <span class="material-symbols-outlined text-[18px]">picture_as_pdf</span>
@@ -383,8 +383,8 @@ function downloadOrdersReport() {
                       <button
                         type="button"
                         class="row-action-btn"
-                        :title="locale === 'ar' ? 'تحميل الفاتورة (PDF)' : 'Download Invoice (PDF)'"
-                        :aria-label="locale === 'ar' ? 'تحميل الفاتورة (PDF)' : 'Download Invoice (PDF)'"
+                        :title="t('admin.downloadInvoicePdf')"
+                        :aria-label="t('admin.downloadInvoicePdf')"
                         @click="downloadInvoice(o)"
                       >
                         <span class="material-symbols-outlined text-[18px]">receipt_long</span>
@@ -517,11 +517,11 @@ function downloadOrdersReport() {
             <div style="display: inline-flex; gap: 0.5rem; flex-wrap: wrap;">
               <BaseButton variant="secondary" size="sm" class="mono" @click="downloadSingleOrder(selectedOrder)">
                 <span class="material-symbols-outlined text-[16px]">picture_as_pdf</span>
-                <span>{{ locale === 'ar' ? 'تحميل وثيقة الطلب (PDF)' : 'Download Order PDF' }}</span>
+                <span>{{ t('admin.downloadOrderPdf') }}</span>
               </BaseButton>
               <BaseButton variant="secondary" size="sm" class="mono" @click="downloadInvoice(selectedOrder)">
                 <span class="material-symbols-outlined text-[16px]">receipt_long</span>
-                <span>{{ locale === 'ar' ? 'تحميل الفاتورة (PDF)' : 'Download Invoice (PDF)' }}</span>
+                <span>{{ t('admin.downloadInvoicePdf') }}</span>
               </BaseButton>
             </div>
             <BaseButton variant="secondary" @click="closeDetails">

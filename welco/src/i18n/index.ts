@@ -69,6 +69,18 @@ export const t = (key: MessageKey, params?: Record<string, string | number>): st
   return text
 }
 
+export const localized = (
+  en?: string | null | { nameEn?: string | null; nameAr?: string | null },
+  ar?: string | null,
+): string => {
+  if (en && typeof en === 'object') {
+    return locale.value === 'ar'
+      ? (en.nameAr || en.nameEn || '')
+      : (en.nameEn || en.nameAr || '')
+  }
+  return locale.value === 'ar' ? (ar || en || '') : (en || ar || '')
+}
+
 type LocaleChangeListener = (locale: Locale) => void
 const localeChangeListeners: LocaleChangeListener[] = []
 

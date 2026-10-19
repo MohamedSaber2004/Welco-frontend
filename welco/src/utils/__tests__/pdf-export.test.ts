@@ -81,9 +81,53 @@ describe('pdf-export utility', () => {
     expect(typeof doc.output).toBe('function')
   })
 
+  it('exports a single order PDF with explicit and fallback SKU codes without throwing', () => {
+    const orderWithSkus: OrderDto = {
+      ...sampleOrder,
+      items: [
+        {
+          id: 'item-1',
+          productId: 'de195ce8-3f4a-4d2b-9c1a-8e7f6a5b4c3d',
+          productNameEn: 'Verbrugge Bone Holding Forceps',
+          quantity: 2,
+          unitPrice: 110,
+          sku: 'PRD-VER-001',
+        },
+        {
+          id: 'item-2',
+          productId: '095a7da6-1234-5678-90ab-cdef01234567',
+          productNameEn: 'Taylor Spinal Retractor',
+          quantity: 1,
+          unitPrice: 320,
+        },
+      ],
+    }
+    const doc = exportOrderPdf(orderWithSkus, 'Apex Surgical Distribution', false)
+    expect(doc).toBeDefined()
+    expect(typeof doc.output).toBe('function')
+  })
+
   it('exports companies directory report PDF without throwing', () => {
     const doc = exportCompaniesReportPdf(sampleCompanies, false)
     expect(doc).toBeDefined()
     expect(typeof doc.output).toBe('function')
+  })
+
+  it('exports bilingual Arabic documents cleanly when lang is set to ar', () => {
+    const orderDoc = exportOrderPdf(sampleOrder, 'شركة أبكس للتوريد الجراحي', false, 'ar')
+    expect(orderDoc).toBeDefined()
+    expect(typeof orderDoc.output).toBe('function')
+
+    const invDoc = exportInvoicePdf(sampleOrder, 'شركة أبكس للتوريد الجراحي', false, 'ar')
+    expect(invDoc).toBeDefined()
+    expect(typeof invDoc.output).toBe('function')
+
+    const providerMap = new Map<string, string>()
+    providerMap.set('comp-1', 'شركة أبكس للتوريد')
+    const reportDoc = exportOrdersReportPdf([sampleOrder], providerMap, false, 'ar')
+    expect(reportDoc).toBeDefined()
+
+    const compsDoc = exportCompaniesReportPdf(sampleCompanies, false, 'ar')
+    expect(compsDoc).toBeDefined()
   })
 })

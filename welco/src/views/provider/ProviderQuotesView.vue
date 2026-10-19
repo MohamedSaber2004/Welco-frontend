@@ -545,7 +545,7 @@ const handleDecline = async (rfq: RfqDto) => {
             <span class="material-symbols-outlined text-purple-600" aria-hidden="true">question_answer</span>
           </div>
           <div class="kpi-info">
-            <span class="kpi-label mono">{{ locale === 'ar' ? 'استفسارات المنتجات' : 'Product Inquiries' }}</span>
+            <span class="kpi-label mono">{{ t('provider.productInquiries') }}</span>
             <strong class="kpi-value mono">{{ inquiries.length }}</strong>
           </div>
           <span v-if="inquiries.filter((i) => !i.response).length > 0" class="negotiation-ping-badge mono">
@@ -618,7 +618,7 @@ const handleDecline = async (rfq: RfqDto) => {
             <input
               v-model="inquirySearch"
               type="search"
-              :placeholder="locale === 'ar' ? 'بحث باسم العميل، الاستفسار، الرد، أو المنتج...' : 'Search by client, question, response, or product...'"
+              :placeholder="t('provider.searchInquiriesPh')"
               class="search-input"
             />
             <button
@@ -634,9 +634,9 @@ const handleDecline = async (rfq: RfqDto) => {
 
           <div class="filter-actions">
             <select v-model="inquiryStatusFilter" class="filter-select mono">
-              <option value="all">{{ locale === 'ar' ? 'جميع الاستفسارات' : 'All Inquiries' }} ({{ inquiries.length }})</option>
-              <option value="pending">{{ locale === 'ar' ? 'قيد الانتظار' : 'Pending Response' }} ({{ inquiriesPendingCount }})</option>
-              <option value="responded">{{ locale === 'ar' ? 'تم الرد' : 'Responded' }} ({{ inquiriesRespondedCount }})</option>
+              <option value="all">{{ t('provider.allInquiries') }} ({{ inquiries.length }})</option>
+              <option value="pending">{{ t('provider.pendingResponse') }} ({{ inquiriesPendingCount }})</option>
+              <option value="responded">{{ t('provider.responded') }} ({{ inquiriesRespondedCount }})</option>
             </select>
           </div>
         </div>
@@ -645,7 +645,7 @@ const handleDecline = async (rfq: RfqDto) => {
         <div class="table-card">
           <div class="table-card-head flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <h2 class="section-title">{{ locale === 'ar' ? 'استفسارات المنتجات' : 'Product Inquiries' }}</h2>
+              <h2 class="section-title">{{ t('provider.productInquiries') }}</h2>
               <span class="items-count-badge mono">{{ filteredInquiries.length }} / {{ inquiries.length }}</span>
             </div>
             <div class="inquiry-status-chips flex items-center gap-2">
@@ -655,7 +655,7 @@ const handleDecline = async (rfq: RfqDto) => {
                 :class="{ 'is-active': inquiryStatusFilter === 'all' }"
                 @click="inquiryStatusFilter = 'all'"
               >
-                {{ locale === 'ar' ? 'الكل' : 'All' }} ({{ inquiries.length }})
+                {{ t('common.all') }} ({{ inquiries.length }})
               </button>
               <button
                 type="button"
@@ -664,7 +664,7 @@ const handleDecline = async (rfq: RfqDto) => {
                 @click="inquiryStatusFilter = 'pending'"
               >
                 <span class="chip-dot chip-dot--pending"></span>
-                {{ locale === 'ar' ? 'بانتظار الرد' : 'Pending' }} ({{ inquiriesPendingCount }})
+                {{ t('provider.pendingResponse') }} ({{ inquiriesPendingCount }})
               </button>
               <button
                 type="button"
@@ -673,7 +673,7 @@ const handleDecline = async (rfq: RfqDto) => {
                 @click="inquiryStatusFilter = 'responded'"
               >
                 <span class="chip-dot chip-dot--responded"></span>
-                {{ locale === 'ar' ? 'تم الرد' : 'Responded' }} ({{ inquiriesRespondedCount }})
+                {{ t('provider.responded') }} ({{ inquiriesRespondedCount }})
               </button>
             </div>
           </div>
@@ -682,16 +682,16 @@ const handleDecline = async (rfq: RfqDto) => {
             :loading="loading"
             :error="fetchError"
             :empty="!filteredInquiries.length"
-            :empty-title="inquirySearch || inquiryStatusFilter !== 'all' ? (locale === 'ar' ? 'لا توجد نتائج مطابقة لبحثك' : 'No matching inquiries found') : (locale === 'ar' ? 'لا توجد استفسارات حالياً' : 'No Product Inquiries Yet')"
+            :empty-title="inquirySearch || inquiryStatusFilter !== 'all' ? t('provider.noInquiriesFound') : t('provider.noInquiriesYet')"
             @retry="loadData"
           >
             <div class="table-wrap">
               <table class="data-table inquiry-data-table">
                 <thead>
                   <tr class="mono">
-                    <th>{{ locale === 'ar' ? 'العميل' : 'Client' }}</th>
+                    <th>{{ t('provider.client') }}</th>
                     <th>{{ t('marketplace.products') }}</th>
-                    <th>{{ locale === 'ar' ? 'الاستفسار والمحادثة' : 'Inquiry & Response' }}</th>
+                    <th>{{ t('provider.inquiryAndResponse') }}</th>
                     <th>{{ t('commerce.status') }}</th>
                     <th class="text-end">{{ t('common.actions') }}</th>
                   </tr>
@@ -739,13 +739,13 @@ const handleDecline = async (rfq: RfqDto) => {
                         <div v-if="inq.response" class="inquiry-response-preview mono">
                           <span class="material-symbols-outlined text-[15px] text-emerald-600 flex-shrink-0">reply</span>
                           <div>
-                            <strong class="text-emerald-700 block mb-0.5">{{ locale === 'ar' ? 'ردك للعميل:' : 'Your Response:' }}</strong>
+                            <strong class="text-emerald-700 block mb-0.5">{{ t('provider.yourResponse') }}</strong>
                             <span class="text-xs text-body">{{ inq.response }}</span>
                           </div>
                         </div>
                         <div v-else class="inquiry-awaiting-badge mono">
                           <span class="material-symbols-outlined text-[14px] text-amber-600">hourglass_top</span>
-                          <span>{{ locale === 'ar' ? 'بانتظار ردك على العميل' : 'Awaiting your response' }}</span>
+                          <span>{{ t('provider.awaitingResponse') }}</span>
                         </div>
                       </div>
                     </td>
@@ -756,7 +756,7 @@ const handleDecline = async (rfq: RfqDto) => {
                         class="status-pill mono"
                         :class="inq.response || inq.status === 'Responded' ? 'status--quoted' : 'status--pending'"
                       >
-                        {{ inq.response || inq.status === 'Responded' ? (locale === 'ar' ? 'تم الرد' : 'Responded') : (locale === 'ar' ? 'قيد الانتظار' : 'Pending') }}
+                        {{ inq.response || inq.status === 'Responded' ? t('provider.responded') : t('provider.pendingResponse') }}
                       </span>
                     </td>
 
@@ -766,11 +766,11 @@ const handleDecline = async (rfq: RfqDto) => {
                         type="button"
                         class="action-btn"
                         :class="inq.response ? 'btn-view' : 'btn-accept'"
-                        :title="inq.response ? (locale === 'ar' ? 'تعديل أو عرض الرد' : 'Edit Response') : (locale === 'ar' ? 'رد على العميل' : 'Reply to Client')"
+                        :title="inq.response ? t('provider.editResponse') : t('provider.replyToClient')"
                         @click="openInquiryResponse(inq)"
                       >
                         <span class="material-symbols-outlined text-[16px]">reply</span>
-                        <span>{{ inq.response ? (locale === 'ar' ? 'تعديل الرد' : 'Edit Reply') : (locale === 'ar' ? 'إرسال رد' : 'Reply') }}</span>
+                        <span>{{ inq.response ? t('provider.editReply') : t('provider.replyBtn') }}</span>
                       </button>
                     </td>
                   </tr>
@@ -1282,7 +1282,7 @@ const handleDecline = async (rfq: RfqDto) => {
       <!-- Product Inquiry Response Modal -->
       <BaseModal
         v-model="showInquiryModal"
-        :title="`${locale === 'ar' ? 'الرد على استفسار المنتج' : 'Respond to Product Inquiry'} · ${selectedInquiry?.name || ''}`"
+        :title="`${t('provider.respondToInquiryTitle')} · ${selectedInquiry?.name || ''}`"
         size="md"
       >
         <div v-if="selectedInquiry" class="detail-modal-body">
@@ -1311,12 +1311,12 @@ const handleDecline = async (rfq: RfqDto) => {
           </div>
 
           <div class="form-group mt-3">
-            <label class="form-lbl mono">{{ locale === 'ar' ? 'رد المزوّد للعميل' : 'Provider Response to Customer' }} *</label>
+            <label class="form-lbl mono">{{ t('provider.providerResponseLabel') }} *</label>
             <textarea
               v-model="inquiryResponseText"
               rows="4"
               class="form-textarea"
-              :placeholder="locale === 'ar' ? 'اكتب ردك المفصل مع شروط الأسعار والتوريد هنا...' : 'Type your detailed response regarding pricing, MOQ, or specifications...'"
+              :placeholder="t('provider.providerResponsePh')"
             ></textarea>
           </div>
         </div>
@@ -1326,7 +1326,7 @@ const handleDecline = async (rfq: RfqDto) => {
             <BaseButton variant="ghost" @click="showInquiryModal = false">{{ t('common.cancel') }}</BaseButton>
             <BaseButton variant="primary" :loading="submittingInquiryResponse" @click="submitInquiryResponse">
               <span class="material-symbols-outlined text-[16px]">send</span>
-              <span>{{ locale === 'ar' ? 'إرسال الرد' : 'Send Response' }}</span>
+              <span>{{ t('provider.sendResponse') }}</span>
             </BaseButton>
           </div>
         </template>

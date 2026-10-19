@@ -447,8 +447,8 @@ const resolvedDescription = computed(() => {
     <DataState
       v-else-if="!product"
       :empty="true"
-      empty-title="Instrument not found"
-      empty-description="The requested surgical instrument is no longer available or was not found."
+      :empty-title="t('pdp.notFoundTitle')"
+      :empty-description="t('pdp.notFoundDesc')"
       @action="router.push({ name: 'marketplace' })"
     />
 
@@ -461,8 +461,8 @@ const resolvedDescription = computed(() => {
           <div class="pdp-badges-top">
             <span class="pdp-sku-pill mono">{{ product.sku }}</span>
             <div class="pdp-status-pills">
-              <span v-if="product.isNew" class="pdp-new-pill mono">{{ locale === 'ar' ? 'جديد' : 'NEW' }}</span>
-              <span v-else-if="product.isFeatured" class="pdp-featured-pill mono">{{ locale === 'ar' ? 'مميز' : 'FEATURED' }}</span>
+              <span v-if="product.isNew" class="pdp-new-pill mono">{{ t('pdp.newBadge') }}</span>
+              <span v-else-if="product.isFeatured" class="pdp-featured-pill mono">{{ t('pdp.featuredBadge') }}</span>
               <span v-if="product.isActive" class="pdp-ce-pill mono">{{ t('catalog.ceMarked') }}</span>
             </div>
             <button
@@ -495,7 +495,7 @@ const resolvedDescription = computed(() => {
               />
               <button type="button" class="pdp-inspect-trigger mono" @click.stop="inspectModalOpen = true">
                 <span class="material-symbols-outlined text-[18px]">zoom_in</span>
-                <span>{{ locale === 'ar' ? 'معاينة مكبرة' : 'Inspect Instrument' }}</span>
+                <span>{{ t('pdp.inspectInstrument') }}</span>
               </button>
             </template>
 
@@ -505,7 +505,7 @@ const resolvedDescription = computed(() => {
                 <span class="material-symbols-outlined pdp-schematic-icon">medical_services</span>
               </div>
               <span class="pdp-schematic-text mono">{{ product.sku }}</span>
-              <span class="pdp-schematic-sub">{{ locale === 'ar' ? 'مستلزم طبي معتمد' : 'Verified Medical Instrument' }}</span>
+              <span class="pdp-schematic-sub">{{ t('pdp.verifiedInstrument') }}</span>
             </div>
           </div>
 
@@ -546,7 +546,7 @@ const resolvedDescription = computed(() => {
           <div class="pdp-supplier-strip">
             <div class="pdp-provider-chip">
               <span class="material-symbols-outlined provider-icon" aria-hidden="true">storefront</span>
-              <span class="provider-lbl">{{ locale === 'ar' ? 'المورد:' : 'Supplier:' }}</span>
+              <span class="provider-lbl">{{ t('pdp.supplierLabel') }}</span>
               <router-link
                 v-if="product.companyId && (product.companyName || product.supplierNameEn)"
                 :to="{ name: 'provider-storefront', params: { id: product.companyId } }"
@@ -560,7 +560,7 @@ const resolvedDescription = computed(() => {
             </div>
 
             <div v-if="product.manufacturerEn || product.manufacturerAr" class="pdp-manufacturer-chip mono">
-              <span class="mfg-lbl">{{ locale === 'ar' ? 'المصنّع:' : 'Mfg:' }}</span>
+              <span class="mfg-lbl">{{ t('pdp.mfgLabel') }}</span>
               <span class="mfg-val">{{ localized(product.manufacturerEn, product.manufacturerAr) }}</span>
             </div>
             
@@ -578,14 +578,14 @@ const resolvedDescription = computed(() => {
               <strong class="spec-chip__v">{{ product.lengthCm }} cm</strong>
             </div>
             <div class="spec-chip">
-              <span class="spec-chip__k mono">{{ locale === 'ar' ? 'المخزون' : 'Inventory' }}</span>
+              <span class="spec-chip__k mono">{{ t('pdp.inventoryLabel') }}</span>
               <strong class="spec-chip__v">
                 {{ product.stock > 0 ? t('catalog.inStock') : t('catalog.madeToOrder') }}
                 <span v-if="product.stock > 0" class="mono text-muted"> ({{ product.stock }})</span>
               </strong>
             </div>
             <div v-if="product.unit || product.unitAr" class="spec-chip">
-              <span class="spec-chip__k mono">{{ locale === 'ar' ? 'الوحدة' : 'Unit' }}</span>
+              <span class="spec-chip__k mono">{{ t('pdp.unitLabel') }}</span>
               <strong class="spec-chip__v">{{ locale === 'ar' ? (product.unitAr || product.unit) : (product.unit || product.unitAr) }}</strong>
             </div>
           </div>
@@ -774,7 +774,7 @@ const resolvedDescription = computed(() => {
                 <dd>{{ localized(product.categoryNameEn, product.categoryNameAr) }}</dd>
               </div>
               <div v-if="product.manufacturerEn || product.manufacturerAr || product.companyName" class="spec-row">
-                <dt class="mono">{{ locale === 'ar' ? 'الجهة المصنعة' : 'Manufacturer' }}</dt>
+                <dt class="mono">{{ t('pdp.manufacturerLabel') }}</dt>
                 <dd>{{ localized(product.manufacturerEn, product.manufacturerAr) || product.companyName }}</dd>
               </div>
               <div v-if="product.isActive" class="spec-row">
@@ -1031,7 +1031,7 @@ const resolvedDescription = computed(() => {
               <span class="material-symbols-outlined pdp-schematic-icon text-[36px]">medical_services</span>
             </div>
             <span class="pdp-schematic-text mono text-lg">{{ product.sku }}</span>
-            <span class="pdp-schematic-sub">{{ locale === 'ar' ? 'مستلزم طبي معتمد' : 'Verified Medical Instrument' }}</span>
+            <span class="pdp-schematic-sub">{{ t('pdp.verifiedInstrument') }}</span>
           </div>
         </div>
         <div class="inspect-foot mono">

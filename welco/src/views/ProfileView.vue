@@ -38,16 +38,16 @@ const isRejected = (status?: CompanyStatus | string | number) =>
   status === CompanyStatus.Rejected || status === 'Rejected' || status === 3 || status === '3'
 
 const companyTypeName = (type?: CompanyType | number) => {
-  if (type === CompanyType.Distributor || type === 2) return locale.value === 'ar' ? 'موزع معتمد' : 'Authorized Distributor'
-  if (type === CompanyType.Hospital || type === 1) return locale.value === 'ar' ? 'مستشفى / مركز طبي' : 'Hospital / Medical Center'
-  if (type === CompanyType.Clinic || type === 3) return locale.value === 'ar' ? 'عيادة تخصصية' : 'Specialized Clinic'
-  return locale.value === 'ar' ? 'منشأة مؤسسية' : 'Enterprise Entity'
+  if (type === CompanyType.Distributor || type === 2) return t('profile.distributorType')
+  if (type === CompanyType.Hospital || type === 1) return t('profile.hospitalType')
+  if (type === CompanyType.Clinic || type === 3) return t('profile.clinicType')
+  return t('profile.enterpriseType')
 }
 
 const companyStatusLabel = (status?: CompanyStatus | string | number) => {
-  if (isApproved(status)) return locale.value === 'ar' ? 'شريك معتمد' : t('account.verifiedPartner')
-  if (isPending(status)) return locale.value === 'ar' ? 'قيد المراجعة' : t('common.pending')
-  if (isRejected(status)) return locale.value === 'ar' ? 'مرفوض' : t('sales.statusDeclined')
+  if (isApproved(status)) return t('account.verifiedPartner')
+  if (isPending(status)) return t('common.pending')
+  if (isRejected(status)) return t('sales.statusDeclined')
   return t('common.pending')
 }
 
@@ -103,7 +103,7 @@ const userTypeInfo = computed(() => {
       label: t('admin.roleAdmin'),
       icon: 'shield_person',
       pillClass: 'user-role-pill--admin',
-      desc: locale.value === 'ar' ? 'صلاحيات إدارية كاملة' : 'Full Administrator Privileges',
+      desc: t('profile.adminPrivileges'),
     }
   }
   if (type === UserType.WelcoStaff) {
@@ -112,7 +112,7 @@ const userTypeInfo = computed(() => {
       label: t('admin.roleAdmin'),
       icon: 'shield_person',
       pillClass: 'user-role-pill--admin',
-      desc: locale.value === 'ar' ? 'صلاحيات إدارية كاملة' : 'Full Administrator Privileges',
+      desc: t('profile.adminPrivileges'),
     }
   }
   if (type === UserType.Client) {
@@ -121,7 +121,7 @@ const userTypeInfo = computed(() => {
       label: t('admin.roleClient'),
       icon: 'person',
       pillClass: 'user-role-pill--client',
-      desc: locale.value === 'ar' ? 'مشتري / عميل معتمد' : 'Verified Buyer / Client',
+      desc: t('profile.verifiedBuyerDesc'),
     }
   }
   // OrganizationUser is a Provider/Distributor (the company IS the provider).
@@ -130,7 +130,7 @@ const userTypeInfo = computed(() => {
     label: t('admin.roleProvider'),
     icon: 'handshake',
     pillClass: 'user-role-pill--org',
-    desc: locale.value === 'ar' ? 'مورّد / موزع معتمد — الشركة هي الجهة المورّدة' : 'Verified Provider / Distributor — your company is the supplying entity',
+    desc: t('profile.providerDesc'),
   }
 })
 
@@ -583,7 +583,7 @@ const setLang = async (v: AppLanguage) => {
                   <template v-if="userPhoneDetails.nationalNumber">
                     <span class="meta-sep">•</span>
                     <div class="meta-banner-item">
-                      <span class="meta-label">{{ locale === 'ar' ? 'الرقم:' : 'Number:' }}</span>
+                      <span class="meta-label">{{ t('profile.phoneNationalLabel') }}</span>
                       <span class="meta-val font-semibold text-slate-800">{{ userPhoneDetails.nationalNumber }}</span>
                     </div>
                   </template>
@@ -592,7 +592,7 @@ const setLang = async (v: AppLanguage) => {
                   {{ phoneCountryHint.code }} — {{ phoneCountryHint.name }} ({{ phoneCountryHint.iso }})
                 </span>
                 <span v-else class="field-caption mono text-slate-400">
-                  {{ locale === 'ar' ? 'حدد رمز الدولة من القائمة وأدخل رقم الهاتف' : 'Select country phone code from the list and enter phone number' }}
+                  {{ t('profile.phoneHintSelect') }}
                 </span>
               </div>
             </div>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { t, locale } from '../../i18n'
+import { t, locale, localized } from '../../i18n'
 import { authService, salesService, commerceService, companyService } from '../../di/container'
 import AccountNav from '../../components/account/AccountNav.vue'
 import StatCard from '../../components/ui/StatCard.vue'
@@ -439,7 +439,7 @@ onMounted(loadDashboard)
                   class="inquiry-product-name mono"
                 >
                   <span class="material-symbols-outlined text-[16px]">inventory_2</span>
-                  <span>{{ (locale === 'ar' ? (inq.productNameAr || inq.productNameEn) : (inq.productNameEn || inq.productNameAr)) || (inq.productSku ? `SKU: ${inq.productSku}` : (locale === 'ar' ? 'تفاصيل المنتج' : 'Product Details')) }}</span>
+                  <span>{{ localized(inq.productNameEn, inq.productNameAr) || (inq.productSku ? `SKU: ${inq.productSku}` : t('account.inquiryProductDetails')) }}</span>
                 </router-link>
                 <span class="inquiry-date mono">{{ inq.createdAt ? new Date(inq.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') : '' }}</span>
               </div>
@@ -447,7 +447,7 @@ onMounted(loadDashboard)
                 class="inquiry-status-pill mono"
                 :class="inq.response ? 'status-responded' : 'status-pending'"
               >
-                {{ inq.response ? (locale === 'ar' ? 'تم الرد' : 'Responded') : t('common.pending') }}
+                {{ inq.response ? t('account.inquiryResponded') : t('common.pending') }}
               </span>
             </div>
 

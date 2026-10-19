@@ -412,7 +412,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
             <span class="chip-num mono">1</span>
             <div class="chip-text">
               <strong class="chip-title">{{ t('admin.quoteStep1') }}</strong>
-              <span class="chip-sub">{{ locale === 'ar' ? 'طلب تسعير العميل' : 'Buyer RFQ' }}</span>
+              <span class="chip-sub">{{ t('admin.quoteStep1Sub') }}</span>
             </div>
           </div>
           <span class="workflow-arrow icon--directional">→</span>
@@ -420,7 +420,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
             <span class="chip-num mono">2</span>
             <div class="chip-text">
               <strong class="chip-title">{{ t('admin.quoteStep2') }}</strong>
-              <span class="chip-sub">{{ locale === 'ar' ? 'تسعير فريق المبيعات' : 'Staff Pricing' }}</span>
+              <span class="chip-sub">{{ t('admin.quoteStep2Sub') }}</span>
             </div>
           </div>
           <span class="workflow-arrow icon--directional">→</span>
@@ -428,7 +428,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
             <span class="chip-num mono">3</span>
             <div class="chip-text">
               <strong class="chip-title">{{ t('admin.quoteStep3') }}</strong>
-              <span class="chip-sub">{{ locale === 'ar' ? 'موافقة العميل' : 'Customer Approval' }}</span>
+              <span class="chip-sub">{{ t('admin.quoteStep3Sub') }}</span>
             </div>
           </div>
           <span class="workflow-arrow icon--directional">→</span>
@@ -436,7 +436,7 @@ async function handleQuoteDecision(quoteId: string, approve: boolean) {
             <span class="chip-num mono">4</span>
             <div class="chip-text">
               <strong class="chip-title">{{ t('admin.quoteStep4') }}</strong>
-              <span class="chip-sub">{{ locale === 'ar' ? 'تحويل لأمر توريد' : 'Convert to Order' }}</span>
+              <span class="chip-sub">{{ t('admin.quoteStep4Sub') }}</span>
             </div>
           </div>
         </div>

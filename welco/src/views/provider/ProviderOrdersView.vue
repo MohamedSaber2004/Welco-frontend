@@ -13,6 +13,7 @@ import { t, locale } from '../../i18n'
 import type { OrderDto } from '../../domain/models/commerce'
 import { ORDER_STATUSES } from '../../domain/models/commerce'
 import { formatDate, formatDateTime, formatPrice } from '../../utils/format'
+import { exportOrderPdf, exportInvoicePdf } from '../../utils/pdf-export'
 
 const router = useRouter()
 const localized = (en?: string | null, ar?: string | null) =>
@@ -104,7 +105,7 @@ const openStatusModalFromDetails = (order: OrderDto) => {
 const copyTracking = async (num: string) => {
   try {
     await navigator.clipboard.writeText(num)
-    toastService.success(locale.value === 'ar' ? 'تم النسخ إلى الحافظة' : 'Copied to clipboard')
+    toastService.success(t('common.copiedToClipboard'))
   } catch {
     toastService.info(num)
   }
@@ -141,6 +142,20 @@ const submitStatusUpdate = async () => {
   } finally {
     updatingStatus.value = false
   }
+}
+
+function downloadSingleOrder(o: OrderDto | null) {
+  if (!o) return
+  const pname = companyService.myCompany.value?.name || 'Welco Manufacturing & Direct Supply'
+  exportOrderPdf(o, pname, true, locale.value)
+  toastService.success(t('commerce.orderPdfDownloaded'))
+}
+
+function downloadInvoice(o: OrderDto | null) {
+  if (!o) return
+  const pname = companyService.myCompany.value?.name || 'Welco Surgical Instruments Manufacturing Ltd.'
+  exportInvoicePdf(o, pname, true, locale.value)
+  toastService.success(t('commerce.invoicePdfDownloaded'))
 }
 </script>
 
@@ -400,7 +415,7 @@ const submitStatusUpdate = async () => {
               @click="copyTracking((selectedOrder as unknown as { trackingNumber?: string }).trackingNumber || '')"
             >
               <span class="material-symbols-outlined text-[15px]">content_copy</span>
-              <span>{{ locale === 'ar' ? 'نسخ' : 'Copy' }}</span>
+              <span>{{ t('common.copy') }}</span>
             </button>
           </div>
 
@@ -463,14 +478,26 @@ const submitStatusUpdate = async () => {
           </div>
 
           <!-- Modal Action Footer -->
-          <div class="order-details-modal-footer">
-            <BaseButton variant="secondary" type="button" @click="showDetailModal = false">
-              {{ t('common.close') }}
-            </BaseButton>
-            <BaseButton variant="primary" type="button" @click="openStatusModalFromDetails(selectedOrder)">
-              <span class="material-symbols-outlined text-[16px]">tune</span>
-              <span>{{ t('common.edit') }} ({{ t('commerce.status') }})</span>
-            </BaseButton>
+          <div class="order-details-modal-footer" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-top: 1rem;">
+            <div style="display: inline-flex; gap: 0.5rem; flex-wrap: wrap;">
+              <BaseButton variant="secondary" size="sm" class="mono" @click="downloadSingleOrder(selectedOrder)">
+                <span class="material-symbols-outlined text-[16px]">picture_as_pdf</span>
+                <span>{{ t('commerce.orderPdf') }}</span>
+              </BaseButton>
+              <BaseButton variant="secondary" size="sm" class="mono" @click="downloadInvoice(selectedOrder)">
+                <span class="material-symbols-outlined text-[16px]">receipt_long</span>
+                <span>{{ t('commerce.invoicePdf') }}</span>
+              </BaseButton>
+            </div>
+            <div style="display: inline-flex; gap: 0.5rem; align-items: center;">
+              <BaseButton variant="secondary" type="button" @click="showDetailModal = false">
+                {{ t('common.close') }}
+              </BaseButton>
+              <BaseButton variant="primary" type="button" @click="openStatusModalFromDetails(selectedOrder)">
+                <span class="material-symbols-outlined text-[16px]">tune</span>
+                <span>{{ t('common.edit') }} ({{ t('commerce.status') }})</span>
+              </BaseButton>
+            </div>
           </div>
         </div>
       </BaseModal>

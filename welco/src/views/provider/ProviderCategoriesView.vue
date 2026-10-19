@@ -171,7 +171,7 @@ const submit = async () => {
 const copyId = async (id: string) => {
   try {
     await navigator.clipboard.writeText(id)
-    toastService.success(locale.value === 'ar' ? 'تم النسخ إلى الحافظة' : 'Copied to clipboard')
+    toastService.success(t('common.copiedToClipboard'))
   } catch {
     toastService.info(id)
   }
@@ -395,7 +395,7 @@ onMounted(() => { void loadAll() })
               </div>
               <div v-else class="root-chip mono">
                 <span class="material-symbols-outlined text-[13px]">folder</span>
-                <span>{{ locale === 'ar' ? 'فئة رئيسية' : 'Main Category' }}</span>
+                <span>{{ t('admin.mainCategory') }}</span>
               </div>
 
               <p class="category-card__desc">
@@ -455,7 +455,7 @@ onMounted(() => { void loadAll() })
                       </div>
                       <div class="cell-title-box">
                         <strong class="table__name">{{ localized(c.nameEn, c.nameAr) }}</strong>
-                        <span class="cell-id mono text-xs text-muted" @click.stop="copyId(c.id)" :title="locale === 'ar' ? 'نسخ' : 'Copy'">
+                        <span class="cell-id mono text-xs text-muted" @click.stop="copyId(c.id)" :title="t('common.copy')">
                           ID: {{ c.id.slice(0, 8) }}…
                         </span>
                       </div>

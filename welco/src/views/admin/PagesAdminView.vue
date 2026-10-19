@@ -295,10 +295,10 @@ onMounted(load)
         </div>
         <select v-model="typeFilter" class="toolbar-select mono" :aria-label="t('admin.pageType')">
           <option value="all">{{ t('common.all') }}</option>
-          <option value="Brand">{{ locale === 'ar' ? 'علامة تجارية (Brand)' : 'Brand' }}</option>
-          <option value="About">{{ locale === 'ar' ? 'من نحن (About)' : 'About' }}</option>
-          <option value="Specialty">{{ locale === 'ar' ? 'تخصص سريري (Specialty)' : 'Specialty' }}</option>
-          <option value="Procedure">{{ locale === 'ar' ? 'إجراء جراحي (Procedure)' : 'Procedure' }}</option>
+          <option value="Brand">{{ t('admin.pageTypeBrand') }}</option>
+          <option value="About">{{ t('admin.pageTypeAbout') }}</option>
+          <option value="Specialty">{{ t('admin.pageTypeSpecialty') }}</option>
+          <option value="Procedure">{{ t('admin.pageTypeProcedure') }}</option>
         </select>
         <span class="mono counter-text">{{ filtered.length }} {{ t('common.of') }} {{ pages.length }}</span>
       </div>

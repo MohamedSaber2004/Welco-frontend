@@ -436,7 +436,7 @@ const goToProduct = (id: string) => {
 
                 <div class="card-provider mono">
                   <span class="material-symbols-outlined provider-icon" aria-hidden="true">storefront</span>
-                  <span class="provider-label">{{ locale === 'ar' ? 'المورد:' : 'Supplier:' }}</span>
+                  <span class="provider-label">{{ t('pdp.supplierLabel') }}</span>
                   <span class="provider-value" dir="auto">{{ p.companyName || localized(p.supplierNameEn, p.supplierNameAr) || localized(p.manufacturerEn, p.manufacturerAr) || t('catalog.fallbackMfr') }}</span>
                 </div>
 

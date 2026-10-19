@@ -17,6 +17,7 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
+        jspdf: 'jspdf/dist/jspdf.es.js',
       },
     },
     server: {

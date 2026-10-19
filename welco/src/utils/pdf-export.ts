@@ -90,9 +90,9 @@ function formatCurrency(amount: number | null | undefined, currency = 'USD'): st
 }
 
 function formatDateStr(dateStr?: string | null): string {
-  if (!dateStr) return new Date().toISOString().split('T')[0]
+  if (!dateStr) return new Date().toISOString().split('T')[0] || ''
   try {
-    return new Date(dateStr).toISOString().split('T')[0]
+    return new Date(dateStr).toISOString().split('T')[0] || ''
   } catch {
     return String(dateStr).slice(0, 10)
   }
@@ -115,11 +115,12 @@ export function exportOrderPdf(
   const orderNum = order.orderNumber || order.id || 'N/A'
   const dateStr = formatDateStr(order.createdAt)
   const currency = order.currencyCode || 'USD'
+  const statusStr = order.status || 'Pending'
 
   drawClinicalHeader(
     doc,
     'Order Consignment & Verification Sheet',
-    `Generated on ${formatDateStr()} • Status: ${order.status}`,
+    `Generated on ${formatDateStr()} • Status: ${statusStr}`,
     `ORDER #: ${orderNum}`,
   )
 
@@ -579,15 +580,42 @@ export function exportCompaniesReportPdf(
     `DATE: ${dateStr}`,
   )
 
+  const typeMap: Record<number, string> = {
+    1: 'Hospital / Clinic',
+    2: 'Medical Distributor',
+    3: 'Surgical Clinic',
+    4: 'Equipment Supplier',
+  }
+
+  const statusMap: Record<number, string> = {
+    1: 'Pending Review',
+    2: 'Verified & Approved',
+    3: 'Rejected',
+  }
+
   const rows = companies.map((c, idx) => {
+    const rawType = c.type as unknown as number | string
+    const typeLabel = typeof rawType === 'number'
+      ? (typeMap[rawType] || (c.isProvider ? 'Provider' : 'Distributor'))
+      : String(rawType || (c.isProvider ? 'Provider' : 'Distributor'))
+
+    const rawStatus = c.status as unknown as number | string
+    const statusLabel = typeof rawStatus === 'number'
+      ? (statusMap[rawStatus] || 'Active')
+      : String(rawStatus || (c.isActive ? 'Active' : 'Inactive'))
+
+    const territory = c.countryNameEn || c.countryNameAr || (c as unknown as { country?: string }).country || 'Global / Export'
+    const phone = (c as unknown as { phone?: string; phoneNumber?: string }).phone ||
+                  (c as unknown as { phone?: string; phoneNumber?: string }).phoneNumber || '—'
+
     return [
       String(idx + 1).padStart(3, '0'),
       c.name || 'Unnamed Institution',
-      c.type || (c.isProvider ? 'Provider' : 'Distributor'),
-      c.status || 'Active',
-      [c.city, c.country].filter(Boolean).join(', ') || 'Global',
+      typeLabel,
+      statusLabel,
+      territory,
       c.email || '—',
-      c.phone || '—',
+      phone,
     ]
   })
 

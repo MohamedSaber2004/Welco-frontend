@@ -14,6 +14,7 @@ import type { OrderDto } from '../../domain/models/commerce'
 import { ORDER_STATUSES } from '../../domain/models/commerce'
 import type { CompanyDto } from '../../domain/models/company'
 import { formatDate, formatDateTime, formatPrice } from '../../utils/format'
+import { exportOrderPdf, exportOrdersReportPdf, exportInvoicePdf } from '../../utils/pdf-export'
 
 useAnimation()
 
@@ -226,6 +227,30 @@ function goPage(p: number) {
   if (p < 1 || p > totalPages.value) return
   localPage.value = p
 }
+
+function downloadSingleOrder(o: OrderDto | null) {
+  if (!o) return
+  const pname = getOrderProviderName(o)
+  exportOrderPdf(o, pname)
+  toastService.success(locale.value === 'ar' ? 'تم تنزيل وثيقة الطلب (PDF) بنجاح' : 'Order PDF downloaded successfully')
+}
+
+function downloadInvoice(o: OrderDto | null) {
+  if (!o) return
+  const pname = getOrderProviderName(o)
+  exportInvoicePdf(o, pname)
+  toastService.success(locale.value === 'ar' ? 'تم تنزيل الفاتورة (PDF) بنجاح' : 'Invoice PDF downloaded successfully')
+}
+
+function downloadOrdersReport() {
+  if (!filteredOrders.value.length) return
+  const pmap = new Map<string, string>()
+  for (const p of providersList.value) {
+    if (p?.id && p?.name) pmap.set(p.id, p.name)
+  }
+  exportOrdersReportPdf(filteredOrders.value, pmap)
+  toastService.success(locale.value === 'ar' ? 'تم تصدير تقرير الطلبات (PDF) بنجاح' : 'Master orders PDF exported successfully')
+}
 </script>
 
 <template>
@@ -242,7 +267,16 @@ function goPage(p: number) {
           <p class="head-subtitle">{{ t('admin.ordersDesc') }}</p>
         </div>
 
-        <div class="head-actions">
+        <div class="head-actions" style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+          <BaseButton
+            variant="secondary"
+            class="mono"
+            :disabled="!filteredOrders.length"
+            @click="downloadOrdersReport"
+          >
+            <span class="material-symbols-outlined text-[18px]">picture_as_pdf</span>
+            <span>{{ locale === 'ar' ? 'تصدير كل الطلبات (PDF)' : 'Export Orders (PDF)' }}</span>
+          </BaseButton>
           <span class="mono count-badge">{{ t('admin.consignmentsTracked', { count: filteredOrders.length }) }}</span>
         </div>
       </header>
@@ -326,16 +360,36 @@ function goPage(p: number) {
                   <td>
                     <StatusPill :status="o.status" />
                   </td>
-                  <td class="text-end">
-                    <button
-                      type="button"
-                      class="row-action-btn"
-                      :title="t('admin.viewDetails')"
-                      :aria-label="t('admin.viewDetails')"
-                      @click="openDetails(o)"
-                    >
-                      <span class="material-symbols-outlined text-[18px]">visibility</span>
-                    </button>
+                  <td class="text-end" style="white-space: nowrap;">
+                    <div style="display: inline-flex; align-items: center; gap: 4px;">
+                      <button
+                        type="button"
+                        class="row-action-btn"
+                        :title="t('admin.viewDetails')"
+                        :aria-label="t('admin.viewDetails')"
+                        @click="openDetails(o)"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">visibility</span>
+                      </button>
+                      <button
+                        type="button"
+                        class="row-action-btn"
+                        :title="locale === 'ar' ? 'تصدير وثيقة الطلب (PDF)' : 'Download Order (PDF)'"
+                        :aria-label="locale === 'ar' ? 'تصدير وثيقة الطلب (PDF)' : 'Download Order (PDF)'"
+                        @click="downloadSingleOrder(o)"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">picture_as_pdf</span>
+                      </button>
+                      <button
+                        type="button"
+                        class="row-action-btn"
+                        :title="locale === 'ar' ? 'تحميل الفاتورة (PDF)' : 'Download Invoice (PDF)'"
+                        :aria-label="locale === 'ar' ? 'تحميل الفاتورة (PDF)' : 'Download Invoice (PDF)'"
+                        @click="downloadInvoice(o)"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">receipt_long</span>
+                      </button>
+                    </div>
                   </td>
                   <td class="text-end">
                     <button
@@ -459,7 +513,17 @@ function goPage(p: number) {
             </div>
           </div>
 
-          <div class="modal-foot">
+          <div class="modal-foot" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-top: 1rem;">
+            <div style="display: inline-flex; gap: 0.5rem; flex-wrap: wrap;">
+              <BaseButton variant="secondary" size="sm" class="mono" @click="downloadSingleOrder(selectedOrder)">
+                <span class="material-symbols-outlined text-[16px]">picture_as_pdf</span>
+                <span>{{ locale === 'ar' ? 'تحميل وثيقة الطلب (PDF)' : 'Download Order PDF' }}</span>
+              </BaseButton>
+              <BaseButton variant="secondary" size="sm" class="mono" @click="downloadInvoice(selectedOrder)">
+                <span class="material-symbols-outlined text-[16px]">receipt_long</span>
+                <span>{{ locale === 'ar' ? 'تحميل الفاتورة (PDF)' : 'Download Invoice (PDF)' }}</span>
+              </BaseButton>
+            </div>
             <BaseButton variant="secondary" @click="closeDetails">
               {{ t('common.close') }}
             </BaseButton>

@@ -296,9 +296,11 @@ const emptyForm = () => ({
   sku: '',
   slug: '',
   description: '',
-  price: '' as unknown as number,
-  stock: 10,
+  price: '' as unknown as number | undefined,
+  stock: '' as unknown as number | undefined,
   imageName: '',
+  images: ['', '', ''] as string[],
+  videoUrl: '',
   material: '',
   currencyId: currencies.value[0]?.id || '',
   categoryId: categories.value[0]?.id || '',
@@ -306,6 +308,22 @@ const emptyForm = () => ({
   isActive: true,
 })
 const form = ref(emptyForm())
+
+const addImageSlot = () => {
+  form.value.images.push('')
+}
+
+const removeImageSlot = (idx: number) => {
+  if (form.value.images.length > 3) {
+    form.value.images.splice(idx, 1)
+  } else {
+    form.value.images[idx] = ''
+  }
+}
+
+const uploadedImagesCount = computed(() =>
+  form.value.images.filter((img) => Boolean(img && img.trim())).length,
+)
 
 const slugify = (v: string): string =>
   v.trim().toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/[\s_]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')
@@ -343,15 +361,26 @@ const openCreate = () => {
 
 const openEdit = (p: AdminProductItem | ProductDto) => {
   editing.value = p
+  let imgs: string[] = []
+  if (Array.isArray(p.images) && p.images.length > 0) {
+    imgs = [...p.images]
+  } else if (p.imageName) {
+    imgs = [p.imageName]
+  }
+  while (imgs.length < 3) {
+    imgs.push('')
+  }
   form.value = {
     nameEn: p.nameEn ?? '',
     nameAr: p.nameAr ?? '',
     sku: p.sku ?? '',
     slug: p.slug || slugify(p.nameEn || '') || (p.sku ? slugify(p.sku) : ''),
     description: p.descriptionEn || p.description || '',
-    price: p.price ?? 0,
-    stock: p.stock ?? 0,
+    price: (p.price !== undefined && p.price !== null) ? p.price : ('' as unknown as number),
+    stock: (p.stock !== undefined && p.stock !== null) ? p.stock : ('' as unknown as number),
     imageName: p.imageName ?? '',
+    images: imgs,
+    videoUrl: p.videoUrl ?? '',
     material: p.material ?? '',
     currencyId: p.currencyId ?? '',
     categoryId: p.categoryId ?? '',
@@ -370,33 +399,64 @@ const closeModal = () => {
 
 const submit = async () => {
   const f = form.value
-  if (!f.nameEn.trim() || !f.nameAr.trim()) { formError.value = t('admin.errBothNames'); return }
+  if (!f.nameEn.trim()) {
+    formError.value = locale.value === 'ar' ? 'الاسم بالإنجليزية مطلوب' : 'English name is required'
+    return
+  }
   if (!f.sku.trim()) { formError.value = t('admin.errSku'); return }
   if (!f.slug.trim()) { f.slug = slugify(f.nameEn) || (f.sku ? slugify(f.sku) : '') || `prd-${Date.now()}` }
   if (!f.categoryId) { formError.value = t('admin.errCategory'); return }
-  const numPrice = Number(f.price)
-  if (isNaN(numPrice) || numPrice <= 0) {
-    formError.value = t('admin.errPricePositive')
+
+  // Price is optional. If provided, must be a non-negative number.
+  let numPrice: number | undefined = undefined
+  if (f.price !== undefined && (f.price as unknown) !== '' && f.price !== null) {
+    const parsed = Number(f.price)
+    if (isNaN(parsed) || parsed < 0) {
+      formError.value = locale.value === 'ar' ? 'يجب أن يكون السعر رقمًا موجبًا' : 'Price must be a positive number'
+      return
+    }
+    numPrice = parsed
+  }
+
+  // Stock is optional. If provided, must be non-negative integer.
+  let numStock: number | undefined = undefined
+  if (f.stock !== undefined && (f.stock as unknown) !== '' && f.stock !== null) {
+    const parsed = Number(f.stock)
+    if (isNaN(parsed) || parsed < 0) {
+      formError.value = t('admin.errStockPositive')
+      return
+    }
+    numStock = parsed
+  }
+
+  // Strict validation: Minimum 3 images required
+  const validImages = f.images.map((img) => (img || '').trim()).filter(Boolean)
+  if (validImages.length < 3) {
+    formError.value = locale.value === 'ar'
+      ? `يجب رفع 3 صور على الأقل للمنتج وفقاً لمعايير الجودة الطبية (تم رفع ${validImages.length} من 3)`
+      : `At least 3 product images are required for medical catalog compliance (uploaded ${validImages.length} of 3)`
     return
   }
-  const numStock = Number(f.stock)
-  if (isNaN(numStock) || numStock < 0) {
-    formError.value = t('admin.errStockPositive')
-    return
-  }
+
+  const primaryImage = validImages[0] || null
+  const video = f.videoUrl.trim() || undefined
+  const nameArVal = f.nameAr.trim() || undefined
+
   formLoading.value = true
   formError.value = ''
   try {
     if (editing.value) {
       const payload: UpdateProductPayload = {
         nameEn: f.nameEn.trim(),
-        nameAr: f.nameAr.trim(),
+        nameAr: nameArVal,
         sku: f.sku.trim(),
         slug: f.slug.trim().toLowerCase(),
         description: f.description.trim() || undefined,
         price: numPrice,
         stock: numStock,
-        imageName: f.imageName.trim() || null,
+        imageName: primaryImage,
+        images: validImages,
+        videoUrl: video,
         material: f.material.trim() || undefined,
         currencyId: f.currencyId || null,
         categoryId: f.categoryId,
@@ -407,13 +467,15 @@ const submit = async () => {
     } else {
       const payload: CreateProductPayload = {
         nameEn: f.nameEn.trim(),
-        nameAr: f.nameAr.trim(),
+        nameAr: nameArVal,
         sku: f.sku.trim(),
         slug: f.slug.trim().toLowerCase(),
         description: f.description.trim() || undefined,
         price: numPrice,
         stock: numStock,
-        imageName: f.imageName.trim() || null,
+        imageName: primaryImage,
+        images: validImages,
+        videoUrl: video,
         material: f.material.trim() || undefined,
         currencyId: f.currencyId || null,
         categoryId: f.categoryId,
@@ -790,8 +852,11 @@ onMounted(async () => {
               <input v-model="form.nameEn" type="text" required class="form-input" @input="onNameEnInput" />
             </div>
             <div class="form-group">
-              <label class="form-label mono">{{ t('admin.nameAr') }} <span class="req">*</span></label>
-              <input v-model="form.nameAr" type="text" required class="form-input" dir="rtl" />
+              <label class="form-label mono">
+                {{ t('admin.nameAr') }}
+                <span class="text-xs text-slate-400 font-normal ms-1">({{ locale === 'ar' ? 'اختياري' : 'Optional' }})</span>
+              </label>
+              <input v-model="form.nameAr" type="text" class="form-input" dir="rtl" />
             </div>
           </div>
 
@@ -853,12 +918,18 @@ onMounted(async () => {
 
           <div class="form-grid-3">
             <div class="form-group">
-              <label class="form-label mono">{{ t('admin.price') }} <span class="req">*</span></label>
-              <input v-model.number="form.price" type="number" step="0.01" min="0.01" required class="form-input mono" />
+              <label class="form-label mono">
+                {{ t('admin.price') }}
+                <span class="text-xs text-slate-400 font-normal ms-1">({{ locale === 'ar' ? 'اختياري' : 'Optional' }})</span>
+              </label>
+              <input v-model.number="form.price" type="number" step="0.01" min="0" placeholder="0.00" class="form-input mono" />
             </div>
             <div class="form-group">
-              <label class="form-label mono">{{ t('admin.stock') }} <span class="req">*</span></label>
-              <input v-model.number="form.stock" type="number" min="0" required class="form-input mono" />
+              <label class="form-label mono">
+                {{ t('admin.stock') }}
+                <span class="text-xs text-slate-400 font-normal ms-1">({{ locale === 'ar' ? 'اختياري' : 'Optional' }})</span>
+              </label>
+              <input v-model.number="form.stock" type="number" min="0" placeholder="0" class="form-input mono" />
             </div>
             <div class="form-group">
               <label class="form-label mono">{{ t('admin.material') }}</label>
@@ -868,18 +939,119 @@ onMounted(async () => {
 
           <div class="form-group">
             <label class="form-label mono">{{ t('admin.specifications') }}</label>
-            <textarea v-model="form.description" rows="3" class="form-textarea"></textarea>
+            <textarea v-model="form.description" rows="2" class="form-textarea"></textarea>
           </div>
 
-          <!-- Product Image Upload -->
-          <div class="form-group">
-            <label class="form-label mono">{{ t('admin.productImage') }}</label>
-            <FileUpload
-              v-model="form.imageName"
-              :place="ATTACHMENT_PLACE.PROVIDERS"
-              :media-type="MEDIA_TYPE.IMAGE"
-              :label="t('admin.editImage')"
-            />
+          <!-- Product Images Multi-Slot Upload (Strict Min 3 Images Required) -->
+          <div class="product-media-card p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/20">
+            <div class="flex items-center justify-between mb-2">
+              <div>
+                <label class="form-label mono font-bold text-slate-800 dark:text-slate-100 mb-0">
+                  {{ locale === 'ar' ? 'صور المنتج (مطلوب 3 صور على الأقل) *' : 'Product Images (Min 3 Strictly Required) *' }}
+                </label>
+                <p class="text-xs text-slate-500 mt-0.5">
+                  {{ locale === 'ar' ? 'ارفع ما لا يقل عن 3 صور سريرية عالية الدقة للمنتج' : 'Upload at least 3 clinical photos from various angles' }}
+                </p>
+              </div>
+              <span
+                class="mono text-xs px-2.5 py-1 rounded-full font-bold transition-colors"
+                :class="uploadedImagesCount >= 3 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800' : 'bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800'"
+              >
+                <span v-if="uploadedImagesCount >= 3">✓ {{ uploadedImagesCount }} {{ locale === 'ar' ? 'صور مرفوعة (مكتمل)' : 'Images Uploaded (Compliant)' }}</span>
+                <span v-else>{{ uploadedImagesCount }} / 3 {{ locale === 'ar' ? 'صور مرفوعة (متبقي صور)' : 'Images (Min 3 required)' }}</span>
+              </span>
+            </div>
+
+            <!-- Image Slots Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div
+                v-for="(img, idx) in form.images"
+                :key="idx"
+                class="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/60 relative flex flex-col gap-2"
+              >
+                <div class="flex items-center justify-between">
+                  <span class="mono text-[11px] font-bold text-slate-700 dark:text-slate-200">
+                    {{ idx === 0 ? (locale === 'ar' ? 'الصورة الرئيسية (الغلاف) *' : 'Cover Image *') : `${locale === 'ar' ? 'صورة' : 'Image'} ${idx + 1} ${idx < 3 ? '*' : ''}` }}
+                  </span>
+                  <button
+                    v-if="form.images.length > 3"
+                    type="button"
+                    class="text-rose-500 hover:text-rose-700 text-xs p-1"
+                    :title="locale === 'ar' ? 'إزالة هذا المربع' : 'Remove slot'"
+                    @click="removeImageSlot(idx)"
+                  >
+                    <span class="material-symbols-outlined text-[16px]">close</span>
+                  </button>
+                </div>
+
+                <FileUpload
+                  v-model="form.images[idx]"
+                  :place="ATTACHMENT_PLACE.PROVIDERS"
+                  :media-type="MEDIA_TYPE.IMAGE"
+                  :label="idx === 0 ? (locale === 'ar' ? 'رفع الغلاف' : 'Upload Cover') : `${locale === 'ar' ? 'رفع صورة' : 'Upload Image'} ${idx + 1}`"
+                />
+              </div>
+            </div>
+
+            <div class="mt-2.5 flex justify-end">
+              <button
+                type="button"
+                class="inline-flex items-center gap-1.5 text-xs font-semibold text-sky-600 hover:text-sky-700 dark:text-sky-400 py-1 px-3 rounded-lg border border-dashed border-sky-300 hover:border-sky-400 bg-sky-50/50 dark:bg-sky-950/20"
+                @click="addImageSlot"
+              >
+                <span class="material-symbols-outlined text-[15px]">add_photo_alternate</span>
+                <span>{{ locale === 'ar' ? '+ إضافة صورة أخرى' : '+ Add Another Image Slot' }}</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Product Demonstration Video -->
+          <div class="product-video-card p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/20">
+            <label class="form-label mono font-bold text-slate-800 dark:text-slate-100 mb-1">
+              {{ locale === 'ar' ? 'فيديو المنتج (اختياري)' : 'Product Video (Optional)' }}
+            </label>
+            <p class="text-xs text-slate-500 mb-2">
+              {{ locale === 'ar' ? 'رابط استعراض أو شرح بالفيديو (MP4، WebM، YouTube أو Vimeo)' : 'Demonstration video URL (MP4, WebM, YouTube, or Vimeo link)' }}
+            </p>
+
+            <div class="flex gap-2">
+              <input
+                v-model="form.videoUrl"
+                type="url"
+                class="form-input mono text-xs flex-1"
+                :placeholder="locale === 'ar' ? 'https://example.com/demo.mp4 أو رابط فيديو' : 'https://example.com/demo.mp4 or video URL'"
+              />
+              <button
+                v-if="form.videoUrl"
+                type="button"
+                class="px-2.5 text-xs text-rose-500 hover:text-rose-700 border border-slate-200 dark:border-slate-700 rounded-lg"
+                @click="form.videoUrl = ''"
+              >
+                {{ locale === 'ar' ? 'مسح' : 'Clear' }}
+              </button>
+            </div>
+
+            <div v-if="form.videoUrl" class="mt-2.5 p-2 rounded-xl bg-slate-900 text-white flex flex-col gap-2 max-w-md">
+              <div class="flex items-center justify-between text-xs text-slate-300 px-1">
+                <span class="flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[14px] text-red-400">play_circle</span>
+                  <span>{{ locale === 'ar' ? 'معاينة الفيديو' : 'Video Preview' }}</span>
+                </span>
+                <a :href="form.videoUrl" target="_blank" rel="noopener noreferrer" class="text-sky-400 underline text-[11px]">
+                  {{ locale === 'ar' ? 'فتح الرابط' : 'Open Link' }}
+                </a>
+              </div>
+              <video
+                v-if="form.videoUrl.match(/\.(mp4|webm|ogg)($|\?)/i)"
+                :src="form.videoUrl"
+                controls
+                class="w-full rounded-lg max-h-48 bg-black"
+              ></video>
+              <div v-else class="p-3 rounded-lg bg-slate-800 text-center text-xs text-slate-300">
+                <span class="material-symbols-outlined text-[24px] text-sky-400 mb-1">movie</span>
+                <p class="truncate font-mono">{{ form.videoUrl }}</p>
+              </div>
+            </div>
           </div>
 
           <div class="form-group">

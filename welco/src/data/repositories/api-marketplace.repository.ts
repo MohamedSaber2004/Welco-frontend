@@ -141,6 +141,23 @@ const normalizeProduct = (p: ProductDto): ProductDto => {
     }
   }
 
+  // Populate multiple images list and video URL
+  if (!p.images || p.images.length === 0) {
+    const rawImgs = (raw.images ?? raw.Images ?? raw.media ?? raw.Media) as unknown
+    if (Array.isArray(rawImgs) && rawImgs.length > 0) {
+      p.images = rawImgs
+        .map((x) => (typeof x === 'string' ? x : String((x as Record<string, unknown>)?.url ?? (x as Record<string, unknown>)?.fileName ?? (x as Record<string, unknown>)?.imageName ?? '')))
+        .filter(Boolean)
+    } else if (p.imageName) {
+      p.images = [p.imageName]
+    } else {
+      p.images = []
+    }
+  }
+  if (!p.videoUrl) {
+    p.videoUrl = (raw.videoUrl ?? raw.VideoUrl ?? null) as string | null
+  }
+
   const lowerName = (p.nameEn || '').toLowerCase()
 
   // Fix miscategorized products

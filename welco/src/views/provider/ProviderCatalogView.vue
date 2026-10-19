@@ -218,20 +218,34 @@ const closeModal = () => {
 
 const submit = async () => {
   const f = form.value
-  if (!f.nameEn.trim() || !f.nameAr.trim()) { formError.value = t('admin.errBothNames'); return }
+  if (!f.nameEn.trim()) {
+    formError.value = locale.value === 'ar' ? 'الاسم بالإنجليزية مطلوب' : 'English name is required'
+    return
+  }
   if (!f.sku.trim()) { formError.value = t('admin.errSku'); return }
   if (!f.slug.trim()) { f.slug = slugify(f.nameEn) || (f.sku ? slugify(f.sku) : '') || `prd-${Date.now()}` }
   if (!f.categoryId) { formError.value = t('admin.errCategory'); return }
-  const numPrice = Number(f.price)
-  if (isNaN(numPrice) || numPrice <= 0) {
-    formError.value = locale.value === 'ar' ? 'يجب أن يكون السعر رقمًا أكبر من 0' : 'Price must be a number greater than 0'
-    return
+
+  let numPrice: number | undefined = undefined
+  if (f.price !== undefined && (f.price as unknown) !== '' && f.price !== null) {
+    const parsed = Number(f.price)
+    if (isNaN(parsed) || parsed < 0) {
+      formError.value = locale.value === 'ar' ? 'يجب أن يكون السعر رقمًا موجبًا' : 'Price must be a positive number'
+      return
+    }
+    numPrice = parsed
   }
-  const numStock = Number(f.stock)
-  if (isNaN(numStock) || numStock < 0) {
-    formError.value = locale.value === 'ar' ? 'لا يمكن أن يكون المخزون سالبًا' : 'Stock cannot be negative'
-    return
+
+  let numStock: number | undefined = undefined
+  if (f.stock !== undefined && (f.stock as unknown) !== '' && f.stock !== null) {
+    const parsed = Number(f.stock)
+    if (isNaN(parsed) || parsed < 0) {
+      formError.value = locale.value === 'ar' ? 'لا يمكن أن يكون المخزون سالبًا' : 'Stock cannot be negative'
+      return
+    }
+    numStock = parsed
   }
+
   formLoading.value = true
   formError.value = ''
   try {
@@ -239,7 +253,7 @@ const submit = async () => {
     if (editing.value) {
       const payload: UpdateProductPayload = {
         nameEn: f.nameEn.trim(),
-        nameAr: f.nameAr.trim(),
+        nameAr: f.nameAr.trim() || undefined,
         sku: f.sku.trim(),
         slug: f.slug.trim().toLowerCase(),
         description: f.description.trim() || undefined,
@@ -256,7 +270,7 @@ const submit = async () => {
     } else {
       const payload: CreateProductPayload = {
         nameEn: f.nameEn.trim(),
-        nameAr: f.nameAr.trim(),
+        nameAr: f.nameAr.trim() || undefined,
         sku: f.sku.trim(),
         slug: f.slug.trim().toLowerCase(),
         description: f.description.trim() || undefined,
@@ -687,8 +701,11 @@ onMounted(() => { void loadAll() })
             />
           </div>
           <div class="form-field">
-            <label class="field-label" for="pp-name-ar">{{ t('admin.productNameAr') }} *</label>
-            <input id="pp-name-ar" v-model="form.nameAr" type="text" class="field-input" required />
+            <label class="field-label" for="pp-name-ar">
+              {{ t('admin.productNameAr') }}
+              <span class="text-xs text-slate-400 font-normal ms-1">({{ locale === 'ar' ? 'اختياري' : 'Optional' }})</span>
+            </label>
+            <input id="pp-name-ar" v-model="form.nameAr" type="text" class="field-input" />
           </div>
         </div>
 
@@ -730,24 +747,29 @@ onMounted(() => { void loadAll() })
 
         <div class="form-row two-cols">
           <div class="form-field">
-            <label class="field-label" for="pp-price">{{ t('admin.price') }} *</label>
+            <label class="field-label" for="pp-price">
+              {{ t('admin.price') }}
+              <span class="text-xs text-slate-400 font-normal ms-1">({{ locale === 'ar' ? 'اختياري' : 'Optional' }})</span>
+            </label>
             <div class="input-with-affix">
               <input
                 id="pp-price"
                 v-model.number="form.price"
                 type="number"
-                min="0.01"
+                min="0"
                 step="any"
                 class="field-input mono-num"
                 placeholder="0.00"
-                required
               />
               <span class="input-affix mono text-xs">{{ getCurrencyCode(form.currencyId) || 'USD' }}</span>
             </div>
           </div>
           <div class="form-field">
-            <label class="field-label" for="pp-stock">{{ t('admin.stock') }} *</label>
-            <input id="pp-stock" v-model.number="form.stock" type="number" min="0" step="1" class="field-input mono-num" placeholder="0" required />
+            <label class="field-label" for="pp-stock">
+              {{ t('admin.stock') }}
+              <span class="text-xs text-slate-400 font-normal ms-1">({{ locale === 'ar' ? 'اختياري' : 'Optional' }})</span>
+            </label>
+            <input id="pp-stock" v-model.number="form.stock" type="number" min="0" step="1" class="field-input mono-num" placeholder="0" />
           </div>
         </div>
 

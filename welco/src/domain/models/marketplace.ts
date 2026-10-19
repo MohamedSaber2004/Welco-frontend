@@ -36,14 +36,16 @@ export interface CurrencyDto {
 
 export interface CreateProductPayload {
   nameEn: string
-  nameAr: string
+  nameAr?: string
   sku: string
   slug: string
   description?: string
-  price: number
-  stock: number
+  price?: number
+  stock?: number
   specifications?: string
   imageName?: string | null
+  images?: string[]
+  videoUrl?: string
   material?: string
   lengthCm?: number
   currencyId?: string | null
@@ -52,14 +54,16 @@ export interface CreateProductPayload {
 
 export interface UpdateProductPayload {
   nameEn: string
-  nameAr: string
+  nameAr?: string
   sku: string
   slug: string
   description?: string
-  price: number
-  stock: number
+  price?: number
+  stock?: number
   specifications?: string
   imageName?: string | null
+  images?: string[]
+  videoUrl?: string
   material?: string
   lengthCm?: number
   currencyId?: string | null
@@ -116,6 +120,8 @@ export interface ProductDto {
   minOrderQty: number
   /** stored attachment name (place=1) resolved via `/files/{name}` — see ATTACHMENT-INTEGRATION.md */
   imageName?: string | null
+  images?: string[]
+  videoUrl?: string | null
   imageGradient: string
   material?: string
   lengthCm?: number

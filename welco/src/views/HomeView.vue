@@ -14,6 +14,7 @@ import BaseModal from '../components/ui/BaseModal.vue'
 import BaseButton from '../components/ui/BaseButton.vue'
 import AppImage from '../components/ui/AppImage.vue'
 import ImageViewer from '../components/ui/ImageViewer.vue'
+import SupportChannelsSection from '../components/support/SupportChannelsSection.vue'
 import { formatPrice } from '../utils/format'
 import { useCart } from '../composables/useCart'
 
@@ -393,7 +394,7 @@ const navigateToOemFromModal = () => {
               <span class="material-symbols-outlined hero__search-icon" aria-hidden="true">search</span>
               <input
                 v-model="heroSearch"
-                :placeholder="locale === 'ar' ? 'ابحث برقم SKU أو اسم الأداة أو المعيار...' : 'Search SKU, instrument name or DIN standard...'"
+                :placeholder="t('home.searchSkuPlaceholder')"
                 aria-label="Search surgical instruments"
               />
               <button
@@ -511,7 +512,7 @@ const navigateToOemFromModal = () => {
                 <div class="mono product-card__meta-alt" dir="auto">{{ locale === 'en' ? p.nameAr : p.nameEn }}</div>
                 <div class="product-card__provider">
                   <span class="material-symbols-outlined provider-icon" aria-hidden="true">storefront</span>
-                  <span class="provider-label">{{ locale === 'ar' ? 'المورد:' : 'Supplier:' }}</span>
+                  <span class="provider-label">{{ t('pdp.supplierLabel') }}</span>
                   <span class="provider-value" dir="auto">
                     {{ p.companyName || localized(p.supplierNameEn, p.supplierNameAr) || localized(p.manufacturerEn, p.manufacturerAr) || t('catalog.fallbackMfr') }}
                   </span>
@@ -1049,6 +1050,9 @@ const navigateToOemFromModal = () => {
         </div>
       </div>
     </section>
+
+    <!-- Dynamic Support Channels Section (WhatsApp, Phone, Email, Facebook, Instagram) -->
+    <SupportChannelsSection />
 
 <!-- Request Institutional Price Quote Modal -->
     <BaseModal v-model="priceModalOpen" :title="t('home.quoteModalTitle')" max-width="580px">

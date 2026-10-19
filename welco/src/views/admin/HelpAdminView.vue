@@ -986,9 +986,9 @@ const closeFaqDetails = () => {
                 <div class="form-field">
                   <div class="flex items-center justify-between mb-1">
                     <label class="field-label mb-0" for="contact-facebook">
-                      {{ locale === 'ar' ? 'صفحة فيسبوك' : 'Facebook Page URL' }}
+                      {{ t('help.facebookChannel') }}
                     </label>
-                    <span class="text-xs text-slate-400">({{ locale === 'ar' ? 'اختياري' : 'Optional' }})</span>
+                    <span class="text-xs text-slate-400">({{ t('common.optional') }})</span>
                   </div>
                   <div class="relative">
                     <input
@@ -997,7 +997,7 @@ const closeFaqDetails = () => {
                       type="url"
                       dir="ltr"
                       class="field-input mono text-xs ps-8"
-                      :placeholder="locale === 'ar' ? 'https://facebook.com/welcosurgical' : 'https://facebook.com/welcosurgical'"
+                      placeholder="https://facebook.com/welcosurgical"
                       @input="contactDirty = true"
                     />
                     <span class="material-symbols-outlined absolute inset-inline-start-2.5 top-2.5 text-blue-600 text-[16px] pointer-events-none">
@@ -1009,9 +1009,9 @@ const closeFaqDetails = () => {
                 <div class="form-field">
                   <div class="flex items-center justify-between mb-1">
                     <label class="field-label mb-0" for="contact-instagram">
-                      {{ locale === 'ar' ? 'حساب إنستغرام' : 'Instagram Profile URL' }}
+                      {{ t('help.instagramChannel') }}
                     </label>
-                    <span class="text-xs text-slate-400">({{ locale === 'ar' ? 'اختياري' : 'Optional' }})</span>
+                    <span class="text-xs text-slate-400">({{ t('common.optional') }})</span>
                   </div>
                   <div class="relative">
                     <input
@@ -1020,7 +1020,7 @@ const closeFaqDetails = () => {
                       type="url"
                       dir="ltr"
                       class="field-input mono text-xs ps-8"
-                      :placeholder="locale === 'ar' ? 'https://instagram.com/welcosurgical' : 'https://instagram.com/welcosurgical'"
+                      placeholder="https://instagram.com/welcosurgical"
                       @input="contactDirty = true"
                     />
                     <span class="material-symbols-outlined absolute inset-inline-start-2.5 top-2.5 text-pink-600 text-[16px] pointer-events-none">

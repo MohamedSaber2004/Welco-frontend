@@ -39,7 +39,7 @@ function openArticle(a: HelpArticleDto) {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function giveArticleFeedback(_helpful: 'yes' | 'no') {
   articleFeedbackGiven.value = true
-  toastService.success(locale.value === 'ar' ? 'شكراً لمشاركتنا رأيك!' : 'Thank you for your feedback!')
+  toastService.success(t('help.feedbackThankYou'))
 }
 
 const quickSubjects = [
@@ -917,9 +917,9 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
                   </svg>
                 </div>
                 <div class="channel-info">
-                  <span class="channel-type mono">{{ locale === 'ar' ? 'فيسبوك الرسمي' : 'Official Facebook' }}</span>
+                  <span class="channel-type mono">{{ t('help.facebookChannel') }}</span>
                   <span class="channel-value truncate max-w-[200px]">{{ contentService.supportContact.value.facebookUrl }}</span>
-                  <span class="channel-note">{{ locale === 'ar' ? 'تحديثات المنتجات والمؤتمرات الطبية' : 'Product updates & medical conventions' }}</span>
+                  <span class="channel-note">{{ t('help.facebookChannelNote') }}</span>
                 </div>
                 <span class="material-symbols-outlined channel-arrow icon--directional">open_in_new</span>
               </a>
@@ -938,9 +938,9 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
                   </svg>
                 </div>
                 <div class="channel-info">
-                  <span class="channel-type mono">{{ locale === 'ar' ? 'إنستغرام' : 'Instagram' }}</span>
+                  <span class="channel-type mono">{{ t('help.instagramChannel') }}</span>
                   <span class="channel-value truncate max-w-[200px]">{{ contentService.supportContact.value.instagramUrl }}</span>
-                  <span class="channel-note">{{ locale === 'ar' ? 'معارض أدوات الجراحة والكتالوجات' : 'Surgical catalog visual highlights' }}</span>
+                  <span class="channel-note">{{ t('help.instagramChannelNote') }}</span>
                 </div>
                 <span class="material-symbols-outlined channel-arrow icon--directional">open_in_new</span>
               </a>
@@ -1102,18 +1102,18 @@ function categoryVisual(categoryId?: string | null, fallback = 'article'): Categ
         <div class="article-modal__feedback">
           <div v-if="articleFeedbackGiven" class="feedback-done mono">
             <span class="material-symbols-outlined text-[18px]">check_circle</span>
-            <span>{{ locale === 'ar' ? 'شكراً لمشاركتنا رأيك!' : 'Thank you for your feedback!' }}</span>
+            <span>{{ t('help.feedbackThankYou') }}</span>
           </div>
           <div v-else class="feedback-row">
-            <span class="mono">{{ locale === 'ar' ? 'هل كان هذا الدليل مفيداً؟' : 'Was this protocol helpful?' }}</span>
+            <span class="mono">{{ t('help.wasGuideHelpful') }}</span>
             <div class="feedback-buttons">
               <button type="button" class="btn btn-sm btn-ghost" @click="giveArticleFeedback('yes')">
                 <span class="material-symbols-outlined text-[16px]">thumb_up</span>
-                <span>{{ locale === 'ar' ? 'نعم' : 'Yes' }}</span>
+                <span>{{ t('help.yes') }}</span>
               </button>
               <button type="button" class="btn btn-sm btn-ghost" @click="giveArticleFeedback('no')">
                 <span class="material-symbols-outlined text-[16px]">thumb_down</span>
-                <span>{{ locale === 'ar' ? 'لا' : 'No' }}</span>
+                <span>{{ t('help.no') }}</span>
               </button>
             </div>
           </div>

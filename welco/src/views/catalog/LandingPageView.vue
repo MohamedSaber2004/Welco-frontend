@@ -10,6 +10,7 @@ import ErrorState from '../../components/ui/ErrorState.vue'
 import BaseButton from '../../components/ui/BaseButton.vue'
 import BackButton from '../../components/ui/BackButton.vue'
 import AppImage from '../../components/ui/AppImage.vue'
+import SupportChannelsSection from '../../components/support/SupportChannelsSection.vue'
 import { useCart } from '../../composables/useCart'
 import { toastService } from '../../infrastructure/feedback/toast.service'
 import type { LandingPageDto } from '../../domain/models/content'
@@ -222,6 +223,9 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
           </router-link>
         </div>
       </section>
+
+      <!-- Dynamic Support Channels Section (WhatsApp, Phone, Email, Facebook, Instagram) -->
+      <SupportChannelsSection />
     </template>
   </div>
 </template>

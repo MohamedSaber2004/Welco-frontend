@@ -63,6 +63,8 @@ const supportContact = computed(() => contentService.supportContact.value)
 const livePhone = computed(() => supportContact.value?.phoneNumber || '+971 4 800 93526')
 const liveWhatsApp = computed(() => supportContact.value?.whatsAppNumber || '+971 50 800 9352')
 const liveEmail = computed(() => supportContact.value?.supportEmail || 'support@welco.health')
+const liveFacebook = computed(() => supportContact.value?.facebookUrl || '')
+const liveInstagram = computed(() => supportContact.value?.instagramUrl || '')
 const liveHours = computed(() => supportContact.value?.workingHours || '24/7 dedicated distributor & hospital escalation desk')
 
 const telLink = computed(() => `tel:${livePhone.value.replace(/\s+/g, '')}`)
@@ -93,9 +95,9 @@ const dynamicCategories = computed(() => {
 })
 
 const priorityOptions = computed(() => [
-  { value: 'normal', label: locale.value === 'ar' ? 'عادي' : 'Normal' },
-  { value: 'high', label: locale.value === 'ar' ? 'أولوية عالية' : 'High Priority' },
-  { value: 'urgent', label: locale.value === 'ar' ? 'عاجل / حرج' : 'Urgent / Blocker' },
+  { value: 'normal', label: t('help.priorityNormal') },
+  { value: 'high', label: t('help.priorityHigh') },
+  { value: 'urgent', label: t('help.priorityUrgent') },
 ])
 
 /* ── Escalation Ticket Form ── */
@@ -113,7 +115,7 @@ const currentCategory = computed({
 
 const submitEscalation = async () => {
   if (!subject.value.trim() || !message.value.trim()) {
-    toastService.info(locale.value === 'ar' ? 'يرجى ملء الموضوع والرسالة.' : 'Please fill in both the subject and message.')
+    toastService.info(t('help.errSubjectMessageRequired'))
     return
   }
 
@@ -155,7 +157,7 @@ const closeTicketDetails = () => {
 const handleCloseTicket = async (ticket: SupportTicketDto) => {
   const ok = await confirmService.confirm({
     title: t('help.closeTicket'),
-    message: locale.value === 'ar' ? 'هل أنت متأكد من إغلاق هذه التذكرة؟' : 'Are you sure you want to mark this ticket as closed?',
+    message: t('help.confirmCloseTicket'),
     variant: 'warning',
     confirmText: t('help.closeTicket'),
     cancelText: t('common.cancel'),
@@ -165,7 +167,7 @@ const handleCloseTicket = async (ticket: SupportTicketDto) => {
   closingTicketId.value = ticket.id
   try {
     await contentService.closeTicket(ticket.id)
-    toastService.success('Ticket marked as closed')
+    toastService.success(t('help.ticketClosedSuccess'))
     await contentService.loadMyTickets()
     if (selectedTicket.value?.id === ticket.id) {
       selectedTicket.value = myTickets.value.find((x) => x.id === ticket.id) ?? null
@@ -391,6 +393,42 @@ const acceptOemInquiry = async (inquiry: OemInquiryDto) => {
               <span>Send Email</span>
             </a>
           </div>
+
+          <!-- Facebook Desk Card -->
+          <div v-if="liveFacebook" class="channel-card">
+            <div class="channel-icon bg-blue-soft">
+              <svg class="w-5 h-5 text-blue-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              </svg>
+            </div>
+            <div class="channel-info">
+              <span class="channel-label mono">{{ t('help.facebookChannel') }}</span>
+              <strong class="channel-main mono text-sm truncate max-w-[220px]">{{ liveFacebook }}</strong>
+              <p class="channel-sub">{{ t('help.facebookChannelNote') }}</p>
+            </div>
+            <a :href="liveFacebook" target="_blank" rel="noopener noreferrer" class="btn-channel btn-fb mono">
+              <span class="material-symbols-outlined text-[16px]">open_in_new</span>
+              <span>{{ t('common.open') || 'Visit' }}</span>
+            </a>
+          </div>
+
+          <!-- Instagram Desk Card -->
+          <div v-if="liveInstagram" class="channel-card">
+            <div class="channel-icon bg-pink-soft">
+              <svg class="w-5 h-5 text-pink-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+              </svg>
+            </div>
+            <div class="channel-info">
+              <span class="channel-label mono">{{ t('help.instagramChannel') }}</span>
+              <strong class="channel-main mono text-sm truncate max-w-[220px]">{{ liveInstagram }}</strong>
+              <p class="channel-sub">{{ t('help.instagramChannelNote') }}</p>
+            </div>
+            <a :href="liveInstagram" target="_blank" rel="noopener noreferrer" class="btn-channel btn-ig mono">
+              <span class="material-symbols-outlined text-[16px]">open_in_new</span>
+              <span>{{ t('common.open') || 'Visit' }}</span>
+            </a>
+          </div>
         </div>
 
         <!-- Central Admin Management Notice -->
@@ -429,7 +467,7 @@ const acceptOemInquiry = async (inquiry: OemInquiryDto) => {
                 </div>
 
                 <div class="form-group w-48">
-                  <label class="form-lbl mono" for="esc-priority">{{ locale === 'ar' ? 'الأولوية' : 'Priority' }} *</label>
+                  <label class="form-lbl mono" for="esc-priority">{{ t('help.priority') }} *</label>
                   <select id="esc-priority" v-model="priority" class="form-select mono" required>
                     <option v-for="p in priorityOptions" :key="p.value" :value="p.value">
                       {{ p.label }}
@@ -1031,6 +1069,20 @@ const acceptOemInquiry = async (inquiry: OemInquiryDto) => {
   border: 1px solid #4338ca;
 }
 .btn-mail:hover { background: #4338ca; }
+
+.btn-fb {
+  background: #1877f2;
+  color: #fff;
+  border: 1px solid #166fe5;
+}
+.btn-fb:hover { background: #166fe5; }
+
+.btn-ig {
+  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+  color: #fff;
+  border: 1px solid rgba(220, 39, 67, 0.4);
+}
+.btn-ig:hover { opacity: 0.92; }
 
 /* Admin Oversight Notice */
 .admin-notice-card {

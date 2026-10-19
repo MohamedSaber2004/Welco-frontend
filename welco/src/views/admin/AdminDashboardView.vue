@@ -344,6 +344,8 @@ const contactForm = ref({
   supportEmail: '',
   phoneNumber: '',
   whatsAppNumber: '',
+  facebookUrl: '',
+  instagramUrl: '',
   workingHours: '',
 })
 
@@ -353,6 +355,8 @@ function openContactModal() {
     supportEmail: current.supportEmail || '',
     phoneNumber: current.phoneNumber || '',
     whatsAppNumber: current.whatsAppNumber || '',
+    facebookUrl: current.facebookUrl || '',
+    instagramUrl: current.instagramUrl || '',
     workingHours: current.workingHours || '',
   }
   contactError.value = null
@@ -367,7 +371,14 @@ async function handleSaveContact() {
   contactLoading.value = true
   contactError.value = null
   try {
-    await services.contentService.updateSupportContact(contactForm.value)
+    await services.contentService.updateSupportContact({
+      supportEmail: contactForm.value.supportEmail.trim(),
+      phoneNumber: contactForm.value.phoneNumber.trim(),
+      whatsAppNumber: contactForm.value.whatsAppNumber.trim(),
+      facebookUrl: contactForm.value.facebookUrl.trim() || undefined,
+      instagramUrl: contactForm.value.instagramUrl.trim() || undefined,
+      workingHours: contactForm.value.workingHours.trim() || undefined,
+    })
     toastService.success(t('admin.supportChannelsSaveSuccess'))
     showContactModal.value = false
   } catch (err: unknown) {
@@ -851,6 +862,21 @@ onUnmounted(_removeListeners)
             :label="t('admin.whatsAppPhoneLabel')"
             placeholder="+15550000000"
             :required="true"
+          />
+        </div>
+
+        <div class="modal-grid-2">
+          <BaseInput
+            v-model="contactForm.facebookUrl"
+            :label="t('admin.facebookUrlLabel')"
+            placeholder="https://facebook.com/welco"
+            :required="false"
+          />
+          <BaseInput
+            v-model="contactForm.instagramUrl"
+            :label="t('admin.instagramUrlLabel')"
+            placeholder="https://instagram.com/welco"
+            :required="false"
           />
         </div>
 

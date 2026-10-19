@@ -10,6 +10,7 @@ import type {
   UpdateSupportContactPayload,
 } from '../domain/models/content'
 import type { ContentRepository } from '../domain/ports/content-repository'
+import { CANONICAL_SUPPORT_DEFAULTS } from '../data/repositories/api-content.repository'
 
 export class ContentService {
   readonly documents = ref<DocumentDto[]>([])
@@ -18,20 +19,50 @@ export class ContentService {
   readonly faqs = ref<FaqItemDto[]>([])
   readonly tickets = ref<import('../domain/models/content').SupportTicketDto[]>([])
   readonly myTickets = ref<import('../domain/models/content').SupportTicketDto[]>([])
-  readonly supportContact = ref<SupportContactDto>({
-    supportEmail: '',
-    phoneNumber: '',
-    whatsAppNumber: '',
-    facebookUrl: '',
-    instagramUrl: '',
-    workingHours: '',
-  })
+  readonly supportContact = ref<SupportContactDto>({ ...CANONICAL_SUPPORT_DEFAULTS })
   readonly loading = ref(false)
 
   private readonly repo: ContentRepository
 
   constructor(repo: ContentRepository) {
     this.repo = repo
+    this.setupLiveSync()
+  }
+
+  private setupLiveSync(): void {
+    if (typeof window === 'undefined') return
+
+    try {
+      const cached = localStorage.getItem('welco_social_contacts')
+      if (cached) {
+        const parsed = JSON.parse(cached)
+        if (parsed.facebookUrl) this.supportContact.value.facebookUrl = parsed.facebookUrl
+        if (parsed.instagramUrl) this.supportContact.value.instagramUrl = parsed.instagramUrl
+      }
+    } catch {
+      // non-blocking
+    }
+
+    window.addEventListener('welco:support-contact-updated', ((e: CustomEvent<SupportContactDto>) => {
+      if (e.detail) {
+        this.supportContact.value = { ...this.supportContact.value, ...e.detail }
+      }
+    }) as EventListener)
+
+    window.addEventListener('storage', (e: StorageEvent) => {
+      if (e.key === 'welco_social_contacts' && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue)
+          this.supportContact.value = {
+            ...this.supportContact.value,
+            facebookUrl: parsed.facebookUrl || this.supportContact.value.facebookUrl,
+            instagramUrl: parsed.instagramUrl || this.supportContact.value.instagramUrl,
+          }
+        } catch {
+          // non-blocking
+        }
+      }
+    })
   }
 
   async loadDocuments(): Promise<void> {

@@ -1,7 +1,11 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { services } from '../../di/container'
 import { t } from '../../i18n'
+
+onMounted(() => {
+  void services.contentService.loadSupportContact()
+})
 
 const support = computed(() => services.contentService.supportContact.value)
 

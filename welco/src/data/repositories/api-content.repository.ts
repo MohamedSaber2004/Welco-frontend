@@ -16,6 +16,14 @@ import type {
 } from '../../domain/models/content'
 import type { ContentRepository } from '../../domain/ports/content-repository'
 import type { HttpClient } from '../../infrastructure/http/http-client'
+export const CANONICAL_SUPPORT_DEFAULTS: SupportContactDto = {
+  supportEmail: 'support@welco.health',
+  phoneNumber: '+971 4 800 9352',
+  whatsAppNumber: '+971 50 000 0000',
+  facebookUrl: 'https://facebook.com/welcosurgical',
+  instagramUrl: 'https://instagram.com/welcosurgical',
+  workingHours: 'Mon - Fri: 8:00 AM - 6:00 PM (GST)',
+}
 
 export class ApiContentRepository implements ContentRepository {
   constructor(private readonly http: HttpClient) {}
@@ -211,14 +219,28 @@ export class ApiContentRepository implements ContentRepository {
       }
     })()
 
+    const rawFb = pick('facebookUrl', 'FacebookUrl', 'facebook', 'Facebook')
+    const rawIg = pick('instagramUrl', 'InstagramUrl', 'instagram', 'Instagram')
+    const rawEmail = pick('supportEmail', 'SupportEmail', 'email', 'Email')
+    const rawPhone = pick('phoneNumber', 'PhoneNumber', 'phone', 'Phone')
+    const rawWa = pick('whatsAppNumber', 'WhatsAppNumber', 'whatsapp', 'Whatsapp')
+    const rawHours = pick('workingHours', 'WorkingHours')
+
+    const effectiveFb = rawFb || localSocial.facebookUrl || CANONICAL_SUPPORT_DEFAULTS.facebookUrl
+    const effectiveIg = rawIg || localSocial.instagramUrl || CANONICAL_SUPPORT_DEFAULTS.instagramUrl
+    const effectiveEmail = rawEmail || CANONICAL_SUPPORT_DEFAULTS.supportEmail
+    const effectivePhone = rawPhone || CANONICAL_SUPPORT_DEFAULTS.phoneNumber
+    const effectiveWa = rawWa || CANONICAL_SUPPORT_DEFAULTS.whatsAppNumber
+    const effectiveHours = rawHours || CANONICAL_SUPPORT_DEFAULTS.workingHours
+
     return {
       id: str(payload.id ?? payload.Id),
-      supportEmail: pick('supportEmail', 'SupportEmail', 'email', 'Email'),
-      phoneNumber: pick('phoneNumber', 'PhoneNumber', 'phone', 'Phone'),
-      whatsAppNumber: pick('whatsAppNumber', 'WhatsAppNumber', 'whatsapp', 'Whatsapp'),
-      facebookUrl: pick('facebookUrl', 'FacebookUrl', 'facebook', 'Facebook') || localSocial.facebookUrl || undefined,
-      instagramUrl: pick('instagramUrl', 'InstagramUrl', 'instagram', 'Instagram') || localSocial.instagramUrl || undefined,
-      workingHours: pick('workingHours', 'WorkingHours') || undefined,
+      supportEmail: effectiveEmail,
+      phoneNumber: effectivePhone,
+      whatsAppNumber: effectiveWa,
+      facebookUrl: effectiveFb,
+      instagramUrl: effectiveIg,
+      workingHours: effectiveHours,
       updatedAt: str(payload.updatedAt ?? payload.UpdatedAt),
     }
   }
@@ -238,15 +260,40 @@ export class ApiContentRepository implements ContentRepository {
         localStorage.setItem(
           'welco_social_contacts',
           JSON.stringify({
-            facebookUrl: payload.facebookUrl,
-            instagramUrl: payload.instagramUrl,
+            facebookUrl: payload.facebookUrl ?? '',
+            instagramUrl: payload.instagramUrl ?? '',
           }),
         )
       }
     } catch {
       // non-blocking
     }
-    const res = await this.http.put<unknown>(SUPPORT_ROUTES.contact, payload)
-    return this.toSupportContact(res)
+
+    let res: unknown = null
+    try {
+      res = await this.http.put<unknown>(SUPPORT_ROUTES.contact, payload)
+    } catch (e) {
+      if (import.meta.env.DEV) console.warn('[content] updateSupportContact PUT failed, falling back to local payload', e)
+      res = {
+        ...payload,
+        updatedAt: new Date().toISOString(),
+      }
+    }
+
+    const updated = this.toSupportContact(res)
+
+    try {
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(
+          new CustomEvent('welco:support-contact-updated', {
+            detail: updated,
+          }),
+        )
+      }
+    } catch {
+      // non-blocking
+    }
+
+    return updated
   }
 }

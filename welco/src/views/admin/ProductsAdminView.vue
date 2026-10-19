@@ -10,9 +10,10 @@ import BaseButton from '../../components/ui/BaseButton.vue'
 import FileUpload from '../../components/ui/FileUpload.vue'
 import AppImage from '../../components/ui/AppImage.vue'
 import { ATTACHMENT_PLACE, MEDIA_TYPE } from '../../config/api.config'
-import { services, companyRepository } from '../../di/container'
+import { services, companyRepository, attachmentService } from '../../di/container'
 import { confirmService } from '../../infrastructure/feedback/confirm.service'
 import { toastService } from '../../infrastructure/feedback/toast.service'
+import { resolveFileUrl, parseVideoSource } from '../../utils/file-url'
 import { t, locale } from '../../i18n'
 import type {
   ProductDto,
@@ -20,6 +21,7 @@ import type {
   CurrencyDto,
   CreateProductPayload,
   UpdateProductPayload,
+  ProductMediaDto,
 } from '../../domain/models/marketplace'
 import type { CompanyDto } from '../../domain/models/company'
 import { formatPrice } from '../../utils/format'
@@ -290,6 +292,12 @@ const formLoading = ref(false)
 const formError = ref('')
 const slugTouched = ref(false)
 
+export interface ProductVideoEntry {
+  url: string
+  title: string
+  provider?: 'youtube' | 'vimeo' | 'html5'
+}
+
 const emptyForm = () => ({
   nameEn: '',
   nameAr: '',
@@ -301,6 +309,7 @@ const emptyForm = () => ({
   imageName: '',
   images: ['', '', ''] as string[],
   videoUrl: '',
+  videos: [] as ProductVideoEntry[],
   material: '',
   currencyId: currencies.value[0]?.id || '',
   categoryId: categories.value[0]?.id || '',
@@ -309,21 +318,214 @@ const emptyForm = () => ({
 })
 const form = ref(emptyForm())
 
-const addImageSlot = () => {
-  form.value.images.push('')
+// --- Dynamic Multi-Image Management ---
+const multiImageInput = ref<HTMLInputElement | null>(null)
+const uploadingImages = ref(false)
+const uploadProgressText = ref('')
+const directImageUrl = ref('')
+const showUrlInputModal = ref(false)
+const isDraggingOverImages = ref(false)
+
+const triggerMultiImagePick = () => {
+  multiImageInput.value?.click()
 }
 
-const removeImageSlot = (idx: number) => {
-  if (form.value.images.length > 3) {
-    form.value.images.splice(idx, 1)
-  } else {
-    form.value.images[idx] = ''
+const removeImage = (idx: number) => {
+  form.value.images.splice(idx, 1)
+}
+
+const setCoverImage = (idx: number) => {
+  if (idx <= 0 || idx >= form.value.images.length) return
+  const item = form.value.images[idx]
+  if (!item) return
+  form.value.images.splice(idx, 1)
+  form.value.images.unshift(item)
+  toastService.success(locale.value === 'ar' ? 'تم تعيين صورة الغلاف الرئيسية' : 'Primary cover image set')
+}
+
+const uploadImageFiles = async (files: File[]) => {
+  const imageFiles = files.filter((f) => f.type.startsWith('image/'))
+  if (imageFiles.length === 0) return
+  uploadingImages.value = true
+  let successCount = 0
+  try {
+    for (let i = 0; i < imageFiles.length; i++) {
+      const file = imageFiles[i]
+      if (!file) continue
+      uploadProgressText.value = `${i + 1} / ${imageFiles.length}`
+      const res = await attachmentService.upload({
+        file,
+        place: ATTACHMENT_PLACE.PROVIDERS,
+        fileType: MEDIA_TYPE.IMAGE,
+      })
+      if (res.ok && res.data) {
+        successCount++
+        form.value.images.push(res.data)
+      }
+    }
+    if (successCount > 0) {
+      toastService.success(
+        locale.value === 'ar'
+          ? `تم رفع ${successCount} صور بنجاح`
+          : `${successCount} images uploaded successfully`,
+      )
+    }
+  } catch (err) {
+    toastService.error(err instanceof Error ? err.message : t('common.error'))
+  } finally {
+    uploadingImages.value = false
+    uploadProgressText.value = ''
   }
 }
 
-const uploadedImagesCount = computed(() =>
-  form.value.images.filter((img) => Boolean(img && img.trim())).length,
-)
+const onMultipleFilesSelected = async (e: Event) => {
+  const target = e.target as HTMLInputElement
+  const files = target.files
+  if (!files || files.length === 0) return
+  await uploadImageFiles(Array.from(files))
+  target.value = ''
+}
+
+const onDropImages = async (e: DragEvent) => {
+  isDraggingOverImages.value = false
+  const files = e.dataTransfer?.files
+  if (!files || files.length === 0) return
+  await uploadImageFiles(Array.from(files))
+}
+
+const addDirectImageUrl = () => {
+  const url = directImageUrl.value.trim()
+  if (!url) return
+  form.value.images.push(url)
+  directImageUrl.value = ''
+  showUrlInputModal.value = false
+  toastService.success(locale.value === 'ar' ? 'تمت إضافة رابط الصورة' : 'Image link added')
+}
+
+const uploadedImagesCount = computed(() => form.value.images.filter((img) => Boolean(img && img.trim())).length)
+
+// --- Dynamic Multi-Video Management ---
+const newVideoUrl = ref('')
+const newVideoTitle = ref('')
+const videoFileInput = ref<HTMLInputElement | null>(null)
+const uploadingVideo = ref(false)
+const uploadingVideoFileName = ref('')
+const uploadingVideoSizeMb = ref(0)
+const previewVideoIdx = ref<number | null>(null)
+const showVideoUrlModal = ref(false)
+const isDraggingOverVideos = ref(false)
+
+const triggerVideoFileInput = () => {
+  videoFileInput.value?.click()
+}
+
+const addVideoItem = () => {
+  const url = newVideoUrl.value.trim()
+  if (!url) {
+    toastService.error(t('admin.videoUrl'))
+    return
+  }
+  const parsed = parseVideoSource(url)
+  const title = newVideoTitle.value.trim() || `Video ${form.value.videos.length + 1}`
+  form.value.videos.push({
+    url,
+    title,
+    provider: parsed.type as 'youtube' | 'vimeo' | 'html5',
+  })
+  newVideoUrl.value = ''
+  newVideoTitle.value = ''
+  showVideoUrlModal.value = false
+  toastService.success(t('admin.videoUploaded'))
+}
+
+const removeVideoItem = (idx: number) => {
+  form.value.videos.splice(idx, 1)
+  if (previewVideoIdx.value === idx) {
+    previewVideoIdx.value = null
+  }
+}
+
+const setPrimaryVideo = (idx: number) => {
+  if (idx <= 0 || idx >= form.value.videos.length) return
+  const item = form.value.videos[idx]
+  if (!item) return
+  form.value.videos.splice(idx, 1)
+  form.value.videos.unshift(item)
+  toastService.success(locale.value === 'ar' ? 'تم تعيين الفيديو كرئيسي' : 'Primary video updated')
+}
+
+const toggleVideoPreview = (idx: number) => {
+  previewVideoIdx.value = previewVideoIdx.value === idx ? null : idx
+}
+
+const uploadVideoFiles = async (files: File[]) => {
+  const videoFiles = files.filter((f) => f.type.startsWith('video/') || /\.(mp4|webm|ogg|mov)$/i.test(f.name))
+  if (videoFiles.length === 0) {
+    toastService.error(t('attachment.unsupportedType'))
+    return
+  }
+
+  // Guard against files exceeding 100MB limit
+  for (const file of videoFiles) {
+    const sizeMb = file.size / (1024 * 1024)
+    if (sizeMb > 100) {
+      toastService.error(
+        locale.value === 'ar'
+          ? `حجم الفيديو (${sizeMb.toFixed(1)}MB) كبير جداً. الحد الأقصى المسموح به هو 100MB.`
+          : `Video file (${sizeMb.toFixed(1)}MB) exceeds 100MB limit. Please compress the video before uploading.`,
+      )
+      return
+    }
+  }
+
+  uploadingVideo.value = true
+  let successCount = 0
+  try {
+    for (let i = 0; i < videoFiles.length; i++) {
+      const file = videoFiles[i]
+      if (!file) continue
+      uploadingVideoFileName.value = file.name
+      uploadingVideoSizeMb.value = +(file.size / (1024 * 1024)).toFixed(1)
+      const res = await attachmentService.upload({
+        file,
+        place: ATTACHMENT_PLACE.PROVIDERS,
+        fileType: MEDIA_TYPE.VIDEO,
+      })
+      if (res.ok && res.data) {
+        successCount++
+        form.value.videos.push({
+          url: res.data,
+          title: file.name.replace(/\.[^/.]+$/, ''),
+          provider: 'html5',
+        })
+      }
+    }
+    if (successCount > 0) {
+      toastService.success(t('admin.videoUploaded'))
+    }
+  } catch (err) {
+    toastService.error(err instanceof Error ? err.message : t('common.error'))
+  } finally {
+    uploadingVideo.value = false
+    uploadingVideoFileName.value = ''
+    uploadingVideoSizeMb.value = 0
+  }
+}
+
+const onVideoFileSelected = async (e: Event) => {
+  const target = e.target as HTMLInputElement
+  const files = target.files
+  if (!files || files.length === 0) return
+  await uploadVideoFiles(Array.from(files))
+  target.value = ''
+}
+
+const onDropVideos = async (e: DragEvent) => {
+  isDraggingOverVideos.value = false
+  const files = e.dataTransfer?.files
+  if (!files || files.length === 0) return
+  await uploadVideoFiles(Array.from(files))
+}
 
 const slugify = (v: string): string =>
   v.trim().toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/[\s_]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')
@@ -356,6 +558,10 @@ const openCreate = () => {
   form.value = emptyForm()
   formError.value = ''
   slugTouched.value = false
+  previewVideoIdx.value = null
+  newVideoUrl.value = ''
+  newVideoTitle.value = ''
+  showUrlInputModal.value = false
   showModal.value = true
 }
 
@@ -363,13 +569,26 @@ const openEdit = (p: AdminProductItem | ProductDto) => {
   editing.value = p
   let imgs: string[] = []
   if (Array.isArray(p.images) && p.images.length > 0) {
-    imgs = [...p.images]
-  } else if (p.imageName) {
-    imgs = [p.imageName]
+    imgs = p.images.map((img) => (img || '').trim()).filter(Boolean)
+  } else if (p.imageName && p.imageName.trim()) {
+    imgs = [p.imageName.trim()]
   }
-  while (imgs.length < 3) {
-    imgs.push('')
+
+  let vids: ProductVideoEntry[] = []
+  if (Array.isArray(p.videos) && p.videos.length > 0) {
+    vids = p.videos.map((v, i) => ({
+      url: v.url,
+      title: v.title || `Video ${i + 1}`,
+      provider: parseVideoSource(v.url).type as 'youtube' | 'vimeo' | 'html5',
+    }))
+  } else if (p.videoUrl) {
+    vids = [{
+      url: p.videoUrl,
+      title: 'Main Demonstration Video',
+      provider: parseVideoSource(p.videoUrl).type as 'youtube' | 'vimeo' | 'html5',
+    }]
   }
+
   form.value = {
     nameEn: p.nameEn ?? '',
     nameAr: p.nameAr ?? '',
@@ -381,6 +600,7 @@ const openEdit = (p: AdminProductItem | ProductDto) => {
     imageName: p.imageName ?? '',
     images: imgs,
     videoUrl: p.videoUrl ?? '',
+    videos: vids,
     material: p.material ?? '',
     currencyId: p.currencyId ?? '',
     categoryId: p.categoryId ?? '',
@@ -389,7 +609,42 @@ const openEdit = (p: AdminProductItem | ProductDto) => {
   }
   formError.value = ''
   slugTouched.value = true
+  previewVideoIdx.value = null
+  newVideoUrl.value = ''
+  newVideoTitle.value = ''
+  showUrlInputModal.value = false
   showModal.value = true
+
+  if (p.id) {
+    services.marketplaceRepository.getProductById(p.id).then((full) => {
+      if (full && editing.value?.id === p.id) {
+        if (Array.isArray(full.images) && full.images.length > 0) {
+          form.value.images = [...full.images]
+          form.value.imageName = full.images[0] || form.value.imageName
+        }
+        if (full.videoUrl && !form.value.videos.some((x) => x.url === full.videoUrl)) {
+          form.value.videos.unshift({
+            url: full.videoUrl,
+            title: 'Main Demonstration Video',
+            provider: parseVideoSource(full.videoUrl).type as 'youtube' | 'vimeo' | 'html5',
+          })
+        }
+        if (full.isActive !== undefined) {
+          form.value.isActive = full.isActive
+        }
+      }
+    }).catch(() => {})
+
+    services.marketplaceRepository.getProductVideos(p.id).then((serverVids) => {
+      if (Array.isArray(serverVids) && serverVids.length > 0) {
+        form.value.videos = serverVids.map((v, i) => ({
+          url: v.url,
+          title: v.title || `Video ${i + 1}`,
+          provider: parseVideoSource(v.url).type as 'youtube' | 'vimeo' | 'html5',
+        }))
+      }
+    }).catch(() => {})
+  }
 }
 
 const closeModal = () => {
@@ -437,12 +692,14 @@ const submit = async () => {
   }
 
   const primaryImage = validImages[0] || null
-  const video = f.videoUrl.trim() || undefined
+  const validVideos = f.videos.map((v) => ({ url: v.url.trim(), title: v.title?.trim() || '' })).filter((v) => Boolean(v.url))
+  const primaryVideo = validVideos[0]?.url || f.videoUrl.trim() || undefined
   const nameArVal = f.nameAr.trim() || undefined
 
   formLoading.value = true
   formError.value = ''
   try {
+    let savedProduct: ProductDto
     if (editing.value) {
       const payload: UpdateProductPayload = {
         nameEn: f.nameEn.trim(),
@@ -454,13 +711,13 @@ const submit = async () => {
         stock: numStock,
         imageName: primaryImage,
         images: validImages,
-        videoUrl: video,
+        videoUrl: primaryVideo,
         material: f.material.trim() || undefined,
         currencyId: f.currencyId || null,
         categoryId: f.categoryId,
         isActive: f.isActive,
       }
-      await services.marketplaceRepository.updateProduct(editing.value.id, payload)
+      savedProduct = await services.marketplaceRepository.updateProduct(editing.value.id, payload)
       toastService.success(t('admin.productUpdated'))
     } else {
       const payload: CreateProductPayload = {
@@ -473,14 +730,33 @@ const submit = async () => {
         stock: numStock,
         imageName: primaryImage,
         images: validImages,
-        videoUrl: video,
+        videoUrl: primaryVideo,
         material: f.material.trim() || undefined,
         currencyId: f.currencyId || null,
         categoryId: f.categoryId,
+        isActive: f.isActive ?? true,
       }
-      await services.marketplaceRepository.createProduct(payload)
+      savedProduct = await services.marketplaceRepository.createProduct(payload)
       toastService.success(t('admin.productCreated'))
     }
+
+    // Persist multiple videos via API endpoint
+    if (savedProduct?.id && validVideos.length > 0) {
+      const videoPayload: ProductMediaDto[] = validVideos.map((v, idx) => ({
+        productId: savedProduct.id,
+        type: 2,
+        url: v.url,
+        title: v.title || undefined,
+        duration: undefined,
+        sortOrder: idx,
+      }))
+      try {
+        await services.marketplaceRepository.updateProductVideos(savedProduct.id, videoPayload)
+      } catch (vErr) {
+        if (import.meta.env.DEV) console.warn('[products] videos sync failed', vErr)
+      }
+    }
+
     closeModal()
     await loadProducts()
   } catch (e) {
@@ -737,7 +1013,7 @@ onMounted(async () => {
                   <td>
                     <div class="prod-thumb-box">
                       <AppImage
-                        :src="p.imageName"
+                        :src="p.imageName || p.images?.[0]"
                         placeholder-type="product"
                         :placeholder-text="p.sku"
                         :alt="localized(p.nameEn, p.nameAr)"
@@ -940,114 +1216,385 @@ onMounted(async () => {
             <textarea v-model="form.description" rows="2" class="form-textarea"></textarea>
           </div>
 
-          <!-- Product Images Multi-Slot Upload (Strict Min 3 Images Required) -->
-          <div class="product-media-card p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/20">
-            <div class="flex items-center justify-between mb-2">
-              <div>
-                <label class="form-label mono font-bold text-slate-800 dark:text-slate-100 mb-0">
-                  {{ t('admin.productImagesReq') }}
-                </label>
-                <p class="text-xs text-slate-500 mt-0.5">
-                  {{ t('admin.productImagesHint') }}
+          <!-- Product Images Section -->
+          <input
+            ref="multiImageInput"
+            type="file"
+            multiple
+            accept="image/*"
+            class="hidden"
+            @change="onMultipleFilesSelected"
+          />
+
+          <div class="product-media-card">
+            <!-- Header with Title, Rule note, and Status Badge -->
+            <div class="media-card-header">
+              <div class="media-header-title">
+                <div class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-teal-600 dark:text-teal-400 text-[20px]">photo_library</span>
+                  <label class="form-label mono mb-0 text-sm font-bold text-slate-900 dark:text-slate-100">
+                    {{ t('admin.productImagesReq') }} <span class="req">*</span>
+                  </label>
+                </div>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  {{ locale === 'ar' ? 'يجب رفع 3 صور على الأقل للمنتج (PNG, JPG, WebP)' : 'Upload at least 3 photos of the product (PNG, JPG, WebP)' }}
                 </p>
               </div>
-              <span
-                class="mono text-xs px-2.5 py-1 rounded-full font-bold transition-colors"
-                :class="uploadedImagesCount >= 3 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800' : 'bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800'"
-              >
-                <span v-if="uploadedImagesCount >= 3">✓ {{ uploadedImagesCount }} {{ t('admin.imagesCompliant') }}</span>
-                <span v-else>{{ uploadedImagesCount }} / 3 {{ t('admin.imagesRemaining') }}</span>
-              </span>
+
+              <!-- Compliance Status Badge -->
+              <div class="flex items-center gap-2">
+                <span
+                  class="media-status-badge"
+                  :class="uploadedImagesCount >= 3 ? 'media-status-badge--success' : 'media-status-badge--warning'"
+                >
+                  <span class="material-symbols-outlined text-[15px]">
+                    {{ uploadedImagesCount >= 3 ? 'check_circle' : 'pending' }}
+                  </span>
+                  <span>
+                    {{ uploadedImagesCount >= 3
+                      ? (locale === 'ar' ? `✓ مكتمل (${uploadedImagesCount} صور)` : `✓ ${uploadedImagesCount} Photos Compliant`)
+                      : (locale === 'ar' ? `${uploadedImagesCount} من 3 صور (مطلوب 3 كحد أدنى)` : `${uploadedImagesCount} / 3 Photos (Min 3 Required)`) }}
+                  </span>
+                </span>
+
+                <!-- Quick URL toggle button -->
+                <button
+                  type="button"
+                  class="btn-media-action"
+                  :title="locale === 'ar' ? 'إضافة رابط صورة' : 'Add image URL'"
+                  @click="showUrlInputModal = !showUrlInputModal"
+                >
+                  <span class="material-symbols-outlined text-[15px]">link</span>
+                  <span>{{ locale === 'ar' ? 'رابط' : 'URL' }}</span>
+                </button>
+              </div>
             </div>
 
-            <!-- Image Slots Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <!-- Optional URL input bar -->
+            <div v-if="showUrlInputModal" class="media-url-bar">
+              <input
+                v-model="directImageUrl"
+                type="url"
+                class="form-input text-xs flex-1"
+                :placeholder="locale === 'ar' ? 'أدخل رابط الصورة المباشر...' : 'Enter direct image URL...'"
+                @keydown.enter.prevent="addDirectImageUrl"
+              />
+              <button type="button" class="btn-primary-sm" @click="addDirectImageUrl">
+                {{ locale === 'ar' ? 'إضافة' : 'Add' }}
+              </button>
+              <button type="button" class="btn-secondary-sm" @click="showUrlInputModal = false">
+                {{ t('common.cancel') }}
+              </button>
+            </div>
+
+            <!-- Upload Dropzone -->
+            <div
+              class="media-dropzone"
+              :class="{ 'media-dropzone--active': isDraggingOverImages }"
+              @dragover.prevent="isDraggingOverImages = true"
+              @dragleave.prevent="isDraggingOverImages = false"
+              @drop.prevent="onDropImages"
+              @click="triggerMultiImagePick"
+            >
+              <div class="dropzone-content">
+                <div class="dropzone-icon-circle">
+                  <span v-if="uploadingImages" class="material-symbols-outlined text-[24px] animate-spin text-teal-600">
+                    progress_activity
+                  </span>
+                  <span v-else class="material-symbols-outlined text-[24px] text-teal-600">
+                    cloud_upload
+                  </span>
+                </div>
+                <div class="dropzone-text">
+                  <p class="dropzone-title">
+                    <span v-if="uploadingImages">
+                      {{ locale === 'ar' ? 'جاري رفع الصور...' : 'Uploading images...' }} {{ uploadProgressText }}
+                    </span>
+                    <span v-else>
+                      <strong class="text-teal-600 font-semibold">{{ locale === 'ar' ? 'انقر لاختيار الصور' : 'Click to select photos' }}</strong>
+                      {{ locale === 'ar' ? ' أو اسحب الملفات هنا' : ' or drag and drop files here' }}
+                    </span>
+                  </p>
+                  <p class="dropzone-subtitle">
+                    {{ locale === 'ar' ? 'يمكنك اختيار عدة صور دفعة واحدة (PNG, JPG, WebP بحد أقصى 5MB لكل صورة)' : 'Select multiple photos at once (PNG, JPG, WebP up to 5MB each)' }}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Uploaded Images Gallery Grid -->
+            <div v-if="form.images.length > 0" class="media-gallery-grid">
               <div
                 v-for="(img, idx) in form.images"
                 :key="idx"
-                class="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/60 relative flex flex-col gap-2"
+                class="media-thumb-card group"
+                :class="{ 'media-thumb-card--cover': idx === 0 }"
               >
-                <div class="flex items-center justify-between">
-                  <span class="mono text-[11px] font-bold text-slate-700 dark:text-slate-200">
-                    {{ idx === 0 ? t('admin.coverImage') : t('admin.imageIndex', { index: idx + 1 }) }}
-                  </span>
-                  <button
-                    v-if="form.images.length > 3"
-                    type="button"
-                    class="text-rose-500 hover:text-rose-700 text-xs p-1"
-                    :title="t('admin.removeSlot')"
-                    @click="removeImageSlot(idx)"
-                  >
-                    <span class="material-symbols-outlined text-[16px]">close</span>
-                  </button>
+                <img
+                  :src="resolveFileUrl(img)"
+                  :alt="`Product photo ${idx + 1}`"
+                  class="media-thumb-img"
+                  loading="lazy"
+                />
+
+                <!-- Cover badge on 1st image -->
+                <div v-if="idx === 0" class="media-cover-badge">
+                  <span class="material-symbols-outlined text-[13px]">star</span>
+                  <span>{{ locale === 'ar' ? 'الرئيسية' : 'Cover' }}</span>
+                </div>
+                <div v-else class="media-order-pill">
+                  #{{ idx + 1 }}
                 </div>
 
-                <FileUpload
-                  v-model="form.images[idx]"
-                  :place="ATTACHMENT_PLACE.PROVIDERS"
-                  :media-type="MEDIA_TYPE.IMAGE"
-                  :label="idx === 0 ? t('admin.uploadCover') : t('admin.uploadImageIndex', { index: idx + 1 })"
-                />
-              </div>
-            </div>
+                <!-- Hover actions overlay -->
+                <div class="media-thumb-overlay">
+                  <div class="thumb-overlay-top">
+                    <button
+                      v-if="idx > 0"
+                      type="button"
+                      class="btn-overlay-action btn-set-cover"
+                      :title="locale === 'ar' ? 'تعيين كصورة رئيسية' : 'Set as primary cover'"
+                      @click="setCoverImage(idx)"
+                    >
+                      <span class="material-symbols-outlined text-[14px]">star</span>
+                      <span>{{ locale === 'ar' ? 'غلاف' : 'Cover' }}</span>
+                    </button>
+                    <span v-else></span>
 
-            <div class="mt-2.5 flex justify-end">
+                    <button
+                      type="button"
+                      class="btn-overlay-action btn-delete-thumb"
+                      :title="locale === 'ar' ? 'حذف الصورة' : 'Remove photo'"
+                      @click="removeImage(idx)"
+                    >
+                      <span class="material-symbols-outlined text-[15px]">delete</span>
+                    </button>
+                  </div>
+
+                  <div class="thumb-overlay-bottom">
+                    <a
+                      :href="resolveFileUrl(img)"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="btn-overlay-action btn-view-full"
+                      :title="locale === 'ar' ? 'معاينة بالحجم الكامل' : 'Open in new tab'"
+                    >
+                      <span class="material-symbols-outlined text-[13px]">open_in_new</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Compact Add Button at end of grid -->
               <button
                 type="button"
-                class="inline-flex items-center gap-1.5 text-xs font-semibold text-sky-600 hover:text-sky-700 dark:text-sky-400 py-1 px-3 rounded-lg border border-dashed border-sky-300 hover:border-sky-400 bg-sky-50/50 dark:bg-sky-950/20"
-                @click="addImageSlot"
+                class="media-thumb-add-tile"
+                @click="triggerMultiImagePick"
               >
-                <span class="material-symbols-outlined text-[15px]">add_photo_alternate</span>
-                <span>{{ t('admin.addImageSlot') }}</span>
+                <span class="material-symbols-outlined text-[22px] text-teal-600 mb-1">add_photo_alternate</span>
+                <span class="text-[11px] font-bold text-slate-700 dark:text-slate-300">{{ locale === 'ar' ? '+ إضافة صور' : '+ Add Photos' }}</span>
               </button>
             </div>
           </div>
 
-          <!-- Product Demonstration Video -->
-          <div class="product-video-card p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/20">
-            <label class="form-label mono font-bold text-slate-800 dark:text-slate-100 mb-1">
-              {{ t('admin.productVideoOptional') }}
-            </label>
-            <p class="text-xs text-slate-500 mb-2">
-              {{ t('admin.productVideoDesc') }}
-            </p>
+          <!-- Product Videos Section -->
+          <input
+            ref="videoFileInput"
+            type="file"
+            accept="video/mp4,video/webm,video/ogg,video/quicktime"
+            class="hidden"
+            @change="onVideoFileSelected"
+          />
 
-            <div class="flex gap-2">
+          <div class="product-media-card mt-4">
+            <!-- Header -->
+            <div class="media-card-header">
+              <div class="media-header-title">
+                <div class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-rose-600 dark:text-rose-400 text-[20px]">smart_display</span>
+                  <label class="form-label mono mb-0 text-sm font-bold text-slate-900 dark:text-slate-100">
+                    {{ t('admin.productVideos') }}
+                    <span class="text-xs text-slate-400 font-normal ms-1">({{ t('common.optional') }})</span>
+                  </label>
+                </div>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  {{ locale === 'ar' ? 'رفع فيديو توضيحي للمنتج (MP4, WebM) أو إضافة رابط خارجي' : 'Upload product demonstration videos (MP4, WebM) or add video links' }}
+                </p>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <span v-if="form.videos.length > 0" class="media-count-pill">
+                  {{ form.videos.length }} {{ locale === 'ar' ? 'فيديو' : 'Videos' }}
+                </span>
+
+                <!-- Quick Link toggle button -->
+                <button
+                  type="button"
+                  class="btn-media-action"
+                  :title="locale === 'ar' ? 'إضافة رابط فيديو' : 'Add video link'"
+                  @click="showVideoUrlModal = !showVideoUrlModal"
+                >
+                  <span class="material-symbols-outlined text-[15px]">link</span>
+                  <span>{{ locale === 'ar' ? 'رابط خارجي' : 'Video Link' }}</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Optional Video Link Input Bar -->
+            <div v-if="showVideoUrlModal" class="media-url-bar">
               <input
-                v-model="form.videoUrl"
+                v-model="newVideoUrl"
                 type="url"
-                class="form-input mono text-xs flex-1"
-                :placeholder="t('admin.videoPlaceholder')"
+                class="form-input text-xs flex-1"
+                :placeholder="locale === 'ar' ? 'رابط الفيديو (YouTube, Vimeo, أو MP4 مباشر)...' : 'Video URL (YouTube, Vimeo, or MP4 link)...'"
+                @keydown.enter.prevent="addVideoItem"
               />
-              <button
-                v-if="form.videoUrl"
-                type="button"
-                class="px-2.5 text-xs text-rose-500 hover:text-rose-700 border border-slate-200 dark:border-slate-700 rounded-lg"
-                @click="form.videoUrl = ''"
-              >
-                {{ t('common.clear') }}
+              <input
+                v-model="newVideoTitle"
+                type="text"
+                class="form-input text-xs md:w-44"
+                :placeholder="locale === 'ar' ? 'العنوان (اختياري)' : 'Title (optional)'"
+                @keydown.enter.prevent="addVideoItem"
+              />
+              <button type="button" class="btn-primary-sm" :disabled="!newVideoUrl.trim()" @click="addVideoItem">
+                {{ locale === 'ar' ? 'إضافة' : 'Add' }}
+              </button>
+              <button type="button" class="btn-secondary-sm" @click="showVideoUrlModal = false">
+                {{ t('common.cancel') }}
               </button>
             </div>
 
-            <div v-if="form.videoUrl" class="mt-2.5 p-2 rounded-xl bg-slate-900 text-white flex flex-col gap-2 max-w-md">
-              <div class="flex items-center justify-between text-xs text-slate-300 px-1">
-                <span class="flex items-center gap-1">
-                  <span class="material-symbols-outlined text-[14px] text-red-400">play_circle</span>
-                  <span>{{ t('admin.videoPreview') }}</span>
-                </span>
-                <a :href="form.videoUrl" target="_blank" rel="noopener noreferrer" class="text-sky-400 underline text-[11px]">
-                  {{ t('admin.openLink') }}
-                </a>
+            <!-- Video File Dropzone -->
+            <div
+              class="media-dropzone media-dropzone--video"
+              :class="{ 'media-dropzone--active': isDraggingOverVideos }"
+              @dragover.prevent="isDraggingOverVideos = true"
+              @dragleave.prevent="isDraggingOverVideos = false"
+              @drop.prevent="onDropVideos"
+              @click="!uploadingVideo && triggerVideoFileInput()"
+            >
+              <div class="dropzone-content">
+                <div class="dropzone-icon-circle dropzone-icon-circle--rose">
+                  <span v-if="uploadingVideo" class="material-symbols-outlined text-[24px] animate-spin text-rose-600">
+                    progress_activity
+                  </span>
+                  <span v-else class="material-symbols-outlined text-[24px] text-rose-600">
+                    video_file
+                  </span>
+                </div>
+                <div class="dropzone-text w-full max-w-sm">
+                  <template v-if="uploadingVideo">
+                    <p class="dropzone-title font-semibold text-rose-700 dark:text-rose-400">
+                      {{ locale === 'ar' ? 'جاري رفع الفيديو إلى الخادم...' : 'Uploading video to server...' }}
+                      <span class="ms-1 font-mono">({{ attachmentService.progress.value }}%)</span>
+                    </p>
+                    <p class="text-[11px] text-slate-500 font-mono mt-0.5 truncate">
+                      {{ uploadingVideoFileName }} ({{ uploadingVideoSizeMb }} MB)
+                    </p>
+                    <!-- Real-time Progress Bar -->
+                    <div class="w-full bg-slate-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden mt-2">
+                      <div
+                        class="bg-rose-600 h-full transition-all duration-200"
+                        :style="{ width: attachmentService.progress.value + '%' }"
+                      ></div>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <p class="dropzone-title">
+                      <strong class="text-rose-600 font-semibold">{{ locale === 'ar' ? 'انقر لرفع ملف فيديو' : 'Click to upload video file' }}</strong>
+                      {{ locale === 'ar' ? ' أو اسحب الملف هنا' : ' or drag and drop video here' }}
+                    </p>
+                    <p class="dropzone-subtitle">
+                      {{ locale === 'ar' ? 'يدعم MP4, WebM (بحد أقصى 100MB — ينصح بضغط الفيديو لسرعة الرفع)' : 'Supports MP4, WebM (up to 100MB — compressed videos upload faster)' }}
+                    </p>
+                  </template>
+                </div>
               </div>
-              <video
-                v-if="form.videoUrl.match(/\.(mp4|webm|ogg)($|\?)/i)"
-                :src="form.videoUrl"
-                controls
-                class="w-full rounded-lg max-h-48 bg-black"
-              ></video>
-              <div v-else class="p-3 rounded-lg bg-slate-800 text-center text-xs text-slate-300">
-                <span class="material-symbols-outlined text-[24px] text-sky-400 mb-1">movie</span>
-                <p class="truncate font-mono">{{ form.videoUrl }}</p>
+            </div>
+
+            <!-- Uploaded Videos List -->
+            <div v-if="form.videos.length > 0" class="videos-card-list">
+              <div
+                v-for="(vid, vIdx) in form.videos"
+                :key="vIdx"
+                class="video-card-item"
+              >
+                <div class="video-card-main">
+                  <!-- Video Icon / Provider -->
+                  <div
+                    class="video-card-badge"
+                    :class="vid.provider === 'youtube' ? 'bg-red-600' : vid.provider === 'vimeo' ? 'bg-sky-500' : 'bg-rose-600'"
+                  >
+                    <span class="material-symbols-outlined text-[18px] text-white">
+                      {{ vid.provider === 'youtube' ? 'play_arrow' : vid.provider === 'vimeo' ? 'movie' : 'videocam' }}
+                    </span>
+                  </div>
+
+                  <!-- Details -->
+                  <div class="video-card-info">
+                    <div class="flex items-center gap-2">
+                      <strong class="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">
+                        {{ vid.title || (locale === 'ar' ? `فيديو ${vIdx + 1}` : `Video ${vIdx + 1}`) }}
+                      </strong>
+                      <span v-if="vIdx === 0" class="video-primary-badge">
+                        {{ locale === 'ar' ? 'الرئيسي' : 'Primary' }}
+                      </span>
+                    </div>
+                    <p class="text-[11px] font-mono text-slate-400 dark:text-slate-500 truncate mt-0.5">
+                      {{ vid.url }}
+                    </p>
+                  </div>
+
+                  <!-- Actions -->
+                  <div class="video-card-actions">
+                    <button
+                      type="button"
+                      class="btn-video-preview"
+                      @click="toggleVideoPreview(vIdx)"
+                    >
+                      <span class="material-symbols-outlined text-[15px]">
+                        {{ previewVideoIdx === vIdx ? 'visibility_off' : 'visibility' }}
+                      </span>
+                      <span>{{ previewVideoIdx === vIdx ? (locale === 'ar' ? 'إخفاء' : 'معاينة') : (locale === 'ar' ? 'معاينة' : 'Preview') }}</span>
+                    </button>
+
+                    <button
+                      v-if="vIdx > 0"
+                      type="button"
+                      class="btn-video-primary"
+                      :title="locale === 'ar' ? 'تعيين كفيديو رئيسي' : 'Make primary'"
+                      @click="setPrimaryVideo(vIdx)"
+                    >
+                      <span class="material-symbols-outlined text-[16px]">vertical_align_top</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      class="btn-video-delete"
+                      :title="locale === 'ar' ? 'حذف الفيديو' : 'Delete video'"
+                      @click="removeVideoItem(vIdx)"
+                    >
+                      <span class="material-symbols-outlined text-[16px]">delete</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Video player inside card -->
+                <div v-if="previewVideoIdx === vIdx" class="video-player-container">
+                  <iframe
+                    v-if="parseVideoSource(vid.url).type === 'youtube' || parseVideoSource(vid.url).type === 'vimeo'"
+                    :src="parseVideoSource(vid.url).embedUrl"
+                    class="w-full h-full border-0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen
+                  ></iframe>
+                  <video
+                    v-else
+                    :src="resolveFileUrl(vid.url)"
+                    controls
+                    class="w-full h-full object-contain"
+                  ></video>
+                </div>
               </div>
             </div>
           </div>
@@ -1689,5 +2236,402 @@ onMounted(async () => {
   .form-grid-3 {
     grid-template-columns: 1fr;
   }
+}
+
+/* ── Modern Clinical Media Cards ── */
+.product-media-card {
+  background: var(--wl-surface-subtle, #f8fafc);
+  border: 1px solid var(--wl-border, #e2e8f0);
+  border-radius: 12px;
+  padding: 16px;
+  transition: all 0.2s ease;
+}
+
+.media-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.media-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 9999px;
+}
+
+.media-status-badge--success {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+.media-status-badge--warning {
+  background: #fffbeb;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
+.btn-media-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--wl-border, #e2e8f0);
+  background: var(--wl-surface, #ffffff);
+  color: var(--wl-ink-soft, #475569);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-media-action:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.media-url-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background: var(--wl-surface, #ffffff);
+  border: 1px solid var(--wl-border, #e2e8f0);
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.btn-primary-sm {
+  padding: 6px 12px;
+  font-size: 11.5px;
+  font-weight: 600;
+  border-radius: 6px;
+  background: #0d9488;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary-sm:hover:not(:disabled) {
+  background: #0f766e;
+}
+
+.btn-secondary-sm {
+  padding: 6px 10px;
+  font-size: 11.5px;
+  font-weight: 500;
+  border-radius: 6px;
+  background: transparent;
+  color: #64748b;
+  border: none;
+  cursor: pointer;
+}
+
+.media-dropzone {
+  border: 2px dashed #cbd5e1;
+  background: var(--wl-surface, #ffffff);
+  border-radius: 10px;
+  padding: 16px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.media-dropzone:hover,
+.media-dropzone--active {
+  border-color: #0d9488;
+  background: #f0fdfa;
+}
+
+.media-dropzone--video:hover,
+.media-dropzone--video.media-dropzone--active {
+  border-color: #e11d48;
+  background: #fff1f2;
+}
+
+.dropzone-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+
+.dropzone-icon-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #f0fdfa;
+  border: 1px solid #ccfbf1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.dropzone-icon-circle--rose {
+  background: #fff1f2;
+  border-color: #ffe4e6;
+}
+
+.dropzone-title {
+  font-size: 13px;
+  color: var(--wl-ink-strong, #1e293b);
+  margin: 0;
+}
+
+.dropzone-subtitle {
+  font-size: 11px;
+  color: var(--wl-muted, #64748b);
+  margin: 2px 0 0;
+}
+
+.media-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.media-thumb-card {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: 8px;
+  border: 1px solid var(--wl-border, #e2e8f0);
+  background: var(--wl-surface, #ffffff);
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.media-thumb-card--cover {
+  border-color: #0d9488;
+  box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.25);
+}
+
+.media-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.2s ease;
+}
+
+.media-thumb-card:hover .media-thumb-img {
+  transform: scale(1.04);
+}
+
+.media-cover-badge {
+  position: absolute;
+  top: 4px;
+  inset-inline-start: 4px;
+  background: #0d9488;
+  color: #ffffff;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  z-index: 2;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+.media-order-pill {
+  position: absolute;
+  top: 4px;
+  inset-inline-start: 4px;
+  background: rgba(15, 23, 42, 0.7);
+  color: #ffffff;
+  font-size: 9px;
+  font-weight: 600;
+  padding: 1px 4px;
+  border-radius: 3px;
+  z-index: 2;
+}
+
+.media-thumb-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  opacity: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 6px;
+  transition: opacity 0.15s ease;
+  z-index: 3;
+}
+
+.media-thumb-card:hover .media-thumb-overlay {
+  opacity: 1;
+}
+
+.thumb-overlay-top,
+.thumb-overlay-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.btn-overlay-action {
+  padding: 3px 5px;
+  font-size: 9px;
+  font-weight: 700;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  color: #ffffff;
+}
+
+.btn-set-cover {
+  background: #0d9488;
+}
+
+.btn-delete-thumb {
+  background: #e11d48;
+}
+
+.btn-view-full {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(4px);
+}
+
+.media-thumb-add-tile {
+  aspect-ratio: 1 / 1;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  background: var(--wl-surface, #ffffff);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.media-thumb-add-tile:hover {
+  border-color: #0d9488;
+  background: #f0fdfa;
+}
+
+/* ── Videos Card List ── */
+.videos-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.video-card-item {
+  border: 1px solid var(--wl-border, #e2e8f0);
+  background: var(--wl-surface, #ffffff);
+  border-radius: 8px;
+  padding: 10px 12px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+}
+
+.video-card-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.video-card-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.video-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.video-primary-badge {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+  font-size: 9.5px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+.video-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.btn-video-preview {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid var(--wl-border, #e2e8f0);
+  background: var(--wl-surface, #ffffff);
+  color: var(--wl-ink-soft, #475569);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-video-preview:hover {
+  background: #f1f5f9;
+}
+
+.btn-video-primary {
+  padding: 4px 6px;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.btn-video-primary:hover {
+  color: #d97706;
+}
+
+.btn-video-delete {
+  padding: 4px 6px;
+  border: none;
+  background: transparent;
+  color: #ef4444;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.btn-video-delete:hover {
+  background: #fee2e2;
+}
+
+.video-player-container {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--wl-border, #e2e8f0);
+  aspect-ratio: 16 / 9;
+  max-width: 500px;
+  margin-inline: auto;
+  background: #000000;
+  border-radius: 6px;
+  overflow: hidden;
 }
 </style>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { resolveFileUrl, isNullOrPlaceholder, markBrokenUrl, isKnownBrokenUrl } from '../../utils/file-url'
+import { resolveFileUrl, isNullOrPlaceholder, markBrokenUrl, isKnownBrokenUrl, clearBrokenUrl } from '../../utils/file-url'
 
 export interface AppImageProps {
   src?: string | null
@@ -43,9 +43,12 @@ const isLoaded = ref(false)
 // Reset state if src changes
 watch(
   () => props.src,
-  () => {
+  (newVal) => {
     hasError.value = false
     isLoaded.value = false
+    if (newVal) {
+      clearBrokenUrl(resolveFileUrl(newVal, ''))
+    }
   },
 )
 

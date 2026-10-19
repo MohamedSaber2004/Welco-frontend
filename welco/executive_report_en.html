@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <title>System Handover & Features Completion Report – Admin Panel</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 18mm 16mm 18mm 16mm;
+    }
+    
+    * {
+      box-sizing: border-box;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    
+    body {
+      font-family: 'Calibri', 'Segoe UI', Arial, sans-serif;
+      font-size: 11pt;
+      line-height: 1.6;
+      color: #111111;
+      background-color: #ffffff;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Word-style header & footer */
+    .doc-header {
+      border-bottom: 1.5px solid #333333;
+      padding-bottom: 8px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 9pt;
+      color: #444444;
+    }
+    
+    .doc-header-brand {
+      font-weight: bold;
+      font-size: 10pt;
+      color: #111111;
+    }
+
+    .doc-title-block {
+      text-align: center;
+      margin-bottom: 24px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid #cccccc;
+    }
+    
+    .doc-main-title {
+      font-size: 18pt;
+      font-weight: bold;
+      color: #000000;
+      margin: 0 0 6px 0;
+    }
+    
+    .doc-subtitle {
+      font-size: 11pt;
+      color: #555555;
+      margin: 0;
+    }
+
+    /* Metadata table */
+    .meta-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 24px;
+      font-size: 9.5pt;
+    }
+    
+    .meta-table td {
+      padding: 6px 10px;
+      border: 1px solid #dcdcdc;
+    }
+    
+    .meta-label {
+      font-weight: bold;
+      background-color: #f7f7f7;
+      width: 18%;
+      color: #222222;
+    }
+    
+    .meta-value {
+      width: 32%;
+      color: #333333;
+    }
+
+    /* Headings hierarchy */
+    h1 {
+      font-size: 13.5pt;
+      font-weight: bold;
+      color: #000000;
+      border-bottom: 1.5px solid #222222;
+      padding-bottom: 4px;
+      margin-top: 22px;
+      margin-bottom: 12px;
+      page-break-after: avoid;
+    }
+    
+    h2 {
+      font-size: 11.5pt;
+      font-weight: bold;
+      color: #111111;
+      margin-top: 14px;
+      margin-bottom: 6px;
+      page-break-after: avoid;
+    }
+
+    p {
+      margin: 0 0 8px 0;
+      text-align: justify;
+    }
+
+    /* Structured lists */
+    ul {
+      margin: 6px 0 12px 0;
+      padding-left: 22px;
+    }
+    
+    li {
+      margin-bottom: 6px;
+    }
+
+    ol {
+      margin: 6px 0 12px 0;
+      padding-left: 22px;
+    }
+
+    .strong-lead {
+      font-weight: bold;
+      color: #111111;
+    }
+
+    /* Callout box (Word quotation style) */
+    .callout-box {
+      border-left: 3px solid #222222;
+      background-color: #fafafa;
+      padding: 10px 14px;
+      margin: 12px 0;
+      font-size: 10pt;
+    }
+
+    /* Clean B&W Table */
+    .summary-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      font-size: 9.5pt;
+    }
+    
+    .summary-table th {
+      background-color: #f0f0f0;
+      color: #000000;
+      font-weight: bold;
+      text-align: left;
+      padding: 8px 10px;
+      border: 1px solid #555555;
+    }
+    
+    .summary-table td {
+      padding: 7px 10px;
+      border: 1px solid #cccccc;
+      vertical-align: top;
+    }
+    
+    .summary-table tr:nth-child(even) {
+      background-color: #fcfcfc;
+    }
+
+    .page-break {
+      page-break-after: always;
+    }
+
+    .avoid-break {
+      page-break-inside: avoid;
+    }
+
+    .footer-note {
+      margin-top: 30px;
+      padding-top: 12px;
+      border-top: 1px solid #cccccc;
+      font-size: 9pt;
+      color: #666666;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .badge-check {
+      font-weight: bold;
+      color: #111111;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- DOCUMENT HEADER -->
+  <div class="doc-header">
+    <div class="doc-header-brand">Welco Surgical Platform – Medical &amp; Surgical Supplies</div>
+    <div>Admin Panel Requirements Completion Report – October 2026</div>
+  </div>
+
+  <!-- TITLE BLOCK -->
+  <div class="doc-title-block">
+    <div class="doc-main-title">Admin Panel Handover &amp; Completion Report</div>
+    <div class="doc-subtitle">Executive User Guide for Orders PDF Exports, Companies Directory, Product Media Controls, and Direct Contact Channels</div>
+  </div>
+
+  <!-- METADATA TABLE -->
+  <table class="meta-table">
+    <tr>
+      <td class="meta-label">Prepared For:</td>
+      <td class="meta-value">Welco Surgical Administration</td>
+      <td class="meta-label">Date of Issue:</td>
+      <td class="meta-value">October 19, 2026</td>
+    </tr>
+    <tr>
+      <td class="meta-label">Prepared By:</td>
+      <td class="meta-value">Welco Platform Engineering Team</td>
+      <td class="meta-label">Execution Status:</td>
+      <td class="meta-value"><b>100% Completed &amp; Verified (Production Ready)</b></td>
+    </tr>
+    <tr>
+      <td class="meta-label">Subject:</td>
+      <td class="meta-value" colspan="3">Detailed handover and operational instructions for all requested admin side features and customer contact integrations.</td>
+    </tr>
+  </table>
+
+  <!-- SECTION 1 -->
+  <h1>1. Overview and Purpose</h1>
+  <p>
+    This report serves as formal documentation and operational verification for the suite of administrative features and website capabilities requested by <b>Welco Surgical Administration</b>.
+  </p>
+  <p>
+    The documentation is deliberately written from an executive, non-technical standpoint. It provides clear, straightforward explanations of <b>what was requested</b>, <b>what was delivered</b>, <b>where to find each feature in the Admin Dashboard</b>, and <b>how to operate it step-by-step</b> in everyday commercial and logistics workflows.
+  </p>
+
+  <!-- SECTION 2 -->
+  <h1>2. Orders Management &amp; PDF Export Engine</h1>
+  <p>
+    <b>Administrative Requirement:</b> Provide PDF export options for individual orders, a consolidated master list of all orders, and official commercial tax invoices.
+  </p>
+
+  <div class="avoid-break">
+    <h2>2.1 Individual Order Consignment &amp; Verification Sheet (Single Order PDF)</h2>
+    <ul>
+      <li><span class="strong-lead">Purpose &amp; Utility:</span> Allows administrators, inventory supervisors, and dispatch staff to generate a formal, printable PDF for any individual order. This document is utilized for warehouse picking, packing inspection, quality checks, and as a formal consignment receipt for hospitals and purchasing clinics.</li>
+      <li><span class="strong-lead">Data Included in the Document:</span> Unique Order Reference Number, submission date, comprehensive buyer details (hospital name, clinic address, contact person), an itemized product table including official SKU codes, product names, shipped quantities, unit prices, subtotal breakdowns, applied discounts, shipping costs, and official Welco branding with ISO quality credentials.</li>
+      <li><span class="strong-lead">Location &amp; How to Use:</span>
+        <ol>
+          <li>From the left navigation menu of the Admin Dashboard, click <b>"Orders"</b>.</li>
+          <li>Click on any order row to open its details modal, or click the action menu icon next to the order.</li>
+          <li>Click the button labeled <b>"Export Order (PDF)"</b>.</li>
+          <li>The PDF downloads immediately to your computer, fully formatted for standard A4 printing.</li>
+        </ol>
+      </li>
+    </ul>
+  </div>
+
+  <div class="avoid-break">
+    <h2>2.2 Master Orders Registry &amp; Consolidated Report (All Orders PDF)</h2>
+    <ul>
+      <li><span class="strong-lead">Purpose &amp; Utility:</span> Enables management to extract an executive, horizontal (Landscape) overview of all orders across the platform for administrative reviews, audit logs, and accounting reconciliations.</li>
+      <li><span class="strong-lead">Data Included in the Report:</span> A structured table summarizing every order: Order ID, order date, medical facility name, total item count, gross value in USD, and current processing status (Pending, Processing, Shipped, Delivered), along with an executive header summary detailing total order counts and aggregate sales volume.</li>
+      <li><span class="strong-lead">Location &amp; How to Use:</span>
+        <ol>
+          <li>In the <b>"Orders"</b> section, navigate to the top toolbar header.</li>
+          <li>Click the button labeled <b>"Export Orders Report (PDF)"</b>.</li>
+          <li>If you have applied any filters (such as orders within a specific date range or only completed orders), the generated PDF automatically respects your exact filter criteria.</li>
+        </ol>
+      </li>
+    </ul>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- SECTION 2 CONTINUED -->
+  <div class="avoid-break">
+    <h2>2.3 Official Commercial Tax Invoice (Commercial Invoice PDF)</h2>
+    <ul>
+      <li><span class="strong-lead">Purpose &amp; Utility:</span> Generates a compliant, formal tax invoice meeting standard hospital procurement and institutional accounting requirements, suitable for financial settlements and customs clearance.</li>
+      <li><span class="strong-lead">Data Included in the Invoice:</span>
+        <ul>
+          <li>Official sequential invoice reference number (e.g., <code>INV-XXXX</code>).</li>
+          <li>Registered seller identification (Welco Manufacturing) with commercial tax and ISO registrations.</li>
+          <li>Purchasing hospital or healthcare institution credentials.</li>
+          <li>Itemized billing schedule detailing catalog items, unit rates, applicable tax percentages, and full currency figures.</li>
+          <li>Dedicated footer space for official company stamping, signature, and executive sign-off.</li>
+        </ul>
+      </li>
+      <li><span class="strong-lead">Location &amp; How to Use:</span> Available directly in the orders table via the invoice receipt icon, or within the order details window by clicking <b>"Tax Invoice (PDF)"</b>.</li>
+    </ul>
+  </div>
+
+  <!-- SECTION 3 -->
+  <h1>3. Healthcare Companies &amp; Providers Directory (Companies PDF)</h1>
+  <p>
+    <b>Administrative Requirement:</b> Ability to export a structured list of all registered healthcare institutions, providers, and suppliers in PDF format.
+  </p>
+
+  <div class="avoid-break">
+    <h2>3.1 Registered Companies Directory Report (Companies Registry PDF)</h2>
+    <ul>
+      <li><span class="strong-lead">Purpose &amp; Utility:</span> Equips management with a consolidated printable directory of all healthcare clients, specialized surgical centers, distributors, and certified suppliers registered on the Welco platform.</li>
+      <li><span class="strong-lead">Data Included in the Document:</span> Sequential company index, legal business name, clinical entity classification (Hospital, Specialized Clinic, Equipment Distributor, Medical Supplier), geographic jurisdiction and country, verified email address, official telephone number, and compliance verification status (Verified &amp; Approved, Under Review, or Suspended).</li>
+      <li><span class="strong-lead">Location &amp; How to Use:</span>
+        <ol>
+          <li>From the left navigation menu, open <b>"Companies"</b>.</li>
+          <li>In the top toolbar, click the button labeled <b>"Export Companies (PDF)"</b>.</li>
+          <li>The platform instantly compiles all active records into a clear, print-ready Landscape PDF document.</li>
+        </ol>
+      </li>
+    </ul>
+  </div>
+
+  <!-- SECTION 4 -->
+  <h1>4. Product Management &amp; New Product Controls (Product / Media)</h1>
+  <p>
+    <b>Administrative Requirement:</b> 
+    <br>1) Make Price, Stock Quantity, and Arabic Product Name optional fields when creating a new product.
+    <br>2) Enforce a minimum requirement of at least 3 product images, with a dedicated field for a product demonstration video.
+  </p>
+
+  <div class="avoid-break">
+    <h2>4.1 Flexible Field Controls (Optional Fields)</h2>
+    <ul>
+      <li><span class="strong-lead">Price Field:</span> Price is no longer mandatory. Products can be created and published without setting a fixed price.
+        <br><i>Operational Benefit:</i> Essential for high-precision surgical instruments, customized surgical sets, or items sold through custom Requests for Quote (RFQ) or volume-based pricing. If a price is entered, it is saved and displayed accurately.
+      </li>
+      <li><span class="strong-lead">Stock Quantity Field:</span> Stock quantity is completely optional. Leaving this field blank will not block product creation or publishing.
+        <br><i>Operational Benefit:</i> Accommodates made-to-order instruments, custom surgical implants, and catalog items supplied continuously by manufacturers without maintaining local fixed inventory counts.
+      </li>
+      <li><span class="strong-lead">Arabic Product Name:</span> The Arabic name is optional. Adding only the standard international English nomenclature is fully accepted.
+        <br><i>Operational Benefit:</i> Expedites bulk catalog onboarding of specialized surgical tools with standard international names without requiring immediate translation, while retaining full support for Arabic text whenever needed.
+      </li>
+      <li><span class="strong-lead">Visual Labeling:</span> All three fields are clearly marked with an <b>"(Optional)"</b> label on the admin screen to ensure clarity for data entry staff.</li>
+    </ul>
+  </div>
+
+  <div class="avoid-break">
+    <h2>4.2 Media Quality Assurance (Images &amp; Video URL)</h2>
+    <ul>
+      <li><span class="strong-lead">Mandatory Minimum of 3 Images:</span> To maintain hospital-grade catalog standards, the system enforces uploading at least 3 distinct images per product. This guarantees that surgeons and procurement officers can examine instrument tips, gripping handles, and craftsmanship from multiple angles.</li>
+      <li><span class="strong-lead">Interactive Media Counter:</span> The admin interface features a smart visual indicator showing remaining images required (e.g., <i>"1 of 3 required images uploaded"</i>). The counter turns to an approved checkmark once 3 images are provided, with additional slots easily added via a dedicated button.</li>
+      <li><span class="strong-lead">Product Demonstration Video URL:</span> A dedicated field is provided for product video links (such as YouTube or direct video streams demonstrating tool functionality or sterilization guidelines). The video player embeds seamlessly on the public product page for prospective buyers.</li>
+      <li><span class="strong-lead">Location &amp; How to Use:</span>
+        <ol>
+          <li>From the left navigation menu, navigate to <b>"Products"</b> and click <b>"Add New Product"</b>.</li>
+          <li>Notice the optional indicators beside Price, Stock, and Arabic Name, alongside the 3 pre-configured image upload slots and the Video URL field.</li>
+        </ol>
+      </li>
+    </ul>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- SECTION 5 -->
+  <h1>5. Direct Contact Channels (Contact Us Integration)</h1>
+  <p>
+    <b>Administrative Requirement:</b> Integrate direct communication channels (Email, Phone, Facebook, Instagram) with full management control from the Admin Dashboard, displaying interactively on the public website.
+  </p>
+
+  <div class="avoid-break">
+    <h2>5.1 Active Channels &amp; Customer Experience</h2>
+    <ul>
+      <li><span class="strong-lead">1. Direct Email (Mail / Email):</span>
+        <ul>
+          <li><b>Admin Control:</b> Dedicated field to update the official customer care and inquiries email.</li>
+          <li><b>Customer Experience:</b> Appears in the site-wide footer and support pages; clicking the email immediately opens the client's mail client with a pre-addressed message to Welco.</li>
+        </ul>
+      </li>
+      <li><span class="strong-lead">2. Direct Telephone / Contact (Phone / Contact):</span>
+        <ul>
+          <li><b>Admin Control:</b> Dedicated field to record the primary phone number with country dialing code.</li>
+          <li><b>Customer Experience:</b> Operates as an instant click-to-call link; mobile users who tap the number initiate an immediate telephone call without manual dialing.</li>
+        </ul>
+      </li>
+      <li><span class="strong-lead">3. Official Facebook Page:</span>
+        <ul>
+          <li><b>Admin Control:</b> Input field to maintain the official Welco Facebook URL.</li>
+          <li><b>Customer Experience:</b> An interactive Facebook badge appears in the footer and help center, launching Welco's official page in a new secure window.</li>
+        </ul>
+      </li>
+      <li><span class="strong-lead">4. Official Instagram Profile:</span>
+        <ul>
+          <li><b>Admin Control:</b> Input field to maintain the official Welco Instagram account URL.</li>
+          <li><b>Customer Experience:</b> An interactive Instagram badge connects buyers to Welco's photo catalog and exhibition showcase.</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <div class="avoid-break">
+    <h2>5.2 Real-Time Autonomous Synchronization</h2>
+    <ul>
+      <li><span class="strong-lead">No Developer Intervention Needed:</span> Administrators can update any phone number, email address, or social link directly from the dashboard settings at any time.</li>
+      <li><span class="strong-lead">Immediate Live Update:</span> Clicking "Save" immediately broadcasts changes across all public pages, headers, footers, and support sections without waiting for IT updates or platform redeployment.</li>
+    </ul>
+  </div>
+
+  <!-- SECTION 6 -->
+  <h1>6. Executive Requirements &amp; Navigation Summary</h1>
+  <p>
+    The following matrix summarizes each requested feature, its operational readiness, dashboard access path, and required user action:
+  </p>
+
+  <table class="summary-table">
+    <thead>
+      <tr>
+        <th style="width: 28%;">Function / Requirement</th>
+        <th style="width: 17%;">Status</th>
+        <th style="width: 25%;">Dashboard Access Path</th>
+        <th style="width: 30%;">User Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><b>Individual Order PDF Export</b><br>(Single Order PDF)</td>
+        <td><span class="badge-check">100% Active &amp; Ready</span></td>
+        <td>Orders &gt; View Any Order Details</td>
+        <td>Click "Export Order (PDF)" to download the official consignment document.</td>
+      </tr>
+      <tr>
+        <td><b>Master Orders Registry PDF</b><br>(All Orders List PDF)</td>
+        <td><span class="badge-check">100% Active &amp; Ready</span></td>
+        <td>Orders &gt; Top Toolbar Header</td>
+        <td>Click "Export Orders Report (PDF)" to generate an aggregate landscape summary.</td>
+      </tr>
+      <tr>
+        <td><b>Commercial Tax Invoice</b><br>(Tax Invoice PDF)</td>
+        <td><span class="badge-check">100% Active &amp; Ready</span></td>
+        <td>Orders Table &gt; Invoice Receipt Icon</td>
+        <td>Click the invoice icon to produce a compliant commercial tax invoice.</td>
+      </tr>
+      <tr>
+        <td><b>Healthcare Companies Directory</b><br>(Companies PDF)</td>
+        <td><span class="badge-check">100% Active &amp; Ready</span></td>
+        <td>Companies &gt; Top Toolbar Header</td>
+        <td>Click "Export Companies (PDF)" to download the registered facilities roster.</td>
+      </tr>
+      <tr>
+        <td><b>Optional Price, Stock &amp; Arabic Name</b></td>
+        <td><span class="badge-check">100% Active &amp; Ready</span></td>
+        <td>Products &gt; Add New Product</td>
+        <td>Fill in or leave blank based on pricing policy; the system saves without restrictions.</td>
+      </tr>
+      <tr>
+        <td><b>Minimum 3 Images + Product Video</b></td>
+        <td><span class="badge-check">100% Active &amp; Ready</span></td>
+        <td>Products &gt; Add New Product</td>
+        <td>Upload at least 3 photos (counter guides progress) and paste demo video URL.</td>
+      </tr>
+      <tr>
+        <td><b>Contact Us (Mail, Phone, FB, IG)</b></td>
+        <td><span class="badge-check">100% Active &amp; Ready</span></td>
+        <td>Dashboard &gt; Support Channels Settings</td>
+        <td>Update contact details anytime; changes reflect across all public pages instantly.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- SECTION 7 -->
+  <div class="avoid-break">
+    <h1>7. System Handover &amp; Operational Sign-Off</h1>
+    <p>
+      We confirm to the executive management of <b>Welco Surgical</b> that all administrative capabilities and customer contact points requested have been successfully delivered, configured, and verified. The platform provides complete operational autonomy, requiring no manual software interventions for daily business execution.
+    </p>
+    <div class="callout-box">
+      <b>Formal Certification:</b> The administrative panel and public storefront integrations are fully validated and ready for commercial operation by the Welco Surgical administration team.
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer-note">
+    <div>Prepared by: Welco Surgical Platform Engineering Team</div>
+    <div>Official Project Handover Document • October 2026</div>
+  </div>
+
+</body>
+</html>

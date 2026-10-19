@@ -489,7 +489,7 @@ const navigateToOemFromModal = () => {
             >
               <div class="product-card__media">
                 <AppImage
-                  :src="p.imageName"
+                  :src="p.imageName || p.images?.[0]"
                   placeholder-type="product"
                   :alt="localized(p.nameEn, p.nameAr)"
                   fit="cover"
@@ -607,9 +607,9 @@ const navigateToOemFromModal = () => {
                 @click="router.push({ name: 'marketplace-product', params: { id: prod.id } })"
               >
                 <AppImage
-                  :src="prod.imageName"
-  placeholder-type="product"
-  :alt="localized(prod.nameEn, prod.nameAr)"
+                  :src="prod.imageName || prod.images?.[0]"
+                  placeholder-type="product"
+                  :alt="localized(prod.nameEn, prod.nameAr)"
                   fit="contain"
                   class="provider-mini__img"
                 />

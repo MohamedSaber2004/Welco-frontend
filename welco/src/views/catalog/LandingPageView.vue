@@ -165,9 +165,9 @@ const heroBody = computed(() => page.value?.heroBody || t('home.heroSubtitle'))
             <article v-for="(p, i) in products" :key="p.id" class="product-card anim-fade-in-up"
                :style="{ animationDelay: `${i * 30}ms` }"
                @click="router.push({ name: 'marketplace-product', params: { id: p.id } })">
-              <div class="product-card__media" :style="{ background: productMediaUrl(p.imageName, p.imageGradient).background }">
+              <div class="product-card__media" :style="{ background: productMediaUrl(p.imageName || p.images?.[0], p.imageGradient).background }">
                 <AppImage
-                  :src="p.imageName"
+                  :src="p.imageName || p.images?.[0]"
                   placeholder-type="product"
                   :alt="localized(p.nameEn, p.nameAr)"
                   fit="cover"

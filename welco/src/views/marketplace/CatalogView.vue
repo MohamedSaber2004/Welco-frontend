@@ -366,9 +366,9 @@ const filteredSidebarCategories = computed(() => {
             <article v-for="(p, i) in products" :key="p.id" class="card catalog-card anim-fade-in-up"
                :style="{ animationDelay: `${i * 30}ms` }"
                @click="router.push({ name: 'marketplace-product', params: { id: p.id } })">
-              <div class="catalog-card__media" :style="{ background: productMediaUrl(p.imageName, p.imageGradient).background }">
+              <div class="catalog-card__media" :style="{ background: productMediaUrl(p.imageName || p.images?.[0], p.imageGradient).background }">
                 <AppImage
-                  :src="p.imageName"
+                  :src="p.imageName || p.images?.[0]"
                   placeholder-type="product"
                   :alt="localized(p.nameEn, p.nameAr)"
                   fit="cover"
@@ -378,6 +378,15 @@ const filteredSidebarCategories = computed(() => {
                   <span v-if="p.sku" class="sku-chip mono">{{ p.sku }}</span>
                   <span v-if="p.stock > 0" class="stock-pill stock-pill--in mono">{{ t('catalog.inStock') }}</span>
                   <span v-else class="stock-pill stock-pill--out mono">{{ t('catalog.madeToOrder') }}</span>
+                </div>
+                <div class="catalog-card__media-badges">
+                  <span v-if="(p.images?.length ?? 0) > 1" class="media-count-badge mono" :title="`${p.images?.length} Photos`">
+                    <span class="material-symbols-outlined text-[13px]">photo_library</span>
+                    <span>{{ p.images?.length }}</span>
+                  </span>
+                  <span v-if="(p.videos?.length ?? 0) > 0 || p.videoUrl" class="media-video-badge mono" :title="t('pdp.tabVideos')">
+                    <span class="material-symbols-outlined text-[13px]">videocam</span>
+                  </span>
                 </div>
                 <button class="catalog-wishlist-btn" :class="{ 'is-saved': isSaved(p.id) }" type="button" :disabled="!canEditWishlist" :aria-label="isSaved(p.id) ? t('marketplace.removeFromWishlist') : t('marketplace.wishlistTitle')" @click.stop="handleWishlist(p.id)">
                   <span class="material-symbols-outlined">{{ isSaved(p.id) ? 'favorite' : 'favorite_border' }}</span>
@@ -990,6 +999,37 @@ const filteredSidebarCategories = computed(() => {
   justify-content: space-between;
   align-items: center;
   pointer-events: none;
+}
+
+.catalog-card__media-badges {
+  position: absolute;
+  bottom: 0.6rem;
+  inset-inline-start: 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.media-count-badge,
+.media-video-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 2px 7px;
+  background: rgba(15, 23, 42, 0.72);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  color: #ffffff;
+  border-radius: var(--radius-pill, 9999px);
+  font-size: 11px;
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.media-video-badge {
+  background: rgba(14, 116, 144, 0.85);
 }
 
 .sku-chip {

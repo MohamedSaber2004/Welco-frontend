@@ -562,7 +562,7 @@ const submitRfq = async () => {
               <div class="cart-line__media">
                 <div class="cart-thumb" :style="{ background: it.product.imageGradient || 'var(--wl-surface-soft)' }">
                   <AppImage
-                    :src="it.product.imageName"
+                    :src="it.product.imageName || it.product.images?.[0]"
                     placeholder-type="product"
                     :placeholder-text="it.product.sku"
                     :alt="localized(it.product.nameEn, it.product.nameAr)"

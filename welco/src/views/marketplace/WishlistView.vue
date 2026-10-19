@@ -126,7 +126,7 @@ const goDetail = (id: string) => {
          @click="goDetail(p.id)">
         <div class="product-media" :style="{ background: p.imageGradient || 'var(--wl-surface-soft)' }">
           <AppImage
-            :src="p.imageName"
+            :src="p.imageName || p.images?.[0]"
             placeholder-type="product"
             :placeholder-text="p.sku"
             :alt="localized(p.nameEn, p.nameAr)"

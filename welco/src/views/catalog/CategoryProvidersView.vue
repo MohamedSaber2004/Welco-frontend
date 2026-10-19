@@ -390,7 +390,7 @@ const openStorefront = (id: string) => {
             @click="router.push({ name: 'marketplace-product', params: { id: product.id } })"
           >
             <AppImage
-              :src="product.imageName"
+              :src="product.imageName || product.images?.[0]"
               placeholder-type="product"
               :alt="localized(product.nameEn, product.nameAr)"
               fit="contain"

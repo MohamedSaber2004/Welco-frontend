@@ -50,9 +50,11 @@ export interface CreateProductPayload {
   lengthCm?: number
   currencyId?: string | null
   categoryId: string
+  isActive?: boolean
 }
 
 export interface UpdateProductPayload {
+  id?: string
   nameEn: string
   nameAr?: string
   sku: string

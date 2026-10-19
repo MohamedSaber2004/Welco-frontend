@@ -33,7 +33,7 @@ export function useMarketplace(init?: {
   isActive?: boolean
 }) {
   const svc = services.marketplaceService
-  const isActive = init?.isActive ?? true
+  const isActive = init?.isActive
   if (init?.page && init.page > 0) {
     svc.page.value = init.page
   }

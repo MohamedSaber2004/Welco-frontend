@@ -181,7 +181,7 @@ async function convertToQuote() {
             <article v-for="it in items" :key="it.product.id" class="line-item">
               <div class="line-item__thumb" :style="{ background: it.product.imageGradient || 'var(--wl-surface-soft)' }">
                 <AppImage
-                  :src="it.product.imageName"
+                  :src="it.product.imageName || it.product.images?.[0]"
                   placeholder-type="product"
                   :placeholder-text="it.product.sku"
                   :alt="localized(it.product.nameEn, it.product.nameAr)"

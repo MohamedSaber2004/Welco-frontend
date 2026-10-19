@@ -374,7 +374,7 @@ const goToProduct = (id: string) => {
               <!-- Media Wrap -->
               <div class="product-card__media">
                 <AppImage
-                  :src="p.imageName"
+                  :src="p.imageName || p.images?.[0]"
                   placeholder-type="product"
                   :alt="localized(p.nameEn, p.nameAr)"
                   fit="cover"

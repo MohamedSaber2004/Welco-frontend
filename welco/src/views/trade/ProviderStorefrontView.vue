@@ -305,9 +305,9 @@ const memberYear = computed(() => {
           @click="$router.push({ name: 'marketplace-product', params: { id: p.id } })"
         >
           <AppImage
-            :src="p.imageName"
-  placeholder-type="product"
-  :alt="localized(p.nameEn, p.nameAr)"
+            :src="p.imageName || p.images?.[0]"
+            placeholder-type="product"
+            :alt="localized(p.nameEn, p.nameAr)"
             fit="contain"
             class="store-row__img"
           />

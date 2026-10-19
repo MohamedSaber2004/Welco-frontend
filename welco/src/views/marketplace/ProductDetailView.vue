@@ -165,18 +165,49 @@ watch(
   },
 )
 
+// Multi-image gallery state
+const selectedImageIndex = ref(0)
+
+const galleryImages = computed<string[]>(() => {
+  if (!product.value) return []
+  const list: string[] = []
+  if (Array.isArray(product.value.images)) {
+    for (const item of product.value.images) {
+      if (item && typeof item === 'string' && item.trim()) {
+        const clean = item.trim()
+        if (!list.includes(clean)) list.push(clean)
+      }
+    }
+  }
+  if (product.value.imageName && typeof product.value.imageName === 'string') {
+    const clean = product.value.imageName.trim()
+    if (clean && !list.includes(clean)) {
+      list.unshift(clean)
+    }
+  }
+  return list
+})
+
+const activeImageName = computed(() => {
+  if (!galleryImages.value.length) return null
+  return galleryImages.value[selectedImageIndex.value] || galleryImages.value[0] || null
+})
+
 // Computed image URL with robust fallback verification
 const productImageUrl = computed(() => {
-  if (!product.value || imageFailed.value) return null
-  const name = product.value.imageName
-  if (!name || !name.trim()) return null
-  const resolved = resolveFileUrl(name)
+  if (!activeImageName.value || imageFailed.value) return null
+  const resolved = resolveFileUrl(activeImageName.value)
   if (!resolved || resolved === PLACEHOLDER || resolved === PLACEHOLDER_PNG) return null
   return resolved
 })
 
 const onImageError = () => {
   imageFailed.value = true
+}
+
+const selectImage = (idx: number) => {
+  selectedImageIndex.value = idx
+  imageFailed.value = false
 }
 
 const currencySymbol = computed(() => {
@@ -297,6 +328,8 @@ interface VideoItem {
 
 const videoItems = ref<VideoItem[]>([])
 const activeVideo = ref<VideoItem | null>(null)
+const selectedVideoIdx = ref(0)
+const currentFeaturedVideo = computed(() => videoItems.value[selectedVideoIdx.value] || videoItems.value[0] || null)
 
 const extractYouTubeId = (url: string): string | null => {
   const m = url.match(
@@ -372,10 +405,27 @@ const fetchVideoThumbnail = async (item: VideoItem): Promise<string | undefined>
 
 const loadProductVideos = async (productId: string) => {
   try {
-    const media = await services.marketplaceService.getProductVideos(productId)
+    let media = await services.marketplaceService.getProductVideos(productId).catch(() => [] as import('../../domain/models/marketplace').ProductMediaDto[])
+    if (!media.length && product.value?.videos?.length) {
+      media = product.value.videos
+    }
+    if (!media.length && product.value?.videoUrl) {
+      media = [{ productId, type: 2, url: product.value.videoUrl, sortOrder: 0, title: t('pdp.tabVideos') }]
+    }
+    const isCleanTitle = (t?: string) => {
+      if (!t || !t.trim()) return false
+      const trimmed = t.trim()
+      if (trimmed.match(/\.(mp4|webm|mov|avi|mkv)$/i)) return false
+      if (trimmed.match(/^[a-f0-9-]{12,}$/i)) return false
+      if (trimmed.match(/^\d+_[a-f0-9]{12,}/i)) return false
+      return true
+    }
+
     const items: VideoItem[] = media.map((m, idx) => ({
       id: m.id || `video-${idx}`,
-      title: m.title || m.url.split('/').pop()?.replace(/[-_]/g, ' ') || t('pdp.tabVideos'),
+      title: isCleanTitle(m.title)
+        ? m.title!
+        : `${locale.value === 'ar' ? 'فيديو توضيحي' : 'Demonstration Video'}${media.length > 1 ? ` (${idx + 1})` : ''}`,
       url: m.url,
       thumbnail: '',
     }))
@@ -383,8 +433,10 @@ const loadProductVideos = async (productId: string) => {
       item.thumbnail = await fetchVideoThumbnail(item)
     }
     videoItems.value = items
+    selectedVideoIdx.value = 0
   } catch {
     videoItems.value = []
+    selectedVideoIdx.value = 0
   }
 }
 
@@ -507,6 +559,25 @@ const resolvedDescription = computed(() => {
               <span class="pdp-schematic-text mono">{{ product.sku }}</span>
               <span class="pdp-schematic-sub">{{ t('pdp.verifiedInstrument') }}</span>
             </div>
+          </div>
+
+          <!-- Multi-Image Thumbnails Gallery Strip -->
+          <div v-if="galleryImages.length > 1" class="pdp-gallery-strip" role="tablist" :aria-label="t('admin.productImagesReq')">
+            <button
+              v-for="(img, idx) in galleryImages"
+              :key="idx"
+              type="button"
+              class="pdp-gallery-thumb"
+              :class="{ 'is-active': selectedImageIndex === idx }"
+              :aria-label="`Photo ${idx + 1}`"
+              @click.stop="selectImage(idx)"
+            >
+              <img
+                :src="resolveFileUrl(img)"
+                :alt="`${localized(product.nameEn, product.nameAr)} - ${idx + 1}`"
+                class="pdp-gallery-thumb-img"
+              />
+            </button>
           </div>
 
           <!-- Visual Stage Footer: Technical Spec Bar -->
@@ -792,29 +863,54 @@ const resolvedDescription = computed(() => {
 
           <!-- Tab Content: Videos -->
           <div v-else-if="activeTab === 'videos'" class="pdp-tab-content">
-            <div v-if="videoItems.length" class="video-grid">
-              <div
-                v-for="v in videoItems"
-                :key="v.id"
-                class="video-card"
-                tabindex="0"
-                role="button"
-                @click="activeVideo = v"
-                @keydown.enter="activeVideo = v"
-              >
-                <div class="video-thumb">
-                  <img v-if="v.thumbnail" :src="v.thumbnail" :alt="v.title" class="video-thumb__img" />
-                  <div v-else class="video-thumb__fallback">
-                    <span class="material-symbols-outlined text-[32px]">videocam</span>
-                  </div>
-                  <div class="video-thumb__overlay">
-                    <span class="video-play">
-                      <span class="material-symbols-outlined text-[20px]">play_arrow</span>
-                    </span>
-                  </div>
+            <div v-if="videoItems.length" class="pdp-video-showcase">
+              <!-- Prominent Responsive Video Cinema Player -->
+              <div v-if="currentFeaturedVideo" class="pdp-main-video-wrapper">
+                <iframe
+                  v-if="parseVideoSource(currentFeaturedVideo.url).type === 'youtube' || parseVideoSource(currentFeaturedVideo.url).type === 'vimeo'"
+                  :src="parseVideoSource(currentFeaturedVideo.url).embedUrl"
+                  class="pdp-featured-video-frame"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowfullscreen
+                ></iframe>
+                <video
+                  v-else
+                  :key="currentFeaturedVideo.url"
+                  :src="parseVideoSource(currentFeaturedVideo.url).src"
+                  class="pdp-featured-video-player"
+                  controls
+                  playsinline
+                  preload="metadata"
+                ></video>
+              </div>
+
+              <!-- Multi-video playlist strip (only shown if > 1 video) -->
+              <div v-if="videoItems.length > 1" class="pdp-video-playlist">
+                <div class="pdp-playlist-header">
+                  <span class="mono text-xs text-muted font-bold">{{ locale === 'ar' ? 'فيديوهات المنتج المتاحة' : 'Available Product Videos' }} ({{ videoItems.length }})</span>
                 </div>
-                <div class="video-card__info">
-                  <div class="video-title">{{ v.title }}</div>
+                <div class="pdp-playlist-strip">
+                  <button
+                    v-for="(v, idx) in videoItems"
+                    :key="v.id"
+                    type="button"
+                    class="pdp-playlist-card"
+                    :class="{ 'is-active': selectedVideoIdx === idx }"
+                    @click="selectedVideoIdx = idx"
+                  >
+                    <div class="pdp-playlist-thumb">
+                      <img v-if="v.thumbnail" :src="v.thumbnail" alt="" class="pdp-playlist-thumb__img" />
+                      <div v-else class="pdp-playlist-thumb__fallback">
+                        <span class="material-symbols-outlined text-[20px]">videocam</span>
+                      </div>
+                      <div class="pdp-playlist-play-icon">
+                        <span class="material-symbols-outlined text-[16px]">play_arrow</span>
+                      </div>
+                    </div>
+                    <div class="pdp-playlist-meta">
+                      <span class="pdp-playlist-badge mono">{{ locale === 'ar' ? 'فيديو' : 'Video' }} {{ idx + 1 }}</span>
+                    </div>
+                  </button>
                 </div>
               </div>
             </div>
@@ -924,7 +1020,7 @@ const resolvedDescription = computed(() => {
           >
             <div class="rel-media">
               <AppImage
-                :src="p.imageName"
+                :src="p.imageName || p.images?.[0]"
                 placeholder-type="product"
                 :placeholder-text="p.sku"
                 :alt="localized(p.nameEn, p.nameAr)"
@@ -1034,6 +1130,20 @@ const resolvedDescription = computed(() => {
             <span class="pdp-schematic-sub">{{ t('pdp.verifiedInstrument') }}</span>
           </div>
         </div>
+
+        <div v-if="galleryImages.length > 1" class="inspect-gallery-strip">
+          <button
+            v-for="(img, idx) in galleryImages"
+            :key="idx"
+            type="button"
+            class="inspect-thumb"
+            :class="{ 'is-active': selectedImageIndex === idx }"
+            @click="selectImage(idx)"
+          >
+            <img :src="resolveFileUrl(img)" :alt="`Photo ${idx + 1}`" class="inspect-thumb-img" />
+          </button>
+        </div>
+
         <div class="inspect-foot mono">
           <div class="inspect-foot__spec">
             <span class="font-bold text-ink-strong">{{ product.sku }}</span>
@@ -1107,6 +1217,84 @@ const resolvedDescription = computed(() => {
   background: var(--wl-surface);
   box-shadow: var(--shadow-card);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* ── Multi-Image Gallery Strip ── */
+.pdp-gallery-strip {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--wl-surface-soft, #f8fafc);
+  border-top: 1px solid var(--wl-line, #e2e8f0);
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.pdp-gallery-thumb {
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  padding: 2px;
+  background: #ffffff;
+  cursor: pointer;
+  overflow: hidden;
+  flex-shrink: 0;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.pdp-gallery-thumb:hover {
+  border-color: var(--wl-primary-soft, #99f6e4);
+  transform: translateY(-2px);
+}
+
+.pdp-gallery-thumb.is-active {
+  border-color: var(--wl-primary, #00A389);
+  box-shadow: 0 0 0 2px rgba(0, 163, 137, 0.25);
+}
+
+.pdp-gallery-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+.inspect-gallery-strip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.75rem;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  overflow-x: auto;
+}
+
+.inspect-thumb {
+  width: 58px;
+  height: 58px;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  padding: 2px;
+  background: #ffffff;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.18s ease;
+}
+
+.inspect-thumb.is-active {
+  border-color: var(--wl-primary, #00A389);
+  box-shadow: 0 0 0 2px rgba(0, 163, 137, 0.3);
+}
+
+.inspect-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 5px;
 }
 
 .pdp-visual-stage:hover {
@@ -1944,94 +2132,135 @@ const resolvedDescription = computed(() => {
 }
 
 
-/* Videos Grid */
-.video-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: var(--space-4);
+/* ── Video Showcase in PDP ── */
+.pdp-video-showcase {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  max-width: 900px;
+  margin: 0 auto;
 }
 
-.video-card {
+.pdp-main-video-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #090d16;
+  border-radius: var(--radius-lg, 16px);
+  overflow: hidden;
   border: 1px solid var(--wl-line);
+  box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pdp-featured-video-frame {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.pdp-featured-video-player {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
+  outline: none;
+}
+
+/* Playlist Strip for multiple videos */
+.pdp-video-playlist {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.pdp-playlist-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pdp-playlist-strip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  overflow-x: auto;
+  padding: 4px;
+}
+
+.pdp-playlist-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
   background: var(--wl-surface);
-  padding: var(--space-2);
+  border: 1px solid var(--wl-line);
   border-radius: var(--radius-md);
   cursor: pointer;
-  transition: transform 0.18s var(--wl-ease-spring), border-color 0.18s, box-shadow 0.18s;
+  transition: all 0.18s ease;
+  flex-shrink: 0;
 }
 
-.video-card:hover:not(:disabled) {
-  transform: translateY(-3px);
+.pdp-playlist-card:hover {
   border-color: var(--wl-primary);
-  box-shadow: var(--shadow-card);
+  transform: translateY(-2px);
 }
 
-.video-card:focus-visible {
-  outline: 2px solid var(--wl-primary);
-  outline-offset: 2px;
-}
-
-.video-thumb {
+.pdp-playlist-card.is-active {
+  border-color: var(--wl-primary);
   background: var(--wl-surface-hover);
-  aspect-ratio: 16/9;
-  display: grid;
-  place-items: center;
+  box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.35);
+}
+
+.pdp-playlist-thumb {
   position: relative;
+  width: 64px;
+  aspect-ratio: 16 / 9;
   border-radius: var(--radius-sm);
   overflow: hidden;
+  background: #000;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
 }
 
-.video-thumb__img {
+.pdp-playlist-thumb__img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.video-thumb__fallback {
+.pdp-playlist-thumb__fallback {
   color: var(--wl-muted);
 }
 
-.video-thumb__overlay {
+.pdp-playlist-play-icon {
   position: absolute;
   inset: 0;
   display: grid;
   place-items: center;
-  background: radial-gradient(circle, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.6) 100%);
-  transition: background 0.18s;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  opacity: 0.8;
+  transition: opacity 0.18s;
 }
 
-.video-card:hover .video-thumb__overlay {
-  background: radial-gradient(circle, rgba(105, 169, 255, 0.3) 0%, rgba(0, 0, 0, 0.7) 100%);
+.pdp-playlist-card:hover .pdp-playlist-play-icon {
+  opacity: 1;
+  background: rgba(20, 184, 166, 0.65);
 }
 
-.video-play {
-  width: 44px;
-  height: 44px;
-  border-radius: var(--radius-full);
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(6px);
-  border: 1px solid rgba(255, 255, 255, 0.7);
+.pdp-playlist-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.pdp-playlist-badge {
+  font-size: var(--step--1);
+  font-weight: 600;
   color: var(--wl-ink-strong);
-  display: grid;
-  place-items: center;
-  transition: all 0.18s var(--wl-ease-spring);
-}
-
-.video-card:hover .video-play {
-  transform: scale(1.12);
-  background: var(--wl-primary);
-  border-color: var(--wl-primary);
-}
-
-.video-card__info {
-  padding-top: var(--space-2);
-}
-
-.video-title {
-  font-size: var(--step-0);
-  font-weight: 700;
-  color: var(--wl-ink-strong);
-  line-height: 1.35;
 }
 
 /* ── Institutional Inquiry Panel ── */

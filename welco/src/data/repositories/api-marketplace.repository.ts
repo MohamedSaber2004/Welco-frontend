@@ -108,55 +108,125 @@ const normalizeProduct = (p: ProductDto): ProductDto => {
     p.supplierNameAr = (raw.supplierNameAr ?? raw.SupplierNameAr ?? raw.supplierName ?? raw.SupplierName ?? suppName ?? '') as string
   }
 
-  // Handle images: support imageName, imageUrl, image, imagePath, fileUrl, photo, attachments, media
-  if (!p.imageName) {
-    let candidate = (raw.imageName ?? raw.ImageName ?? raw.imageUrl ?? raw.ImageUrl ?? raw.image ?? raw.Image ?? raw.fileUrl ?? raw.FileUrl ?? raw.photo ?? raw.Photo ?? raw.filePath ?? raw.FilePath ?? null) as unknown
-    if (!candidate) {
-      const arr = (raw.attachments ?? raw.Attachments ?? raw.media ?? raw.Media ?? raw.images ?? raw.Images ?? raw.productImages ?? raw.ProductImages) as unknown
-      if (Array.isArray(arr) && arr.length > 0) {
-        const first = arr[0]
-        if (typeof first === 'string') {
-          candidate = first
-        } else if (first && typeof first === 'object') {
-          const item = first as Record<string, unknown>
-          candidate = item.fileName ?? item.FileName ?? item.name ?? item.Name ?? item.url ?? item.Url ?? item.fileUrl ?? item.FileUrl ?? item.filePath ?? item.FilePath ?? item.imageName ?? item.ImageName
-        }
-      }
-    }
-    if (typeof candidate === 'string') {
-      let cleaned = candidate.trim()
-      if ((cleaned.startsWith('{') && cleaned.endsWith('}')) || (cleaned.startsWith('"') && cleaned.endsWith('"'))) {
+  // 1. Comprehensive multi-format image normalization
+  const imageCandidates: string[] = []
+  const pushImg = (val: unknown) => {
+    if (!val) return
+    if (typeof val === 'string') {
+      let trimmed = val.trim()
+      if (
+        (trimmed.startsWith('[') && trimmed.endsWith(']')) ||
+        (trimmed.startsWith('{') && trimmed.endsWith('}')) ||
+        (trimmed.startsWith('"') && trimmed.endsWith('"'))
+      ) {
         try {
-          const parsed = JSON.parse(cleaned)
-          if (typeof parsed === 'string') cleaned = parsed
-          else if (parsed && typeof parsed === 'object') {
+          const parsed = JSON.parse(trimmed)
+          if (Array.isArray(parsed)) {
+            parsed.forEach(pushImg)
+            return
+          }
+          if (typeof parsed === 'string') {
+            trimmed = parsed.trim()
+          } else if (parsed && typeof parsed === 'object') {
             const o = parsed as Record<string, unknown>
-            cleaned = String(o.fileName ?? o.FileName ?? o.name ?? o.Name ?? o.url ?? o.Url ?? '')
+            pushImg(
+              o.fileName ??
+                o.FileName ??
+                o.name ??
+                o.Name ??
+                o.url ??
+                o.Url ??
+                o.fileUrl ??
+                o.FileUrl ??
+                o.filePath ??
+                o.FilePath ??
+                o.imageName ??
+                o.ImageName,
+            )
+            return
           }
         } catch {
-          // keep cleaned as is
+          // not JSON, continue
         }
       }
-      p.imageName = cleaned || null
+      if (trimmed && trimmed !== 'null' && trimmed !== 'undefined' && !imageCandidates.includes(trimmed)) {
+        imageCandidates.push(trimmed)
+      }
+    } else if (Array.isArray(val)) {
+      val.forEach(pushImg)
+    } else if (typeof val === 'object') {
+      const o = val as Record<string, unknown>
+      pushImg(
+        o.fileName ??
+          o.FileName ??
+          o.name ??
+          o.Name ??
+          o.url ??
+          o.Url ??
+          o.fileUrl ??
+          o.FileUrl ??
+          o.filePath ??
+          o.FilePath ??
+          o.imageName ??
+          o.ImageName,
+      )
     }
   }
 
-  // Populate multiple images list and video URL
-  if (!p.images || p.images.length === 0) {
-    const rawImgs = (raw.images ?? raw.Images ?? raw.media ?? raw.Media) as unknown
-    if (Array.isArray(rawImgs) && rawImgs.length > 0) {
-      p.images = rawImgs
-        .map((x) => (typeof x === 'string' ? x : String((x as Record<string, unknown>)?.url ?? (x as Record<string, unknown>)?.fileName ?? (x as Record<string, unknown>)?.imageName ?? '')))
-        .filter(Boolean)
-    } else if (p.imageName) {
-      p.images = [p.imageName]
-    } else {
-      p.images = []
+  // Check all image candidate sources from backend envelopes
+  pushImg(p.imageName)
+  pushImg(raw.imageName ?? raw.ImageName)
+  pushImg(raw.imageUrl ?? raw.ImageUrl)
+  pushImg(raw.image ?? raw.Image)
+  pushImg(raw.fileUrl ?? raw.FileUrl)
+  pushImg(raw.photo ?? raw.Photo)
+  pushImg(raw.filePath ?? raw.FilePath)
+  pushImg(p.images)
+  pushImg(raw.images ?? raw.Images)
+  pushImg(raw.productImages ?? raw.ProductImages)
+  pushImg(raw.attachments ?? raw.Attachments)
+  pushImg(raw.media ?? raw.Media)
+
+  p.images = imageCandidates
+  p.imageName = imageCandidates[0] || null
+
+  // 2. Comprehensive video normalization
+  const videoList: ProductMediaDto[] = []
+  if (Array.isArray(p.videos) && p.videos.length > 0) {
+    videoList.push(...p.videos)
+  }
+  const rawVideos = (raw.videos ?? raw.Videos ?? raw.videoList ?? raw.VideoList) as unknown
+  if (Array.isArray(rawVideos)) {
+    for (const v of rawVideos) {
+      if (typeof v === 'string' && v.trim()) {
+        videoList.push({ productId: p.id, type: 2, url: v.trim(), sortOrder: videoList.length, title: 'Product Video' })
+      } else if (v && typeof v === 'object') {
+        const item = v as Record<string, unknown>
+        const url = String(item.url ?? item.Url ?? item.fileName ?? item.FileName ?? '')
+        if (url) {
+          videoList.push({
+            id: (item.id ?? item.Id) as string | undefined,
+            productId: (item.productId ?? item.ProductId ?? p.id) as string,
+            type: 2,
+            url,
+            title: (item.title ?? item.Title ?? 'Product Video') as string,
+            duration: (item.duration ?? item.Duration) as string | undefined,
+            sortOrder: (item.sortOrder ?? item.SortOrder ?? videoList.length) as number,
+          })
+        }
+      }
     }
   }
-  if (!p.videoUrl) {
-    p.videoUrl = (raw.videoUrl ?? raw.VideoUrl ?? null) as string | null
+  const rawVidUrl = (raw.videoUrl ?? raw.VideoUrl ?? p.videoUrl) as string | null | undefined
+  if (rawVidUrl && typeof rawVidUrl === 'string' && rawVidUrl.trim()) {
+    p.videoUrl = rawVidUrl.trim()
+    if (!videoList.some((x) => x.url === rawVidUrl.trim())) {
+      videoList.push({ productId: p.id, type: 2, url: rawVidUrl.trim(), sortOrder: videoList.length, title: 'Product Video' })
+    }
+  } else if (videoList.length > 0 && videoList[0]) {
+    p.videoUrl = videoList[0].url
   }
+  p.videos = videoList
 
   const lowerName = (p.nameEn || '').toLowerCase()
 
@@ -234,6 +304,7 @@ export class ApiMarketplaceRepository implements MarketplaceRepository {
     const cleanSearch = (query.search || '').trim()
     if (cleanSearch) {
       params.set('searchTerm', cleanSearch)
+      params.set('search', cleanSearch)
     }
     if (query.sku?.trim()) {
       params.set('sku', query.sku.trim())
@@ -561,12 +632,24 @@ export class ApiMarketplaceRepository implements MarketplaceRepository {
   }
 
   async createProduct(payload: CreateProductPayload): Promise<ProductDto> {
-    const raw = await this.http.post<ProductDto>(MARKETPLACE_ROUTES.products, payload)
+    const cleanPayload: CreateProductPayload = {
+      ...payload,
+      isActive: payload.isActive ?? true,
+      imageName: payload.imageName || payload.images?.[0] || null,
+      images: payload.images?.length ? payload.images : payload.imageName ? [payload.imageName] : [],
+    }
+    const raw = await this.http.post<ProductDto>(MARKETPLACE_ROUTES.products, cleanPayload)
     return normalizeProduct(raw)
   }
 
   async updateProduct(id: string, payload: UpdateProductPayload): Promise<ProductDto> {
-    const raw = await this.http.put<ProductDto>(MARKETPLACE_ROUTES.productById(id), { id, ...payload })
+    const cleanPayload: UpdateProductPayload = {
+      ...payload,
+      id,
+      imageName: payload.imageName || payload.images?.[0] || null,
+      images: payload.images?.length ? payload.images : payload.imageName ? [payload.imageName] : [],
+    }
+    const raw = await this.http.put<ProductDto>(MARKETPLACE_ROUTES.productById(id), cleanPayload)
     return normalizeProduct(raw)
   }
 

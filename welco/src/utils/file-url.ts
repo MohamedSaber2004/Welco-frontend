@@ -48,7 +48,6 @@ export function isKnownMissingSeedFile(fileName: string | null | undefined): boo
   const baseName = clean.split('/').pop() || clean
   if (KNOWN_MISSING_SEED_FILES.has(baseName)) return true
   if (/^(sfda|fda|iso|mdsap|ce)[-_0-9a-z]*[-_]\d{4}\.(jpg|jpeg|png|webp|svg)$/i.test(baseName)) return true
-  if (/^[a-z0-9-]+-\d{2}\.(jpg|jpeg|png|webp)$/i.test(baseName)) return true
   return false
 }
 
@@ -74,6 +73,15 @@ export function isKnownBrokenUrl(url: string | null | undefined): boolean {
   return !!url && brokenUrls.has(url)
 }
 
+export function clearBrokenUrl(url: string | null | undefined): void {
+  if (!url || typeof url !== 'string') return
+  brokenUrls.delete(url)
+}
+
+export function clearAllBrokenUrls(): void {
+  brokenUrls.clear()
+}
+
 export function isStoredFileName(value: string | null | undefined): boolean {
   if (typeof value !== 'string') return false
   const trimmed = value.trim().replace(/^\/+/, '')
@@ -93,14 +101,30 @@ export function resolveFileUrl(storedName: string | null | undefined, fallback =
   if (trimmed === 'null' || trimmed === 'undefined') return fallback
   if (trimmed === PLACEHOLDER || trimmed === PLACEHOLDER_PNG) return trimmed
 
-  // Unpack JSON string if passed (e.g. '{"fileName":"foo.png"}')
-  if ((trimmed.startsWith('{') && trimmed.endsWith('}')) || (trimmed.startsWith('"') && trimmed.endsWith('"'))) {
+  // Unpack JSON string or array if passed (e.g. '{"fileName":"foo.png"}' or '["foo.png"]')
+  if (
+    (trimmed.startsWith('{') && trimmed.endsWith('}')) ||
+    (trimmed.startsWith('[') && trimmed.endsWith(']')) ||
+    (trimmed.startsWith('"') && trimmed.endsWith('"'))
+  ) {
     try {
       const parsed = JSON.parse(trimmed)
       if (typeof parsed === 'string') return resolveFileUrl(parsed, fallback)
+      if (Array.isArray(parsed) && parsed.length > 0) return resolveFileUrl(parsed[0], fallback)
       if (parsed && typeof parsed === 'object') {
         const o = parsed as Record<string, unknown>
-        const val = (o.fileName ?? o.FileName ?? o.name ?? o.Name ?? o.url ?? o.Url ?? o.fileUrl ?? o.FileUrl ?? o.filePath ?? o.FilePath) as string | undefined
+        const val = (o.fileName ??
+          o.FileName ??
+          o.name ??
+          o.Name ??
+          o.url ??
+          o.Url ??
+          o.fileUrl ??
+          o.FileUrl ??
+          o.filePath ??
+          o.FilePath ??
+          o.imageName ??
+          o.ImageName) as string | undefined
         if (val) return resolveFileUrl(val, fallback)
       }
     } catch {
@@ -108,7 +132,12 @@ export function resolveFileUrl(storedName: string | null | undefined, fallback =
     }
   }
 
-  if (trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('data:') || trimmed.startsWith('blob:')) {
+  if (
+    trimmed.startsWith('http://') ||
+    trimmed.startsWith('https://') ||
+    trimmed.startsWith('data:') ||
+    trimmed.startsWith('blob:')
+  ) {
     return trimmed
   }
 
@@ -132,18 +161,16 @@ export function resolveFileUrl(storedName: string | null | undefined, fallback =
     return fallback
   }
 
-  const backendBase = (BACKEND_BASE_URL || API_BASE_URL || 'https://welco-gateway.runasp.net').replace(/\/+$/, '')
+  const fileOnly = cleanName.replace(/^files\/+/, '')
 
-  if (trimmed.startsWith('/files/')) {
-    const fileOnly = trimmed.replace(/^\/+files\/+/, '')
-    return `${backendBase}/files/${fileOnly}`
-  }
-  if (trimmed.startsWith('files/')) {
-    const fileOnly = trimmed.replace(/^files\/+/, '')
-    return `${backendBase}/files/${fileOnly}`
+  // In standard web runtime (Vite dev proxy or Vercel rewrite), `/files` routes to the gateway.
+  // Using relative path `/files/...` ensures same-origin requests with zero CORS or protocol blocking.
+  if (!API_BASE_URL) {
+    return `/files/${fileOnly}`
   }
 
-  return `${backendBase}/files/${cleanName}`
+  const backendBase = (BACKEND_BASE_URL || API_BASE_URL).replace(/\/+$/, '')
+  return `${backendBase}/files/${fileOnly}`
 }
 
 export function withImageFallback(img: HTMLImageElement): void {
@@ -170,9 +197,10 @@ export function isNullOrPlaceholder(value: string | null | undefined): boolean {
 }
 
 export function productMediaUrl(
-  imageName: string | null | undefined,
+  imageOrImages: string | string[] | null | undefined,
   gradient: string | undefined,
 ): { url: string; background: string; hasImage: boolean } {
+  const imageName = Array.isArray(imageOrImages) ? imageOrImages[0] : imageOrImages
   if (imageName && imageName.trim() && !isNullOrPlaceholder(imageName)) {
     return { url: resolveFileUrl(imageName), background: gradient ?? '', hasImage: true }
   }

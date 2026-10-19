@@ -1,11 +1,22 @@
 # Dynamic Support Channels (Instagram, Facebook & Social Channels) Architecture & Design
 
 ## 1. Overview & Objective
-Enable dynamic administration and public display of support channels across Welco platform:
+Enable dynamic administration, canonical defaults, and reactive public display of support channels across the Welco platform:
 - Support channels include: Email, Phone, WhatsApp, Facebook, Instagram, and Working Hours.
-- Admins can configure these channels dynamically from both `AdminDashboardView` (Quick Support Channels Modal) and `HelpAdminView` (Help Center Settings).
-- Public visitor touchpoints (Home Page, Specialty Landing Pages, Footer, Help Center, and Provider Support) dynamically render these channels reactively via `contentService.supportContact`.
-- Inactive / empty channels are conditionally hidden so only configured channels are displayed.
+- **Canonical Defaults:** In absence of admin customization (or when backend returns `null`), the system falls back to official verified brand handles:
+  - Facebook: `https://facebook.com/welcosurgical`
+  - Instagram: `https://instagram.com/welcosurgical`
+  - WhatsApp: `+971 50 000 0000`
+  - Phone: `+971 4 800 9352`
+  - Email: `support@welco.health`
+- **Dynamic Admin Management:** Admins can configure these channels dynamically from both `AdminDashboardView` (Quick Support Channels Modal) and `HelpAdminView` (Help Center Settings).
+- **Public Visitor Touchpoints:**
+  - Home Page (`HomeView.vue`)
+  - Specialty Landing Pages (`LandingPageView.vue`)
+  - Main Footer (`AppFooter.vue`)
+  - Help Center (`HelpCenterView.vue`)
+  - Provider Support Hub (`ProviderSupportView.vue`)
+- **Instant Reactive Synchronization:** Changes made in Admin instantly update all mounted components across tabs and sessions via reactive state, `localStorage`, and custom window events.
 
 ## 2. Architecture & Data Flow
 
@@ -20,8 +31,10 @@ Enable dynamic administration and public display of support channels across Welc
                               v
 +-----------------------------------------------------------+
 |                   ContentService & Repo                   |
-|  - ContentService.supportContact (reactive ref)           |
-|  - ApiContentRepository: API PUT + LocalStorage Cache     |
+|  - Fallback to Canonical Defaults (welcosurgical)         |
+|  - API PUT /api/v1/support/contact                        |
+|  - LocalStorage Cache ('welco_social_contacts')           |
+|  - Custom Event ('welco:support-contact-updated')         |
 +-----------------------------+-----------------------------+
                               |
        +----------------------+----------------------+
@@ -52,6 +65,7 @@ export interface SupportContactDto {
 
 ### Component: `src/components/support/SupportChannelsSection.vue`
 - **Container**: Contained in standard page layout container (`max-width: var(--wl-max-width)`), matching Welco design tokens.
+- **Self-Sufficiency**: Calls `contentService.loadSupportContact()` upon `onMounted` to ensure immediate data fetch even on direct entry to landing pages.
 - **Header**:
   - Eyebrow: `t('help.channelsTitle')` with active status pulse indicator.
   - Title & Subtitle: Highlighting multi-channel clinical & operations assistance.
@@ -67,22 +81,19 @@ export interface SupportContactDto {
   - Micro-interactions: Subtle lift on hover, glowing gradient border accent on active focus, smooth CSS transitions.
   - Accessibility: WCAG AA compliant contrast, proper `aria-label`s, directional arrow support for RTL and LTR.
 
-### Admin Modal Enhancement (`AdminDashboardView.vue`)
-- Add form fields in `showContactModal`:
-  - Facebook Page URL (`contactForm.facebookUrl`)
-  - Instagram Profile URL (`contactForm.instagramUrl`)
-- Update `openContactModal()` to populate `facebookUrl` and `instagramUrl` from `contentService.supportContact.value`.
-- Update `handleSaveContact()` to submit `facebookUrl` and `instagramUrl` alongside existing fields.
+### Repository Fallback & Live Event Broadcasting
+- When `getSupportContact()` is executed:
+  - Check API response. If `facebookUrl` is missing or null, check `localStorage['welco_social_contacts']`.
+  - If still missing, apply canonical default `https://facebook.com/welcosurgical`.
+  - Same for `instagramUrl` (`https://instagram.com/welcosurgical`).
+- When `updateSupportContact()` is executed:
+  - Save to `localStorage['welco_social_contacts']`.
+  - Execute API PUT call.
+  - Dispatch `window.dispatchEvent(new CustomEvent('welco:support-contact-updated', { detail: updated }))`.
+  - `contentService` and `App.vue` listen to `storage` and `welco:support-contact-updated` to reflect changes live across all open views without page reloads.
 
-### Provider Support Hub Enhancement (`ProviderSupportView.vue`)
-- In addition to existing WhatsApp, Phone, and Email cards, dynamically render Facebook and Instagram channel cards if configured.
-
-### Translations (`en.ts`, `ar.ts`, `messages.ts`)
-- Ensure keys for Facebook and Instagram labels, notes, placeholders, and support section headers are available and synchronized.
-
-## 4. Verification & Testing Criteria
+### Verification & Testing Criteria
 1. When Facebook and Instagram URLs are configured in `AdminDashboardView` or `HelpAdminView`, the saved values persist to the repository and reactive state.
-2. `HomeView.vue` and `LandingPageView.vue` display the new Support Channels section showing the configured channels.
-3. If Facebook or Instagram URL is cleared/empty, the respective card is cleanly hidden without leaving layout gaps.
-4. Clicking Facebook or Instagram cards opens the respective URL in a new tab securely (`noopener noreferrer`).
-5. Design respects RTL / LTR locale switches and mobile responsive breakpoints.
+2. `HomeView.vue` and `LandingPageView.vue` display the Support Channels section showing the configured channels (or official defaults).
+3. Clicking Facebook or Instagram cards opens the respective URL in a new tab securely (`noopener noreferrer`).
+4. Design respects RTL / LTR locale switches and mobile responsive breakpoints.

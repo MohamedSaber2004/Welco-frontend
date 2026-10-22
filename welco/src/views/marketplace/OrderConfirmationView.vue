@@ -9,6 +9,7 @@ import SkeletonLoader from '../../components/ui/SkeletonLoader.vue'
 import BackButton from '../../components/ui/BackButton.vue'
 import type { OrderDto } from '../../domain/models/commerce'
 import { formatPrice } from '../../utils/format'
+import { toastService } from '../../infrastructure/feedback/toast.service'
 
 const route = useRoute()
 const router = useRouter()
@@ -24,6 +25,15 @@ onMounted(async () => {
     loading.value = false
   }
 })
+const copyRef = async () => {
+  if (!order.value?.orderNumber) return
+  try {
+    await navigator.clipboard.writeText(order.value.orderNumber)
+    toastService.success(locale.value === 'ar' ? 'تم نسخ مرجع الشحنة' : 'Consignment reference copied')
+  } catch {
+    // fallback
+  }
+}
 </script>
 
 <template>
@@ -54,9 +64,10 @@ onMounted(async () => {
         <h1 class="confirm-title">{{ t('commerce.orderConfirmationTitle') }}</h1>
         <p class="confirm-subtitle">{{ t('commerce.orderConfirmationSubtitle') }}</p>
 
-        <div class="order-id-badge mono">
+        <div class="order-id-badge mono cursor-pointer" role="button" @click="copyRef" :title="locale === 'ar' ? 'نسخ مرجع الشحنة' : 'Copy consignment reference'">
           <span class="id-label">{{ t('commerce.consignmentRef') }}</span>
           <span class="id-num">#{{ order.orderNumber }}</span>
+          <span class="material-symbols-outlined text-[16px] text-slate-400 hover:text-indigo-600 transition-colors">content_copy</span>
         </div>
 
         <StatusPill :status="order.status" />
@@ -106,7 +117,7 @@ onMounted(async () => {
             <button
               type="button"
               class="btn-primary-action mono"
-              @click="router.push({ name: 'order-tracking' })"
+              @click="router.push({ name: 'order-tracking', query: { ref: order.orderNumber } })"
             >
               <span class="material-symbols-outlined text-[18px]">local_shipping</span>
               <span>{{ t('nav.trackOrder') }}</span>

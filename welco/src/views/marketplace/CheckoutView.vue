@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { t, locale } from '../../i18n'
 import { useCart } from '../../composables/useCart'
@@ -29,6 +29,28 @@ const submittingRfq = ref(false)
 const error = ref<string | null>(null)
 
 const addressCurrencyOptions = ref<string[]>([])
+
+const availableCurrencies = computed(() => {
+  const fromService = services.marketplaceService.currencies.value
+  const list: string[] = []
+  if (Array.isArray(fromService) && fromService.length > 0) {
+    for (const c of fromService) {
+      if (c?.code && !list.includes(c.code.toUpperCase())) {
+        list.push(c.code.toUpperCase())
+      }
+    }
+  }
+  for (const c of addressCurrencyOptions.value) {
+    if (c && !list.includes(c.toUpperCase())) {
+      list.push(c.toUpperCase())
+    }
+  }
+  const standard = ['USD', 'EUR', 'EGP', 'AED', 'SAR']
+  for (const s of standard) {
+    if (!list.includes(s)) list.push(s)
+  }
+  return list
+})
 
 onMounted(async () => {
   if (!items.value.length) {
@@ -150,18 +172,27 @@ async function convertToQuote() {
     <div class="checkout-layout">
       <!-- Left Column: Order Items -->
       <section class="checkout-main">
-        <!-- Currency Selection Row - address based -->
+        <!-- Currency Selection Row -->
         <div class="curr-selector-card">
           <div class="curr-selector-left">
             <span class="mono curr-label">{{ t('checkout.currency') }}:</span>
             <div class="curr-chips">
-              <template v-if="addressCurrencyOptions.length>1">
-                <button v-for="code in addressCurrencyOptions" :key="code" type="button" class="curr-chip mono" :class="{ active: code===targetCurrency }" @click="setTargetCurrency(code)">{{ code }}</button>
-              </template>
-              <span v-else class="curr-chip mono active" :title="t('checkout.exchangeLocked')">{{ targetCurrency }}</span>
+              <button
+                v-for="code in availableCurrencies"
+                :key="code"
+                type="button"
+                class="curr-chip mono"
+                :class="{ active: code.toUpperCase() === targetCurrency.toUpperCase() }"
+                @click="setTargetCurrency(code)"
+              >
+                {{ code }}
+              </button>
             </div>
           </div>
-          <span class="curr-lock mono">{{ addressCurrencyOptions.length>1 ? t('cart.activeCurrency') : t('checkout.exchangeLocked') }}</span>
+          <span class="curr-lock mono text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">currency_exchange</span>
+            {{ t('cart.activeCurrency') || 'Active Currency' }}
+          </span>
         </div>
         <div v-if="unconvertedIds.length" class="rate-warn mono" role="alert">
           <span class="material-symbols-outlined text-[14px]">warning</span>

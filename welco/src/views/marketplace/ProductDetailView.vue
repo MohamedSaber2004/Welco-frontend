@@ -19,7 +19,7 @@ import { formatPrice } from '../../utils/format'
 
 const route = useRoute()
 const router = useRouter()
-const { add } = useCart()
+const { add, targetCurrency, setTargetCurrency } = useCart()
 
 const product = ref<ProductDto | null>(null)
 const loading = ref(true)
@@ -101,6 +101,8 @@ const loadProductData = async (id: string) => {
   imageFailed.value = false
   inspectModalOpen.value = false
   try {
+    void services.marketplaceService.loadCurrencies().catch(() => {})
+    void services.exchangeRateService.loadLatest('USD').catch(() => {})
     const p = await services.marketplaceService.getProduct(id)
     product.value = p
     if (p) {
@@ -210,9 +212,170 @@ const selectImage = (idx: number) => {
   imageFailed.value = false
 }
 
-const currencySymbol = computed(() => {
-  if (!product.value) return '$'
-  return product.value.currencySymbol || product.value.currencyCode || product.value.currency || '$'
+const availableCurrencies = computed(() => services.marketplaceService.currencies.value)
+
+const onCurrencySelectChange = () => {
+  setTargetCurrency(targetCurrency.value)
+}
+
+const conversionRate = ref(1)
+
+const updateConversionRate = async () => {
+  if (!product.value) {
+    conversionRate.value = 1
+    return
+  }
+  const baseCur = (product.value.currencyCode || product.value.currency || 'USD').toUpperCase()
+  const targetCur = (targetCurrency.value || 'USD').toUpperCase()
+  if (baseCur === targetCur) {
+    conversionRate.value = 1
+    return
+  }
+  try {
+    const rate = await services.exchangeRateService.getRate(baseCur, targetCur)
+    if (typeof rate === 'number' && rate > 0) {
+      conversionRate.value = rate
+    } else {
+      conversionRate.value = 1
+    }
+  } catch {
+    conversionRate.value = 1
+  }
+}
+
+watch([targetCurrency, product], () => {
+  void updateConversionRate()
+}, { immediate: true })
+
+const displayPrice = computed(() => {
+  if (!product.value) return 0
+  const basePrice = product.value.price || 0
+  const baseCur = (product.value.currencyCode || product.value.currency || 'USD').toUpperCase()
+  const targetCur = (targetCurrency.value || 'USD').toUpperCase()
+  if (baseCur === targetCur) return basePrice
+  const rate = conversionRate.value
+  if (rate && rate > 0) {
+    return Math.round(basePrice * rate * 100) / 100
+  }
+  return basePrice
+})
+
+const activeCurrencySymbol = computed(() => {
+  const targetCur = (targetCurrency.value || 'USD').toUpperCase()
+  const c = availableCurrencies.value.find((x) => (x.code || '').toUpperCase() === targetCur)
+  return c?.symbolNative || c?.symbol || targetCur
+})
+
+const currencySymbol = computed(() => activeCurrencySymbol.value)
+
+interface ParsedSpecifications {
+  bullets: string[]
+  wireCapacity?: string
+  wireCuttingCapacity?: string
+}
+
+const parsedSpecs = computed<ParsedSpecifications>(() => {
+  const res: ParsedSpecifications = {
+    bullets: [],
+    wireCapacity: product.value?.wireCapacity || undefined,
+    wireCuttingCapacity: product.value?.wireCuttingCapacity || undefined,
+  }
+  const raw = product.value?.specifications?.trim()
+  if (!raw) return res
+
+  if (raw.startsWith('{') && raw.endsWith('}')) {
+    try {
+      const parsed = JSON.parse(raw) as Record<string, unknown>
+      if (typeof parsed.wireCapacity === 'string' && parsed.wireCapacity.trim()) {
+        res.wireCapacity = parsed.wireCapacity.trim()
+      }
+      if (typeof parsed.wireCuttingCapacity === 'string' && parsed.wireCuttingCapacity.trim()) {
+        res.wireCuttingCapacity = parsed.wireCuttingCapacity.trim()
+      }
+      if (Array.isArray(parsed.bullets)) {
+        res.bullets.push(...parsed.bullets.map((b) => String(b).trim()).filter(Boolean))
+      }
+      if (typeof parsed.specification === 'string' && parsed.specification.trim()) {
+        const lines = parsed.specification.split(/[\r\n]+/).map((l) => l.replace(/^[-*•\d.]+\s*/, '').trim()).filter(Boolean)
+        res.bullets.push(...lines)
+      }
+      return res
+    } catch {
+      // not JSON, fallback to line parsing
+    }
+  }
+
+  const lines = raw.split(/[\r\n]+/)
+  for (const line of lines) {
+    const clean = line.replace(/^[-*•\d.]+\s*/, '').trim()
+    if (!clean) continue
+    const lower = clean.toLowerCase()
+    if (lower.startsWith('wire capacity:') || lower.startsWith('wire capacity :') || lower.startsWith('سعة السلك:')) {
+      res.wireCapacity = clean.split(':')[1]?.trim() || clean
+    } else if (lower.startsWith('wire cutting capacity:') || lower.startsWith('wire cutting capacity :') || lower.startsWith('سعة قطع السلك:')) {
+      res.wireCuttingCapacity = clean.split(':')[1]?.trim() || clean
+    } else {
+      res.bullets.push(clean)
+    }
+  }
+  return res
+})
+
+const hasSpecifications = computed(() => {
+  return parsedSpecs.value.bullets.length > 0 || Boolean(parsedSpecs.value.wireCapacity) || Boolean(parsedSpecs.value.wireCuttingCapacity)
+})
+
+// ── Interactive High-Resolution Inspection Zoom & Pan ──
+const zoomLevel = ref(1.0)
+const panX = ref(0)
+const panY = ref(0)
+const isDragging = ref(false)
+const dragStartX = ref(0)
+const dragStartY = ref(0)
+
+const zoomIn = () => {
+  zoomLevel.value = Math.min(3.5, Math.round((zoomLevel.value + 0.3) * 10) / 10)
+}
+const zoomOut = () => {
+  zoomLevel.value = Math.max(1.0, Math.round((zoomLevel.value - 0.3) * 10) / 10)
+  if (zoomLevel.value === 1.0) {
+    panX.value = 0
+    panY.value = 0
+  }
+}
+const resetZoom = () => {
+  zoomLevel.value = 1.0
+  panX.value = 0
+  panY.value = 0
+}
+
+const onInspectWheel = (e: WheelEvent) => {
+  if (e.deltaY < 0) {
+    zoomIn()
+  } else {
+    zoomOut()
+  }
+}
+
+const onPanStart = (e: MouseEvent) => {
+  if (zoomLevel.value <= 1.0) return
+  isDragging.value = true
+  dragStartX.value = e.clientX - panX.value
+  dragStartY.value = e.clientY - panY.value
+}
+const onPanMove = (e: MouseEvent) => {
+  if (!isDragging.value || zoomLevel.value <= 1.0) return
+  panX.value = e.clientX - dragStartX.value
+  panY.value = e.clientY - dragStartY.value
+}
+const onPanEnd = () => {
+  isDragging.value = false
+}
+
+watch(inspectModalOpen, (open) => {
+  if (!open) {
+    resetZoom()
+  }
 })
 
 const onQtyChange = () => {
@@ -613,6 +776,30 @@ const resolvedDescription = computed(() => {
             </div>
           </div>
 
+          <!-- Bulleted Specifications under Product Title -->
+          <div v-if="hasSpecifications" class="pdp-specs-bullets-card">
+            <div class="specs-bullets-header mono">
+              <span class="material-symbols-outlined text-[16px] text-indigo-600">checklist</span>
+              <span>{{ locale === 'ar' ? 'المواصفات الفنية' : 'Technical Specifications' }}</span>
+            </div>
+            <ul class="specs-bullets-list">
+              <li v-for="(spec, sIdx) in parsedSpecs.bullets" :key="sIdx" class="spec-bullet-item">
+                <span class="bullet-dot"></span>
+                <span class="bullet-text">{{ spec }}</span>
+              </li>
+              <li v-if="parsedSpecs.wireCapacity" class="spec-bullet-item spec-bullet-highlight">
+                <span class="material-symbols-outlined bullet-icon text-indigo-600">electric_bolt</span>
+                <span class="bullet-label mono">{{ locale === 'ar' ? 'سعة السلك:' : 'Wire Capacity:' }}</span>
+                <strong class="bullet-value">{{ parsedSpecs.wireCapacity }}</strong>
+              </li>
+              <li v-if="parsedSpecs.wireCuttingCapacity" class="spec-bullet-item spec-bullet-highlight">
+                <span class="material-symbols-outlined bullet-icon text-amber-600">content_cut</span>
+                <span class="bullet-label mono">{{ locale === 'ar' ? 'سعة قطع السلك:' : 'Wire Cutting Capacity:' }}</span>
+                <strong class="bullet-value">{{ parsedSpecs.wireCuttingCapacity }}</strong>
+              </li>
+            </ul>
+          </div>
+
           <!-- Provider / Supplier & Regulatory Bar -->
           <div class="pdp-supplier-strip">
             <div class="pdp-provider-chip">
@@ -666,11 +853,26 @@ const resolvedDescription = computed(() => {
             <div class="pdp-price-header">
               <div class="price-figure-wrap">
                 <strong class="pdp-price-figure mono">
-                  {{ formatPrice(product.price, locale) }}
+                  {{ formatPrice(displayPrice, locale) }}
                 </strong>
-                <span class="pdp-currency-unit mono">{{ currencySymbol }}</span>
+                <!-- Interactive Currency Selector -->
+                <div class="pdp-currency-select-wrap">
+                  <select
+                    v-model="targetCurrency"
+                    class="pdp-currency-select mono"
+                    :aria-label="t('checkout.currency')"
+                    @change="onCurrencySelectChange"
+                  >
+                    <option v-for="c in availableCurrencies" :key="c.code" :value="c.code">
+                      {{ c.code }} ({{ c.symbol || c.symbolNative }})
+                    </option>
+                  </select>
+                </div>
                 <span class="pdp-unit-caption mono">
                   / {{ locale === 'ar' ? (product.unitAr || product.unit || 'قطعة') : (product.unit || 'pcs') }}
+                </span>
+                <span v-if="targetCurrency !== (product.currencyCode || 'USD')" class="pdp-original-price-note mono text-xs text-muted">
+                  ({{ formatPrice(product.price, locale) }} {{ product.currencyCode || 'USD' }})
                 </span>
               </div>
 
@@ -1111,16 +1313,70 @@ const resolvedDescription = computed(() => {
     <BaseModal
       :model-value="inspectModalOpen"
       :title="product ? localized(product.nameEn, product.nameAr) : 'Instrument Inspection'"
-      max-width="920px"
-      @update:model-value="(val) => { inspectModalOpen = val }"
+      max-width="960px"
+      @update:model-value="(val) => { inspectModalOpen = val; if (!val) resetZoom(); }"
     >
       <div v-if="product" class="pdp-inspect-modal">
-        <div class="inspect-viewport">
+        <!-- Floating Interactive Zoom Toolbar -->
+        <div class="inspect-toolbar mono">
+          <div class="zoom-controls-group">
+            <button
+              type="button"
+              class="zoom-btn"
+              :title="locale === 'ar' ? 'تكبير' : 'Zoom In'"
+              aria-label="Zoom in"
+              @click="zoomIn"
+            >
+              <span class="material-symbols-outlined text-[18px]">add</span>
+            </button>
+            <span class="zoom-percent-badge">{{ Math.round(zoomLevel * 100) }}%</span>
+            <button
+              type="button"
+              class="zoom-btn"
+              :disabled="zoomLevel <= 1.0"
+              :title="locale === 'ar' ? 'تصغير' : 'Zoom Out'"
+              aria-label="Zoom out"
+              @click="zoomOut"
+            >
+              <span class="material-symbols-outlined text-[18px]">remove</span>
+            </button>
+            <button
+              type="button"
+              class="zoom-btn zoom-btn--reset"
+              :disabled="zoomLevel === 1.0 && panX === 0 && panY === 0"
+              :title="locale === 'ar' ? 'إعادة ضبط' : 'Reset Zoom'"
+              @click="resetZoom"
+            >
+              <span class="material-symbols-outlined text-[18px]">restart_alt</span>
+              <span>100%</span>
+            </button>
+          </div>
+          <span class="zoom-hint text-xs text-muted hidden sm:inline-block">
+            {{ zoomLevel > 1.0 ? (locale === 'ar' ? 'اسحب للتحريك أو استخدم العجلة' : 'Drag to pan or use wheel') : (locale === 'ar' ? 'انقر أو استخدم العجلة للتكبير' : 'Click or scroll to zoom') }}
+          </span>
+        </div>
+
+        <div
+          class="inspect-viewport"
+          :class="{ 'is-zoomed': zoomLevel > 1.0, 'is-dragging': isDragging }"
+          @wheel.prevent="onInspectWheel"
+          @mousedown="onPanStart"
+          @mousemove="onPanMove"
+          @mouseup="onPanEnd"
+          @mouseleave="onPanEnd"
+        >
           <img
             v-if="productImageUrl"
             :src="productImageUrl"
             :alt="localized(product.nameEn, product.nameAr)"
             class="inspect-image"
+            :style="{
+              transform: `scale(${zoomLevel}) translate(${panX / zoomLevel}px, ${panY / zoomLevel}px)`,
+              cursor: zoomLevel > 1.0 ? (isDragging ? 'grabbing' : 'grab') : 'zoom-in',
+              transition: isDragging ? 'none' : 'transform 0.15s ease-out',
+            }"
+            draggable="false"
+            @click="zoomLevel === 1.0 ? zoomIn() : null"
           />
           <div v-else class="pdp-schematic-fallback">
             <div class="pdp-fallback-icon-wrap">
@@ -2713,6 +2969,197 @@ const resolvedDescription = computed(() => {
 .inspect-foot__badge {
   color: var(--wl-primary);
   font-weight: 700;
+}
+
+/* ── Bulleted Specifications Card under Title ── */
+.pdp-specs-bullets-card {
+  margin-top: var(--space-4);
+  margin-bottom: var(--space-4);
+  background: var(--wl-surface-subtle, #f8fafc);
+  border: 1px solid var(--wl-line);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-5);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.specs-bullets-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--step--1);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--wl-ink-strong);
+  margin-bottom: var(--space-3);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px dashed var(--wl-line);
+}
+
+.specs-bullets-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.spec-bullet-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2-5, 0.625rem);
+  font-size: var(--step--1);
+  color: var(--wl-ink-body, #334155);
+  line-height: 1.5;
+}
+
+.bullet-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--wl-primary, #4f46e5);
+  margin-top: 0.45rem;
+  flex-shrink: 0;
+}
+
+.bullet-text {
+  flex: 1;
+}
+
+.spec-bullet-highlight {
+  align-items: center;
+  background: var(--wl-surface, #ffffff);
+  border: 1px solid var(--wl-line);
+  border-radius: var(--radius-sm);
+  padding: 0.35rem 0.65rem;
+  margin-top: 0.25rem;
+}
+
+.bullet-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.bullet-label {
+  font-size: var(--step--1);
+  color: var(--wl-muted);
+  font-weight: 600;
+}
+
+.bullet-value {
+  font-size: var(--step--1);
+  color: var(--wl-ink-strong);
+  font-weight: 700;
+}
+
+/* ── PDP Interactive Currency Selector ── */
+.pdp-currency-select-wrap {
+  display: inline-flex;
+  align-items: center;
+  margin-inline-start: var(--space-1);
+}
+
+.pdp-currency-select {
+  background: var(--wl-surface, #ffffff);
+  border: 1px solid var(--wl-line);
+  border-radius: var(--radius-sm);
+  padding: 0.2rem 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--wl-primary, #4f46e5);
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.pdp-currency-select:hover,
+.pdp-currency-select:focus {
+  border-color: var(--wl-primary);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+}
+
+.pdp-original-price-note {
+  display: block;
+  width: 100%;
+  margin-top: var(--space-1);
+}
+
+/* ── Interactive Zoom Toolbar ── */
+.inspect-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  background: var(--wl-surface-subtle, #f1f5f9);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--wl-line);
+  margin-bottom: var(--space-3);
+  gap: var(--space-3);
+}
+
+.zoom-controls-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.zoom-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--wl-line);
+  background: var(--wl-surface, #ffffff);
+  color: var(--wl-ink-strong);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.zoom-btn:hover:not(:disabled) {
+  background: var(--wl-primary, #4f46e5);
+  color: #ffffff;
+  border-color: var(--wl-primary);
+}
+
+.zoom-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.zoom-btn--reset {
+  font-size: 0.8rem;
+}
+
+.zoom-percent-badge {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--wl-primary);
+  min-width: 48px;
+  text-align: center;
+}
+
+.zoom-hint {
+  font-size: 0.75rem;
+  color: var(--wl-muted);
+}
+
+.inspect-viewport {
+  position: relative;
+  user-select: none;
+  touch-action: none;
+}
+
+.inspect-viewport.is-zoomed {
+  cursor: grab;
+}
+
+.inspect-viewport.is-dragging {
+  cursor: grabbing;
 }
 
 /* ── Responsive Media Queries ── */

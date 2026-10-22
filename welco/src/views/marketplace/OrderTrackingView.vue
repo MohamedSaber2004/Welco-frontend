@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { t, locale } from '../../i18n'
 import { commerceService } from '../../di/container'
 import ChainSteps from '../../components/ui/ChainSteps.vue'
@@ -10,6 +10,7 @@ import BackButton from '../../components/ui/BackButton.vue'
 import type { OrderDto } from '../../domain/models/commerce'
 import { formatDate, formatPrice } from '../../utils/format'
 
+const route = useRoute()
 const router = useRouter()
 const query = ref('')
 const order = ref<OrderDto | null>(null)
@@ -20,12 +21,13 @@ const localized = (en?: string | null, ar?: string | null) =>
   locale.value === 'ar' ? ar || en || '' : en || ar || ''
 
 async function track() {
-  if (!query.value.trim()) return
+  const clean = query.value.trim().replace(/^#+/, '').trim()
+  if (!clean) return
   tracking.value = true
   notFound.value = false
   order.value = null
   try {
-    const found = await commerceService.trackOrder(query.value.trim())
+    const found = await commerceService.trackOrder(clean)
     if (!found) {
       notFound.value = true
     } else {
@@ -35,6 +37,14 @@ async function track() {
     tracking.value = false
   }
 }
+
+onMounted(() => {
+  const refParam = route.query.ref ? String(route.query.ref) : ''
+  if (refParam) {
+    query.value = refParam
+    void track()
+  }
+})
 </script>
 
 <template>

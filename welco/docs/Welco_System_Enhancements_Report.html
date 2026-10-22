@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welco System Enhancements & Implementation Guide</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap');
+
+    @page {
+      size: A4 portrait;
+      margin: 0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: #1e293b;
+      background-color: #f1f5f9;
+      line-height: 1.45;
+      font-size: 12px;
+      -webkit-font-smoothing: antialiased;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    /* Exactly A4 Sheet Container */
+    .page-container {
+      width: 210mm;
+      height: 297mm;
+      max-height: 297mm;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 12mm 14mm 10mm 14mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      page-break-after: always;
+      break-after: page;
+      position: relative;
+      overflow: hidden;
+    }
+
+    @media screen {
+      .page-container {
+        margin-bottom: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      }
+    }
+
+    .page-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Cover / Top Banner */
+    .cover-banner {
+      background: linear-gradient(135deg, #091e3a 0%, #0f3d6c 50%, #0284c7 100%);
+      color: #ffffff;
+      padding: 16px 20px;
+      border-radius: 12px;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.2);
+    }
+
+    .brand-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.16);
+      backdrop-filter: blur(8px);
+      padding: 3px 10px;
+      border-radius: 14px;
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: #7dd3fc;
+      margin-bottom: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+
+    .cover-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 21px;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 4px;
+      letter-spacing: -0.4px;
+    }
+
+    .cover-subtitle {
+      font-size: 11.5px;
+      color: #cbd5e1;
+      line-height: 1.4;
+      margin-bottom: 10px;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    .meta-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .meta-label {
+      font-size: 9px;
+      text-transform: uppercase;
+      color: #94a3b8;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .meta-value {
+      font-size: 11px;
+      font-weight: 700;
+      color: #f8fafc;
+    }
+
+    /* Section Headers */
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .section-badge {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 11px;
+      color: #ffffff;
+      flex-shrink: 0;
+    }
+
+    .badge-blue { background: #0284c7; }
+    .badge-emerald { background: #059669; }
+    .badge-purple { background: #7c3aed; }
+    .badge-amber { background: #d97706; }
+
+    .section-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: #0f172a;
+      letter-spacing: -0.2px;
+    }
+
+    /* Feature Cards */
+    .feature-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 11px 14px;
+      margin-bottom: 10px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .card-title-group {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .card-number {
+      background: #f1f5f9;
+      color: #475569;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid #cbd5e1;
+    }
+
+    .card-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .status-pill {
+      font-size: 9.5px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      background: #ecfdf5;
+      color: #047857;
+      border: 1px solid #a7f3d0;
+    }
+
+    .card-desc {
+      font-size: 11.5px;
+      color: #475569;
+      margin-bottom: 6px;
+      line-height: 1.4;
+    }
+
+    /* Comparison Box */
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 6px;
+      margin-bottom: 6px;
+    }
+
+    .comp-col {
+      padding: 7px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+    }
+
+    .comp-col.before {
+      background: #fff1f2;
+      border: 1px solid #fecdd3;
+    }
+
+    .comp-col.after {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+    }
+
+    .comp-header {
+      font-weight: 700;
+      font-size: 9.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      margin-bottom: 3px;
+    }
+
+    .comp-col.before .comp-header { color: #be123c; }
+    .comp-col.after .comp-header { color: #15803d; }
+
+    .comp-body {
+      color: #334155;
+      line-height: 1.35;
+    }
+
+    /* Implementation Highlight */
+    .impl-box {
+      background: #f8fafc;
+      border-left: 3px solid #0284c7;
+      padding: 6px 10px;
+      border-radius: 0 6px 6px 0;
+      margin-top: 6px;
+      font-size: 11px;
+      color: #334155;
+      line-height: 1.35;
+    }
+
+    .impl-box.purple { border-left-color: #7c3aed; }
+    .impl-box.amber { border-left-color: #d97706; }
+    .impl-box.emerald { border-left-color: #059669; }
+
+    .impl-title {
+      font-weight: 700;
+      color: #0369a1;
+      margin-bottom: 2px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .impl-box.purple .impl-title { color: #6d28d9; }
+    .impl-box.amber .impl-title { color: #b45309; }
+    .impl-box.emerald .impl-title { color: #047857; }
+
+    .bullet-list {
+      list-style-type: none;
+      padding-left: 0;
+      margin-top: 4px;
+    }
+
+    .bullet-list li {
+      position: relative;
+      padding-left: 14px;
+      margin-bottom: 3px;
+      font-size: 11px;
+      color: #334155;
+      line-height: 1.35;
+    }
+
+    .bullet-list li::before {
+      content: "•";
+      position: absolute;
+      left: 3px;
+      color: #0284c7;
+      font-weight: bold;
+      font-size: 13px;
+    }
+    .bullet-list.purple li::before { color: #7c3aed; }
+
+    /* Summary Table */
+    .summary-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 10.5px;
+      background: #ffffff;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+      margin-top: 4px;
+    }
+
+    .summary-table th {
+      background: #0f172a;
+      color: #ffffff;
+      font-weight: 700;
+      text-align: left;
+      padding: 7px 10px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .summary-table td {
+      padding: 6.5px 10px;
+      border-bottom: 1px solid #e2e8f0;
+      color: #334155;
+      vertical-align: middle;
+    }
+
+    .summary-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .summary-table tr:nth-child(even) td {
+      background: #f8fafc;
+    }
+
+    .badge-mini {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 9px;
+      font-weight: 700;
+    }
+
+    .badge-mini.customer { background: #e0f2fe; color: #0369a1; }
+    .badge-mini.marketplace { background: #fef3c7; color: #92400e; }
+    .badge-mini.account { background: #ede9fe; color: #6d28d9; }
+    .badge-mini.admin { background: #dcfce7; color: #15803d; }
+
+    /* Highlights Banner */
+    .highlights-box {
+      background: linear-gradient(to right, #f8fafc, #edf2f7);
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .hl-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .hl-title {
+      font-weight: 700;
+      font-size: 10.5px;
+      color: #0f172a;
+      margin-bottom: 2px;
+    }
+
+    .hl-desc {
+      font-size: 10px;
+      color: #475569;
+      line-height: 1.3;
+    }
+
+    /* Footer */
+    .doc-footer {
+      padding-top: 8px;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 9.5px;
+      color: #94a3b8;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== PAGE 1 ==================== -->
+  <div class="page-container">
+    <div class="page-content">
+      
+      <!-- Top Cover Banner -->
+      <div class="cover-banner">
+        <div class="brand-tag">Welco Medical & Dental Solutions • Official Engineering Report</div>
+        <h1 class="cover-title">System Enhancements & Implementation Guide</h1>
+        <p class="cover-subtitle">
+          An executive, non-technical walkthrough of recent major platform upgrades across Customer Journey, Marketplace Quoting, Account Privacy, and Catalog Administration.
+        </p>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <span class="meta-label">Target Audience</span>
+            <span class="meta-value">Stakeholders & Admins</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Platform Scope</span>
+            <span class="meta-value">Storefront & Admin Portals</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Features Delivered</span>
+            <span class="meta-value">8 Core Upgrades</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Status</span>
+            <span class="meta-value" style="color: #4ade80;">100% Deployed & Verified</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 1: CUSTOMER ORDER & SHIPMENT -->
+      <div class="section-header">
+        <div class="section-badge badge-blue">1</div>
+        <h2 class="section-title">Customer Order & Shipment Experience</h2>
+      </div>
+
+      <!-- Feature 1 -->
+      <div class="feature-card">
+        <div class="card-top">
+          <div class="card-title-group">
+            <span class="card-number">F-01</span>
+            <h3 class="card-title">Place Order: Unified Consignment Reference Number</h3>
+          </div>
+          <span class="status-pill">Completed</span>
+        </div>
+        <p class="card-desc">
+          Standardizes order identification so hospital buyers and shipping couriers share the exact same shipment code from checkout to delivery.
+        </p>
+        <div class="comparison-grid">
+          <div class="comp-col before">
+            <div class="comp-header">✕ Previous Limitation</div>
+            <div class="comp-body">
+              Order confirmations showed internal database IDs. Customers could not easily find their courier dispatch reference.
+            </div>
+          </div>
+          <div class="comp-col after">
+            <div class="comp-header">✓ Implemented Solution</div>
+            <div class="comp-body">
+              Every placed order automatically generates and highlights a clean <strong>Consignment Reference</strong> (e.g. <code>WL-2026-1022</code>) with a 1-click copy button.
+            </div>
+          </div>
+        </div>
+        <div class="impl-box">
+          <div class="impl-title">How It Works in Practice</div>
+          Directly on the checkout success screen, the consignment reference is prominently displayed with instant track-order buttons. This reference links seamlessly into courier delivery manifests and support tickets.
+        </div>
+      </div>
+
+      <!-- Feature 2 -->
+      <div class="feature-card">
+        <div class="card-top">
+          <div class="card-title-group">
+            <span class="card-number">F-02</span>
+            <h3 class="card-title">Order Tracking: Frictionless Public Lookup by Consignment Ref</h3>
+          </div>
+          <span class="status-pill">Completed</span>
+        </div>
+        <p class="card-desc">
+          Enables any buyer or logistic partner holding a consignment reference to track package status without requiring login credentials.
+        </p>
+        <div class="comparison-grid">
+          <div class="comp-col before">
+            <div class="comp-header">✕ Previous Limitation</div>
+            <div class="comp-body">
+              Entering numbers with <code>#</code> or extra spaces produced errors. Tracking also required mandatory account login.
+            </div>
+          </div>
+          <div class="comp-col after">
+            <div class="comp-header">✓ Implemented Solution</div>
+            <div class="comp-body">
+              Built smart input sanitization that strips <code>#</code> and spaces automatically, and enabled secure public tracking without sign-in hurdles.
+            </div>
+          </div>
+        </div>
+        <div class="impl-box">
+          <div class="impl-title">How It Works in Practice</div>
+          Whether a customer types <code>#WL-1520</code>, <code>wl-1520</code>, or pastes with accidental spaces, the system normalizes the query instantly, fetching milestones (Confirmed, Processing, Shipped, Delivered) with real-time visual progress bars.
+        </div>
+      </div>
+
+    </div>
+
+    <div class="doc-footer">
+      <span>Welco Medical Solutions • System Upgrade Documentation</span>
+      <span>Page 1 of 4 • Customer Journey Enhancements</span>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 2 ==================== -->
+  <div class="page-container">
+    <div class="page-content">
+      
+      <!-- SECTION 2: MARKETPLACE & QUOTING -->
+      <div class="section-header">
+        <div class="section-badge badge-emerald">2</div>
+        <h2 class="section-title">Marketplace Quoting & Product Presentation</h2>
+      </div>
+
+      <!-- Feature 3 -->
+      <div class="feature-card">
+        <div class="card-top">
+          <div class="card-title-group">
+            <span class="card-number">F-03</span>
+            <h3 class="card-title">Direct Quote: Dynamic Multi-Currency Switching</h3>
+          </div>
+          <span class="status-pill">Completed</span>
+        </div>
+        <p class="card-desc">
+          Empowers international dental clinics and hospitals to view instrument prices and request formal quotes in their preferred local currency.
+        </p>
+        <div class="comparison-grid">
+          <div class="comp-col before">
+            <div class="comp-header">✕ Previous Limitation</div>
+            <div class="comp-body">
+              All product prices and quotes were locked exclusively in US Dollars ($). Clients in UAE, Saudi Arabia, Europe, and Egypt could not change currency.
+            </div>
+          </div>
+          <div class="comp-col after">
+            <div class="comp-header">✓ Implemented Solution</div>
+            <div class="comp-body">
+              Integrated an active currency selector across Product Detail, Cart, and Checkout (USD, EUR, AED, SAR, GBP, EGP) with live conversion rates.
+            </div>
+          </div>
+        </div>
+        <div class="impl-box emerald">
+          <div class="impl-title">How It Works in Practice</div>
+          Selecting <strong>AED</strong> converts prices dynamically in real-time. When requesting a Direct Quote, the customer's selected currency is saved and transmitted to sales reps, guaranteeing the formal quotation arrives in the exact currency requested.
+        </div>
+      </div>
+
+      <!-- Feature 4 -->
+      <div class="feature-card">
+        <div class="card-top">
+          <div class="card-title-group">
+            <span class="card-number">F-04</span>
+            <h3 class="card-title">Product Details: Bulleted Technical Specifications List</h3>
+          </div>
+          <span class="status-pill">Completed</span>
+        </div>
+        <p class="card-desc">
+          Displays essential surgical and orthodontic instrument dimensions directly beneath the product title in a fast, scannable format.
+        </p>
+        <div class="comparison-grid">
+          <div class="comp-col before">
+            <div class="comp-header">✕ Previous Limitation</div>
+            <div class="comp-body">
+              Technical specifications were hidden in bottom tabs or formatted as dense paragraphs that were cumbersome for clinicians to scan.
+            </div>
+          </div>
+          <div class="comp-col after">
+            <div class="comp-header">✓ Implemented Solution</div>
+            <div class="comp-body">
+              Placed a clean bulleted list directly below the instrument name, highlighting dimensions, materials, autoclave ratings, and wire limits.
+            </div>
+          </div>
+        </div>
+        <div class="impl-box emerald">
+          <div class="impl-title">Visible Information Hierarchy</div>
+          <ul class="bullet-list">
+            <li><strong>General Specifications:</strong> Autoclave rating (134°C), German Stainless Steel grade (DIN 1.4021), CE Class IIa certification.</li>
+            <li><strong>Wire Capacity:</strong> Dedicated badge indicating maximum wire gauge (e.g., up to .022" x .028").</li>
+            <li><strong>Wire Cutting Capacity:</strong> Explicit thresholds for hard vs. soft wire cutting without cluttering descriptions.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Feature 5 -->
+      <div class="feature-card">
+        <div class="card-top">
+          <div class="card-title-group">
+            <span class="card-number">F-05</span>
+            <h3 class="card-title">Interactive Instrument Inspection: Zoom In, Out & Pan</h3>
+          </div>
+          <span class="status-pill">Completed</span>
+        </div>
+        <p class="card-desc">
+          Allows surgeons and dental procurement specialists to scrutinize instrument tips, serrations, and hinge alignment in ultra-high resolution.
+        </p>
+        <div class="comparison-grid">
+          <div class="comp-col before">
+            <div class="comp-header">✕ Previous Limitation</div>
+            <div class="comp-body">
+              The "Inspect Instrument" popup was completely static with no zoom controls or ability to navigate fine instrument details.
+            </div>
+          </div>
+          <div class="comp-col after">
+            <div class="comp-header">✓ Implemented Solution</div>
+            <div class="comp-body">
+              Built an interactive inspection viewer equipped with Zoom In (+), Zoom Out (-), 100% Reset, mouse wheel zooming, and click-and-drag panning.
+            </div>
+          </div>
+        </div>
+        <div class="impl-box emerald">
+          <div class="impl-title">How It Works in Practice</div>
+          Clicking "Inspect Instrument" opens a distraction-free studio lightbox. Clinicians can zoom up to 300% to examine blade edges or serrations with silky-smooth drag navigation.
+        </div>
+      </div>
+
+    </div>
+
+    <div class="doc-footer">
+      <span>Welco Medical Solutions • System Upgrade Documentation</span>
+      <span>Page 2 of 4 • Marketplace & Clinical Presentation</span>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 3 ==================== -->
+  <div class="page-container">
+    <div class="page-content">
+      
+      <!-- SECTION 3: PRIVACY & MULTI-TENANCY -->
+      <div class="section-header">
+        <div class="section-badge badge-purple">3</div>
+        <h2 class="section-title">Customer Account Privacy & Multi-Tenancy Security</h2>
+      </div>
+
+      <!-- Feature 6 -->
+      <div class="feature-card">
+        <div class="card-top">
+          <div class="card-title-group">
+            <span class="card-number">F-06</span>
+            <h3 class="card-title">Customer Accounts: 100% Strict Data Isolation</h3>
+          </div>
+          <span class="status-pill">Completed</span>
+        </div>
+        <p class="card-desc">
+          Guarantees that every registered customer strictly accesses their own personal orders, quotes, and communications—never records of other clinics.
+        </p>
+        <div class="comparison-grid">
+          <div class="comp-col before">
+            <div class="comp-header">✕ Security Risk</div>
+            <div class="comp-body">
+              Certain account portal queries lacked customer ID locks, risking potential visibility of other clients' commercial proposals and purchase inquiries.
+            </div>
+          </div>
+          <div class="comp-col after">
+            <div class="comp-header">✓ Implemented Solution</div>
+            <div class="comp-body">
+              Enforced strict cryptographic tenant filters at both the database query layer and the front-end user portal components.
+            </div>
+          </div>
+        </div>
+        <div class="impl-box purple">
+          <div class="impl-title">Protected Account Sections</div>
+          <ul class="bullet-list purple">
+            <li><strong>Account Dashboard:</strong> Metric summary cards (Total Orders, Spend, RFQs) calculate exclusively from the customer's own activity.</li>
+            <li><strong>Quote Requests (RFQs):</strong> Only RFQs initiated by the customer or their verified clinic account are displayed.</li>
+            <li><strong>Price Quotes:</strong> Commercial proposals and confidential pricing discounts are restricted solely to the recipient.</li>
+            <li><strong>Order History:</strong> Past purchase receipts and tracking history belong strictly to the logged-in client.</li>
+            <li><strong>Product Inquiries:</strong> Technical consultations and instrument questions are private between the client and Welco support.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- SECTION 4: ADMIN CONTROLS -->
+      <div class="section-header" style="margin-top: 6px;">
+        <div class="section-badge badge-amber">4</div>
+        <h2 class="section-title">Admin Management & Catalog Architecture</h2>
+      </div>
+
+      <!-- Feature 7 -->
+      <div class="feature-card">
+        <div class="card-top">
+          <div class="card-title-group">
+            <span class="card-number">F-07</span>
+            <h3 class="card-title">Admin Catalog: Explicit "Most Selling Product" Control</h3>
+          </div>
+          <span class="status-pill">Completed</span>
+        </div>
+        <p class="card-desc">
+          Provides store administrators with direct editorial authority over which instruments appear in the storefront's "Most Selling" carousel.
+        </p>
+        <div class="comparison-grid">
+          <div class="comp-col before">
+            <div class="comp-header">✕ Previous Limitation</div>
+            <div class="comp-body">
+              Newly created products automatically entered the "Most Selling" carousel because the query sorted by creation date, confusing site visitors.
+            </div>
+          </div>
+          <div class="comp-col after">
+            <div class="comp-header">✓ Implemented Solution</div>
+            <div class="comp-body">
+              Added a dedicated <strong>"Feature as Most Selling Product"</strong> toggle in the admin portal and updated catalog queries to respect admin curation.
+            </div>
+          </div>
+        </div>
+        <div class="impl-box amber">
+          <div class="impl-title">How It Works in Practice</div>
+          When adding or editing a product, the admin can deliberately toggle the "Most Selling" badge on or off. Standard new items stay neatly in their catalog categories without unintentionally crowding the featured sales section.
+        </div>
+      </div>
+
+      <!-- Feature 8 -->
+      <div class="feature-card">
+        <div class="card-top">
+          <div class="card-title-group">
+            <span class="card-number">F-08</span>
+            <h3 class="card-title">New Product Form: Structured Bullet Specs & Capacities</h3>
+          </div>
+          <span class="status-pill">Completed</span>
+        </div>
+        <p class="card-desc">
+          Standardizes technical specification entry in the admin portal with dedicated optional fields for orthodontic wire capacities.
+        </p>
+        <div class="impl-box amber">
+          <div class="impl-title">Dedicated Admin Input Fields</div>
+          <ul class="bullet-list">
+            <li><strong>Specification (Optional):</strong> Multi-line box where each line renders as a clean bullet point on the storefront.</li>
+            <li><strong>Wire Capacity (Optional):</strong> Specific gauge rating (e.g. <code>.022" x .028"</code>). If left empty, it hides automatically.</li>
+            <li><strong>Wire Cutting Capacity (Optional):</strong> Maximum wire cut threshold (e.g. <code>Hard Wire ≤ 0.56 mm</code>).</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="doc-footer">
+      <span>Welco Medical Solutions • System Upgrade Documentation</span>
+      <span>Page 3 of 4 • Account Security & Admin Control</span>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 4 ==================== -->
+  <div class="page-container">
+    <div class="page-content">
+      
+      <!-- Feature 9: Category Cascade Delete -->
+      <div class="section-header">
+        <div class="section-badge badge-amber">5</div>
+        <h2 class="section-title">Catalog Integrity: Category Cascade Deletion</h2>
+      </div>
+
+      <div class="feature-card">
+        <div class="card-top">
+          <div class="card-title-group">
+            <span class="card-number">F-09</span>
+            <h3 class="card-title">Category Cleanup: Automatic Cascading Product Deletion</h3>
+          </div>
+          <span class="status-pill">Completed</span>
+        </div>
+        <p class="card-desc">
+          Maintains database cleanliness and storefront stability by automatically removing all child products whenever an obsolete category is removed.
+        </p>
+        <div class="comparison-grid">
+          <div class="comp-col before">
+            <div class="comp-header">✕ Previous Risk</div>
+            <div class="comp-body">
+              Deleting a category left orphaned products in the database with missing category links, causing broken storefront filters or 404 search errors.
+            </div>
+          </div>
+          <div class="comp-col after">
+            <div class="comp-header">✓ Implemented Solution</div>
+            <div class="comp-body">
+              Implemented automatic cascading removal: deleting a category automatically marks every product assigned to it as deleted in the database.
+            </div>
+          </div>
+        </div>
+        <div class="impl-box amber">
+          <div class="impl-title">How It Works in Practice</div>
+          When an administrator confirms category removal, the database executes an atomic cascade update. All linked products are removed simultaneously, guaranteeing that zero orphaned records remain visible to customers.
+        </div>
+      </div>
+
+      <!-- EXECUTIVE SUMMARY MATRIX TABLE -->
+      <div class="section-header" style="margin-top: 10px;">
+        <div class="section-badge badge-blue">✓</div>
+        <h2 class="section-title">Executive Implementation Summary Matrix</h2>
+      </div>
+
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th style="width: 25%;">Feature Name</th>
+            <th style="width: 14%;">Domain</th>
+            <th style="width: 48%;">Core Business Value</th>
+            <th style="width: 13%;">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Consignment Reference</strong></td>
+            <td><span class="badge-mini customer">Customer</span></td>
+            <td>Clear, standardized shipment reference shared across invoices & couriers</td>
+            <td><strong style="color: #059669;">✓ Live</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Public Order Tracking</strong></td>
+            <td><span class="badge-mini customer">Customer</span></td>
+            <td>Frictionless tracking without login; auto-cleans # symbols & spaces</td>
+            <td><strong style="color: #059669;">✓ Live</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Multi-Currency Quoting</strong></td>
+            <td><span class="badge-mini marketplace">Marketplace</span></td>
+            <td>Real-time currency rates with locked quote selection (USD, EUR, AED, SAR, etc.)</td>
+            <td><strong style="color: #059669;">✓ Live</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Bulleted Specifications</strong></td>
+            <td><span class="badge-mini marketplace">Marketplace</span></td>
+            <td>Prominent spec checklist directly beneath instrument title for rapid scanning</td>
+            <td><strong style="color: #059669;">✓ Live</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Inspection Modal Zoom</strong></td>
+            <td><span class="badge-mini marketplace">Marketplace</span></td>
+            <td>Interactive 300% zoom, wheel scroll, and pan navigation for clinical examination</td>
+            <td><strong style="color: #059669;">✓ Live</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Account Data Isolation</strong></td>
+            <td><span class="badge-mini account">Security</span></td>
+            <td>100% privacy: clients only see their own quotes, orders, and inquiries</td>
+            <td><strong style="color: #059669;">✓ Live</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Most Selling Admin Toggle</strong></td>
+            <td><span class="badge-mini admin">Admin</span></td>
+            <td>Direct admin curation over featured high-selling instruments on homepage</td>
+            <td><strong style="color: #059669;">✓ Live</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Product Capacities Form</strong></td>
+            <td><span class="badge-mini admin">Admin</span></td>
+            <td>Dedicated optional fields for wire & cutting capacities with clean UI fallback</td>
+            <td><strong style="color: #059669;">✓ Live</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Category Cascade Delete</strong></td>
+            <td><span class="badge-mini admin">Admin</span></td>
+            <td>Prevents orphaned products by auto-deleting child items with parent category</td>
+            <td><strong style="color: #059669;">✓ Live</strong></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Highlights Banner -->
+      <div class="highlights-box">
+        <div class="hl-item">
+          <div class="hl-title">🛡️ Data Privacy & Multi-Tenancy</div>
+          <div class="hl-desc">Database-level client isolation protects hospital bids, pricing, and purchase records.</div>
+        </div>
+        <div class="hl-item">
+          <div class="hl-title">🌍 Global Trade Ready</div>
+          <div class="hl-desc">Seamless currency switching accommodates procurement teams across the GCC and Europe.</div>
+        </div>
+        <div class="hl-item">
+          <div class="hl-title">⚡ Zero Catalog Errors</div>
+          <div class="hl-desc">Cascading category deletions eliminate broken links and orphaned database records.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="doc-footer">
+      <span>Welco Medical Solutions • Executive Engineering Report</span>
+      <span>Page 4 of 4 • Fully Approved & Deployed to Production</span>
+    </div>
+  </div>
+
+</body>
+</html>

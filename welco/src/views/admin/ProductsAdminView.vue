@@ -304,6 +304,9 @@ const emptyForm = () => ({
   sku: '',
   slug: '',
   description: '',
+  specificationText: '',
+  wireCapacity: '',
+  wireCuttingCapacity: '',
   price: '' as unknown as number | undefined,
   stock: '' as unknown as number | undefined,
   imageName: '',
@@ -315,6 +318,7 @@ const emptyForm = () => ({
   categoryId: categories.value[0]?.id || '',
   companyId: '',
   isActive: true,
+  isMostSelling: false,
 })
 const form = ref(emptyForm())
 
@@ -589,12 +593,38 @@ const openEdit = (p: AdminProductItem | ProductDto) => {
     }]
   }
 
+  let specText = ''
+  let wireCap = p.wireCapacity || ''
+  let wireCutCap = p.wireCuttingCapacity || ''
+  if (p.specifications) {
+    const raw = p.specifications.trim()
+    if (raw.startsWith('{') && raw.endsWith('}')) {
+      try {
+        const parsed = JSON.parse(raw)
+        if (parsed.wireCapacity) wireCap = String(parsed.wireCapacity).trim()
+        if (parsed.wireCuttingCapacity) wireCutCap = String(parsed.wireCuttingCapacity).trim()
+        if (Array.isArray(parsed.bullets)) {
+          specText = parsed.bullets.join('\n')
+        } else if (typeof parsed.specification === 'string') {
+          specText = parsed.specification
+        }
+      } catch {
+        specText = raw
+      }
+    } else {
+      specText = raw
+    }
+  }
+
   form.value = {
     nameEn: p.nameEn ?? '',
     nameAr: p.nameAr ?? '',
     sku: p.sku ?? '',
     slug: p.slug || slugify(p.nameEn || '') || (p.sku ? slugify(p.sku) : ''),
     description: p.descriptionEn || p.description || '',
+    specificationText: specText,
+    wireCapacity: wireCap,
+    wireCuttingCapacity: wireCutCap,
     price: (p.price !== undefined && p.price !== null) ? p.price : ('' as unknown as number),
     stock: (p.stock !== undefined && p.stock !== null) ? p.stock : ('' as unknown as number),
     imageName: p.imageName ?? '',
@@ -606,6 +636,7 @@ const openEdit = (p: AdminProductItem | ProductDto) => {
     categoryId: p.categoryId ?? '',
     companyId: p.companyId ?? '',
     isActive: p.isActive ?? true,
+    isMostSelling: Boolean(p.isMostSelling),
   }
   formError.value = ''
   slugTouched.value = true
@@ -631,6 +662,19 @@ const openEdit = (p: AdminProductItem | ProductDto) => {
         }
         if (full.isActive !== undefined) {
           form.value.isActive = full.isActive
+        }
+        if (full.isMostSelling !== undefined) {
+          form.value.isMostSelling = Boolean(full.isMostSelling)
+        }
+        if (full.specifications) {
+          try {
+            const parsed = JSON.parse(full.specifications)
+            if (parsed.wireCapacity && !form.value.wireCapacity) form.value.wireCapacity = String(parsed.wireCapacity).trim()
+            if (parsed.wireCuttingCapacity && !form.value.wireCuttingCapacity) form.value.wireCuttingCapacity = String(parsed.wireCuttingCapacity).trim()
+            if (Array.isArray(parsed.bullets) && !form.value.specificationText) {
+              form.value.specificationText = parsed.bullets.join('\n')
+            }
+          } catch {}
         }
       }
     }).catch(() => {})
@@ -699,6 +743,27 @@ const submit = async () => {
   formLoading.value = true
   formError.value = ''
   try {
+    const bulletLines = (f.specificationText || '')
+      .split(/[\r\n]+/)
+      .map((l) => l.replace(/^[-*•\d.]+\s*/, '').trim())
+      .filter(Boolean)
+
+    const specsObject: Record<string, unknown> = {}
+    if (bulletLines.length > 0) {
+      specsObject.bullets = bulletLines
+      specsObject.specification = bulletLines.join('\n')
+    }
+    if (f.wireCapacity && f.wireCapacity.trim()) {
+      specsObject.wireCapacity = f.wireCapacity.trim()
+    }
+    if (f.wireCuttingCapacity && f.wireCuttingCapacity.trim()) {
+      specsObject.wireCuttingCapacity = f.wireCuttingCapacity.trim()
+    }
+
+    const finalSpecsString = Object.keys(specsObject).length > 0
+      ? JSON.stringify(specsObject)
+      : undefined
+
     let savedProduct: ProductDto
     if (editing.value) {
       const payload: UpdateProductPayload = {
@@ -707,6 +772,7 @@ const submit = async () => {
         sku: f.sku.trim(),
         slug: f.slug.trim().toLowerCase(),
         description: f.description.trim() || undefined,
+        specifications: finalSpecsString,
         price: numPrice,
         stock: numStock,
         imageName: primaryImage,
@@ -716,6 +782,7 @@ const submit = async () => {
         currencyId: f.currencyId || null,
         categoryId: f.categoryId,
         isActive: f.isActive,
+        isMostSelling: Boolean(f.isMostSelling),
       }
       savedProduct = await services.marketplaceRepository.updateProduct(editing.value.id, payload)
       toastService.success(t('admin.productUpdated'))
@@ -726,6 +793,7 @@ const submit = async () => {
         sku: f.sku.trim(),
         slug: f.slug.trim().toLowerCase(),
         description: f.description.trim() || undefined,
+        specifications: finalSpecsString,
         price: numPrice,
         stock: numStock,
         imageName: primaryImage,
@@ -735,6 +803,7 @@ const submit = async () => {
         currencyId: f.currencyId || null,
         categoryId: f.categoryId,
         isActive: f.isActive ?? true,
+        isMostSelling: Boolean(f.isMostSelling),
       }
       savedProduct = await services.marketplaceRepository.createProduct(payload)
       toastService.success(t('admin.productCreated'))
@@ -801,6 +870,33 @@ const toggleActive = async (p: AdminProductItem) => {
     const target = rawProducts.value.find((x) => x.id === p.id)
     if (target) target.isActive = next
     toastService.success(next ? t('admin.productActivated') : t('admin.productDeactivated'))
+  } catch (e) {
+    toastService.error(e instanceof Error ? e.message : t('common.error'))
+  }
+}
+
+const toggleMostSelling = async (p: AdminProductItem) => {
+  try {
+    const next = !Boolean(p.isMostSelling)
+    await services.marketplaceRepository.updateProduct(p.id, {
+      nameEn: p.nameEn,
+      nameAr: p.nameAr,
+      sku: p.sku,
+      slug: p.slug || `sku-${p.sku}`,
+      price: p.price,
+      stock: p.stock,
+      categoryId: p.categoryId,
+      isActive: p.isActive ?? true,
+      isMostSelling: next,
+    })
+    p.isMostSelling = next
+    const target = rawProducts.value.find((x) => x.id === p.id)
+    if (target) target.isMostSelling = next
+    toastService.success(
+      next
+        ? (locale.value === 'ar' ? 'تم تعيين المنتج كأكثر مبيعاً' : 'Product set as Most Selling')
+        : (locale.value === 'ar' ? 'تمت إزالة صفة الأكثر مبيعاً' : 'Most Selling flag removed'),
+    )
   } catch (e) {
     toastService.error(e instanceof Error ? e.message : t('common.error'))
   }
@@ -1024,7 +1120,17 @@ onMounted(async () => {
                   </td>
                   <td>
                     <div class="prod-name-col">
-                      <strong class="prod-name-en" dir="auto">{{ p.nameEn }}</strong>
+                      <div class="flex items-center gap-1.5 flex-wrap">
+                        <strong class="prod-name-en" dir="auto">{{ p.nameEn }}</strong>
+                        <span
+                          v-if="p.isMostSelling"
+                          class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30"
+                          :title="locale === 'ar' ? 'المنتج مضاف إلى الأكثر مبيعاً' : 'Featured in Most Selling'"
+                        >
+                          <span class="material-symbols-outlined text-[12px]">local_fire_department</span>
+                          <span>{{ locale === 'ar' ? 'الأكثر مبيعاً' : 'Most Selling' }}</span>
+                        </span>
+                      </div>
                       <span class="prod-name-ar text-muted text-xs" dir="auto">{{ p.nameAr }}</span>
                     </div>
                   </td>
@@ -1060,6 +1166,17 @@ onMounted(async () => {
                   </td>
                   <td class="text-end" style="white-space: nowrap;">
                     <div class="row-actions">
+                      <button
+                        type="button"
+                        class="row-action-btn"
+                        :class="p.isMostSelling ? 'text-amber-600 bg-amber-500/10 hover:bg-amber-500/20' : 'text-slate-400 hover:text-amber-600'"
+                        :title="p.isMostSelling ? (locale === 'ar' ? 'إزالة من الأكثر مبيعاً' : 'Remove from Most Selling') : (locale === 'ar' ? 'تعيين كأكثر مبيعاً' : 'Set as Most Selling')"
+                        @click="toggleMostSelling(p)"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">
+                          {{ p.isMostSelling ? 'local_fire_department' : 'whatshot' }}
+                        </span>
+                      </button>
                       <button
                         type="button"
                         class="row-action-btn"
@@ -1212,8 +1329,66 @@ onMounted(async () => {
           </div>
 
           <div class="form-group">
-            <label class="form-label mono">{{ t('admin.specifications') }}</label>
-            <textarea v-model="form.description" rows="2" class="form-textarea"></textarea>
+            <label class="form-label mono">
+              {{ locale === 'ar' ? 'الوصف العام للمنتج' : 'Product Description' }}
+              <span class="text-xs text-slate-400 font-normal ms-1">({{ t('common.optional') }})</span>
+            </label>
+            <textarea
+              v-model="form.description"
+              rows="2"
+              class="form-textarea"
+              :placeholder="locale === 'ar' ? 'نبذة تعريفية مختصرة عن الأداة واستخداماتها...' : 'Brief overview of the instrument and its surgical application...'"
+            ></textarea>
+          </div>
+
+          <!-- Product Technical Specifications & Capacities -->
+          <div class="product-specs-card">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="material-symbols-outlined text-indigo-600 text-[18px]">format_list_bulleted</span>
+              <label class="form-label mono mb-0 font-bold text-slate-800 dark:text-slate-100">
+                {{ locale === 'ar' ? 'المواصفات الفنية (نقاط / قائمة)' : 'Technical Specifications (Bullet Points)' }}
+                <span class="text-xs text-slate-400 font-normal ms-1">({{ t('common.optional') }})</span>
+              </label>
+            </div>
+            <p class="text-xs text-slate-500 mb-2">
+              {{ locale === 'ar' ? 'اكتب كل مواصفة في سطر منفصل؛ ستظهر كنقاط مرتبة أسفل اسم المنتج مباشرة.' : 'Enter each specification on a new line; they will be displayed as bullet points under the product title.' }}
+            </p>
+            <textarea
+              v-model="form.specificationText"
+              rows="3"
+              class="form-textarea mono text-xs"
+              :placeholder="locale === 'ar' ? '• فولاذ ألماني مقاوم للصدأ عالي الجودة\n• تشطيب غير عاكس للضوء\n• قابل للتعقيم بالبخار حتى 134 درجة مئوية' : '• High-grade surgical stainless steel\n• Non-reflective satin finish\n• Autoclavable up to 134°C'"
+            ></textarea>
+
+            <!-- Specific capacity fields (optional) -->
+            <div class="form-grid-2 mt-3">
+              <div class="form-group mb-0">
+                <label class="form-label mono text-xs">
+                  <span class="material-symbols-outlined text-[14px] text-indigo-600 align-middle me-1">electric_bolt</span>
+                  {{ locale === 'ar' ? 'سعة السلك (Wire Capacity)' : 'Wire Capacity' }}
+                  <span class="text-xs text-slate-400 font-normal ms-1">({{ t('common.optional') }})</span>
+                </label>
+                <input
+                  v-model="form.wireCapacity"
+                  type="text"
+                  class="form-input text-xs"
+                  :placeholder="locale === 'ar' ? 'مثال: Up to 1.5mm' : 'e.g. Up to 1.5mm'"
+                />
+              </div>
+              <div class="form-group mb-0">
+                <label class="form-label mono text-xs">
+                  <span class="material-symbols-outlined text-[14px] text-amber-600 align-middle me-1">content_cut</span>
+                  {{ locale === 'ar' ? 'سعة قطع السلك (Wire Cutting Capacity)' : 'Wire Cutting Capacity' }}
+                  <span class="text-xs text-slate-400 font-normal ms-1">({{ t('common.optional') }})</span>
+                </label>
+                <input
+                  v-model="form.wireCuttingCapacity"
+                  type="text"
+                  class="form-input text-xs"
+                  :placeholder="locale === 'ar' ? 'مثال: Up to 2.2mm soft wire' : 'e.g. Up to 2.2mm soft wire'"
+                />
+              </div>
+            </div>
           </div>
 
           <!-- Product Images Section -->
@@ -1599,11 +1774,25 @@ onMounted(async () => {
             </div>
           </div>
 
-          <div class="form-group">
-            <label class="form-checkbox-label">
-              <input v-model="form.isActive" type="checkbox" class="form-checkbox" />
-              <span class="mono">{{ t('admin.productActive') }}</span>
-            </label>
+          <div class="form-grid-2 pt-3 border-t border-slate-200 dark:border-slate-800">
+            <div class="form-group mb-0">
+              <label class="form-checkbox-label">
+                <input v-model="form.isActive" type="checkbox" class="form-checkbox" />
+                <span class="mono">{{ t('admin.productActive') }}</span>
+              </label>
+            </div>
+            <div class="form-group mb-0">
+              <label class="form-checkbox-label">
+                <input v-model="form.isMostSelling" type="checkbox" class="form-checkbox" />
+                <span class="mono font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[16px]">local_fire_department</span>
+                  {{ locale === 'ar' ? 'منتج أكثر مبيعاً (Most Selling)' : 'Most Selling Product' }}
+                </span>
+              </label>
+              <p class="text-[11px] text-slate-500 ms-6 mt-0.5">
+                {{ locale === 'ar' ? 'يظهر المنتج بشكل مميز في قسم الأكثر مبيعاً بالصفحة الرئيسية' : 'Displays this product in the Most Selling showcase on the homepage' }}
+              </p>
+            </div>
           </div>
 
           <div class="modal-actions">
@@ -2236,6 +2425,16 @@ onMounted(async () => {
   .form-grid-3 {
     grid-template-columns: 1fr;
   }
+}
+
+/* ── Product Specifications Card ── */
+.product-specs-card {
+  background: var(--wl-surface-subtle, #f8fafc);
+  border: 1px solid var(--wl-border, #e2e8f0);
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 /* ── Modern Clinical Media Cards ── */

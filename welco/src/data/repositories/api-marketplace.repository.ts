@@ -70,6 +70,24 @@ const normalizeProduct = (p: ProductDto): ProductDto => {
   if (typeof p.isActive !== 'boolean') p.isActive = true
   if (typeof p.rating !== 'number') p.rating = 0
   if (typeof p.reviewCount !== 'number') p.reviewCount = 0
+  p.isMostSelling = Boolean(raw.isMostSelling ?? raw.IsMostSelling ?? p.isMostSelling)
+  const rawSpecs = (raw.specifications ?? raw.Specifications ?? p.specifications) as string | undefined
+  if (rawSpecs) {
+    p.specifications = rawSpecs
+    if (rawSpecs.startsWith('{') && rawSpecs.endsWith('}')) {
+      try {
+        const parsed = JSON.parse(rawSpecs)
+        if (parsed.wireCapacity && !p.wireCapacity) p.wireCapacity = String(parsed.wireCapacity).trim()
+        if (parsed.wireCuttingCapacity && !p.wireCuttingCapacity) p.wireCuttingCapacity = String(parsed.wireCuttingCapacity).trim()
+      } catch {}
+    }
+  }
+  if (!p.wireCapacity && (raw.wireCapacity || raw.WireCapacity)) {
+    p.wireCapacity = String(raw.wireCapacity ?? raw.WireCapacity)
+  }
+  if (!p.wireCuttingCapacity && (raw.wireCuttingCapacity || raw.WireCuttingCapacity)) {
+    p.wireCuttingCapacity = String(raw.wireCuttingCapacity ?? raw.WireCuttingCapacity)
+  }
 
   // Handle names
   const rawName = (raw.name ?? raw.Name) as string | undefined

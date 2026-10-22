@@ -179,6 +179,9 @@ const emptyForm = () => ({
   sku: '',
   slug: '',
   description: '',
+  specificationText: '',
+  wireCapacity: '',
+  wireCuttingCapacity: '',
   price: '' as unknown as number,
   stock: 0,
   imageName: '',
@@ -378,12 +381,38 @@ const openEdit = async (p: ProductDto) => {
     vids = [{ url: p.videoUrl, title: 'Product Video', sortOrder: 0 }]
   }
 
+  let specText = ''
+  let wireCap = p.wireCapacity || ''
+  let wireCutCap = p.wireCuttingCapacity || ''
+  if (p.specifications) {
+    const raw = p.specifications.trim()
+    if (raw.startsWith('{') && raw.endsWith('}')) {
+      try {
+        const parsed = JSON.parse(raw)
+        if (parsed.wireCapacity) wireCap = String(parsed.wireCapacity).trim()
+        if (parsed.wireCuttingCapacity) wireCutCap = String(parsed.wireCuttingCapacity).trim()
+        if (Array.isArray(parsed.bullets)) {
+          specText = parsed.bullets.join('\n')
+        } else if (typeof parsed.specification === 'string') {
+          specText = parsed.specification
+        }
+      } catch {
+        specText = raw
+      }
+    } else {
+      specText = raw
+    }
+  }
+
   form.value = {
     nameEn: p.nameEn ?? '',
     nameAr: p.nameAr ?? '',
     sku: p.sku ?? '',
     slug: p.slug || slugify(p.nameEn || '') || (p.sku ? slugify(p.sku) : ''),
     description: p.descriptionEn || p.description || '',
+    specificationText: specText,
+    wireCapacity: wireCap,
+    wireCuttingCapacity: wireCutCap,
     price: (p.price !== undefined && p.price !== null) ? p.price : ('' as unknown as number),
     stock: (p.stock !== undefined && p.stock !== null) ? p.stock : ('' as unknown as number),
     imageName: imgs[0] || p.imageName || '',
@@ -414,6 +443,16 @@ const openEdit = async (p: ProductDto) => {
         }
         if (full.isActive !== undefined) {
           form.value.isActive = full.isActive
+        }
+        if (full.specifications) {
+          try {
+            const parsed = JSON.parse(full.specifications)
+            if (parsed.wireCapacity && !form.value.wireCapacity) form.value.wireCapacity = String(parsed.wireCapacity).trim()
+            if (parsed.wireCuttingCapacity && !form.value.wireCuttingCapacity) form.value.wireCuttingCapacity = String(parsed.wireCuttingCapacity).trim()
+            if (Array.isArray(parsed.bullets) && !form.value.specificationText) {
+              form.value.specificationText = parsed.bullets.join('\n')
+            }
+          } catch {}
         }
       }
       if (Array.isArray(serverVids) && serverVids.length > 0) {
@@ -475,6 +514,27 @@ const submit = async () => {
   formLoading.value = true
   formError.value = ''
   try {
+    const bulletLines = (f.specificationText || '')
+      .split(/[\r\n]+/)
+      .map((l) => l.replace(/^[-*•\d.]+\s*/, '').trim())
+      .filter(Boolean)
+
+    const specsObject: Record<string, unknown> = {}
+    if (bulletLines.length > 0) {
+      specsObject.bullets = bulletLines
+      specsObject.specification = bulletLines.join('\n')
+    }
+    if (f.wireCapacity && f.wireCapacity.trim()) {
+      specsObject.wireCapacity = f.wireCapacity.trim()
+    }
+    if (f.wireCuttingCapacity && f.wireCuttingCapacity.trim()) {
+      specsObject.wireCuttingCapacity = f.wireCuttingCapacity.trim()
+    }
+
+    const finalSpecsString = Object.keys(specsObject).length > 0
+      ? JSON.stringify(specsObject)
+      : undefined
+
     let savedProduct: ProductDto
     if (editing.value) {
       const payload: UpdateProductPayload = {
@@ -483,6 +543,7 @@ const submit = async () => {
         sku: f.sku.trim(),
         slug: f.slug.trim().toLowerCase(),
         description: f.description.trim() || undefined,
+        specifications: finalSpecsString,
         price: numPrice,
         stock: numStock,
         imageName: validImages[0] || null,
@@ -502,6 +563,7 @@ const submit = async () => {
         sku: f.sku.trim(),
         slug: f.slug.trim().toLowerCase(),
         description: f.description.trim() || undefined,
+        specifications: finalSpecsString,
         price: numPrice,
         stock: numStock,
         imageName: validImages[0] || null,
@@ -1061,7 +1123,57 @@ onMounted(() => { void loadAll() })
 
         <div class="form-field">
           <label class="field-label" for="pp-desc">{{ t('admin.description') }}</label>
-          <textarea id="pp-desc" v-model="form.description" class="field-textarea" rows="3" placeholder="Provide product overview, intended use, etc."></textarea>
+          <textarea id="pp-desc" v-model="form.description" class="field-textarea" rows="2" placeholder="Provide product overview, intended use, etc."></textarea>
+        </div>
+
+        <!-- Product Technical Specifications & Capacities -->
+        <div class="product-specs-card">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="material-symbols-outlined text-indigo-600 text-[18px]">format_list_bulleted</span>
+            <label class="field-label mb-0 font-bold text-slate-800 dark:text-slate-100">
+              {{ locale === 'ar' ? 'المواصفات الفنية (نقاط / قائمة)' : 'Technical Specifications (Bullet Points)' }}
+              <span class="text-xs text-slate-400 font-normal ms-1">({{ t('common.optional') }})</span>
+            </label>
+          </div>
+          <p class="text-xs text-slate-500 mb-2">
+            {{ locale === 'ar' ? 'اكتب كل مواصفة في سطر منفصل؛ ستظهر كنقاط مرتبة أسفل اسم المنتج مباشرة.' : 'Enter each specification on a new line; they will be displayed as bullet points under the product title.' }}
+          </p>
+          <textarea
+            v-model="form.specificationText"
+            rows="3"
+            class="field-textarea mono-num text-xs"
+            :placeholder="locale === 'ar' ? '• فولاذ ألماني مقاوم للصدأ عالي الجودة\n• تشطيب غير عاكس للضوء\n• قابل للتعقيم بالبخار حتى 134 درجة مئوية' : '• High-grade surgical stainless steel\n• Non-reflective satin finish\n• Autoclavable up to 134°C'"
+          ></textarea>
+
+          <!-- Specific capacity fields (optional) -->
+          <div class="form-row two-cols mt-3">
+            <div class="form-field mb-0">
+              <label class="field-label text-xs">
+                <span class="material-symbols-outlined text-[14px] text-indigo-600 align-middle me-1">electric_bolt</span>
+                {{ locale === 'ar' ? 'سعة السلك (Wire Capacity)' : 'Wire Capacity' }}
+                <span class="text-xs text-slate-400 font-normal ms-1">({{ t('common.optional') }})</span>
+              </label>
+              <input
+                v-model="form.wireCapacity"
+                type="text"
+                class="field-input text-xs"
+                :placeholder="locale === 'ar' ? 'مثال: Up to 1.5mm' : 'e.g. Up to 1.5mm'"
+              />
+            </div>
+            <div class="form-field mb-0">
+              <label class="field-label text-xs">
+                <span class="material-symbols-outlined text-[14px] text-amber-600 align-middle me-1">content_cut</span>
+                {{ locale === 'ar' ? 'سعة قطع السلك (Wire Cutting Capacity)' : 'Wire Cutting Capacity' }}
+                <span class="text-xs text-slate-400 font-normal ms-1">({{ t('common.optional') }})</span>
+              </label>
+              <input
+                v-model="form.wireCuttingCapacity"
+                type="text"
+                class="field-input text-xs"
+                :placeholder="locale === 'ar' ? 'مثال: Up to 2.2mm soft wire' : 'e.g. Up to 2.2mm soft wire'"
+              />
+            </div>
+          </div>
         </div>
 
         <!-- Hidden File Inputs -->
@@ -2299,6 +2411,15 @@ onMounted(() => { void loadAll() })
   background: #fef2f2;
   color: #b91c1c;
   border: 1px solid #fecaca;
+}
+
+.product-specs-card {
+  background: var(--wl-surface-subtle, #f8fafc);
+  border: 1px solid var(--wl-border, #e2e8f0);
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .specs-quad-grid {

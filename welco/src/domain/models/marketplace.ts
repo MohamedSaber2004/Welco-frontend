@@ -51,6 +51,7 @@ export interface CreateProductPayload {
   currencyId?: string | null
   categoryId: string
   isActive?: boolean
+  isMostSelling?: boolean
 }
 
 export interface UpdateProductPayload {
@@ -71,6 +72,7 @@ export interface UpdateProductPayload {
   currencyId?: string | null
   categoryId: string
   isActive?: boolean
+  isMostSelling?: boolean
 }
 
 export interface CreateCategoryPayload {
@@ -128,9 +130,12 @@ export interface ProductDto {
   material?: string
   lengthCm?: number
   specifications?: string
+  wireCapacity?: string
+  wireCuttingCapacity?: string
   isActive: boolean
   isFeatured?: boolean
   isNew?: boolean
+  isMostSelling?: boolean
   rating: number
   reviewCount: number
   createdAt: string
